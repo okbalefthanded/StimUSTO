@@ -26,8 +26,7 @@ HEADERS  += configpanel.h \
     flashingspeller.h \
     matrixlayout.h \
     ovmarkersender.h \
-    randomflashsequence.h \
-    ovreceiver.h
+    randomflashsequence.h
 
 INCLUDEPATH += C:\openvibe-1.2.2-src\openvibe-1.2.2-src\toolkit\include\toolkit
 

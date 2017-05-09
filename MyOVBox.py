@@ -8,6 +8,7 @@
 
 import socket
 import time
+import random
 
 OVTK_StimulationId_ExperimentStart = 0x00008001
 OVTK_StimulationId_ExperimentStop = 0x00008002
@@ -16,7 +17,10 @@ OVTK_StimulationId_TrialStop = 0x00008006
 OVTK_StimulationId_Target = 0x00008205
 OVTK_StimulationId_NonTarget = 0x00008206
 OVTK_StimulationLabel_Base = 0x00008100
-
+Letters = [ 'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O',
+            'P','Q','R','S','T','V', 'W', 'X', 'Y', 'Z','0','1','2','3',
+            '4','5','6','7','8','9','0'
+            ]
 
 class MyOVBox(OVBox):
     def __init__(self):
@@ -47,10 +51,10 @@ class MyOVBox(OVBox):
                     if stim.identifier == OVTK_StimulationId_TrialStop:                        
                         # TODO : feedback
                         self.feedback_data = self.feedback_data + 1
-                        self.feedback_socket.sendto(str(self.feedback_data), (self.hostname, self.feedback_port) )    
-                        print 'sending feedback', str(self.feedback_data)              
+                        data = Letters[random.randint(0,35)]
+                        self.feedback_socket.sendto(data, (self.hostname, self.feedback_port) )                         
+                        print 'sending feedback', data
                         
-
                     elif stim.identifier == OVTK_StimulationId_ExperimentStop:
                         # TODO : stop
                         print 'ExperimentStop'

@@ -180,7 +180,7 @@ void FlashingSpeller::pauseFlashing()
         //        }
         //        else
         //        {
-
+        sendMarker(OVTK_StimulationId_TrialStop);
         state = FEEDBACK;
 
         if(spelling_mode == COPY_MODE || spelling_mode == FREE_MODE){
@@ -229,19 +229,24 @@ void FlashingSpeller::pre_trial()
 void FlashingSpeller::feedback()
 {
     qDebug() << Q_FUNC_INFO;
-    wait(2000);
-    receiveFeedback();
 
+    receiveFeedback();
+    textRow->setText(text_row);
     if (spelling_mode == COPY_MODE)
     {
-        qDebug()<< "COPY MODE";
+
+        if(text_row[currentLetter - 1] == desired_phrase[currentLetter - 1])
+        {
+            this->layout()->itemAt(currentTarget)->
+                    widget()->setStyleSheet("QLabel { color : green; font: 40pt }");
+        }
+        else
+        {
+            this->layout()->itemAt(currentTarget)->
+                    widget()->setStyleSheet("QLabel { color : blue; font: 40pt }");
+        }
 
     }
-    else
-    {
-        qDebug() << "FREE MODE";
-    }
-
     post_trial();
 }
 
@@ -249,13 +254,15 @@ void FlashingSpeller::post_trial()
 {
     qDebug()<< Q_FUNC_INFO;
 
-    sendMarker(OVTK_StimulationId_TrialStop);
+
     currentStimulation = 0;
     state = PRE_TRIAL;
     // wait
     wait(1000);
 
-    if (currentLetter >= desired_phrase.length()){
+    refreshTarget();
+
+    if (currentLetter >= desired_phrase.length() && (spelling_mode == COPY_MODE || spelling_mode == CALIBRATION)){
         qDebug()<< "Experiment End";
         sendMarker(OVTK_StimulationId_ExperimentStop);
         wait(2000);
@@ -264,20 +271,24 @@ void FlashingSpeller::post_trial()
     else{
         startTrial();
     }
+
 }
 
 void FlashingSpeller::receiveFeedback()
 {
-
+    // wait for OV python script to write in UDP feedback socket
+    wait(200);
     QHostAddress sender;
     quint16 senderPort;
     QByteArray *buffer = new QByteArray();
+
 
     buffer->resize(feedback_socket->pendingDatagramSize());
     qDebug() << "buffer size" << buffer->size();
 
     feedback_socket->readDatagram(buffer->data(), buffer->size(), &sender, &senderPort);
     feedback_socket->waitForBytesWritten();
+    text_row += buffer->data();
     qDebug()<< "Feedback Data" << buffer->data();
 }
 
