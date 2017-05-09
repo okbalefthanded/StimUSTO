@@ -22,7 +22,6 @@ ConfigPanel::~ConfigPanel()
 
 }
 
-
 //set a TCP socket connection to OpenVibe Acquisition Client
 /**
  * @brief ConfigPanel::on_connectOvAsBtn_clicked
@@ -63,8 +62,7 @@ void ConfigPanel::on_initSpeller_clicked()
     {
         FlashingSpeller *Fspeller = new FlashingSpeller();
 
-//        connect(ui->startSpeller, SIGNAL(clicked()), Fspeller, SLOT(startTrial()));
-        connect(ui->startSpeller, SIGNAL(clicked()), Fspeller, SLOT(tick()) );
+        connect(ui->startSpeller, SIGNAL(clicked()), Fspeller, SLOT(startTrial()));
         connect(Fspeller, SIGNAL(markerTag(uint64_t)), cTest, SLOT(sendStimulation(uint64_t)));
 
         Fspeller->setStimulation_duration(ui->stimulusDuration->text().toInt());
@@ -72,6 +70,7 @@ void ConfigPanel::on_initSpeller_clicked()
         Fspeller->setNr_sequence(ui->numberOfRepetition->text().toInt());
         Fspeller->setSpelling_mode(ui->spellingModeChoices->currentIndex());
         Fspeller->setDesired_phrase(ui->desiredPhrase->text());
+
         break;
     }
     case FACES_SPELLER:
@@ -83,12 +82,14 @@ void ConfigPanel::on_initSpeller_clicked()
         connect(ui->startSpeller, SIGNAL(clicked()), Fspeller, SLOT(startTrial()));
         connect(Fspeller, SIGNAL(markerTag(uint64_t)), cTest, SLOT(sendStimulation(uint64_t)));
         //
+
         Fspeller->setStimulation_duration(ui->stimulusDuration->text().toInt());
         Fspeller->setIsi(ui->interStimulusDuration->text().toInt());
         Fspeller->setNr_sequence(ui->numberOfRepetition->text().toInt());
         Fspeller->setSpelling_mode(ui->spellingModeChoices->currentIndex());
         Fspeller->setDesired_phrase(ui->desiredPhrase->text());
         Fspeller->setSpeller_type(ui->spellerType->currentIndex());
+        Fspeller->setFeedbackPort(ui->feedback_port->text().toInt());
 
         break;
     }

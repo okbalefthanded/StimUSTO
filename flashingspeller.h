@@ -1,15 +1,14 @@
 #ifndef FLASHINGSPELLER_H
 #define FLASHINGSPELLER_H
-
+//
 #include <QWidget>
 #include <QLabel>
 #include <QImage>
 #include <QElapsedTimer>
-
-#include <matrixlayout.h>
-
+#include <QUdpSocket>
+//
 #include "randomflashsequence.h"
-
+#include "matrixlayout.h"
 namespace Ui {
 class FlashingSpeller;
 }
@@ -29,6 +28,7 @@ public:
     void setSpelling_mode(int value);
     void setDesired_phrase(const QString &value);
     void setSpeller_type(int value);
+    void setFeedbackPort(quint16 value);
 
 
 signals:
@@ -42,11 +42,11 @@ private slots:
     void post_trial();
     void startFlashing();
     void pauseFlashing();
+    void receiveFeedback();
 
 
 public slots:
 
-    void tick();
     void wait(int millisecondsToWait);
     void create_layout();
     void refresh_layout();
@@ -59,6 +59,8 @@ public slots:
 private:
 
     bool isTarget();
+    void highlightTarget();
+    void refreshTarget();
 
 
     Ui::FlashingSpeller *ui;
@@ -68,13 +70,11 @@ private:
     int nr_elements;
     int matrix_width;
     int matrix_height;
-    int currentStimulation=0;
+    int currentStimulation = 0;
     int currentLetter = 0;
+    int currentTarget = 0;
 
-    //    bool pre_trial = false;
     bool stimulus = true;
-    //    bool feedback = false;
-    //    bool post_trial = false;
 
     bool state_finished = false;
     bool running = true;
@@ -88,6 +88,7 @@ private:
     int speller_type;
     int pre_trial_wait = 2; // 2 seconds
     int pre_trial_count = 0;
+    quint16 feedback_port = 12345;
 
     QString desired_phrase;
     QString text_row;
@@ -100,7 +101,9 @@ private:
     QTimer *isiTimer;
 
     QLabel *textRow;
+    QUdpSocket *feedback_socket;
     RandomFlashSequence *flashingSequence;
+
 
 };
 

@@ -19,7 +19,7 @@
      <rect>
       <x>20</x>
       <y>10</y>
-      <width>179</width>
+      <width>191</width>
       <height>141</height>
      </rect>
     </property>
@@ -351,7 +351,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>160</y>
+      <y>220</y>
       <width>191</width>
       <height>151</height>
      </rect>
@@ -416,14 +416,53 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>320</y>
+      <y>370</y>
       <width>601</width>
-      <height>191</height>
+      <height>141</height>
      </rect>
     </property>
     <property name="title">
      <string>Hybrid BCI</string>
     </property>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_5">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>150</y>
+      <width>191</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>OV Feedback Receiver</string>
+    </property>
+    <widget class="QLineEdit" name="feedback_port">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>113</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>12345</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="portLabel_2">
+     <property name="geometry">
+      <rect>
+       <x>130</x>
+       <y>20</y>
+       <width>47</width>
+       <height>13</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Port</string>
+     </property>
+    </widget>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">

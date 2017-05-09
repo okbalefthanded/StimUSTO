@@ -26,7 +26,8 @@ HEADERS  += configpanel.h \
     flashingspeller.h \
     matrixlayout.h \
     ovmarkersender.h \
-    randomflashsequence.h
+    randomflashsequence.h \
+    ovreceiver.h
 
 INCLUDEPATH += C:\openvibe-1.2.2-src\openvibe-1.2.2-src\toolkit\include\toolkit
 
@@ -35,3 +36,6 @@ FORMS    += configpanel.ui \
 
 RESOURCES += \
     asset.qrc
+
+DISTFILES += \
+    MyOVBox.py

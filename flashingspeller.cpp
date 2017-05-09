@@ -15,7 +15,7 @@
 #include "ovtk_stimulations.h"
 #include "randomflashsequence.h"
 
-QChar letters[6][6] = {
+static QChar letters[6][6] = {
     {'A','B','C','D','E','F'},
     {'G','H','I','J','K','L'},
     {'M','N','O','Q','P','R'},
@@ -73,54 +73,16 @@ FlashingSpeller::FlashingSpeller(QWidget *parent) :
     connect( isiTimer, SIGNAL(timeout()), this, SLOT(startFlashing()) );
     connect( preTrialTimer, SIGNAL(timeout()), this, SLOT(startTrial()) );
 
+    feedback_socket = new QUdpSocket(this);
+    feedback_socket->bind(QHostAddress::LocalHost, feedback_port);
+
     state = PRE_TRIAL;
 
 }
 
-//TODO : define tick loop
-void FlashingSpeller::tick()
-{
-
-    qDebug()<< "[TICK]";
-
-    while (running){
-        if (state == PRE_TRIAL){
-            //                pre_trial();
-        }
-        else if (state == STIMULUS){
-            startTrial();
-        }
-        else if (state == FEEDBACK){
-            qDebug()<<"doing feedba9";
-            //                feedback();
-        }
-        else if (state == POST_TRIAL){
-            qDebug()<<"doing post trial";
-            //                post_trial();
-        }
-    }
-}
-
-void FlashingSpeller::wait(int millisecondsToWait)
-{
-
-    qDebug()<< Q_FUNC_INFO;
-
-    // from stackoverflow question:
-    // http://stackoverflow.com/questions/3752742/how-do-i-create-a-pause-wait-function-using-qt
-    QTime dieTime = QTime::currentTime().addMSecs( millisecondsToWait );
-    while( QTime::currentTime() < dieTime )
-    {
-        QCoreApplication::processEvents( QEventLoop::AllEvents, 100 );
-    }
-}
-
-
-//TODO: start flashing
 void FlashingSpeller::startTrial()
 {
     qDebug()<< "[TRIAL START]" << Q_FUNC_INFO;
-
 
     if (state == PRE_TRIAL)
     {
@@ -158,7 +120,7 @@ void FlashingSpeller::startTrial()
 
 void FlashingSpeller::startFlashing()
 {
-    qDebug()<< Q_FUNC_INFO;
+    //    qDebug()<< Q_FUNC_INFO;
 
     sendMarker(OVTK_StimulationId_VisualStimulationStart);
     sendMarker(OVTK_StimulationLabel_Base + flashingSequence->sequence[currentStimulation]);
@@ -180,33 +142,34 @@ void FlashingSpeller::startFlashing()
     if(speller_type == FACES_SPELLER)
         this->layout()->itemAt(flashingSequence->sequence[currentStimulation])->
             widget()->setStyleSheet("image: url(:/images/bennabi_face.png)");
-    else
+
+    else if(speller_type == FLASHING_SPELLER)
         this->layout()->itemAt(flashingSequence->sequence[currentStimulation])->
             widget()->setStyleSheet("QLabel { color : white; font: 60pt }");
 
     stimTimer->start();
-    qDebug("Stim Timer started");
+    //    qDebug("Stim Timer started");
     isiTimer->stop();
     state = POST_STIMULUS;
 }
 
 void FlashingSpeller::pauseFlashing()
 {
-    qDebug()<< Q_FUNC_INFO;
+    //    qDebug()<< Q_FUNC_INFO;
     // sendMarker(OVTK_StimulationId_VisualStimulationStop);
     this->layout()->itemAt(flashingSequence->sequence[currentStimulation])->
             widget()->setStyleSheet("QLabel { color : gray; font: 40pt }");
 
     stimTimer->stop();
     isiTimer->start();
-    qDebug("Isi Timer started");
+    //    qDebug("Isi Timer started");
     currentStimulation++;
     state = STIMULUS;
 
     if (currentStimulation >= flashingSequence->sequence.count())
     {
         currentLetter++;
-        qDebug("STOPPED: isi Timer & Stim timer");
+        //        qDebug("STOPPED: isi Timer & Stim timer");
         isiTimer->stop();
         stimTimer->stop();
 
@@ -230,10 +193,96 @@ void FlashingSpeller::pauseFlashing()
     }
 }
 
+void FlashingSpeller::pre_trial()
+{
+    qDebug()<< Q_FUNC_INFO;
+
+    if (pre_trial_count == 0)
+    {
+        flashingSequence = new RandomFlashSequence(nr_elements, nr_sequence);
+        sendMarker(OVTK_StimulationId_TrialStart);
+
+        if (spelling_mode == CALIBRATION)
+        {
+            highlightTarget();
+            text_row += desired_phrase[currentLetter];
+            textRow->setText(text_row);
+        }
+        else if(spelling_mode == COPY_MODE)
+        {
+            highlightTarget();
+        }
+    }
+
+    preTrialTimer->start();
+    pre_trial_count++;
+    
+    if (pre_trial_count > pre_trial_wait)
+    {
+        refreshTarget();
+        preTrialTimer->stop();
+        pre_trial_count = 0;
+        state = STIMULUS;
+    }
+}
+
+void FlashingSpeller::feedback()
+{
+    qDebug() << Q_FUNC_INFO;
+    wait(2000);
+    receiveFeedback();
+
+    if (spelling_mode == COPY_MODE)
+    {
+        qDebug()<< "COPY MODE";
+
+    }
+    else
+    {
+        qDebug() << "FREE MODE";
+    }
+
+    post_trial();
+}
+
+void FlashingSpeller::post_trial()
+{
+    qDebug()<< Q_FUNC_INFO;
+
+    sendMarker(OVTK_StimulationId_TrialStop);
+    currentStimulation = 0;
+    state = PRE_TRIAL;
+    // wait
+    wait(1000);
+
+    if (currentLetter >= desired_phrase.length()){
+        qDebug()<< "Experiment End";
+        sendMarker(OVTK_StimulationId_ExperimentStop);
+        wait(2000);
+        this->close();
+    }
+    else{
+        startTrial();
+    }
+}
+
+void FlashingSpeller::receiveFeedback()
+{
+
+    QHostAddress sender;
+    quint16 senderPort;
+    QByteArray *buffer = new QByteArray();
+
+    buffer->resize(feedback_socket->pendingDatagramSize());
+    qDebug() << "buffer size" << buffer->size();
+
+    feedback_socket->readDatagram(buffer->data(), buffer->size(), &sender, &senderPort);
+    feedback_socket->waitForBytesWritten();
+    qDebug()<< "Feedback Data" << buffer->data();
+}
 
 bool FlashingSpeller::isTarget()
 {
-
     int row, column;
     int index = flashingSequence->sequence[currentStimulation] - 1;
     row = index / nr_elements;
@@ -251,64 +300,42 @@ bool FlashingSpeller::isTarget()
         return false;
 }
 
-void FlashingSpeller::pre_trial()
+void FlashingSpeller::highlightTarget()
 {
-    qDebug()<< Q_FUNC_INFO;
+    int idx = 0;
 
-
-    if (pre_trial_count == 0)
+    for (int i=0; i<6; i++)
     {
-        flashingSequence = new RandomFlashSequence(nr_elements, nr_sequence);
-        sendMarker(OVTK_StimulationId_TrialStart);
-
-        if (spelling_mode == CALIBRATION || spelling_mode == COPY_MODE)
+        for (int j=0; j<6; j++)
         {
-            text_row += desired_phrase[currentLetter];
-            textRow->setText(text_row);
+            idx++;
+            if (desired_phrase[currentLetter] == letters[i][j]){
+                currentTarget = idx;
+                break;
+            }
         }
     }
-
-    preTrialTimer->start();
-    pre_trial_count++;
-    
-    if (pre_trial_count > pre_trial_wait)
-    {
-        preTrialTimer->stop();
-        pre_trial_count = 0;
-        state = STIMULUS;
-    }
+    this->layout()->itemAt(currentTarget)->
+            widget()->setStyleSheet("QLabel { color : red; font: 60pt }");
 }
 
-void FlashingSpeller::feedback()
+void FlashingSpeller::refreshTarget()
 {
-    qDebug() << Q_FUNC_INFO;
-
-    if (spelling_mode == COPY_MODE){
-        qDebug()<< "COPY MODE";
-    }
-    else {
-        qDebug() << "FREE MODE";
-    }
-
-    post_trial();
+    this->layout()->itemAt(currentTarget)->
+            widget()->setStyleSheet("QLabel { color : gray; font: 40pt }");
 }
 
-void FlashingSpeller::post_trial()
+void FlashingSpeller::wait(int millisecondsToWait)
 {
+
     qDebug()<< Q_FUNC_INFO;
 
-    sendMarker(OVTK_StimulationId_TrialStop);
-    currentStimulation = 0;
-    state = PRE_TRIAL;
-    // wait
-    //    wait(2000);
-
-    if (currentLetter >= desired_phrase.length()){
-        qDebug()<< "Experiment End";
-        sendMarker(OVTK_StimulationId_ExperimentStop);
-    }
-    else{
-        startTrial();
+    // from stackoverflow question:
+    // http://stackoverflow.com/questions/3752742/how-do-i-create-a-pause-wait-function-using-qt
+    QTime dieTime = QTime::currentTime().addMSecs( millisecondsToWait );
+    while( QTime::currentTime() < dieTime )
+    {
+        QCoreApplication::processEvents( QEventLoop::AllEvents, 100 );
     }
 }
 
@@ -316,6 +343,11 @@ void FlashingSpeller::post_trial()
 void FlashingSpeller::setSpeller_type(int value)
 {
     speller_type = value;
+}
+
+void FlashingSpeller::setFeedbackPort(quint16 value)
+{
+    feedback_port = value;
 }
 
 void FlashingSpeller::setStimulation_duration(int value)
