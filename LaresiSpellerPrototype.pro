@@ -18,7 +18,8 @@ SOURCES += main.cpp\
     flashingspeller.cpp \
     matrixlayout.cpp \
     ovmarkersender.cpp \
-    randomflashsequence.cpp
+    randomflashsequence.cpp \
+    motionitem.cpp
 
 HEADERS  += configpanel.h \
     mvepspeller.h \
@@ -26,7 +27,8 @@ HEADERS  += configpanel.h \
     flashingspeller.h \
     matrixlayout.h \
     ovmarkersender.h \
-    randomflashsequence.h
+    randomflashsequence.h \
+    motionitem.h
 
 INCLUDEPATH += C:\openvibe-1.2.2-src\openvibe-1.2.2-src\toolkit\include\toolkit
 
