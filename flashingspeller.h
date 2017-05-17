@@ -9,6 +9,7 @@
 //
 #include "randomflashsequence.h"
 #include "matrixlayout.h"
+
 namespace Ui {
 class FlashingSpeller;
 }
@@ -29,7 +30,6 @@ public:
     void setDesired_phrase(const QString &value);
     void setSpeller_type(int value);
     void setFeedbackPort(quint16 value);
-
 
 signals:
     void markerTag(uint64_t ovStimulation);
@@ -92,7 +92,7 @@ private:
 
     QString desired_phrase;
     QString text_row;
-    QImage *face_flasher;
+    QImage *face_stimuli;
 
     MatrixLayout *Mlayout;
     // Timers
@@ -103,7 +103,6 @@ private:
     QLabel *textRow;
     QUdpSocket *feedback_socket;
     RandomFlashSequence *flashingSequence;
-
 
 };
 

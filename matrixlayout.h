@@ -11,14 +11,15 @@ class MatrixLayout : public QObject
 public:
     explicit MatrixLayout(QObject *parent = 0);
     MatrixLayout(QPair<int, int> size, int rows, int cols);
-
+    ~MatrixLayout();
+    QList<QPair<int, int>> positions;
 signals:
 
 public slots:
 
 private:
     QPair<int, int> size;
-    QList<QPair<int, int>> positions;
+
     int rows;
     int cols;
 };

@@ -34,3 +34,8 @@ MatrixLayout::MatrixLayout(QPair<int, int> size, int rows, int cols)
     }
 }
 
+MatrixLayout::~MatrixLayout()
+{
+    delete this;
+}
+

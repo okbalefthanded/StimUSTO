@@ -24,18 +24,18 @@ static QChar letters[6][6] = {
     {'4','5','6','7','8','9'},
 };
 
-const uint PRE_TRIAL = 0;
-const uint STIMULUS = 1;
-const uint POST_STIMULUS = 2;
-const uint FEEDBACK = 3;
-const uint POST_TRIAL = 4;
+const quint8 PRE_TRIAL = 0;
+const quint8 STIMULUS = 1;
+const quint8 POST_STIMULUS = 2;
+const quint8 FEEDBACK = 3;
+const quint8 POST_TRIAL = 4;
 
-const uint FLASHING_SPELLER = 0;
-const uint FACES_SPELLER = 1;
+const quint8 FLASHING_SPELLER = 0;
+const quint8 FACES_SPELLER = 1;
 
-const int CALIBRATION = 0;
-const int COPY_MODE  = 1;
-const int FREE_MODE = 2;
+const quint8 CALIBRATION = 0;
+const quint8 COPY_MODE  = 1;
+const quint8 FREE_MODE = 2;
 
 const uint64_t OVTK_StimulationLabel_Base = 0x00008100;
 /**
@@ -47,6 +47,7 @@ FlashingSpeller::FlashingSpeller(QWidget *parent) :
     ui(new Ui::FlashingSpeller)
 {
     ui->setupUi(this);
+
     this->show();
 
     this->windowHandle()->setScreen(qApp->screens().last());
@@ -146,6 +147,7 @@ void FlashingSpeller::startFlashing()
     else if(speller_type == FLASHING_SPELLER)
         this->layout()->itemAt(flashingSequence->sequence[currentStimulation])->
             widget()->setStyleSheet("QLabel { color : white; font: 60pt }");
+
 
     stimTimer->start();
     //    qDebug("Stim Timer started");
@@ -282,7 +284,6 @@ void FlashingSpeller::receiveFeedback()
     quint16 senderPort;
     QByteArray *buffer = new QByteArray();
 
-
     buffer->resize(feedback_socket->pendingDatagramSize());
     qDebug() << "buffer size" << buffer->size();
 
@@ -346,7 +347,9 @@ void FlashingSpeller::wait(int millisecondsToWait)
     QTime dieTime = QTime::currentTime().addMSecs( millisecondsToWait );
     while( QTime::currentTime() < dieTime )
     {
-        QCoreApplication::processEvents( QEventLoop::AllEvents, 100 );
+        //        qDebug()<<"waiting..."<<QTime::currentTime();
+        QCoreApplication::processEvents( QEventLoop::AllEvents, 100);
+
     }
 }
 

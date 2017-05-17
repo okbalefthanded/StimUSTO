@@ -329,7 +329,12 @@
      </item>
      <item>
       <property name="text">
-       <string>motion</string>
+       <string>Motion_Bar</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Motion_Face</string>
       </property>
      </item>
     </widget>

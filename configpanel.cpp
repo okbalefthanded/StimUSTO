@@ -5,9 +5,10 @@
 #include "ovmarkersender.h"
 #include <QMessageBox>
 
-const int FLASHING_SPELLER = 0;
-const int FACES_SPELLER = 1;
-const int MOTION_SPELLER = 2;
+const quint8 FLASHING_SPELLER = 0;
+const quint8 FACES_SPELLER = 1;
+const quint8 MOTION_BAR = 2;
+const quint8 MOTION_FACE = 3;
 
 ConfigPanel::ConfigPanel(QWidget *parent) :
     QMainWindow(parent),
@@ -21,7 +22,6 @@ ConfigPanel::~ConfigPanel()
     delete ui;
 
 }
-
 //set a TCP socket connection to OpenVibe Acquisition Client
 /**
  * @brief ConfigPanel::on_connectOvAsBtn_clicked
@@ -55,7 +55,6 @@ void ConfigPanel::on_initSpeller_clicked()
 {
     int spellerType = ui->spellerType->currentIndex();
 
-
     switch(spellerType)
     {
     case FLASHING_SPELLER:
@@ -70,7 +69,8 @@ void ConfigPanel::on_initSpeller_clicked()
         Fspeller->setNr_sequence(ui->numberOfRepetition->text().toInt());
         Fspeller->setSpelling_mode(ui->spellingModeChoices->currentIndex());
         Fspeller->setDesired_phrase(ui->desiredPhrase->text());
-
+        Fspeller->setSpeller_type(spellerType);
+        Fspeller->setFeedbackPort(ui->feedback_port->text().toInt());
         break;
     }
     case FACES_SPELLER:
@@ -82,26 +82,33 @@ void ConfigPanel::on_initSpeller_clicked()
         connect(ui->startSpeller, SIGNAL(clicked()), Fspeller, SLOT(startTrial()));
         connect(Fspeller, SIGNAL(markerTag(uint64_t)), cTest, SLOT(sendStimulation(uint64_t)));
         //
-
         Fspeller->setStimulation_duration(ui->stimulusDuration->text().toInt());
         Fspeller->setIsi(ui->interStimulusDuration->text().toInt());
         Fspeller->setNr_sequence(ui->numberOfRepetition->text().toInt());
         Fspeller->setSpelling_mode(ui->spellingModeChoices->currentIndex());
         Fspeller->setDesired_phrase(ui->desiredPhrase->text());
-        Fspeller->setSpeller_type(ui->spellerType->currentIndex());
+        Fspeller->setSpeller_type(spellerType);
         Fspeller->setFeedbackPort(ui->feedback_port->text().toInt());
-
         break;
     }
 
-
-    case MOTION_SPELLER:
+    case MOTION_BAR:
+    case MOTION_FACE:
     {
-        mVEPSpeller *Mspeller = new mVEPSpeller();
+        mVEPSpeller *Mspeller = new mVEPSpeller(spellerType);
+        connect(ui->startSpeller, SIGNAL(clicked()), Mspeller, SLOT(startTrial()));
+        connect(Mspeller, SIGNAL(markerTag(uint64_t)), cTest, SLOT(sendStimulation(uint64_t)));
+
+        Mspeller->setStimulation_duration(ui->stimulusDuration->text().toInt());
+        Mspeller->setIsi(ui->interStimulusDuration->text().toInt());
+        Mspeller->setNr_sequence(ui->numberOfRepetition->text().toInt());
+        Mspeller->setSpelling_mode(ui->spellingModeChoices->currentIndex());
+        Mspeller->setDesired_phrase(ui->desiredPhrase->text());
+        Mspeller->setSpeller_type(spellerType);
+        Mspeller->setFeedbackPort(ui->feedback_port->text().toInt());
         break;
     }
     }
-    //    speller = new mVEPSpeller();
 
 }
 
@@ -109,7 +116,7 @@ void ConfigPanel::on_initSpeller_clicked()
 //Start speller
 void ConfigPanel::on_startSpeller_clicked()
 {
- this->onStart = true;
+    this->onStart = true;
 }
 
 //TODO
