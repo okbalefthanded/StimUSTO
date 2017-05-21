@@ -52,6 +52,7 @@ mVEPSpeller::mVEPSpeller(quint8 spellerType, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::mVEPSpeller)
 {
+    qDebug()<< Q_FUNC_INFO;
 
     ui->setupUi(this);
     this->show();
@@ -59,6 +60,7 @@ mVEPSpeller::mVEPSpeller(quint8 spellerType, QWidget *parent) :
     this->showFullScreen();
 
     speller_type = spellerType;
+    animation = new QGraphicsItemAnimation;
 
     create_layout();
 
@@ -66,6 +68,8 @@ mVEPSpeller::mVEPSpeller(quint8 spellerType, QWidget *parent) :
     isiTimer = new QTimer(this);
     preTrialTimer = new QTimer(this);
     animTimer = new QTimeLine();
+
+    animation->setTimeLine(animTimer);
 
     stimTimer->setTimerType(Qt::PreciseTimer);
     stimTimer->setSingleShot(true);
@@ -80,14 +84,12 @@ mVEPSpeller::mVEPSpeller(quint8 spellerType, QWidget *parent) :
     connect( stimTimer, SIGNAL(timeout()), this, SLOT(pauseFlashing()) );
     connect( isiTimer, SIGNAL(timeout()), this, SLOT(startFlashing()) );
     connect( preTrialTimer, SIGNAL(timeout()), this, SLOT(startTrial()) );
+//    connect( animTimer, SIGNAL(finished()), this, SLOT(pauseFlashing()));
 
     feedback_socket = new QUdpSocket(this);
     feedback_socket->bind(QHostAddress::LocalHost, feedback_port);
 
-    animation = new QGraphicsItemAnimation;
-    animation->setTimeLine(animTimer);
     state = PRE_TRIAL;
-
 }
 
 void mVEPSpeller::startTrial()
@@ -177,7 +179,11 @@ void mVEPSpeller::startFlashing()
         image_stimuli->setPos(x, y);
         qDebug()<< "im pos before animation: "<< image_stimuli->pos();
         image_stimuli->show();
-        animation->setItem(image_stimuli);
+        for (int i = 0; i < 100; ++i)
+        {
+            animation->setPosAt(i / 100.0, QPointF(x - i, y));
+
+        }
 
         //        QTimeLine *timer = new QTimeLine(100);
         //        timer->setFrameRange(0, 10);
@@ -185,8 +191,8 @@ void mVEPSpeller::startFlashing()
         //        QGraphicsItemAnimation *animation = new QGraphicsItemAnimation;
         //        animation->setItem(im);
         //        animation->setTimeLine(timer);
-        animation->setTranslationAt(0, x-10, y);
-        qDebug()<<"moving im to:(" << x-10 << " , " << y <<")";
+
+//        qDebug()<<"moving im to:(" << x-10 << " , " << y <<")";
         qDebug()<<"anim duration: " <<animTimer->duration();
         //        animTimer->start();
 
@@ -226,24 +232,37 @@ void mVEPSpeller::startFlashing()
     else
         if(speller_type == MOTION_BAR)
         {
+            //            animation->setItem(bar_stimuli);
+//            qDebug()<< Q_FUNC_INFO << "animation Item" <<animation->item();
             qreal y = itemsList[flashingSequence->sequence[currentStimulation]]->y();
             qreal x = itemsList[flashingSequence->sequence[currentStimulation]]->x() +
                     itemsList[flashingSequence->sequence[currentStimulation]]->boundingRect().width() -
                     bar_stimuli->boundingRect().width();
-            bar_stimuli->setPos(x, y);
-            qDebug()<< "im pos before animation: "<< bar_stimuli->pos();
-            bar_stimuli->show();
-            animation->setItem(bar_stimuli);
-            animation->setTranslationAt(0, x-100, y);
-            qDebug()<<"moving im to:(" << x-100 << " , " << y <<")";
-            qDebug()<<"anim duration: " <<animTimer->duration();
-        }
+//            qreal dx = (x - itemsList[flashingSequence->sequence[currentStimulation]]->boundingRect().width() / 2) / ;
+            animation->reset();
 
-//    stimTimer->start();
+
+//            qDebug()<< "im pos before animation: "<< bar_stimuli->pos();
+            bar_stimuli->show();
+//            animation->setPosAt(0.2, QPointF(x-100, y));
+            for (int i = 0; i < 100; ++i)
+            {
+                animation->setPosAt(i / 100.0, QPointF(x - i, y));
+
+            }
+//            animation->setTranslationAt(0, x-50, 0);
+            //            animation->setRotationAt(0.1, 20);
+//            qDebug()<< Q_FUNC_INFO << "animation timeline"<<animation->timeLine();
+//            qDebug()<<"moving im to:(" << x-100 << " , " << y <<")";
+            qDebug()<<"anim duration: " << animTimer->duration();
+        }
+//    qDebug()<<"Pos List"<<animation->posList();
+    stimTimer->start();
+
     animTimer->start();
     isiTimer->stop();
     state = POST_STIMULUS;
-//    pauseFlashing();
+//        pauseFlashing();
 
 }
 
@@ -252,8 +271,14 @@ void mVEPSpeller::pauseFlashing()
     qDebug()<< Q_FUNC_INFO;
     // sendMarker(OVTK_StimulationId_VisualStimulationStop);
     animTimer->stop();
+    animation->reset();
+//    animation->setStep(0);
     stimTimer->stop();
     isiTimer->start();
+    if(speller_type == MOTION_BAR)
+            bar_stimuli->hide();
+        else
+            image_stimuli->hide();
     //    qDebug("Isi Timer started");
     currentStimulation++;
     state = STIMULUS;
@@ -358,6 +383,7 @@ void mVEPSpeller::receiveFeedback()
 void mVEPSpeller::create_layout()
 {
 
+    qDebug()<< Q_FUNC_INFO;
     // speller settings
     rows = 6;
     cols = 6;
@@ -386,8 +412,8 @@ void mVEPSpeller::create_layout()
     view->setScene(scene);
 
     Mlayout = new MatrixLayout(qMakePair(matrix_width, matrix_height), rows, cols);
-    qDebug()<< view->width() <<" "<< view->height();
-    qDebug()<< Mlayout->positions;
+    //    qDebug()<< view->width() <<" "<< view->height();
+    //    qDebug()<< Mlayout->positions;
 
     int k=0;
     for (int row=0; row<rows; row++)
@@ -411,8 +437,10 @@ void mVEPSpeller::create_layout()
         bar_stimuli = new QGraphicsRectItem(0, 0, 10, 50);
         bar_stimuli->setBrush(b);
         bar_stimuli->setPos(0, 0);
-        scene->addItem(bar_stimuli);
         bar_stimuli->hide();
+        scene->addItem(bar_stimuli);
+        animation->setItem(bar_stimuli);
+
         qDebug()<< Q_FUNC_INFO << "Setting the bar stimuli";
         break;
     }
@@ -423,9 +451,9 @@ void mVEPSpeller::create_layout()
         face_stimuli = face_stimuli.scaled(50, 50, Qt::KeepAspectRatio);
         image_stimuli = new QGraphicsPixmapItem(QPixmap::fromImage(face_stimuli));
         image_stimuli->setPos(0, 0);
+        image_stimuli->hide();
         scene->addItem(image_stimuli);
-        //                image_stimuli->hide();
-        //                animation->setItem(image_stimuli);
+        animation->setItem(image_stimuli);
         qDebug()<< Q_FUNC_INFO << "Setting the face stimuli";
         break;
     }
@@ -499,7 +527,9 @@ void mVEPSpeller::setStimulation_duration(int value)
 
 void mVEPSpeller::setDesired_phrase(const QString &value)
 {
+
     desired_phrase = value;
+
 }
 
 void mVEPSpeller::setSpelling_mode(int value)
