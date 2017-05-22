@@ -206,6 +206,7 @@ void FlashingSpeller::pre_trial()
 
         if (spelling_mode == CALIBRATION)
         {
+            qDebug()<< "highlightTarget";
             highlightTarget();
             text_row += desired_phrase[currentLetter];
             textRow->setText(text_row);
@@ -215,6 +216,7 @@ void FlashingSpeller::pre_trial()
             highlightTarget();
         }
     }
+    qDebug()<< "Pre trial timer start";
 
     preTrialTimer->start();
     pre_trial_count++;
@@ -226,6 +228,7 @@ void FlashingSpeller::pre_trial()
         pre_trial_count = 0;
         state = STIMULUS;
     }
+
 }
 
 void FlashingSpeller::feedback()
@@ -300,25 +303,39 @@ bool FlashingSpeller::isTarget()
     row = index / nr_elements;
     column = index % nr_elements;
 
-    if (desired_phrase[currentLetter]==letters[row][column])
+
+    if(desired_phrase[currentLetter]==presented_letters[index])
     {
-        // qDebug()<< "letter : " << letters[row][column];
-        // qDebug()<< "desired letter: " << desired_phrase[currentLetter];
-        // qDebug()<< "flashing: "<< flashingSequence->sequence[currentStimulation];
-        // qDebug()<< "row: " << row << " column: "<< column;
+        qDebug()<< "letter : " << letters[row][column];
+        qDebug()<< "desired letter: " << desired_phrase[currentLetter];
+        qDebug()<< "flashing: "<< flashingSequence->sequence[currentStimulation];
+        qDebug()<< "presented letter:" << presented_letters[index];
+        qDebug()<< "row: " << row << " column: "<< column;
         return true;
     }
     else
+    {
         return false;
+    }
+    //    if (desired_phrase[currentLetter]==letters[row][column])
+    //    {
+    //        // qDebug()<< "letter : " << letters[row][column];
+    //        // qDebug()<< "desired letter: " << desired_phrase[currentLetter];
+    //        // qDebug()<< "flashing: "<< flashingSequence->sequence[currentStimulation];
+    //        // qDebug()<< "row: " << row << " column: "<< column;
+    //        return true;
+    //    }
+    //    else
+    //        return false;
 }
 
 void FlashingSpeller::highlightTarget()
 {
     int idx = 0;
 
-    for (int i=0; i<6; i++)
+    for (int i=0; i<rows; i++)
     {
-        for (int j=0; j<6; j++)
+        for (int j=0; j<cols; j++)
         {
             idx++;
             if (desired_phrase[currentLetter] == letters[i][j]){
@@ -399,8 +416,8 @@ void FlashingSpeller::setIsi(int value)
 void FlashingSpeller::create_layout()
 {
     // speller settings
-    this->rows = 6;
-    this->cols = 6;
+    this->rows = 3;
+    this->cols = 3;
     this->nr_elements = rows * cols;
     this->matrix_height = 640;
     this->matrix_width = 480;
@@ -426,6 +443,7 @@ void FlashingSpeller::create_layout()
             element->setStyleSheet("font: 40pt; color:gray");
             element->setAlignment(Qt::AlignCenter);
             layout->addWidget(element,i,j);
+            presented_letters.append(letters[i-1][j]);
         }
     }
 

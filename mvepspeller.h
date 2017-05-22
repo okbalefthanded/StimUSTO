@@ -99,6 +99,7 @@ private:
 
     QString desired_phrase;
     QString text_row;
+    QList<QChar> presented_letters;
     QImage face_stimuli;
     MatrixLayout *Mlayout;
     // Timers
