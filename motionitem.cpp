@@ -1,11 +1,12 @@
 #include "motionitem.h"
+#include <QDebug>
 
 const QString DEFAULT_TEXT = "#";
 const QColor DEFAULT_TEXT_COLOR = Qt::black;
-const quint8 DEFAULT_TEXT_SIZE = 20;
+const quint8 DEFAULT_TEXT_SIZE = 30;
 const QColor DEFAULT_ROW_COLOR = Qt::blue;
-const quint16 DEFAULT_SIZE_WIDTH = 100;
-const quint16 DEFAULT_SIZE_HEIGHT = 100;
+const quint16 DEFAULT_SIZE_WIDTH = 120;
+const quint16 DEFAULT_SIZE_HEIGHT = 150;
 
 MotionItem::MotionItem()
 {
@@ -35,4 +36,7 @@ void MotionItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
     painter->setFont(font);
     painter->drawText(DEFAULT_SIZE_WIDTH / 2, 0, text);
     painter->drawRect(rec);
+
+//    QRectF mid_rect = QRectF(DEFAULT_SIZE_WIDTH / 2, 0, 10, DEFAULT_SIZE_HEIGHT / 2);
+//    painter->drawRect(mid_rect);
 }

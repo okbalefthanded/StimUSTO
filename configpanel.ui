@@ -192,7 +192,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>10</string>
+      <string>15</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_5">
@@ -254,7 +254,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>HELLO OKBA</string>
+      <string>123456789</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_7">
@@ -335,6 +335,16 @@
      <item>
       <property name="text">
        <string>Motion_Face</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Moving_Face</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>ssvep</string>
       </property>
      </item>
     </widget>

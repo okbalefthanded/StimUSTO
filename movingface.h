@@ -1,35 +1,27 @@
-#ifndef MVEPSPELLER_H
-#define MVEPSPELLER_H
+#ifndef MOVINGFACE_H
+#define MOVINGFACE_H
 //
 #include <QWidget>
 #include <QLabel>
 #include <QImage>
 #include <QElapsedTimer>
 #include <QUdpSocket>
-#include <QGraphicsView>
-#include <QList>
-#include <QGraphicsItem>
-#include <QGraphicsRectItem>
-#include <QGraphicsPixmapItem>
-#include <QGraphicsItemAnimation>
-#include <QTimeLine>
+#include <QTimer>
 //
 #include "randomflashsequence.h"
 #include "matrixlayout.h"
-#include "motionitem.h"
-
 //
 namespace Ui {
-class mVEPSpeller;
+class MovingFace;
 }
 
-class mVEPSpeller : public QWidget
+class MovingFace : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit mVEPSpeller(quint8 spellerType, QWidget *parent = 0);
-    ~mVEPSpeller();
+    explicit MovingFace(QWidget *parent = 0);
+    ~MovingFace();
 
     void setStimulation_duration(int value);
     void setIsi(int value);
@@ -37,13 +29,11 @@ public:
     void setNr_trials(int value);
     void setSpelling_mode(int value);
     void setDesired_phrase(const QString &value);
-    void setSpeller_type(quint16 value);
+    void setSpeller_type(int value);
     void setFeedbackPort(quint16 value);
-    void setAnimTimeUpdateIntervale(int value);
 
 signals:
     void markerTag(uint64_t ovStimulation);
-    void timeOutSignal();
 
 private slots:
 
@@ -54,6 +44,8 @@ private slots:
     void startFlashing();
     void pauseFlashing();
     void receiveFeedback();
+    void rotate_stimuli();
+
 
 public slots:
 
@@ -61,7 +53,7 @@ public slots:
     void create_layout();
     void refresh_layout();
 
-    //
+
     void sendMarker(uint64_t ovStimulation){
         emit markerTag(ovStimulation);
     }
@@ -72,7 +64,7 @@ private:
     void highlightTarget();
     void refreshTarget();
 
-    Ui::mVEPSpeller *ui;
+    Ui::MovingFace *ui;
 
     int rows;
     int cols;
@@ -82,6 +74,7 @@ private:
     int currentStimulation = 0;
     int currentLetter = 0;
     int currentTarget = 0;
+    int stimulusRotation = 0;
 
     bool stimulus = true;
 
@@ -89,37 +82,29 @@ private:
     bool running = true;
     int state;
 
-    quint16 stimulation_duration;
-    quint16 isi;
-    quint16 nr_sequence;
-    quint16 nr_trials;
-    quint8 spelling_mode;
-    quint16 speller_type;
-    quint8 pre_trial_wait = 2; // 2 seconds
-    quint8 pre_trial_count = 0;
+    int stimulation_duration;
+    int isi;
+    int nr_sequence;
+    int nr_trials;
+    int spelling_mode;
+    int speller_type;
+    int pre_trial_wait = 2; // 2 seconds
+    int pre_trial_count = 0;
     quint16 feedback_port = 12345;
-    int distance;
 
     QString desired_phrase;
     QString text_row;
-    QList<QString> presented_letters;
-    QImage face_stimuli;
+    QImage *face_stimuli;
+    QList<QChar> presented_letters;
     MatrixLayout *Mlayout;
     // Timers
     QTimer *preTrialTimer;
     QTimer *stimTimer;
     QTimer *isiTimer;
-    QTimeLine *animTimer;
-    // Utils
+
     QLabel *textRow;
     QUdpSocket *feedback_socket;
     RandomFlashSequence *flashingSequence;
-    // Graphics
-    QGraphicsView *view;
-    QList<QGraphicsItem*> itemsList;
-    QGraphicsPixmapItem *image_stimuli;
-    QGraphicsItemAnimation *animation;
-    QGraphicsRectItem *bar_stimuli;
 };
 
-#endif // MVEPSPELLER_H
+#endif // MOVINGFACE_H

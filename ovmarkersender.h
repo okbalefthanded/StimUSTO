@@ -14,6 +14,7 @@ public:
     explicit OVMarkerSender(QObject *parent = 0);
     ~OVMarkerSender();
     bool Connect(QString asAddress, QString asTcpTagPort);
+    bool connectedOnce;
 
 
 signals:
@@ -25,8 +26,8 @@ public slots:
 private :
     QTcpSocket *socket;
 
-protected :
-    bool connectedOnce;
+    //protected :
+    //    bool connectedOnce;
 
 };
 

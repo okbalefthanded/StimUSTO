@@ -84,7 +84,7 @@ mVEPSpeller::mVEPSpeller(quint8 spellerType, QWidget *parent) :
     connect( stimTimer, SIGNAL(timeout()), this, SLOT(pauseFlashing()) );
     connect( isiTimer, SIGNAL(timeout()), this, SLOT(startFlashing()) );
     connect( preTrialTimer, SIGNAL(timeout()), this, SLOT(startTrial()) );
-    //    connect( animTimer, SIGNAL(finished()), this, SLOT(pauseFlashing()));
+//    connect( animTimer, SIGNAL(finished()), this, SLOT(pauseFlashing()));
 
     feedback_socket = new QUdpSocket(this);
     feedback_socket->bind(QHostAddress::LocalHost, feedback_port);
@@ -142,13 +142,19 @@ void mVEPSpeller::pre_trial()
         preTrialTimer->stop();
         pre_trial_count = 0;
         state = STIMULUS;
+         if(speller_type==MOTION_FACE)
+             distance  = itemsList[flashingSequence->sequence[currentStimulation]]->boundingRect().width() -
+                         image_stimuli->boundingRect().width();
+         else
+              distance  = itemsList[flashingSequence->sequence[currentStimulation]]->boundingRect().width();
         //        qDebug()<<"Let's do stimulus!;
     }
 }
 
 void mVEPSpeller::startFlashing()
 {
-    qDebug()<< Q_FUNC_INFO<< " Current Iteration"<<currentStimulation;
+    qDebug()<< Q_FUNC_INFO;
+    //    " Current Iteration"<<currentStimulation;
 
     //    stimTimer->start();
 
@@ -176,11 +182,17 @@ void mVEPSpeller::startFlashing()
         qreal x = itemsList[flashingSequence->sequence[currentStimulation]]->x() +
                 itemsList[flashingSequence->sequence[currentStimulation]]->boundingRect().width() -
                 image_stimuli->boundingRect().width();
-        image_stimuli->setPos(x, y);
-        image_stimuli->show();
-        int distance = (itemsList[flashingSequence->sequence[currentStimulation]]->boundingRect().width() / 2);
 
-        for (int i = 0; i < distance; i++)
+        image_stimuli->setPos(x, y);
+
+        // inverted face
+        //        image_stimuli->setPos(x+50, y + 100);
+        //        image_stimuli->setRotation(180);
+        //
+        image_stimuli->show();
+//        distance -= image_stimuli->boundingRect().width();
+        distance = 20;
+        for (int i = 0; i < distance; i+=2)
         {
             animation->setPosAt(i / qreal(distance), QPointF(x - i, y));
         }
@@ -192,19 +204,28 @@ void mVEPSpeller::startFlashing()
             qreal x = itemsList[flashingSequence->sequence[currentStimulation]]->x() +
                     itemsList[flashingSequence->sequence[currentStimulation]]->boundingRect().width() -
                     bar_stimuli->boundingRect().width();
-            int distance = (itemsList[flashingSequence->sequence[currentStimulation]]->boundingRect().width() / 2);
-            bar_stimuli->setPos(x, y);
-//            animation->reset();
-            bar_stimuli->show();
+            //            int distance = (itemsList[flashingSequence->sequence[currentStimulation]]->boundingRect().width() / 2);
+            //            animation->setItem(itemsList[flashingSequence->sequence[currentStimulation]]);
+            //            int distance = 40;
 
-            for (int i = 0; i < distance; i++)
+            bar_stimuli->setPos(x, y);
+            //            animation->reset();
+            bar_stimuli->show();
+            distance = 20;
+
+            for (int i = 0; i < distance; i+=2)
             {
-                animation->setPosAt(i / qreal(distance), QPointF(x - i, y));
+                animation->setPosAt(i / (qreal(distance)), QPointF(x - i, y));
             }
+            //            animTimer->setFrameRange(1,10);
 
         }
+    qDebug()<<"Anim Pos List: "<<animation->posList().count();
     stimTimer->start();
-    animTimer->start();
+
+    //    sendMarker(OVTK_StimulationId_VisualStimulationStart);
+    //    sendMarker(OVTK_StimulationLabel_Base + flashingSequence->sequence[currentStimulation]);
+//    animTimer->start();
     isiTimer->stop();
     state = POST_STIMULUS;
 }
@@ -212,15 +233,20 @@ void mVEPSpeller::startFlashing()
 void mVEPSpeller::pauseFlashing()
 {
     qDebug()<< Q_FUNC_INFO;
-    // sendMarker(OVTK_StimulationId_VisualStimulationStop);
+//     sendMarker(OVTK_StimulationId_VisualStimulationStop);
+
+    if(speller_type == MOTION_BAR)
+    {
+        bar_stimuli->hide();
+    }
+    else
+    {
+        image_stimuli->hide();
+    }
+
     animTimer->stop();
     stimTimer->stop();
     isiTimer->start();
-
-    if(speller_type == MOTION_BAR)
-    { bar_stimuli->hide();}
-    else
-    { image_stimuli->hide();}
 
     currentStimulation++;
     state = STIMULUS;
@@ -327,8 +353,8 @@ void mVEPSpeller::create_layout()
 
     qDebug()<< Q_FUNC_INFO;
     // speller settings
-    rows = 6;
-    cols = 6;
+    rows = 3;
+    cols = 3;
     nr_elements = rows * cols;
     matrix_width = 800;//1300;
     matrix_height = 600;//700;
@@ -349,6 +375,7 @@ void mVEPSpeller::create_layout()
     layout->addWidget(view);
 
     QGraphicsScene *scene = new QGraphicsScene(this);
+
     //    view->setAlignment(Qt::AlignTop);
     view->setScene(scene);
 
@@ -362,10 +389,13 @@ void mVEPSpeller::create_layout()
     {
         for(int col=0; col<cols; col++)
         {
-            MotionItem *item = new MotionItem(letters[row][col]);
+            //            MotionItem *item = new MotionItem(letters[row][col]);
+            MotionItem *item = new MotionItem(QString::number(k+1));
+
             item->setPos(Mlayout->positions[k].first, Mlayout->positions[k].second);
             scene->addItem(item);
-            presented_letters.append(letters[row][col]);
+            //            presented_letters.append(letters[row][col]);
+            presented_letters.append(QString::number(k+1));
             k++;
         }
     }
@@ -376,8 +406,8 @@ void mVEPSpeller::create_layout()
     {
     case MOTION_BAR :
     {
-        QBrush b(Qt::black);
-        bar_stimuli = new QGraphicsRectItem(0, 0, 10, 50);
+        QBrush b(Qt::red);
+        bar_stimuli = new QGraphicsRectItem(0, 0, 8, 75);
         bar_stimuli->hide();
         bar_stimuli->setBrush(b);
         bar_stimuli->setPos(0, 0);
@@ -391,8 +421,10 @@ void mVEPSpeller::create_layout()
     {
 
         face_stimuli = QImage(":/images/bennabi_face.png");
-        face_stimuli = face_stimuli.scaled(50, 50, Qt::KeepAspectRatio);
+
+        face_stimuli = face_stimuli.scaled(50, 75, Qt::IgnoreAspectRatio);
         image_stimuli = new QGraphicsPixmapItem(QPixmap::fromImage(face_stimuli));
+
         image_stimuli->hide();
         image_stimuli->setPos(0, 0);
         scene->addItem(image_stimuli);
@@ -414,30 +446,25 @@ void mVEPSpeller::refresh_layout()
 
 bool mVEPSpeller::isTarget()
 {
-    int row, column;
+    //    int row, column;
     int index = flashingSequence->sequence[currentStimulation] - 1;
-    row = index / nr_elements;
-    column = index % nr_elements;
+    //    row = index / nr_elements;
+    //    column = index % nr_elements;
 
-    if(desired_phrase[currentLetter]==presented_letters[index])
+    if(desired_phrase[currentLetter]==presented_letters[index][0])
     {
-        qDebug()<< "letter : " << letters[row][column];
+        //                qDebug()<< "letter : " << letters[row][column];
         qDebug()<< "desired letter: " << desired_phrase[currentLetter];
-        qDebug()<< "flashing: "<< flashingSequence->sequence[currentStimulation];
+        //        qDebug()<< "flashing: "<< flashingSequence->sequence[currentStimulation];
         qDebug()<< "presented letter:" << presented_letters[index];
-        qDebug()<< "row: " << row << " column: "<< column;
+        //        qDebug()<< "row: " << row << " column: "<< column;
         return true;
     }
     else
     {
         return false;
     }
-//    if (desired_phrase[currentLetter]==letters[row][column])
-//    {
-//        return true;
-//    }
-//    else
-//        return false;
+
 }
 
 void mVEPSpeller::highlightTarget()
@@ -472,6 +499,12 @@ void mVEPSpeller::setSpeller_type(quint16 value)
 void mVEPSpeller::setFeedbackPort(quint16 value)
 {
     feedback_port = value;
+}
+
+void mVEPSpeller::setAnimTimeUpdateIntervale(int value)
+{
+    // 20 ?
+    animTimer->setUpdateInterval(value-20);
 }
 
 void mVEPSpeller::setStimulation_duration(int value)
