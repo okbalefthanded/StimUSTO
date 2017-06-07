@@ -1,5 +1,7 @@
 <RCC>
     <qresource prefix="/images">
         <file>bennabi_face.png</file>
+        <file>bennabi_face_inverted.png</file>
+        <file>bennabi_face_90_degree.png</file>
     </qresource>
 </RCC>

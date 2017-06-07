@@ -22,6 +22,24 @@ RandomFlashSequence::RandomFlashSequence(int length,int nr_sequences, int min_di
     for (int i=1; i<nr_sequences; i++){
         random_shuffle(l.begin(), l.end());
         list.append( l );
+        if(list.last()==l.first())
+        {
+
+            std::swap(l[0],l[2]);
+
+        }
+        else if(list.last()==l[1])
+        {
+
+            std::swap(l[1],l[2]);
+
+        }
+        else if(list[list.count()-1]==l[0])
+        {
+
+            std::swap(l[0],l[1]);
+
+        }
     }
     sequence = list;
 

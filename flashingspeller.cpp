@@ -33,6 +33,7 @@ const quint8 POST_TRIAL = 4;
 
 const quint8 FLASHING_SPELLER = 0;
 const quint8 FACES_SPELLER = 1;
+const quint8 INVERTED_FACE = 6;
 
 const quint8 CALIBRATION = 0;
 const quint8 COPY_MODE  = 1;
@@ -140,33 +141,39 @@ void FlashingSpeller::startFlashing()
             sendMarker(OVTK_StimulationId_NonTarget);
         }
     }
-    QPropertyAnimation pAnimation(this->layout()->itemAt(flashingSequence->sequence[currentStimulation])->widget(),
-                                  "geometry");
+//    QPropertyAnimation pAnimation(this->layout()->itemAt(flashingSequence->sequence[currentStimulation])->widget(),
+//                                  "geometry");
     if(speller_type == FACES_SPELLER)
     {
         this->layout()->itemAt(flashingSequence->sequence[currentStimulation])->
-                widget()->setStyleSheet("image: url(:/images/bennabi_face_inverted.png)");
-//        QPropertyAnimation pAnimation(this->layout()->itemAt(flashingSequence->sequence[currentStimulation])->widget(),
-//                                      "geometry");
-        int x = this->layout()->itemAt(flashingSequence->sequence[currentStimulation])->widget()->pos().x();
-        int y = this->layout()->itemAt(flashingSequence->sequence[currentStimulation])->widget()->pos().y();
-        int h = this->layout()->itemAt(flashingSequence->sequence[currentStimulation])->widget()->geometry().height();
-        int w = this->layout()->itemAt(flashingSequence->sequence[currentStimulation])->widget()->geometry().width();
+                widget()->setStyleSheet("image: url(:/images/bennabi_face.png)");
+////        QPropertyAnimation pAnimation(this->layout()->itemAt(flashingSequence->sequence[currentStimulation])->widget(),
+////                                      "geometry");
+//        int x = this->layout()->itemAt(flashingSequence->sequence[currentStimulation])->widget()->pos().x();
+//        int y = this->layout()->itemAt(flashingSequence->sequence[currentStimulation])->widget()->pos().y();
+//        int h = this->layout()->itemAt(flashingSequence->sequence[currentStimulation])->widget()->geometry().height();
+//        int w = this->layout()->itemAt(flashingSequence->sequence[currentStimulation])->widget()->geometry().width();
 
-        pAnimation.setStartValue(QRect(x, y, w, h));
-        pAnimation.setEndValue(QRect(x + 500, y + 100, w, h));
-//        pAnimation.setEasingCurve(QEasingCurve::OutBounce);
-        pAnimation.setDuration(100);
-        qDebug()<<"animation";
+//        pAnimation.setStartValue(QRect(x, y, w, h));
+//        pAnimation.setEndValue(QRect(x + 500, y + 100, w, h));
+////        pAnimation.setEasingCurve(QEasingCurve::OutBounce);
+//        pAnimation.setDuration(100);
+//        qDebug()<<"animation";
         //        this->layout()->itemAt(flashingSequence->sequence[currentStimulation])->
         //            widget()->setStyleSheet("image: url(:/images/bennabi_face.png)");
+    }
+
+    else if(speller_type == INVERTED_FACE)
+    {
+        this->layout()->itemAt(flashingSequence->sequence[currentStimulation])->
+                widget()->setStyleSheet("image: url(:/images/bennabi_face_inverted.png)");
     }
     else if(speller_type == FLASHING_SPELLER)
     {
         this->layout()->itemAt(flashingSequence->sequence[currentStimulation])->
                 widget()->setStyleSheet("QLabel { color : white; font: 60pt }");
     }
-     pAnimation.start();
+//     pAnimation.start();
     stimTimer->start();
 
     //    qDebug("Stim Timer started");

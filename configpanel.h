@@ -41,6 +41,8 @@ private slots:
     void on_stopSpeller_clicked();
     void on_quitSpeller_clicked();
 
+    void on_initSSVEP_clicked();
+
 private:
     Ui::ConfigPanel *ui;
 

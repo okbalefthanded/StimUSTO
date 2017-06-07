@@ -1,17 +1,21 @@
+//
+#include <QMessageBox>
+//
 #include "configpanel.h"
 #include "ui_configpanel.h"
 #include "mvepspeller.h"
 #include "flashingspeller.h"
 #include "movingface.h"
 #include "ovmarkersender.h"
-#include <QMessageBox>
-
+#include "ssvep.h"
+//
 const quint8 FLASHING_SPELLER = 0;
 const quint8 FACES_SPELLER = 1;
 const quint8 MOTION_BAR = 2;
 const quint8 MOTION_FACE = 3;
 const quint8 MOVING_FACE = 4;
 const quint8 SSVEP = 5;
+const quint8 INVERTED_FACE = 6;
 
 ConfigPanel::ConfigPanel(QWidget *parent) :
     QMainWindow(parent),
@@ -100,6 +104,22 @@ void ConfigPanel::on_initSpeller_clicked()
             Fspeller->setFeedbackPort(ui->feedback_port->text().toInt());
             break;
         }
+        case INVERTED_FACE:
+        {
+            FlashingSpeller *Fspeller = new FlashingSpeller();
+            //
+            connect(ui->startSpeller, SIGNAL(clicked()), Fspeller, SLOT(startTrial()));
+            connect(Fspeller, SIGNAL(markerTag(uint64_t)), cTest, SLOT(sendStimulation(uint64_t)));
+            //
+            Fspeller->setStimulation_duration(ui->stimulusDuration->text().toInt());
+            Fspeller->setIsi(ui->interStimulusDuration->text().toInt());
+            Fspeller->setNr_sequence(ui->numberOfRepetition->text().toInt());
+            Fspeller->setSpelling_mode(ui->spellingModeChoices->currentIndex());
+            Fspeller->setDesired_phrase(ui->desiredPhrase->text());
+            Fspeller->setSpeller_type(spellerType);
+            Fspeller->setFeedbackPort(ui->feedback_port->text().toInt());
+            break;
+        }
 
         case MOTION_BAR:
         case MOTION_FACE:
@@ -138,6 +158,36 @@ void ConfigPanel::on_initSpeller_clicked()
         case SSVEP:
             break;
         }
+    }
+}
+
+//TODO
+//INIT SSVEP
+void ConfigPanel::on_initSSVEP_clicked()
+{
+    qDebug()<<Q_FUNC_INFO;
+
+
+    if(!cTest->connectedOnce)
+    {
+        QMessageBox::information(this,"Socket connection","Not Connected");
+    }
+
+    else
+    {
+        Ssvep *ssvepStimulation = new Ssvep();
+
+        connect(ui->startSpeller, SIGNAL(clicked()), ssvepStimulation, SLOT(startTrial()));
+        connect(ssvepStimulation, SIGNAL(markerTag(uint64_t)), cTest, SLOT(sendStimulation(uint64_t)));
+
+        ssvepStimulation->setFrequencies(ui->Frequencies->text());
+        ssvepStimulation->setStimulationDuration(ui->SSVEP_StimDuration->text().toInt());
+        ssvepStimulation->setBreakDuration(ui->SSVEP_BreakDuration->text().toInt());
+        ssvepStimulation->setSequence(ui->SSVEP_Sequence->text().toInt());
+        ssvepStimulation->setFlickeringMode(ui->SSVEP_mode->currentIndex());
+        ssvepStimulation->setFeedbackPort(ui->feedback_port->text().toInt());
+
+
     }
 }
 
