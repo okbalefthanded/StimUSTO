@@ -21,7 +21,8 @@ SOURCES += main.cpp\
     randomflashsequence.cpp \
     motionitem.cpp \
     movingface.cpp \
-    ssvep.cpp
+    ssvep.cpp \
+    coloredface.cpp
 
 HEADERS  += configpanel.h \
     mvepspeller.h \
@@ -32,14 +33,16 @@ HEADERS  += configpanel.h \
     randomflashsequence.h \
     motionitem.h \
     movingface.h \
-    ssvep.h
+    ssvep.h \
+    coloredface.h
 
 INCLUDEPATH += C:\openvibe-1.2.2-src\openvibe-1.2.2-src\toolkit\include\toolkit
 
 FORMS    += configpanel.ui \
     flashingspeller.ui \
     movingface.ui \
-    ssvep.ui
+    ssvep.ui \
+    coloredface.ui
 
 RESOURCES += \
     asset.qrc

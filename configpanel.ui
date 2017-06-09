@@ -221,6 +221,16 @@
           <string>Inverted_face</string>
          </property>
         </item>
+        <item>
+         <property name="text">
+          <string>Colored_Face</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Inverted_Colored_Face</string>
+         </property>
+        </item>
        </widget>
       </item>
      </layout>
@@ -436,7 +446,7 @@
       <string>Init SSVEP</string>
      </property>
     </widget>
-    <widget class="QWidget" name="">
+    <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
        <x>11</x>
@@ -495,7 +505,7 @@
       </item>
      </layout>
     </widget>
-    <widget class="QWidget" name="">
+    <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
        <x>135</x>

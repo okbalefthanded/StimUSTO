@@ -8,6 +8,7 @@
 #include "movingface.h"
 #include "ovmarkersender.h"
 #include "ssvep.h"
+#include "coloredface.h"
 //
 const quint8 FLASHING_SPELLER = 0;
 const quint8 FACES_SPELLER = 1;
@@ -16,6 +17,8 @@ const quint8 MOTION_FACE = 3;
 const quint8 MOVING_FACE = 4;
 const quint8 SSVEP = 5;
 const quint8 INVERTED_FACE = 6;
+const quint8 COLORED_FACE = 7;
+const quint8 INVERTED_COLORED_FACE = 8;
 
 ConfigPanel::ConfigPanel(QWidget *parent) :
     QMainWindow(parent),
@@ -155,8 +158,22 @@ void ConfigPanel::on_initSpeller_clicked()
 
             break;
         }
-        case SSVEP:
+        case COLORED_FACE:
+        case INVERTED_COLORED_FACE:
+        {
+            ColoredFace *coloredFaceSpeller = new ColoredFace();
+            connect(ui->startSpeller, SIGNAL(clicked()), coloredFaceSpeller, SLOT(startTrial()));
+            connect(coloredFaceSpeller, SIGNAL(markerTag(uint64_t)), cTest, SLOT(sendStimulation(uint64_t)));
+
+            coloredFaceSpeller->setStimulation_duration(ui->stimulusDuration->text().toInt());
+            coloredFaceSpeller->setIsi(ui->interStimulusDuration->text().toInt());
+            coloredFaceSpeller->setNr_sequence(ui->numberOfRepetition->text().toInt());
+            coloredFaceSpeller->setSpelling_mode(ui->spellingModeChoices->currentIndex());
+            coloredFaceSpeller->setDesired_phrase(ui->desiredPhrase->text());
+            coloredFaceSpeller->setSpeller_type(spellerType);
+            coloredFaceSpeller->setFeedbackPort(ui->feedback_port->text().toInt());
             break;
+        }
         }
     }
 }

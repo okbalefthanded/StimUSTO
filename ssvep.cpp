@@ -78,8 +78,8 @@ void Ssvep::pre_trial()
 
     if(firstRun)
     {
-        flickeringSequence = new RandomFlashSequence(nr_elements, stimulationSequence);
-        qDebug()<<"sequence"<<flickeringSequence->sequence;
+        flickeringSequence = new RandomFlashSequence(nr_elements, stimulationSequence / nr_elements);
+        //        qDebug()<<"sequence"<<flickeringSequence->sequence;
         firstRun = false;
     }
 
@@ -90,7 +90,7 @@ void Ssvep::pre_trial()
 
         if (flickering_mode == CALIBRATION)
         {
-            qDebug()<< "highlightTarget";
+            //            qDebug()<< "highlightTarget";
             highlightTarget();
             //            text_row += desired_phrase[currentLetter];
             //            textRow->setText(text_row);
@@ -100,7 +100,7 @@ void Ssvep::pre_trial()
             highlightTarget();
         }
     }
-    qDebug()<< "Pre trial timer start";
+    //    qDebug()<< "Pre trial timer start";
 
     preTrialTimer->start();
     pre_trial_count++;
@@ -126,9 +126,13 @@ void Ssvep::post_trial()
     int waitMillisec = breakDuration - pre_trial_wait * 1000;
     wait(waitMillisec);
 
-    refreshTarget();
+    //    refreshTarget();
 
-    if (currentFlicker >= flickeringSequence->sequence.size() && (flickering_mode == COPY_MODE || flickering_mode == CALIBRATION))
+    //    qDebug()<<"current flicker"<<currentFlicker;
+    //    qDebug()<<"sequence size"<< flickeringSequence->sequence.size();
+
+    if (currentFlicker >= flickeringSequence->sequence.size() &&
+            (flickering_mode == COPY_MODE || flickering_mode == CALIBRATION))
     {
         qDebug()<< "Experiment End";
         sendMarker(OVTK_StimulationId_ExperimentStop);
@@ -150,11 +154,37 @@ void Ssvep::Flickering()
 
     QTime dieTime = QTime::currentTime().addMSecs(stimulationDuration * 1000);
     QTime elapsedTime = QTime::currentTime();
+
     while( QTime::currentTime() < dieTime )
     {
 
+//        qDebug()<<"elapsed"<< elapsedTime.elapsed();
         qDebug()<<"Flickering"<<QTime::currentTime();
-        QCoreApplication::processEvents( QEventLoop::AllEvents, 100);
+        //        QCoreApplication::processEvents( QEventLoop::AllEvents, 100);
+        QCoreApplication::processEvents(QEventLoop::AllEvents);
+
+        if( elapsedTime.elapsed() == (1/frequencies[0]))
+        {
+            this->layout()->itemAt(0)->widget()
+                    ->setStyleSheet("background-color: black");
+        }
+        else if(elapsedTime.elapsed() == (1/frequencies[1]))
+        {
+            this->layout()->itemAt(1)->widget()
+                    ->setStyleSheet("background-color: black");
+        }
+        else if(elapsedTime.elapsed() == (1/frequencies[3]))
+        {
+            this->layout()->itemAt(3)->widget()
+                    ->setStyleSheet("background-color: black");
+        }
+        else if(elapsedTime.elapsed() == (1/frequencies[4]))
+        {
+            this->layout()->itemAt(4)->widget()
+                    ->setStyleSheet("background-color: black");
+        }
+        //        qDebug()<<"Flickering"<<QTime::currentTime();
+        //QCoreApplication::processEvents( QEventLoop::AllEvents, 100);
         //Flickering
 
 
@@ -162,7 +192,7 @@ void Ssvep::Flickering()
     }
 
     currentFlicker++;
-//    qDebug()<<"current flicker"<<currentFlicker;
+    //    qDebug()<<"current flicker"<<currentFlicker;
     state = POST_TRIAL;
 
 }
@@ -182,6 +212,7 @@ void Ssvep::wait(int millisecondsToWait)
     }
 
 }
+
 void Ssvep::create_layout()
 {
     qDebug()<<Q_FUNC_INFO;
@@ -236,18 +267,12 @@ void Ssvep::create_layout()
 
 }
 
-//bool Ssvep::isTarget()
-//{
-
-//}
-
 void Ssvep::highlightTarget()
 {
-    qDebug()<<Q_FUNC_INFO;
-    qDebug()<<flickeringSequence->sequence[currentFlicker];
+    qDebug()<<Q_FUNC_INFO<<flickeringSequence->sequence[currentFlicker];
 
     if(flickeringSequence->sequence[currentFlicker]==3)
-        this->layout()->itemAt(flickeringSequence->sequence[currentFlicker]-1)
+        this->layout()->itemAt(2)
             ->widget()->setStyleSheet("background-color: gray; border: 2px solid red");
     else
         this->layout()->itemAt(flickeringSequence->sequence[currentFlicker]-1)
@@ -256,12 +281,20 @@ void Ssvep::highlightTarget()
 
 void Ssvep::refreshTarget()
 {
+    qDebug()<<Q_FUNC_INFO<<flickeringSequence->sequence[currentFlicker];
+
     if(flickeringSequence->sequence[currentFlicker]==3)
-        this->layout()->itemAt(flickeringSequence->sequence[currentFlicker]-1)
-            ->widget()->setStyleSheet("background-color: gray");
+    {
+        qDebug()<<"refresh gray box";
+        this->layout()->itemAt(2)
+                ->widget()->setStyleSheet("background-color: gray");
+    }
     else
+    {
+        qDebug()<<"refresh white box";
         this->layout()->itemAt(flickeringSequence->sequence[currentFlicker]-1)
-            ->widget()->setStyleSheet("background-color: rgb(255, 255, 255)");
+                ->widget()->setStyleSheet("background-color: white");
+    }
 }
 
 //Setters

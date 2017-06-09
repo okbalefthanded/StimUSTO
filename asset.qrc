@@ -3,5 +3,21 @@
         <file>bennabi_face.png</file>
         <file>bennabi_face_inverted.png</file>
         <file>bennabi_face_90_degree.png</file>
+        <file>bennabi_face_blue.png</file>
+        <file>bennabi_face_blue_inverted.png</file>
+        <file>bennabi_face_brown.png</file>
+        <file>bennabi_face_brown_inverted.png</file>
+        <file>bennabi_face_cyan.png</file>
+        <file>bennabi_face_cyan_inverted.png</file>
+        <file>bennabi_face_green.png</file>
+        <file>bennabi_face_green_inverted.png</file>
+        <file>bennabi_face_magenta.png</file>
+        <file>bennabi_face_magenta_inverted.png</file>
+        <file>bennabi_face_orange.png</file>
+        <file>bennabi_face_orange_inverted.png</file>
+        <file>bennabi_face_red.png</file>
+        <file>bennabi_face_red_inverted.png</file>
+        <file>bennabi_face_yellow.png</file>
+        <file>bennabi_face_yellow_inverted.png</file>
     </qresource>
 </RCC>
