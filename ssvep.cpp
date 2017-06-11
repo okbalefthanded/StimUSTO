@@ -32,8 +32,8 @@ Ssvep::Ssvep(QWidget *parent) :
     ui->setupUi(this);
     this->show();
 
-    this->windowHandle()->setScreen(qApp->screens().last());
-    this->showFullScreen();
+    //    this->windowHandle()->setScreen(qApp->screens().last());
+    //    this->showFullScreen();
     this->setStyleSheet("background-color : black");
 
     create_layout();
@@ -154,43 +154,118 @@ void Ssvep::Flickering()
 
     QTime dieTime = QTime::currentTime().addMSecs(stimulationDuration * 1000);
     QTime elapsedTime = QTime::currentTime();
+    QTime elapsedTime1 = elapsedTime;
+    QTime elapsedTime2 = elapsedTime;
+    QTime elapsedTime3 = elapsedTime;
+
+    int counter = 0;
+    bool fl = false;
+    bool fl1 = false;
+    bool fl2 = false;
+    bool fl3 = false;
 
     while( QTime::currentTime() < dieTime )
     {
 
-//        qDebug()<<"elapsed"<< elapsedTime.elapsed();
-        qDebug()<<"Flickering"<<QTime::currentTime();
+        //        qDebug()<<"elapsed"<< elapsedTime.elapsed();
+        //        qDebug()<<"Flickering"<<QTime::currentTime();
         //        QCoreApplication::processEvents( QEventLoop::AllEvents, 100);
         QCoreApplication::processEvents(QEventLoop::AllEvents);
 
-        if( elapsedTime.elapsed() == (1/frequencies[0]))
+
+
+        if( QTime::currentTime() == elapsedTime.addMSecs((1/frequencies[0])*500) )
         {
-            this->layout()->itemAt(0)->widget()
-                    ->setStyleSheet("background-color: black");
+            qDebug()<<"freq1 dur"<< (1/frequencies[0])*1000;
+            elapsedTime = QTime::currentTime() ;
+            qDebug()<< "elapsed time"<< elapsedTime;
+            if (!fl)
+            {this->layout()->itemAt(0)->widget()
+                        ->setStyleSheet("background-color: black");
+                qDebug()<<"BLACK";
+                fl = true;
+            }
+            else
+            {  this->layout()->itemAt(0)->widget()
+                        ->setStyleSheet("background-color: white");
+                fl = false;
+                qDebug()<<"White";
+
+            }
+            qDebug()<<"One flash done";
+
+            //            counter++;
         }
-        else if(elapsedTime.elapsed() == (1/frequencies[1]))
+        else if(QTime::currentTime() == elapsedTime1.addMSecs((1/frequencies[1])*500))
         {
-            this->layout()->itemAt(1)->widget()
-                    ->setStyleSheet("background-color: black");
+
+            elapsedTime1 = QTime::currentTime() ;
+
+            if (!fl1)
+            {this->layout()->itemAt(1)->widget()
+                        ->setStyleSheet("background-color: black");
+                qDebug()<<"BLACK";
+                fl1 = true;
+            }
+            else
+            {  this->layout()->itemAt(1)->widget()
+                        ->setStyleSheet("background-color: white");
+                fl1 = false;
+                qDebug()<<"White";
+
+            }
+            qDebug()<<"One flash done";
         }
-        else if(elapsedTime.elapsed() == (1/frequencies[3]))
+
+        else if(QTime::currentTime() == elapsedTime2.addMSecs((1/frequencies[2])*500))
         {
-            this->layout()->itemAt(3)->widget()
-                    ->setStyleSheet("background-color: black");
+            elapsedTime2 = QTime::currentTime() ;
+
+            if (!fl2)
+            {this->layout()->itemAt(3)->widget()
+                        ->setStyleSheet("background-color: black");
+                qDebug()<<"BLACK";
+                fl2 = true;
+            }
+            else
+            {  this->layout()->itemAt(3)->widget()
+                        ->setStyleSheet("background-color: white");
+                fl2 = false;
+                qDebug()<<"White";
+
+            }
+            qDebug()<<"One flash done";
         }
-        else if(elapsedTime.elapsed() == (1/frequencies[4]))
+
+        else if(QTime::currentTime() == elapsedTime3.addMSecs((1/frequencies[3])*500))
         {
-            this->layout()->itemAt(4)->widget()
-                    ->setStyleSheet("background-color: black");
+            elapsedTime3 = QTime::currentTime() ;
+
+            if (!fl3)
+            {this->layout()->itemAt(4)->widget()
+                        ->setStyleSheet("background-color: black");
+                qDebug()<<"BLACK";
+                fl3 = true;
+            }
+            else
+            {  this->layout()->itemAt(4)->widget()
+                        ->setStyleSheet("background-color: white");
+                fl3 = false;
+                qDebug()<<"White";
+
+            }
+            qDebug()<<"One flash done";
         }
+
         //        qDebug()<<"Flickering"<<QTime::currentTime();
         //QCoreApplication::processEvents( QEventLoop::AllEvents, 100);
         //Flickering
+        // refresh layout
 
 
 
     }
-
+    qDebug()<<"freq1 counter="<<counter;
     currentFlicker++;
     //    qDebug()<<"current flicker"<<currentFlicker;
     state = POST_TRIAL;

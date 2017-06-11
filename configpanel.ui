@@ -122,7 +122,7 @@
       <rect>
        <x>11</x>
        <y>26</y>
-       <width>111</width>
+       <width>147</width>
        <height>321</height>
       </rect>
      </property>
@@ -459,7 +459,7 @@
       <item>
        <widget class="QLineEdit" name="Frequencies">
         <property name="text">
-         <string>7.50,8.57,10,12</string>
+         <string>7,9,11,13</string>
         </property>
        </widget>
       </item>
