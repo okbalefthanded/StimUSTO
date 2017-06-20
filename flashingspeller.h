@@ -93,7 +93,7 @@ private:
     QString desired_phrase;
     QString text_row;
     QImage *face_stimuli;
-    QList<QChar> presented_letters;
+    QList<QString> presented_letters;
     MatrixLayout *Mlayout;
     // Timers
     QTimer *preTrialTimer;

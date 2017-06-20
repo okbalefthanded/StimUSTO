@@ -52,8 +52,11 @@ FlashingSpeller::FlashingSpeller(QWidget *parent) :
 
     this->show();
 
-    this->windowHandle()->setScreen(qApp->screens().last());
-    this->showFullScreen();
+    if(qApp->screens().count() == 2){
+
+        this->windowHandle()->setScreen(qApp->screens().last());
+        this->showFullScreen();
+    }
     this->setStyleSheet("background-color : black");
 
     create_layout();
@@ -141,24 +144,24 @@ void FlashingSpeller::startFlashing()
             sendMarker(OVTK_StimulationId_NonTarget);
         }
     }
-//    QPropertyAnimation pAnimation(this->layout()->itemAt(flashingSequence->sequence[currentStimulation])->widget(),
-//                                  "geometry");
+    //    QPropertyAnimation pAnimation(this->layout()->itemAt(flashingSequence->sequence[currentStimulation])->widget(),
+    //                                  "geometry");
     if(speller_type == FACES_SPELLER)
     {
         this->layout()->itemAt(flashingSequence->sequence[currentStimulation])->
                 widget()->setStyleSheet("image: url(:/images/bennabi_face.png)");
-////        QPropertyAnimation pAnimation(this->layout()->itemAt(flashingSequence->sequence[currentStimulation])->widget(),
-////                                      "geometry");
-//        int x = this->layout()->itemAt(flashingSequence->sequence[currentStimulation])->widget()->pos().x();
-//        int y = this->layout()->itemAt(flashingSequence->sequence[currentStimulation])->widget()->pos().y();
-//        int h = this->layout()->itemAt(flashingSequence->sequence[currentStimulation])->widget()->geometry().height();
-//        int w = this->layout()->itemAt(flashingSequence->sequence[currentStimulation])->widget()->geometry().width();
+        ////        QPropertyAnimation pAnimation(this->layout()->itemAt(flashingSequence->sequence[currentStimulation])->widget(),
+        ////                                      "geometry");
+        //        int x = this->layout()->itemAt(flashingSequence->sequence[currentStimulation])->widget()->pos().x();
+        //        int y = this->layout()->itemAt(flashingSequence->sequence[currentStimulation])->widget()->pos().y();
+        //        int h = this->layout()->itemAt(flashingSequence->sequence[currentStimulation])->widget()->geometry().height();
+        //        int w = this->layout()->itemAt(flashingSequence->sequence[currentStimulation])->widget()->geometry().width();
 
-//        pAnimation.setStartValue(QRect(x, y, w, h));
-//        pAnimation.setEndValue(QRect(x + 500, y + 100, w, h));
-////        pAnimation.setEasingCurve(QEasingCurve::OutBounce);
-//        pAnimation.setDuration(100);
-//        qDebug()<<"animation";
+        //        pAnimation.setStartValue(QRect(x, y, w, h));
+        //        pAnimation.setEndValue(QRect(x + 500, y + 100, w, h));
+        ////        pAnimation.setEasingCurve(QEasingCurve::OutBounce);
+        //        pAnimation.setDuration(100);
+        //        qDebug()<<"animation";
         //        this->layout()->itemAt(flashingSequence->sequence[currentStimulation])->
         //            widget()->setStyleSheet("image: url(:/images/bennabi_face.png)");
     }
@@ -173,7 +176,7 @@ void FlashingSpeller::startFlashing()
         this->layout()->itemAt(flashingSequence->sequence[currentStimulation])->
                 widget()->setStyleSheet("QLabel { color : white; font: 60pt }");
     }
-//     pAnimation.start();
+    //     pAnimation.start();
     stimTimer->start();
 
     //    qDebug("Stim Timer started");
@@ -183,7 +186,7 @@ void FlashingSpeller::startFlashing()
 
 void FlashingSpeller::pauseFlashing()
 {
-        qDebug()<< Q_FUNC_INFO;
+    qDebug()<< Q_FUNC_INFO;
     // sendMarker(OVTK_StimulationId_VisualStimulationStop);
     this->layout()->itemAt(flashingSequence->sequence[currentStimulation])->
             widget()->setStyleSheet("QLabel { color : gray; font: 40pt }");
@@ -208,6 +211,7 @@ void FlashingSpeller::pauseFlashing()
         //        }
         //        else
         //        {
+        wait(1000);
         sendMarker(OVTK_StimulationId_TrialStop);
         state = FEEDBACK;
 
@@ -314,7 +318,7 @@ void FlashingSpeller::receiveFeedback()
     QByteArray *buffer = new QByteArray();
 
     buffer->resize(feedback_socket->pendingDatagramSize());
-    qDebug() << "buffer size" << buffer->size();
+    //    qDebug() << "buffer size" << buffer->size();
 
     feedback_socket->readDatagram(buffer->data(), buffer->size(), &sender, &senderPort);
     feedback_socket->waitForBytesWritten();
@@ -330,12 +334,25 @@ bool FlashingSpeller::isTarget()
     //    column = index % nr_elements;
 
 
-    if(desired_phrase[currentLetter]==presented_letters[index])
+    //    if(desired_phrase[currentLetter]==presented_letters[index])
+    //    {
+    //        //        qDebug()<< "letter : " << letters[row][column];
+    //        //        qDebug()<< "desired letter: " << desired_phrase[currentLetter];
+    //        //        qDebug()<< "flashing: "<< flashingSequence->sequence[currentStimulation];
+    //        //        qDebug()<< "presented letter:" << presented_letters[index];
+    //        //        qDebug()<< "row: " << row << " column: "<< column;
+    //        return true;
+    //    }
+    //    else
+    //    {
+    //        return false;
+    //    }
+    if(desired_phrase[currentLetter]==presented_letters[index][0])
     {
-        //        qDebug()<< "letter : " << letters[row][column];
-        //        qDebug()<< "desired letter: " << desired_phrase[currentLetter];
+        //                qDebug()<< "letter : " << letters[row][column];
+        qDebug()<< "desired letter: " << desired_phrase[currentLetter];
         //        qDebug()<< "flashing: "<< flashingSequence->sequence[currentStimulation];
-        //        qDebug()<< "presented letter:" << presented_letters[index];
+        qDebug()<< "presented letter:" << presented_letters[index];
         //        qDebug()<< "row: " << row << " column: "<< column;
         return true;
     }
@@ -343,6 +360,7 @@ bool FlashingSpeller::isTarget()
     {
         return false;
     }
+
 
 }
 
@@ -354,13 +372,19 @@ void FlashingSpeller::highlightTarget()
     {
         for (int j=0; j<cols; j++)
         {
-            idx++;
-            if (desired_phrase[currentLetter] == letters[i][j]){
-                currentTarget = idx;
+            //            idx++;
+            //            if (desired_phrase[currentLetter] == letters[i][j]){
+            //                currentTarget = idx;
+            //                break;
+            if(desired_phrase[currentLetter]==presented_letters[idx][0])
+            {
+                currentTarget = idx + 1;
                 break;
             }
+            idx++;
         }
     }
+
     this->layout()->itemAt(currentTarget)->
             widget()->setStyleSheet("QLabel { color : red; font: 60pt }");
 }
@@ -449,18 +473,21 @@ void FlashingSpeller::create_layout()
     textRow->setAlignment(Qt::AlignCenter);
     //    textRow->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(textRow,0,0,1,0);
-
+    int k = 1;
     // add speller ellements
     for(int i=1; i<rows+1; i++)
     {
         for(int j=0; j<cols; j++)
         {
             QLabel *element = new QLabel(this);
-            element->setText(letters[i-1][j]);
+            element->setText(QString::number(k));
+            //            element->setText(letters[i-1][j]);
             element->setStyleSheet("font: 40pt; color:gray");
             element->setAlignment(Qt::AlignCenter);
             layout->addWidget(element,i,j);
-            presented_letters.append(letters[i-1][j]);
+            presented_letters.append(QString::number(k));
+            k++;
+            //            presented_letters.append(letters[i-1][j]);
         }
     }
 

@@ -9,6 +9,7 @@
 #include "ovmarkersender.h"
 #include "ssvep.h"
 #include "coloredface.h"
+#include "hybridstimulation.h"
 //
 const quint8 FLASHING_SPELLER = 0;
 const quint8 FACES_SPELLER = 1;
@@ -234,4 +235,36 @@ void ConfigPanel::on_stopSpeller_clicked()
 void ConfigPanel::on_quitSpeller_clicked()
 {
 
+}
+
+void ConfigPanel::on_initHybrid_clicked()
+{
+
+    int spellerType = ui->spellerType->currentIndex();
+
+    if(!cTest->connectedOnce)
+    {
+        QMessageBox::information(this,"Socket connection","Not Connected");
+    }
+    else
+    {
+        HybridStimulation *hybrid = new HybridStimulation();
+        connect(ui->startSpeller, SIGNAL(clicked()), hybrid, SLOT(startTrial()));
+        connect(hybrid, SIGNAL(markerTag(uint64_t)), cTest, SLOT(sendStimulation(uint64_t)));
+        //ERP configuration
+        hybrid->setERPStimulationDuration(ui->stimulusDuration->text().toInt());
+        hybrid->setIsi(ui->interStimulusDuration->text().toInt());
+        hybrid->setERPNrSequence(ui->numberOfRepetition->text().toInt());
+        hybrid->setOperationMode(ui->spellingModeChoices->currentIndex());
+        hybrid->setDesiredSequence(ui->desiredPhrase->text());
+        hybrid->setERPStimulationType(spellerType);
+        //SSVEP configuration
+        hybrid->setFrequencies(ui->Frequencies->text());
+        hybrid->setSSVEPStimulationDuration(ui->SSVEP_StimDuration->text().toInt());
+        hybrid->setBreakDuration(ui->SSVEP_BreakDuration->text().toInt());
+        hybrid->setSSVEPSequence(ui->SSVEP_Sequence->text().toInt());
+        hybrid->setFlickeringMode(ui->SSVEP_mode->currentIndex());
+        // general configuration
+        hybrid->setFeedbackPort(ui->feedback_port->text().toInt());
+    }
 }

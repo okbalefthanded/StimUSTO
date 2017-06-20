@@ -32,8 +32,8 @@ Ssvep::Ssvep(QWidget *parent) :
     ui->setupUi(this);
     this->show();
 
-    //    this->windowHandle()->setScreen(qApp->screens().last());
-    //    this->showFullScreen();
+    this->windowHandle()->setScreen(qApp->screens().last());
+    this->showFullScreen();
     this->setStyleSheet("background-color : black");
 
     create_layout();
@@ -120,6 +120,7 @@ void Ssvep::post_trial()
     qDebug()<< Q_FUNC_INFO;
 
 
+    sendMarker(OVTK_StimulationId_TrialStop);
     //    currentStimulation = 0;
     state = PRE_TRIAL;
     // wait
@@ -151,6 +152,7 @@ void Ssvep::Flickering()
     qDebug()<< Q_FUNC_INFO;
 
     sendMarker(OVTK_StimulationLabel_Base + flickeringSequence->sequence[currentFlicker]);
+    sendMarker(OVTK_StimulationId_VisualSteadyStateStimulationStart);
 
     QTime dieTime = QTime::currentTime().addMSecs(stimulationDuration * 1000);
     QTime elapsedTime = QTime::currentTime();
@@ -176,23 +178,23 @@ void Ssvep::Flickering()
 
         if( QTime::currentTime() == elapsedTime.addMSecs((1/frequencies[0])*500) )
         {
-            qDebug()<<"freq1 dur"<< (1/frequencies[0])*1000;
+//            qDebug()<<"freq1 dur"<< (1/frequencies[0])*1000;
             elapsedTime = QTime::currentTime() ;
-            qDebug()<< "elapsed time"<< elapsedTime;
+//            qDebug()<< "elapsed time"<< elapsedTime;
             if (!fl)
             {this->layout()->itemAt(0)->widget()
                         ->setStyleSheet("background-color: black");
-                qDebug()<<"BLACK";
+//                qDebug()<<"BLACK";
                 fl = true;
             }
             else
             {  this->layout()->itemAt(0)->widget()
                         ->setStyleSheet("background-color: white");
                 fl = false;
-                qDebug()<<"White";
+//                qDebug()<<"White";
 
             }
-            qDebug()<<"One flash done";
+//            qDebug()<<"One flash done";
 
             //            counter++;
         }
@@ -204,17 +206,17 @@ void Ssvep::Flickering()
             if (!fl1)
             {this->layout()->itemAt(1)->widget()
                         ->setStyleSheet("background-color: black");
-                qDebug()<<"BLACK";
+//                qDebug()<<"BLACK";
                 fl1 = true;
             }
             else
             {  this->layout()->itemAt(1)->widget()
                         ->setStyleSheet("background-color: white");
                 fl1 = false;
-                qDebug()<<"White";
+//                qDebug()<<"White";
 
             }
-            qDebug()<<"One flash done";
+//            qDebug()<<"One flash done";
         }
 
         else if(QTime::currentTime() == elapsedTime2.addMSecs((1/frequencies[2])*500))
@@ -224,17 +226,17 @@ void Ssvep::Flickering()
             if (!fl2)
             {this->layout()->itemAt(3)->widget()
                         ->setStyleSheet("background-color: black");
-                qDebug()<<"BLACK";
+//                qDebug()<<"BLACK";
                 fl2 = true;
             }
             else
             {  this->layout()->itemAt(3)->widget()
                         ->setStyleSheet("background-color: white");
                 fl2 = false;
-                qDebug()<<"White";
+//                qDebug()<<"White";
 
             }
-            qDebug()<<"One flash done";
+//            qDebug()<<"One flash done";
         }
 
         else if(QTime::currentTime() == elapsedTime3.addMSecs((1/frequencies[3])*500))
@@ -244,17 +246,19 @@ void Ssvep::Flickering()
             if (!fl3)
             {this->layout()->itemAt(4)->widget()
                         ->setStyleSheet("background-color: black");
-                qDebug()<<"BLACK";
+//                qDebug()<<"BLACK";
                 fl3 = true;
             }
             else
             {  this->layout()->itemAt(4)->widget()
                         ->setStyleSheet("background-color: white");
                 fl3 = false;
-                qDebug()<<"White";
+
+//                qDebug()<<"White";
 
             }
-            qDebug()<<"One flash done";
+             counter++;
+//            qDebug()<<"One flash done";
         }
 
         //        qDebug()<<"Flickering"<<QTime::currentTime();
@@ -265,7 +269,7 @@ void Ssvep::Flickering()
 
 
     }
-    qDebug()<<"freq1 counter="<<counter;
+    qDebug()<<"freq4 counter="<<counter;
     currentFlicker++;
     //    qDebug()<<"current flicker"<<currentFlicker;
     state = POST_TRIAL;
@@ -340,6 +344,7 @@ void Ssvep::create_layout()
 
     this->setLayout(layout);
 
+
 }
 
 void Ssvep::highlightTarget()
@@ -348,10 +353,10 @@ void Ssvep::highlightTarget()
 
     if(flickeringSequence->sequence[currentFlicker]==3)
         this->layout()->itemAt(2)
-            ->widget()->setStyleSheet("background-color: gray; border: 2px solid red");
+            ->widget()->setStyleSheet("background-color: gray; border: 4px solid red");
     else
         this->layout()->itemAt(flickeringSequence->sequence[currentFlicker]-1)
-            ->widget()->setStyleSheet("background-color: rgb(255, 255, 255); border: 2px solid red");
+            ->widget()->setStyleSheet("background-color: rgb(255, 255, 255); border: 4px solid red");
 }
 
 void Ssvep::refreshTarget()
@@ -385,6 +390,7 @@ void Ssvep::setFrequencies(QString freqs)
     }
 
 
+
 }
 
 void Ssvep::setFlickeringMode(int mode)
@@ -402,6 +408,7 @@ void Ssvep::setStimulationDuration(int stimDuration)
 void Ssvep::setBreakDuration(int brkDuration)
 {
     breakDuration = brkDuration;
+    pre_trial_wait = brkDuration;
 
 }
 

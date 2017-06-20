@@ -63,7 +63,7 @@ private:
 
     bool firstRun = true;
     int pre_trial_count=0;
-    int pre_trial_wait=2;
+    int pre_trial_wait;
     int currentFlicker=0;
     int state;
     int flickering_mode;

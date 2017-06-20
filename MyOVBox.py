@@ -17,6 +17,7 @@ OVTK_StimulationId_TrialStop = 0x00008006
 OVTK_StimulationId_Target = 0x00008205
 OVTK_StimulationId_NonTarget = 0x00008206
 OVTK_StimulationLabel_Base = 0x00008100
+
 Letters = [ 'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O',
             'P','Q','R','S','T','V', 'W', 'X', 'Y', 'Z','0','1','2','3',
             '4','5','6','7','8','9','0'

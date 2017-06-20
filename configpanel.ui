@@ -123,14 +123,14 @@
        <x>11</x>
        <y>26</y>
        <width>147</width>
-       <height>321</height>
+       <height>301</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>
        <widget class="QLineEdit" name="stimulusDuration">
         <property name="text">
-         <string>150</string>
+         <string>100</string>
         </property>
        </widget>
       </item>
@@ -161,7 +161,7 @@
       <item>
        <widget class="QLineEdit" name="desiredPhrase">
         <property name="text">
-         <string>ABCGHIMNO</string>
+         <string>123456789</string>
         </property>
        </widget>
       </item>
@@ -238,10 +238,10 @@
     <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
-       <x>130</x>
+       <x>160</x>
        <y>30</y>
        <width>101</width>
-       <height>321</height>
+       <height>291</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -381,6 +381,19 @@
     <property name="title">
      <string>Hybrid BCI</string>
     </property>
+    <widget class="QPushButton" name="initHybrid">
+     <property name="geometry">
+      <rect>
+       <x>730</x>
+       <y>140</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Init Hybrid</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QGroupBox" name="groupBox_5">
     <property name="geometry">
@@ -466,7 +479,7 @@
       <item>
        <widget class="QLineEdit" name="SSVEP_StimDuration">
         <property name="text">
-         <string>4</string>
+         <string>2</string>
         </property>
        </widget>
       </item>

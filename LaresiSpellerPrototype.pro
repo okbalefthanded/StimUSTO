@@ -22,7 +22,9 @@ SOURCES += main.cpp\
     motionitem.cpp \
     movingface.cpp \
     ssvep.cpp \
-    coloredface.cpp
+    coloredface.cpp \
+    hybridstimulation.cpp \
+    ellipselayout.cpp
 
 HEADERS  += configpanel.h \
     mvepspeller.h \
@@ -34,7 +36,9 @@ HEADERS  += configpanel.h \
     motionitem.h \
     movingface.h \
     ssvep.h \
-    coloredface.h
+    coloredface.h \
+    hybridstimulation.h \
+    ellipselayout.h
 
 INCLUDEPATH += C:\openvibe-1.2.2-src\openvibe-1.2.2-src\toolkit\include\toolkit
 
@@ -42,7 +46,8 @@ FORMS    += configpanel.ui \
     flashingspeller.ui \
     movingface.ui \
     ssvep.ui \
-    coloredface.ui
+    coloredface.ui \
+    hybridstimulation.ui
 
 RESOURCES += \
     asset.qrc

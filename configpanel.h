@@ -43,6 +43,8 @@ private slots:
 
     void on_initSSVEP_clicked();
 
+    void on_initHybrid_clicked();
+
 private:
     Ui::ConfigPanel *ui;
 
