@@ -261,9 +261,9 @@ void ConfigPanel::on_initHybrid_clicked()
         //SSVEP configuration
         hybrid->setFrequencies(ui->Frequencies->text());
         hybrid->setSSVEPStimulationDuration(ui->SSVEP_StimDuration->text().toInt());
-        hybrid->setBreakDuration(ui->SSVEP_BreakDuration->text().toInt());
-        hybrid->setSSVEPSequence(ui->SSVEP_Sequence->text().toInt());
-        hybrid->setFlickeringMode(ui->SSVEP_mode->currentIndex());
+//        hybrid->setBreakDuration(ui->SSVEP_BreakDuration->text().toInt());
+//        hybrid->setSSVEPSequence(ui->SSVEP_Sequence->text().toInt());
+//        hybrid->setFlickeringMode(ui->SSVEP_mode->currentIndex());
         // general configuration
         hybrid->setFeedbackPort(ui->feedback_port->text().toInt());
     }

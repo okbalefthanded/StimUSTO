@@ -372,12 +372,15 @@ void mVEPSpeller::create_layout()
 
     view = new QGraphicsView(this);
     view->setStyleSheet("border:transparent");
+    QBrush brush(Qt::black);
+    view->setBackgroundBrush(brush);
     layout->addWidget(view);
 
     QGraphicsScene *scene = new QGraphicsScene(this);
 
     //    view->setAlignment(Qt::AlignTop);
     view->setScene(scene);
+
 
 
     Mlayout = new MatrixLayout(qMakePair(matrix_width, matrix_height), rows, cols);
@@ -401,7 +404,9 @@ void mVEPSpeller::create_layout()
     }
 
     qDebug()<< Q_FUNC_INFO << "speller type "<< speller_type;
-
+//    QBrush brush(Qt::black);
+    scene->setBackgroundBrush(brush);
+//    view->setBackgroundBrush(brush);
     switch(speller_type)
     {
     case MOTION_BAR :
@@ -413,7 +418,6 @@ void mVEPSpeller::create_layout()
         bar_stimuli->setPos(0, 0);
         scene->addItem(bar_stimuli);
         animation->setItem(bar_stimuli);
-
         qDebug()<< Q_FUNC_INFO << "Setting the bar stimuli";
         break;
     }
@@ -422,7 +426,7 @@ void mVEPSpeller::create_layout()
 
         face_stimuli = QImage(":/images/bennabi_face.png");
 
-        face_stimuli = face_stimuli.scaled(50, 75, Qt::IgnoreAspectRatio);
+//        face_stimuli = face_stimuli.scaled(50, 75, Qt::IgnoreAspectRatio);
         image_stimuli = new QGraphicsPixmapItem(QPixmap::fromImage(face_stimuli));
 
         image_stimuli->hide();

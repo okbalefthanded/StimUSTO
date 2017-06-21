@@ -64,7 +64,7 @@ void EllipseLayout::setGeometry(const QRect &r)
 
     if( orientation.compare("upper", Qt::CaseInsensitive) == 0)
     {
-        a = 700;
+        a = 670;
         b = 300;
 //                a = 650;
 //                b = 275;
@@ -73,8 +73,8 @@ void EllipseLayout::setGeometry(const QRect &r)
     }
     else
     {
-        a = 400;
-        b = 150;
+        a = 500;
+        b = 300;
         start = qDegreesToRadians(-130.0 / 2);
         step =  (   M_PI / list.size() );
     }

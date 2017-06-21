@@ -9,6 +9,7 @@
 #include <QThread>
 #include <QTime>
 #include <QPropertyAnimation>
+#include <QPixmap>
 //
 #include "hybridstimulation.h"
 #include "ui_hybridstimulation.h"
@@ -50,7 +51,6 @@ HybridStimulation::HybridStimulation(QWidget *parent) :
         this->windowHandle()->setScreen(qApp->screens().last());
         this->showFullScreen();
     }
-
 
     QPalette pal = palette();
     pal.setColor(QPalette::Background, Qt::black);
@@ -120,80 +120,103 @@ void HybridStimulation::startFlashing()
     // send target marker
     if (operationMode == CALIBRATION || operationMode == COPY_MODE)
     {
-        if (isTarget())
-        {
-            // qDebug()<< desired_phrase[currentLetter];
-            sendMarker(OVTK_StimulationId_Target);
-        }
-        else
-        {
-            sendMarker(OVTK_StimulationId_NonTarget);
-        }
+        if (isTarget()){sendMarker(OVTK_StimulationId_Target);}
+        else{sendMarker(OVTK_StimulationId_NonTarget);}
     }
 
-    if(ERPStimulationType == COLORED_FACE)
+    if(ERPStimulationType == INVERTED_FACE)
+    {
+        ERPLayout->itemAt(ERPFlashingSequence->sequence[currentStimulation] - 1)->
+                widget()->setStyleSheet("background-image: url(:/images/bennabi_face_inverted.png);"
+                                        "background-repeat: no-repeat;"
+                                        "background-position: left;"
+                                        );
+    }
+
+    else if(ERPStimulationType == COLORED_FACE)
     {
         switch (ERPFlashingSequence->sequence[currentStimulation])
         {
         case 1:
         {
-            this->layout()->itemAt(ERPFlashingSequence->sequence[currentStimulation])->
-                    widget()->setStyleSheet("image: url(:/images/bennabi_face_blue.png)");
+            ERPLayout->itemAt(ERPFlashingSequence->sequence[currentStimulation] - 1)->
+                    widget()->setStyleSheet("background-image: url(:/images/bennabi_face_blue.png);"
+                                            "background-repeat: no-repeat;"
+                                            "background-position: left;"
+                                            );
             break;
         }
         case 2:
         {
-            this->layout()->itemAt(ERPFlashingSequence->sequence[currentStimulation])->
-                    widget()->setStyleSheet("image: url(:/images/bennabi_face_green.png)");
+            ERPLayout->itemAt(ERPFlashingSequence->sequence[currentStimulation] - 1)->
+                    widget()->setStyleSheet("background-image: url(:/images/bennabi_face_green.png)"
+                                            "background-repeat: no-repeat;"
+                                            "background-position: left;"
+                                            );
             break;
         }
         case 3:
         {
-            this->layout()->itemAt(ERPFlashingSequence->sequence[currentStimulation])->
-                    widget()->setStyleSheet("image: url(:/images/bennabi_face_red.png)");
+            ERPLayout->itemAt(ERPFlashingSequence->sequence[currentStimulation] - 1)->
+                    widget()->setStyleSheet("background-image: url(:/images/bennabi_face_red.png);"
+                                            "background-repeat: no-repeat;"
+                                            "background-position: left;"
+                                            );
             break;
         }
         case 4:
         {
-            this->layout()->itemAt(ERPFlashingSequence->sequence[currentStimulation])->
-                    widget()->setStyleSheet("image: url(:/images/bennabi_face_brown.png)");
+            ERPLayout->itemAt(ERPFlashingSequence->sequence[currentStimulation] - 1)->
+                    widget()->setStyleSheet("background-image: url(:/images/bennabi_face_cyan.png);"
+                                            "background-repeat: no-repeat;"
+                                            "background-position: left;"
+                                            );
             break;
         }
         case 5:
         {
-            this->layout()->itemAt(ERPFlashingSequence->sequence[currentStimulation])->
-                    widget()->setStyleSheet("image: url(:/images/bennabi_face_cyan.png)");
+            ERPLayout->itemAt(ERPFlashingSequence->sequence[currentStimulation] - 1)->
+                    widget()->setStyleSheet("background-image: url(:/images/bennabi_face.png);"
+                                            "background-repeat: no-repeat;"
+                                            "background-position: left;"
+                                            );
             break;
         }
         case 6:
         {
-            this->layout()->itemAt(ERPFlashingSequence->sequence[currentStimulation])->
-                    widget()->setStyleSheet("image: url(:/images/bennabi_face.png)");
+            ERPLayout->itemAt(ERPFlashingSequence->sequence[currentStimulation] - 1)->
+                    widget()->setStyleSheet("background-image: url(:/images/bennabi_face_yellow.png)"
+                                            "background-repeat: no-repeat;"
+                                            "background-position: left;"
+                                            );
             break;
         }
         case 7:
         {
-            this->layout()->itemAt(ERPFlashingSequence->sequence[currentStimulation])->
-                    widget()->setStyleSheet("image: url(:/images/bennabi_face_yellow.png)");
+            ERPLayout->itemAt(ERPFlashingSequence->sequence[currentStimulation] - 1)->
+                    widget()->setStyleSheet("background-image: url(:/images/bennabi_face_magenta.png);"
+                                            "background-repeat: no-repeat;"
+                                            "background-position: left;"
+                                            );
             break;
         }
         case 8:
         {
-            this->layout()->itemAt(ERPFlashingSequence->sequence[currentStimulation])->
-                    widget()->setStyleSheet("image: url(:/images/bennabi_face_orange.png)");
+            ERPLayout->itemAt(ERPFlashingSequence->sequence[currentStimulation] - 1)->
+                    widget()->setStyleSheet("background-image: url(:/images/bennabi_face_orange.png);"
+                                            "background-repeat: no-repeat;"
+                                            "background-position: left;"
+                                            );
             break;
         }
-        case 9:
-        {
-            this->layout()->itemAt(ERPFlashingSequence->sequence[currentStimulation])->
-                    widget()->setStyleSheet("image: url(:/images/bennabi_face_magenta.png)");
-            break;
-        }
+            //        case 9:
+            //        {
+            //            this->layout()->itemAt(ERPFlashingSequence->sequence[currentStimulation])->
+            //                    widget()->setStyleSheet("image: url(:/images/bennabi_face_magenta.png)");
+            //            break;
+            //        }
 
         }
-
-        //          this->layout()->itemAt(flashingSequence->sequence[currentStimulation])->
-        //                widget()->setStyleSheet("image: url(:/images/bennabi_face.png)");
     }
 
     else if(ERPStimulationType == INVERTED_COLORED_FACE)
@@ -202,68 +225,87 @@ void HybridStimulation::startFlashing()
         {
         case 1:
         {
-            this->layout()->itemAt(ERPFlashingSequence->sequence[currentStimulation])->
-                    widget()->setStyleSheet("image: url(:/images/bennabi_face_blue_inverted.png)");
+            ERPLayout->itemAt(ERPFlashingSequence->sequence[currentStimulation] - 1)->
+                    widget()->setStyleSheet("background-image: url(:/images/bennabi_face_blue_inverted.png);"
+                                            "background-repeat: no-repeat;"
+                                            "background-position: left;"
+                                            );
             break;
         }
         case 2:
         {
-            this->layout()->itemAt(ERPFlashingSequence->sequence[currentStimulation])->
-                    widget()->setStyleSheet("image: url(:/images/bennabi_face_green_inverted.png)");
+            ERPLayout->itemAt(ERPFlashingSequence->sequence[currentStimulation] - 1)->
+                    widget()->setStyleSheet("background-image: url(:/images/bennabi_face_green_inverted.png);"
+                                            "background-repeat: no-repeat;"
+                                            "background-position: left;"
+                                            );
             break;
         }
         case 3:
         {
-            this->layout()->itemAt(ERPFlashingSequence->sequence[currentStimulation])->
-                    widget()->setStyleSheet("image: url(:/images/bennabi_face_red_inverted.png)");
+            ERPLayout->itemAt(ERPFlashingSequence->sequence[currentStimulation] - 1)->
+                    widget()->setStyleSheet("background-image: url(:/images/bennabi_face_red_inverted.png);"
+                                            "background-repeat: no-repeat;"
+                                            "background-position: left;"
+                                            );
             break;
         }
         case 4:
         {
-            this->layout()->itemAt(ERPFlashingSequence->sequence[currentStimulation])->
-                    widget()->setStyleSheet("image: url(:/images/bennabi_face_brown_inverted.png)");
+            ERPLayout->itemAt(ERPFlashingSequence->sequence[currentStimulation] - 1)->
+                    widget()->setStyleSheet("background-image: url(:/images/bennabi_face_cyan_inverted.png);"
+                                            "background-repeat: no-repeat;"
+                                            "background-position: left;"
+                                            );
             break;
         }
         case 5:
         {
-            this->layout()->itemAt(ERPFlashingSequence->sequence[currentStimulation])->
-                    widget()->setStyleSheet("image: url(:/images/bennabi_face_cyan_inverted.png)");
+            ERPLayout->itemAt(ERPFlashingSequence->sequence[currentStimulation] - 1)->
+                    widget()->setStyleSheet("background-image: url(:/images/bennabi_face_inverted.png);"
+                                            "background-repeat: no-repeat;"
+                                            "background-position: left;"
+                                            );
             break;
         }
         case 6:
         {
-            this->layout()->itemAt(ERPFlashingSequence->sequence[currentStimulation])->
-                    widget()->setStyleSheet("image: url(:/images/bennabi_face_inverted.png)");
+            ERPLayout->itemAt(ERPFlashingSequence->sequence[currentStimulation] - 1)->
+                    widget()->setStyleSheet("background-image: url(:/images/bennabi_face_yellow_inverted.png);"
+                                            "background-repeat: no-repeat;"
+                                            "background-position: left;"
+                                            );
             break;
         }
         case 7:
         {
-            this->layout()->itemAt(ERPFlashingSequence->sequence[currentStimulation])->
-                    widget()->setStyleSheet("image: url(:/images/bennabi_face_yellow_inverted.png)");
+            ERPLayout->itemAt(ERPFlashingSequence->sequence[currentStimulation] - 1)->
+                    widget()->setStyleSheet("background-image: url(:/images/bennabi_face_magenta_inverted.png);"
+                                            "background-repeat: no-repeat;"
+                                            "background-position: left;"
+                                            );
             break;
         }
         case 8:
         {
-            this->layout()->itemAt(ERPFlashingSequence->sequence[currentStimulation])->
-                    widget()->setStyleSheet("image: url(:/images/bennabi_face_orange_inverted.png)");
+            ERPLayout->itemAt(ERPFlashingSequence->sequence[currentStimulation] - 1)->
+                    widget()->setStyleSheet("background-image: url(:/images/bennabi_face_orange_inverted.png);"
+                                            "background-repeat: no-repeat;"
+                                            "background-position: left;"
+                                            );
             break;
         }
-        case 9:
-        {
-            this->layout()->itemAt(ERPFlashingSequence->sequence[currentStimulation])->
-                    widget()->setStyleSheet("image: url(:/images/bennabi_face_magenta_inverted.png)");
-            break;
-        }
+            //        case 9:
+            //        {
+            //            this->layout()->itemAt(ERPFlashingSequence->sequence[currentStimulation])->
+            //                    widget()->setStyleSheet("image: url(:/images/bennabi_face_magenta_inverted.png)");
+            //            break;
+            //        }
 
         }
-        //        this->layout()->itemAt(flashingSequence->sequence[currentStimulation])->
-        //                widget()->setStyleSheet("image: url(:/images/bennabi_face_inverted.png)");
     }
 
-
     stimTimer->start();
-
-    //    qDebug("Stim Timer started");
     isiTimer->stop();
     state = POST_ERPSTIMULUS;
 }
@@ -272,14 +314,14 @@ void HybridStimulation::pauseFlashing()
 {
     //    qDebug()<< Q_FUNC_INFO;
     // sendMarker(OVTK_StimulationId_VisualStimulationStop);
-    this->layout()->itemAt(ERPFlashingSequence->sequence[currentStimulation])->
+    ERPLayout->itemAt(ERPFlashingSequence->sequence[currentStimulation] - 1)->
             widget()->setStyleSheet("QLabel { color : gray; font: 40pt }");
 
     stimTimer->stop();
     isiTimer->start();
     //    qDebug("Isi Timer started");
     currentStimulation++;
-    state = ERPSTIMULUS;
+    //    state = ERPSTIMULUS;
 
     if (currentStimulation >= ERPFlashingSequence->sequence.count())
     {
@@ -297,25 +339,24 @@ void HybridStimulation::pauseFlashing()
         //        {
         wait(1000);
         sendMarker(OVTK_StimulationId_TrialStop);
-//        state = FEEDBACK;
+        //        state = FEEDBACK;
 
         state = SSVEPSTIMULUS;
-        start_trial();
+        startTrial();
 
-//        if(operationMode == COPY_MODE || operationMode == FREE_MODE){
-//            feedback();
-//        }
-//        else if(operationMode == CALIBRATION)
-//        {
-//            post_trial();
-//        }
+        //        if(operationMode == COPY_MODE || operationMode == FREE_MODE){
+        //            feedback();
+        //        }
+        //        else if(operationMode == CALIBRATION)
+        //        {
+        //            post_trial();
+        //        }
     }
 }
 
 void HybridStimulation::Flickering()
 {
-
-
+    qDebug()<<Q_FUNC_INFO;
     sendMarker(OVTK_StimulationId_VisualSteadyStateStimulationStart);
 
     QTime dieTime = QTime::currentTime().addMSecs(SSVEPStimulationDuration * 1000);
@@ -331,19 +372,21 @@ void HybridStimulation::Flickering()
     bool fl3 = false;
 
     while( QTime::currentTime() < dieTime )
+
     {
         QCoreApplication::processEvents(QEventLoop::AllEvents);
         if( QTime::currentTime() == elapsedTime.addMSecs((1/frequencies[0])*500) )
         {
             elapsedTime = QTime::currentTime() ;
             if (!fl)
-            {this->layout()->itemAt(0)->widget()
-                        ->setStyleSheet("background-color: black");
+            {
+
+                SSVEPLayout->itemAt(0)->widget()->setStyleSheet("background-color: black");
                 fl = true;
             }
             else
-            {  this->layout()->itemAt(0)->widget()
-                        ->setStyleSheet("background-color: white");
+            {
+                SSVEPLayout->itemAt(0)->widget()->setStyleSheet("background-color: white");
                 fl = false;
             }
         }
@@ -352,13 +395,13 @@ void HybridStimulation::Flickering()
 
             elapsedTime1 = QTime::currentTime() ;
             if (!fl1)
-            {this->layout()->itemAt(1)->widget()
-                        ->setStyleSheet("background-color: black");
+            {
+                SSVEPLayout->itemAt(1)->widget()->setStyleSheet("background-color: black");
                 fl1 = true;
             }
             else
-            {  this->layout()->itemAt(1)->widget()
-                        ->setStyleSheet("background-color: white");
+            {
+                SSVEPLayout->itemAt(1)->widget()->setStyleSheet("background-color: white");
                 fl1 = false;
             }
         }
@@ -366,13 +409,13 @@ void HybridStimulation::Flickering()
         {
             elapsedTime2 = QTime::currentTime() ;
             if (!fl2)
-            {this->layout()->itemAt(3)->widget()
-                        ->setStyleSheet("background-color: black");
+            {
+                SSVEPLayout->itemAt(2)->widget()->setStyleSheet("background-color: black");
                 fl2 = true;
             }
             else
-            {  this->layout()->itemAt(3)->widget()
-                        ->setStyleSheet("background-color: white");
+            {
+                SSVEPLayout->itemAt(2)->widget()->setStyleSheet("background-color: white");
                 fl2 = false;
             }
         }
@@ -380,13 +423,13 @@ void HybridStimulation::Flickering()
         {
             elapsedTime3 = QTime::currentTime() ;
             if (!fl3)
-            {this->layout()->itemAt(4)->widget()
-                        ->setStyleSheet("background-color: black");
+            {
+                SSVEPLayout->itemAt(3)->widget()->setStyleSheet("background-color: black");
                 fl3 = true;
             }
             else
-            {  this->layout()->itemAt(4)->widget()
-                        ->setStyleSheet("background-color: white");
+            {
+                SSVEPLayout->itemAt(3)->widget()->setStyleSheet("background-color: white");
                 fl3 = false;
             }
         }
@@ -410,7 +453,8 @@ void HybridStimulation::pre_trial()
     if (pre_trial_count == 0)
     {
         ERPFlashingSequence = new RandomFlashSequence(nrERPElements, nrERPSequence);
-        SSVEPFlickeringSequence = new RandomFlashSequence(nrSSVEPElements, 1);
+
+        //        SSVEPFlickeringSequence = new RandomFlashSequence(nrSSVEPElements, 1);
         sendMarker(OVTK_StimulationId_TrialStart);
 
         if (operationMode == CALIBRATION)
@@ -509,32 +553,14 @@ void HybridStimulation::receiveFeedback()
 
 bool HybridStimulation::isTarget()
 {
-    //    int row, column;
+    //    qDebug()<<Q_FUNC_INFO;
     int index = ERPFlashingSequence->sequence[currentStimulation] - 1;
-    //    row = index / nr_elements;
-    //    column = index % nr_elements;
-
-
-    //    if(desired_phrase[currentLetter]==presented_letters[index])
-    //    {
-    //        //        qDebug()<< "letter : " << letters[row][column];
-    //        //        qDebug()<< "desired letter: " << desired_phrase[currentLetter];
-    //        //        qDebug()<< "flashing: "<< flashingSequence->sequence[currentStimulation];
-    //        //        qDebug()<< "presented letter:" << presented_letters[index];
-    //        //        qDebug()<< "row: " << row << " column: "<< column;
-    //        return true;
-    //    }
-    //    else
-    //    {
-    //        return false;
-    //    }
-
     if(desiredSequence[currentLetter]==presentedCommands[index][0])
     {
         //                qDebug()<< "letter : " << letters[row][column];
-        qDebug()<< "desired letter: " << desiredSequence[currentLetter];
+        //        qDebug()<< "desired letter: " << desiredSequence[currentLetter];
         //        qDebug()<< "flashing: "<< flashingSequence->sequence[currentStimulation];
-        qDebug()<< "presented letter:" << desiredSequence[index];
+        //        qDebug()<< "presented letter:" << desiredSequence[index];
         //        qDebug()<< "row: " << row << " column: "<< column;
         return true;
     }
@@ -549,90 +575,73 @@ void HybridStimulation::highlightTarget()
 {
     int idx = 0;
 
-    for (int i=0; i<rows; i++)
+    for (int i=0; i<nrERPElements; i++)
     {
-        for (int j=0; j<cols; j++)
+        if(desiredSequence[currentLetter]==presentedCommands[idx][0])
         {
-            //                        idx++;
-            //            if (desired_phrase[currentLetter] == letters[i][j]){
-            //                currentTarget = idx;
-            //                break;
-            if(desiredSequence[currentLetter]==presentedCommands[idx][0])
-            {
-                currentTarget = idx + 1;
-                break;
-            }
-            idx++;
+            currentTarget = idx;
+            break;
+        }
+        idx++;
+    }
+
+    if ( (ERPStimulationType == COLORED_FACE) || (ERPStimulationType == INVERTED_COLORED_FACE) )
+    {
+        switch (currentTarget)
+        {
+        case 0:
+        {
+            ERPLayout->itemAt(currentTarget)->widget()->setStyleSheet("QLabel { color : blue; font: 60pt }");
+            break;
+        }
+        case 1:
+        {
+            ERPLayout->itemAt(currentTarget)->widget()->setStyleSheet("QLabel { color : green; font: 60pt }");
+            break;
+        }
+        case 2:
+        {
+            ERPLayout->itemAt(currentTarget)->widget()->setStyleSheet("QLabel { color : red; font: 60pt }");
+            break;
+        }
+        case 3:
+        {
+            ERPLayout->itemAt(currentTarget)->widget()->setStyleSheet("QLabel { color : cyan; font: 60pt }");
+            break;
+        }
+        case 4:
+        {
+            ERPLayout->itemAt(currentTarget)->widget()->setStyleSheet("QLabel { color : white; font: 60pt }");
+            break;
+        }
+        case 5:
+        {
+            ERPLayout->itemAt(currentTarget)->widget()->setStyleSheet("QLabel { color : yellow; font: 60pt }");
+            break;
+        }
+        case 6:
+        {
+            ERPLayout->itemAt(currentTarget)->widget()->setStyleSheet("QLabel { color : magenta; font: 60pt }");
+            break;
+        }
+        case 7:
+        {
+            ERPLayout->itemAt(currentTarget)->widget()->setStyleSheet("QLabel { color : orange; font: 60pt }");
+            break;
+        }
+
         }
     }
-    //    qDebug()
-
-//    this->layout()->itemAt(currentTarget)->
-//            widget()->setStyleSheet("QLabel { color : red; font: 60pt }");
-    switch (currentTarget)
-    {
-    case 1:
-    {
-        this->layout()->itemAt(currentTarget)->
-                widget()->setStyleSheet("QLabel { color : blue; font: 60pt }");
-        break;
-    }
-    case 2:
-    {
-        this->layout()->itemAt(currentTarget)->
-                widget()->setStyleSheet("QLabel { color : green; font: 60pt }");
-        break;
-    }
-    case 3:
-    {
-        this->layout()->itemAt(currentTarget)->
-                widget()->setStyleSheet("QLabel { color : red; font: 60pt }");
-        break;
-    }
-    case 4:
-    {
-        this->layout()->itemAt(currentTarget)->
-                widget()->setStyleSheet("QLabel { color : brown; font: 60pt }");
-        break;
-    }
-    case 5:
-    {
-        this->layout()->itemAt(currentTarget)->
-                widget()->setStyleSheet("QLabel { color : cyan; font: 60pt }");
-        break;
-    }
-    case 6:
-    {
-        this->layout()->itemAt(currentTarget)->
-                widget()->setStyleSheet("QLabel { color : white; font: 60pt })");
-        break;
-    }
-    case 7:
-    {
-        this->layout()->itemAt(currentTarget)->
-                widget()->setStyleSheet("QLabel { color : yellow; font: 60pt }");
-        break;
-    }
-    case 8:
-    {
-        this->layout()->itemAt(currentTarget)->
-                widget()->setStyleSheet("QLabel { color : orange; font: 60pt }");
-        break;
-    }
-    case 9:
-    {
-        this->layout()->itemAt(currentTarget)->
-                widget()->setStyleSheet("QLabel { color : magenta; font: 60pt }");
-        break;
-    }
-
-    }
+    else
+        ERPLayout->itemAt(currentTarget)->widget()->setStyleSheet("QLabel { color : red; font: 60pt }");
 }
+
 
 void HybridStimulation::refreshTarget()
 {
-    this->layout()->itemAt(currentTarget)->
-            widget()->setStyleSheet("QLabel { color : gray; font: 40pt }");
+
+    ERPLayout->itemAt(currentTarget)->widget()->setStyleSheet("QLabel { color : gray; font: 40pt }");
+
 }
 
 void HybridStimulation::wait(int millisecondsToWait)
@@ -729,6 +738,7 @@ void HybridStimulation::create_layout()
         lb->setText(QString::number(i));
         lb->setStyleSheet("font: 40pt; color:gray");
         ERPLayout->addWidget(lb);
+        presentedCommands.append(QString::number(i));
     }
 
     for(int i=1; i<=nrSSVEPElements; i++)
