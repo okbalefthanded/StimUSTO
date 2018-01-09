@@ -8,7 +8,7 @@ RandomFlashSequence::RandomFlashSequence(QObject *parent) : QObject(parent)
 {
 
 }
-RandomFlashSequence::RandomFlashSequence(int length,int nr_sequences, int min_dist, bool repetition)
+RandomFlashSequence::RandomFlashSequence(int length, int nr_sequences, int min_dist, bool repetition)
 {
 
     srand(time(0));
@@ -20,25 +20,32 @@ RandomFlashSequence::RandomFlashSequence(int length,int nr_sequences, int min_di
     l = list;
 
     for (int i=1; i<nr_sequences; i++){
-        random_shuffle(l.begin(), l.end());
-        list.append( l );
-        if(list.last()==l.first())
+        if (length == 1)
         {
-
-            std::swap(l[0],l[2]);
-
+            list.append( l );
         }
-        else if(list.last()==l[1])
-        {
+        else {
+            random_shuffle(l.begin(), l.end());
+            list.append( l );
 
-            std::swap(l[1],l[2]);
+            if(list.last()==l.first())
+            {
 
-        }
-        else if(list[list.count()-1]==l[0])
-        {
+                std::swap(l[0],l[2]);
 
-            std::swap(l[0],l[1]);
+            }
+            else if(list.last()==l[1])
+            {
 
+                std::swap(l[1],l[2]);
+
+            }
+            else if(list[list.count()-1]==l[0])
+            {
+
+                std::swap(l[0],l[1]);
+
+            }
         }
     }
     sequence = list;
