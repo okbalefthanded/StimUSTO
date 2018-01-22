@@ -218,7 +218,7 @@
         </item>
         <item>
          <property name="text">
-          <string>Inverted_face</string>
+          <string>Inverted_Face</string>
          </property>
         </item>
         <item>
@@ -472,14 +472,14 @@
       <item>
        <widget class="QLineEdit" name="Frequencies">
         <property name="text">
-         <string>7,9,11,13</string>
+         <string>7,8.57,10,12</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QLineEdit" name="SSVEP_StimDuration">
         <property name="text">
-         <string>2</string>
+         <string>4</string>
         </property>
        </widget>
       </item>
@@ -493,7 +493,7 @@
       <item>
        <widget class="QLineEdit" name="SSVEP_Sequence">
         <property name="text">
-         <string>30</string>
+         <string>20</string>
         </property>
        </widget>
       </item>
@@ -512,6 +512,11 @@
         <item>
          <property name="text">
           <string>Free mode</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Single</string>
          </property>
         </item>
        </widget>

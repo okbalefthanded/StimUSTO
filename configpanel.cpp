@@ -1,5 +1,6 @@
 //
 #include <QMessageBox>
+
 //
 #include "configpanel.h"
 #include "ui_configpanel.h"
@@ -10,7 +11,8 @@
 #include "ssvep.h"
 #include "coloredface.h"
 #include "hybridstimulation.h"
-//
+#include "hybridgridstimulation.h"
+// speller types
 const quint8 FLASHING_SPELLER = 0;
 const quint8 FACES_SPELLER = 1;
 const quint8 MOTION_BAR = 2;
@@ -20,6 +22,12 @@ const quint8 SSVEP = 5;
 const quint8 INVERTED_FACE = 6;
 const quint8 COLORED_FACE = 7;
 const quint8 INVERTED_COLORED_FACE = 8;
+// operation modes
+const quint8 CALIBRATION = 0;
+const quint8 COPY_MODE  = 1;
+const quint8 FREE_MODE = 2;
+const quint8 SSVEP_SINGLE = 3;
+const int start_port = 54321;
 
 ConfigPanel::ConfigPanel(QWidget *parent) :
     QMainWindow(parent),
@@ -44,15 +52,11 @@ void ConfigPanel::on_connectOvAsBtn_clicked()
     cTest = new OVMarkerSender(this);
 
     if (cTest->Connect(ovAsAddress,ovTcpTagPort))
-
     {
         QMessageBox::information(this,"Socket connection","Connected");
-
     }
-
     else
     {
-
         QMessageBox::information(this,"Socket connection","Not Connected");
     }
 }
@@ -64,6 +68,19 @@ void ConfigPanel::on_connectOvAsBtn_clicked()
  */
 void ConfigPanel::on_initSpeller_clicked()
 {
+
+    QHostAddress sender;
+    quint16 senderPort = 54321;
+    QByteArray *buffer = new QByteArray();
+
+    //    buffer->resize(start_socket->pendingDatagramSize());
+    //    //    qDebug() << "buffer size" << buffer->size();
+
+    //    start_socket->readDatagram(buffer->data(), buffer->size(), &sender, &senderPort);
+
+    start_socket = new QUdpSocket(this);
+    start_socket->bind(QHostAddress("10.3.65.37"), 54321);
+
     if(!cTest->connectedOnce)
     {
         QMessageBox::information(this,"Socket connection","Not Connected");
@@ -113,6 +130,7 @@ void ConfigPanel::on_initSpeller_clicked()
             FlashingSpeller *Fspeller = new FlashingSpeller();
             //
             connect(ui->startSpeller, SIGNAL(clicked()), Fspeller, SLOT(startTrial()));
+            connect(start_socket, SIGNAL(readyRead()), Fspeller, SLOT(startTrial()));
             connect(Fspeller, SIGNAL(markerTag(uint64_t)), cTest, SLOT(sendStimulation(uint64_t)));
             //
             Fspeller->setStimulation_duration(ui->stimulusDuration->text().toInt());
@@ -122,6 +140,8 @@ void ConfigPanel::on_initSpeller_clicked()
             Fspeller->setDesired_phrase(ui->desiredPhrase->text());
             Fspeller->setSpeller_type(spellerType);
             Fspeller->setFeedbackPort(ui->feedback_port->text().toInt());
+            //            buffer->resize(start_socket->pendingDatagramSize());
+            //            qDebug()<< "Start Data" << buffer->data();
             break;
         }
 
@@ -193,16 +213,30 @@ void ConfigPanel::on_initSSVEP_clicked()
 
     else
     {
-        Ssvep *ssvepStimulation = new Ssvep();
+        quint8 SSVEPNrElements;
+        quint8 operationMode;
+        if (ui->SSVEP_mode->currentIndex() == SSVEP_SINGLE)
+        {
+            SSVEPNrElements = 1;
+            operationMode = CALIBRATION;
+        }
+        else
+        {
+            QStringList freqsList = ui->Frequencies->text().split(',');
+            SSVEPNrElements = freqsList.count() + 1;
+            operationMode = ui->SSVEP_mode->currentIndex();
+        }
+
+        Ssvep *ssvepStimulation = new Ssvep(SSVEPNrElements);
 
         connect(ui->startSpeller, SIGNAL(clicked()), ssvepStimulation, SLOT(startTrial()));
         connect(ssvepStimulation, SIGNAL(markerTag(uint64_t)), cTest, SLOT(sendStimulation(uint64_t)));
 
         ssvepStimulation->setFrequencies(ui->Frequencies->text());
-        ssvepStimulation->setStimulationDuration(ui->SSVEP_StimDuration->text().toInt());
+        ssvepStimulation->setStimulationDuration(ui->SSVEP_StimDuration->text().toFloat());
         ssvepStimulation->setBreakDuration(ui->SSVEP_BreakDuration->text().toInt());
         ssvepStimulation->setSequence(ui->SSVEP_Sequence->text().toInt());
-        ssvepStimulation->setFlickeringMode(ui->SSVEP_mode->currentIndex());
+        ssvepStimulation->setFlickeringMode(operationMode);
         ssvepStimulation->setFeedbackPort(ui->feedback_port->text().toInt());
 
 
@@ -248,7 +282,9 @@ void ConfigPanel::on_initHybrid_clicked()
     }
     else
     {
-        HybridStimulation *hybrid = new HybridStimulation();
+        //        HybridStimulation *hybrid = new HybridStimulation();
+
+        HybridGridStimulation *hybrid = new HybridGridStimulation();
         connect(ui->startSpeller, SIGNAL(clicked()), hybrid, SLOT(startTrial()));
         connect(hybrid, SIGNAL(markerTag(uint64_t)), cTest, SLOT(sendStimulation(uint64_t)));
         //ERP configuration
@@ -261,10 +297,13 @@ void ConfigPanel::on_initHybrid_clicked()
         //SSVEP configuration
         hybrid->setFrequencies(ui->Frequencies->text());
         hybrid->setSSVEPStimulationDuration(ui->SSVEP_StimDuration->text().toInt());
-//        hybrid->setBreakDuration(ui->SSVEP_BreakDuration->text().toInt());
-//        hybrid->setSSVEPSequence(ui->SSVEP_Sequence->text().toInt());
-//        hybrid->setFlickeringMode(ui->SSVEP_mode->currentIndex());
+        //        hybrid->setBreakDuration(ui->SSVEP_BreakDuration->text().toInt());
+        //        hybrid->setSSVEPSequence(ui->SSVEP_Sequence->text().toInt());
+        //        hybrid->setFlickeringMode(ui->SSVEP_mode->currentIndex());
         // general configuration
         hybrid->setFeedbackPort(ui->feedback_port->text().toInt());
     }
 }
+
+
+

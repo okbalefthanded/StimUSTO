@@ -186,7 +186,7 @@ void FlashingSpeller::startFlashing()
 
 void FlashingSpeller::pauseFlashing()
 {
-    qDebug()<< Q_FUNC_INFO;
+    // qDebug()<< Q_FUNC_INFO;
     // sendMarker(OVTK_StimulationId_VisualStimulationStop);
     this->layout()->itemAt(flashingSequence->sequence[currentStimulation])->
             widget()->setStyleSheet("QLabel { color : gray; font: 40pt }");
@@ -227,26 +227,28 @@ void FlashingSpeller::pauseFlashing()
 
 void FlashingSpeller::pre_trial()
 {
-    qDebug()<< Q_FUNC_INFO;
+    //qDebug()<< Q_FUNC_INFO;
 
     if (pre_trial_count == 0)
     {
         flashingSequence = new RandomFlashSequence(nr_elements, nr_sequence);
+        qDebug()<<"sequence "<<flashingSequence->sequence;
         sendMarker(OVTK_StimulationId_TrialStart);
 
         if (spelling_mode == CALIBRATION)
         {
-            qDebug()<< "highlightTarget";
+            // qDebug()<< "highlightTarget";
             highlightTarget();
             text_row += desired_phrase[currentLetter];
             textRow->setText(text_row);
         }
         else if(spelling_mode == COPY_MODE)
         {
+            textRow->setText(desired_phrase.at(currentLetter));
             highlightTarget();
         }
     }
-    qDebug()<< "Pre trial timer start";
+    // qDebug()<< "Pre trial timer start";
 
     preTrialTimer->start();
     pre_trial_count++;
@@ -274,11 +276,16 @@ void FlashingSpeller::feedback()
         {
             this->layout()->itemAt(currentTarget)->
                     widget()->setStyleSheet("QLabel { color : green; font: 40pt }");
+            //            textRow->set
+
         }
         else
         {
             this->layout()->itemAt(currentTarget)->
                     widget()->setStyleSheet("QLabel { color : blue; font: 40pt }");
+            desired_phrase.insert(currentLetter-1, desired_phrase[currentLetter - 1]);
+
+            //            qDebug()<< Q_FUNC_INFO << "Desired_phrase "<< desired_phrase;
         }
 
     }
@@ -288,8 +295,6 @@ void FlashingSpeller::feedback()
 void FlashingSpeller::post_trial()
 {
     qDebug()<< Q_FUNC_INFO;
-
-
     currentStimulation = 0;
     state = PRE_TRIAL;
     // wait
@@ -321,7 +326,7 @@ void FlashingSpeller::receiveFeedback()
     //    qDebug() << "buffer size" << buffer->size();
 
     feedback_socket->readDatagram(buffer->data(), buffer->size(), &sender, &senderPort);
-    feedback_socket->waitForBytesWritten();
+    //    feedback_socket->waitForBytesWritten();
     text_row += buffer->data();
     qDebug()<< "Feedback Data" << buffer->data();
 }
@@ -350,9 +355,9 @@ bool FlashingSpeller::isTarget()
     if(desired_phrase[currentLetter]==presented_letters[index][0])
     {
         //                qDebug()<< "letter : " << letters[row][column];
-        qDebug()<< "desired letter: " << desired_phrase[currentLetter];
+       // qDebug()<< "desired letter: " << desired_phrase[currentLetter];
         //        qDebug()<< "flashing: "<< flashingSequence->sequence[currentStimulation];
-        qDebug()<< "presented letter:" << presented_letters[index];
+       // qDebug()<< "presented letter:" << presented_letters[index];
         //        qDebug()<< "row: " << row << " column: "<< column;
         return true;
     }
@@ -481,16 +486,30 @@ void FlashingSpeller::create_layout()
         {
             QLabel *element = new QLabel(this);
             element->setText(QString::number(k));
-            //            element->setText(letters[i-1][j]);
+            //element->setText(letters[i-1][j]);
             element->setStyleSheet("font: 40pt; color:gray");
             element->setAlignment(Qt::AlignCenter);
+
+            /*
+            QString imagePath, imageName;
+            imagePath = ":/images/";
+            imageName = QString::number(k) + ".png";
+            imagePath.append(imageName);
+            QImage im(imagePath);
+            QImage im2;
+            im2 = im.scaled(70, 70, Qt::IgnoreAspectRatio);
+            QPixmap mp(QPixmap::fromImage(im2));
+            mp.scaled(50, 50, Qt::IgnoreAspectRatio);
+            mp.scaled(QSize(50,50),Qt::IgnoreAspectRatio);
+            element->setPixmap(mp);
+            */
+
             layout->addWidget(element,i,j);
             presented_letters.append(QString::number(k));
             k++;
             //            presented_letters.append(letters[i-1][j]);
         }
     }
-
     this->setLayout(layout);
 }
 

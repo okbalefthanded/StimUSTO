@@ -348,6 +348,8 @@ void ColoredFace::feedback()
 
     receiveFeedback();
     textRow->setText(text_row);
+
+
     if (spelling_mode == COPY_MODE)
     {
 
@@ -360,8 +362,8 @@ void ColoredFace::feedback()
         {
             this->layout()->itemAt(currentTarget)->
                     widget()->setStyleSheet("QLabel { color : blue; font: 40pt }");
-        }
 
+        }
     }
     post_trial();
 }
@@ -402,7 +404,7 @@ void ColoredFace::receiveFeedback()
     qDebug() << "buffer size" << buffer->size();
 
     feedback_socket->readDatagram(buffer->data(), buffer->size(), &sender, &senderPort);
-    feedback_socket->waitForBytesWritten();
+//    feedback_socket->waitForBytesWritten();
     text_row += buffer->data();
     qDebug()<< "Feedback Data" << buffer->data();
 }

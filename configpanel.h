@@ -1,7 +1,9 @@
 #ifndef CONFIGPANEL_H
 #define CONFIGPANEL_H
-
+//
 #include <QMainWindow>
+#include <QUdpSocket>
+//
 #include "mvepspeller.h"
 #include "ovmarkersender.h"
 
@@ -30,8 +32,7 @@ public:
 //    QString desired_phrase;
 
     OVMarkerSender *cTest;
-
-
+    QUdpSocket *start_socket;
 
 private slots:
     void on_connectOvAsBtn_clicked();
@@ -44,6 +45,7 @@ private slots:
     void on_initSSVEP_clicked();
 
     void on_initHybrid_clicked();
+
 
 private:
     Ui::ConfigPanel *ui;

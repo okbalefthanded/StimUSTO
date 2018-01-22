@@ -24,8 +24,6 @@ const quint8 POST_ERPSTIMULUS = 3;
 const quint8 FEEDBACK = 4;
 const quint8 POST_TRIAL = 5;
 
-const quint8 FLASHING_SPELLER = 0;
-const quint8 FACES_SPELLER = 1;
 const quint8 INVERTED_FACE = 6;
 const quint8 COLORED_FACE = 7;
 const quint8 INVERTED_COLORED_FACE = 8;
@@ -35,7 +33,6 @@ const quint8 COPY_MODE  = 1;
 const quint8 FREE_MODE = 2;
 
 const uint64_t OVTK_StimulationLabel_Base = 0x00008100;
-//const uint64_t OVTK_StimulationId_Number_00 = 0 ;
 //
 HybridStimulation::HybridStimulation(QWidget *parent) :
     QWidget(parent),
@@ -436,7 +433,9 @@ void HybridStimulation::Flickering()
 
     }
 
+    sendMarker(OVTK_StimulationId_VisualSteadyStateStimulationStop);
     state = POST_TRIAL;
+
     if(operationMode == COPY_MODE || operationMode == FREE_MODE){
         feedback();
     }
@@ -495,12 +494,12 @@ void HybridStimulation::feedback()
 
         if(text_row[currentLetter - 1] == desiredSequence[currentLetter - 1])
         {
-            this->layout()->itemAt(currentTarget)->
+            ERPLayout->layout()->itemAt(currentTarget)->
                     widget()->setStyleSheet("QLabel { color : green; font: 40pt }");
         }
         else
         {
-            this->layout()->itemAt(currentTarget)->
+            ERPLayout->layout()->itemAt(currentTarget)->
                     widget()->setStyleSheet("QLabel { color : blue; font: 40pt }");
         }
 
@@ -636,7 +635,6 @@ void HybridStimulation::highlightTarget()
         ERPLayout->itemAt(currentTarget)->widget()->setStyleSheet("QLabel { color : red; font: 60pt }");
 }
 
-
 void HybridStimulation::refreshTarget()
 {
 
@@ -753,7 +751,6 @@ void HybridStimulation::create_layout()
     layout->addLayout(ERPLayout,2,0,2,2);
     layout->addLayout(SSVEPLayout,3,1);
     this->setLayout(layout);
-
 }
 
 void HybridStimulation::refresh_layout()

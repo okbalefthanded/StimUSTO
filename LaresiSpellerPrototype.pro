@@ -24,7 +24,8 @@ SOURCES += main.cpp\
     ssvep.cpp \
     coloredface.cpp \
     hybridstimulation.cpp \
-    ellipselayout.cpp
+    ellipselayout.cpp \
+    hybridgridstimulation.cpp
 
 HEADERS  += configpanel.h \
     mvepspeller.h \
@@ -38,7 +39,8 @@ HEADERS  += configpanel.h \
     ssvep.h \
     coloredface.h \
     hybridstimulation.h \
-    ellipselayout.h
+    ellipselayout.h \
+    hybridgridstimulation.h
 
 INCLUDEPATH += C:\openvibe-1.2.2-src\openvibe-1.2.2-src\toolkit\include\toolkit
 
@@ -47,7 +49,9 @@ FORMS    += configpanel.ui \
     movingface.ui \
     ssvep.ui \
     coloredface.ui \
-    hybridstimulation.ui
+    hybridstimulation.ui \
+    hybridgridstimulation.ui \
+    ssvepsingle.ui
 
 RESOURCES += \
     asset.qrc

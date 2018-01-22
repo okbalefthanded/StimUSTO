@@ -18,12 +18,12 @@ class Ssvep : public QWidget
     Q_OBJECT
 
 public:
-    explicit Ssvep(QWidget *parent = 0);
+    explicit Ssvep(quint8 nrElements = 1, QWidget *parent = 0);
     ~Ssvep();
 
     void setFrequencies(QString freqs);
     void setFlickeringMode(int mode);
-    void setStimulationDuration(int stimDuration);
+    void setStimulationDuration(float stimDuration);
     void setBreakDuration(int brkDuration);
     void setSequence(int sequence);
     void setFeedbackPort(int port);
@@ -70,7 +70,7 @@ private:
     int nr_elements;
     QLabel *textRow;
     QList<float> frequencies;
-    int stimulationDuration;
+    float stimulationDuration;
     int stimulationSequence;
     int breakDuration;
 
