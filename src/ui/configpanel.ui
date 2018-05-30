@@ -1,0 +1,598 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ConfigPanel</class>
+ <widget class="QMainWindow" name="ConfigPanel">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>850</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>ConfigPanel</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <widget class="QGroupBox" name="groupBox">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>10</y>
+      <width>191</width>
+      <height>141</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>OV Acquisition Server Connection</string>
+    </property>
+    <widget class="QLineEdit" name="addressOvAs">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>30</y>
+       <width>113</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>127.0.0.1</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="portOvAs">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>70</y>
+       <width>113</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>15361</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="connectOvAsBtn">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>100</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Connect</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="addressLabel">
+     <property name="geometry">
+      <rect>
+       <x>130</x>
+       <y>30</y>
+       <width>47</width>
+       <height>13</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Address</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="portLabel">
+     <property name="geometry">
+      <rect>
+       <x>130</x>
+       <y>70</y>
+       <width>47</width>
+       <height>13</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Port</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_2">
+    <property name="geometry">
+     <rect>
+      <x>230</x>
+      <y>10</y>
+      <width>301</width>
+      <height>361</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>ERP spellers configuration</string>
+    </property>
+    <widget class="QPushButton" name="initSpeller">
+     <property name="geometry">
+      <rect>
+       <x>220</x>
+       <y>320</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Init Speller</string>
+     </property>
+    </widget>
+    <widget class="QWidget" name="layoutWidget">
+     <property name="geometry">
+      <rect>
+       <x>11</x>
+       <y>26</y>
+       <width>147</width>
+       <height>301</height>
+      </rect>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <widget class="QLineEdit" name="stimulusDuration">
+        <property name="text">
+         <string>100</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="interStimulusDuration">
+        <property name="text">
+         <string>100</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="interTrialPause">
+        <property name="text">
+         <string>2</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="numberOfRepetition">
+        <property name="text">
+         <string>10</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="numberOfTrials"/>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="desiredPhrase">
+        <property name="text">
+         <string>123456789</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="spellingModeChoices">
+        <item>
+         <property name="text">
+          <string>Calibration</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Copy Mode</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Free Mode</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="spellerType">
+        <item>
+         <property name="text">
+          <string>Flashing</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Faces</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Motion_Bar</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Motion_Face</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Moving_Face</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>ssvep</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Inverted_Face</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Colored_Face</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Inverted_Colored_Face</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="layoutWidget">
+     <property name="geometry">
+      <rect>
+       <x>160</x>
+       <y>30</y>
+       <width>101</width>
+       <height>291</height>
+      </rect>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_4">
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Stimulus Duration</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>ISI</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Inter Trial Pause</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>Number of repetition</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>Number of Trials</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_7">
+        <property name="text">
+         <string>Desired phrase</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_8">
+        <property name="text">
+         <string>Spelling mode</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_9">
+        <property name="text">
+         <string>Speller Type</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_4">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>220</y>
+      <width>191</width>
+      <height>151</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Control</string>
+    </property>
+    <widget class="QPushButton" name="startSpeller">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Start</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pauseSpeller">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>50</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Pause</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="stopSpeller">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>80</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Stop</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="quitSpeller">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>110</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Quit</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_3">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>370</y>
+      <width>821</width>
+      <height>171</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Hybrid BCI</string>
+    </property>
+    <widget class="QPushButton" name="initHybrid">
+     <property name="geometry">
+      <rect>
+       <x>730</x>
+       <y>140</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Init Hybrid</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_5">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>150</y>
+      <width>191</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>OV Feedback Receiver</string>
+    </property>
+    <widget class="QLineEdit" name="feedback_port">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>113</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>12345</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="portLabel_2">
+     <property name="geometry">
+      <rect>
+       <x>130</x>
+       <y>20</y>
+       <width>47</width>
+       <height>13</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Port</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_6">
+    <property name="geometry">
+     <rect>
+      <x>539</x>
+      <y>10</y>
+      <width>301</width>
+      <height>361</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>SSVEP configuration</string>
+    </property>
+    <widget class="QPushButton" name="initSSVEP">
+     <property name="geometry">
+      <rect>
+       <x>220</x>
+       <y>320</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Init SSVEP</string>
+     </property>
+    </widget>
+    <widget class="QWidget" name="layoutWidget">
+     <property name="geometry">
+      <rect>
+       <x>11</x>
+       <y>23</y>
+       <width>111</width>
+       <height>281</height>
+      </rect>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QLineEdit" name="Frequencies">
+        <property name="text">
+         <string>7.5,8.57,10,12</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="SSVEP_StimDuration">
+        <property name="text">
+         <string>4</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="SSVEP_BreakDuration">
+        <property name="text">
+         <string>4</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="SSVEP_Sequence">
+        <property name="text">
+         <string>20</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="SSVEP_mode">
+        <item>
+         <property name="text">
+          <string>Calibration</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Copy mode</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Free mode</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Single</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="layoutWidget">
+     <property name="geometry">
+      <rect>
+       <x>135</x>
+       <y>21</y>
+       <width>111</width>
+       <height>281</height>
+      </rect>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>Frequencies</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_13">
+        <property name="text">
+         <string>Stimulation Duration</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_14">
+        <property name="text">
+         <string>Break Duration</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_15">
+        <property name="text">
+         <string>Sequence</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_10">
+        <property name="text">
+         <string>Mode</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>850</width>
+     <height>18</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QToolBar" name="mainToolBar">
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>
