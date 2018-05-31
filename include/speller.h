@@ -40,7 +40,7 @@ protected slots:
     void preTrial();
     void feedback();
     void postTrial();
-    virtual void startFlashing();
+    void startFlashing();
     void pauseFlashing();
     void receiveFeedback();
     void createLayout();
@@ -49,12 +49,18 @@ protected slots:
 public slots:
 
     void wait(int t_millisecondsToWait);
-
-
     //
     void sendMarker(uint64_t t_ovStimulation){
         emit markerTag(t_ovStimulation);
     }
+
+private:
+
+    void stimulationFlashing();
+    void stimulationFace();
+    void stimulationColoredFace();
+    void stimulationInvertedFace();
+    void stimulationInvertedColoredFace();
 
 protected:
 

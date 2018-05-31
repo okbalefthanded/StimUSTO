@@ -4,7 +4,9 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network
+QT       += core gui network opengl
+
+CONFIG += c++11
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -12,49 +14,61 @@ TARGET = LaresiSpellerPrototype
 TEMPLATE = app
 
 
-SOURCES += main.cpp\
-        configpanel.cpp \
-    mvepspeller.cpp \
-    flashingspeller.cpp \
-    matrixlayout.cpp \
-    ovmarkersender.cpp \
-    randomflashsequence.cpp \
-    motionitem.cpp \
-    movingface.cpp \
-    ssvep.cpp \
-    coloredface.cpp \
-    hybridstimulation.cpp \
-    ellipselayout.cpp \
-    hybridgridstimulation.cpp
+SOURCES += src\main.cpp\
+        src\configpanel.cpp \
+    src\mvepspeller.cpp \
+    src\flashingspeller.cpp \
+    src\matrixlayout.cpp \
+    src\ovmarkersender.cpp \
+    src\randomflashsequence.cpp \
+    src\motionitem.cpp \
+    src\movingface.cpp \
+    src\ssvep.cpp \
+    src\coloredface.cpp \
+    src\hybridstimulation.cpp \
+    src\ellipselayout.cpp \
+    src\hybridgridstimulation.cpp \
+    src\ssvepgl.cpp \
+    src\utils.cpp \
+    src\speller.cpp \
+    src/test.cpp
 
-HEADERS  += configpanel.h \
-    mvepspeller.h \
-   C:\openvibe-1.2.2-src\openvibe-1.2.2-src\toolkit\include\toolkit\ovtk_stimulations.h \
-    flashingspeller.h \
-    matrixlayout.h \
-    ovmarkersender.h \
-    randomflashsequence.h \
-    motionitem.h \
-    movingface.h \
-    ssvep.h \
-    coloredface.h \
-    hybridstimulation.h \
-    ellipselayout.h \
-    hybridgridstimulation.h
+HEADERS  += include\configpanel.h \
+    include\mvepspeller.h \
+    include\ovtk_stimulations.h \
+    include\flashingspeller.h \
+    include\matrixlayout.h \
+    include\ovmarkersender.h \
+    include\randomflashsequence.h \
+    include\motionitem.h \
+    include\movingface.h \
+    include\ssvep.h \
+    include\coloredface.h \
+    include\hybridstimulation.h \
+    include\ellipselayout.h \
+    include\hybridgridstimulation.h \
+    include\ssvepgl.h \
+    include\utils.h \
+    include\speller.h \
+    include\test.h
 
-INCLUDEPATH += C:\openvibe-1.2.2-src\openvibe-1.2.2-src\toolkit\include\toolkit
+INCLUDEPATH += include\
 
-FORMS    += configpanel.ui \
-    flashingspeller.ui \
-    movingface.ui \
-    ssvep.ui \
-    coloredface.ui \
-    hybridstimulation.ui \
-    hybridgridstimulation.ui \
-    ssvepsingle.ui
+FORMS    += src\ui\configpanel.ui \
+    src\ui\flashingspeller.ui \
+    src\ui\movingface.ui \
+    src\ui\mvepspeller.ui \
+    src\ui\ssvep.ui \
+    src\ui\coloredface.ui \
+    src\ui\hybridstimulation.ui \
+    src\ui\hybridgridstimulation.ui \
+    src\ui\ssvepsingle.ui \
+    src\ui\speller.ui
 
-RESOURCES += \
-    asset.qrc
+RESOURCES +=  assets\asset.qrc
 
 DISTFILES += \
-    MyOVBox.py
+    MyOVBox.py \
+    shaders/sh_v.vert \
+    shaders/sh_f.frag \
+    .gitignore

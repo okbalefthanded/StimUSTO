@@ -79,9 +79,61 @@ void Speller::startTrial()
         pauseFlashing();
 
     }
-
 }
 
+void Speller::startFlashing()
+{
+    sendMarker(OVTK_StimulationId_VisualStimulationStart);
+    sendMarker(config::OVTK_StimulationLabel_Base + m_flashingSequence->sequence[m_currentStimulation]);
+
+    // send target marker
+    if (m_spellingMode == operation_mode::CALIBRATION ||
+            m_spellingMode == operation_mode::COPY_MODE)
+    {
+        if (isTarget())
+        {
+            // qDebug()<< desired_phrase[currentLetter];
+            sendMarker(OVTK_StimulationId_Target);
+        }
+        else
+        {
+            sendMarker(OVTK_StimulationId_NonTarget);
+        }
+    }
+
+    switch(m_spellerType)
+    {
+    case speller_type::FLASHING_SPELLER:
+    {
+        stimulationFlashing();
+        break;
+    }
+    case speller_type::FACES_SPELLER:
+    {
+        stimulationFace();
+        break;
+    }
+    case speller_type::INVERTED_FACE:
+    {
+        stimulationInvertedFace();
+        break;
+    }
+    case speller_type::COLORED_FACE :
+    {
+        stimulationColoredFace();
+        break;
+    }
+    case speller_type::INVERTED_COLORED_FACE:
+    {
+        stimulationInvertedColoredFace();
+        break;
+    }
+    }
+
+    m_stimTimer->start();
+    m_isiTimer->stop();
+    m_state = trial_state::POST_STIMULUS;
+}
 
 void Speller::pauseFlashing()
 {
@@ -214,11 +266,6 @@ void Speller::postTrial()
 
 }
 
-void Speller::startFlashing()
-{
-
-}
-
 void Speller::receiveFeedback()
 {
     // wait for OV python script to write in UDP feedback socket
@@ -261,9 +308,9 @@ bool Speller::isTarget()
     if(m_desiredPhrase[m_currentLetter] == m_presentedLetters[index][0])
     {
         //                qDebug()<< "letter : " << letters[row][column];
-        qDebug()<< "desired letter: " << m_desiredPhrase[m_currentLetter];
+//        qDebug()<< "desired letter: " << m_desiredPhrase[m_currentLetter];
         //        qDebug()<< "flashing: "<< flashingSequence->sequence[m_currentStimulation];
-        qDebug()<< "presented letter:" << m_presentedLetters[index];
+//        qDebug()<< "presented letter:" << m_presentedLetters[index];
         //        qDebug()<< "row: " << row << " column: "<< column;
         return true;
     }
@@ -320,6 +367,156 @@ void Speller::wait(int t_millisecondsToWait)
         QCoreApplication::processEvents( QEventLoop::AllEvents, 100);
 
     }
+}
+
+void Speller::stimulationFlashing()
+{
+    this->layout()
+            ->itemAt(m_flashingSequence->sequence[m_currentStimulation])
+            ->widget()
+            ->setStyleSheet("QLabel { color : white; font: 60pt }");
+}
+
+void Speller::stimulationFace()
+{
+    this->layout()
+            ->itemAt(m_flashingSequence->sequence[m_currentStimulation])
+            ->widget()
+            ->setStyleSheet("image: url(:/images/bennabi_face.png)");
+}
+
+void Speller::stimulationColoredFace()
+{
+    switch (m_flashingSequence->sequence[m_currentStimulation])
+    {
+    case 1:
+    {
+        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
+                widget()->setStyleSheet("image: url(:/images/bennabi_face_blue.png)");
+        break;
+    }
+    case 2:
+    {
+        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
+                widget()->setStyleSheet("image: url(:/images/bennabi_face_green.png)");
+        break;
+    }
+    case 3:
+    {
+        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
+                widget()->setStyleSheet("image: url(:/images/bennabi_face_red.png)");
+        break;
+    }
+    case 4:
+    {
+        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
+                widget()->setStyleSheet("image: url(:/images/bennabi_face_brown.png)");
+        break;
+    }
+    case 5:
+    {
+        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
+                widget()->setStyleSheet("image: url(:/images/bennabi_face_cyan.png)");
+        break;
+    }
+    case 6:
+    {
+        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
+                widget()->setStyleSheet("image: url(:/images/bennabi_face.png)");
+        break;
+    }
+    case 7:
+    {
+        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
+                widget()->setStyleSheet("image: url(:/images/bennabi_face_yellow.png)");
+        break;
+    }
+    case 8:
+    {
+        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
+                widget()->setStyleSheet("image: url(:/images/bennabi_face_orange.png)");
+        break;
+    }
+    case 9:
+    {
+        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
+                widget()->setStyleSheet("image: url(:/images/bennabi_face_magenta.png)");
+        break;
+    }
+
+    }
+
+}
+
+void Speller::stimulationInvertedFace()
+{
+    this->layout()
+            ->itemAt(m_flashingSequence->sequence[m_currentStimulation])
+            ->widget()
+            ->setStyleSheet("image: url(:/images/bennabi_face_inverted.png)");
+}
+
+void Speller::stimulationInvertedColoredFace()
+{
+    switch (m_flashingSequence->sequence[m_currentStimulation])
+    {
+    case 1:
+    {
+        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
+                widget()->setStyleSheet("image: url(:/images/bennabi_face_blue_inverted.png)");
+        break;
+    }
+    case 2:
+    {
+        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
+                widget()->setStyleSheet("image: url(:/images/bennabi_face_green_inverted.png)");
+        break;
+    }
+    case 3:
+    {
+        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
+                widget()->setStyleSheet("image: url(:/images/bennabi_face_red_inverted.png)");
+        break;
+    }
+    case 4:
+    {
+        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
+                widget()->setStyleSheet("image: url(:/images/bennabi_face_brown_inverted.png)");
+        break;
+    }
+    case 5:
+    {
+        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
+                widget()->setStyleSheet("image: url(:/images/bennabi_face_cyan_inverted.png)");
+        break;
+    }
+    case 6:
+    {
+        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
+                widget()->setStyleSheet("image: url(:/images/bennabi_face_inverted.png)");
+        break;
+    }
+    case 7:
+    {
+        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
+                widget()->setStyleSheet("image: url(:/images/bennabi_face_yellow_inverted.png)");
+        break;
+    }
+    case 8:
+    {
+        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
+                widget()->setStyleSheet("image: url(:/images/bennabi_face_orange_inverted.png)");
+        break;
+    }
+    case 9:
+    {
+        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
+                widget()->setStyleSheet("image: url(:/images/bennabi_face_magenta_inverted.png)");
+        break;
+    }
+
+    }
+
 }
 
 /* Setters */

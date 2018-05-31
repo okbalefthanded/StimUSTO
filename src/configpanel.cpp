@@ -3,6 +3,7 @@
 //
 #include "configpanel.h"
 #include "ui_configpanel.h"
+#include "test.h"
 #include "mvepspeller.h"
 #include "flashingspeller.h"
 #include "movingface.h"
@@ -73,120 +74,23 @@ void ConfigPanel::on_initSpeller_clicked()
     }
     else
     {
-
         int spellerType = ui->spellerType->currentIndex();
+        Speller *Fspeller = new Speller();
 
-        switch(spellerType)
-        {
-        case speller_type::FLASHING_SPELLER:
-        {
-            FlashingSpeller *Fspeller = new FlashingSpeller();
+        connect(ui->startSpeller, SIGNAL(clicked()), Fspeller, SLOT(startTrial()));
+        connect(Fspeller, SIGNAL(markerTag(uint64_t)), cTest, SLOT(sendStimulation(uint64_t)));
 
-            connect(ui->startSpeller, SIGNAL(clicked()), Fspeller, SLOT(startTrial()));
-            connect(Fspeller, SIGNAL(markerTag(uint64_t)), cTest, SLOT(sendStimulation(uint64_t)));
-
-            Fspeller->setStimulation_duration(ui->stimulusDuration->text().toInt());
-            Fspeller->setIsi(ui->interStimulusDuration->text().toInt());
-            Fspeller->setNr_sequence(ui->numberOfRepetition->text().toInt());
-            Fspeller->setSpelling_mode(ui->spellingModeChoices->currentIndex());
-            Fspeller->setDesired_phrase(ui->desiredPhrase->text());
-            Fspeller->setSpeller_type(spellerType);
-            Fspeller->setFeedbackPort(ui->feedback_port->text().toInt());
-            break;
-        }
-        case speller_type::FACES_SPELLER:
-        {
-            //TODO
-
-            FlashingSpeller *Fspeller = new FlashingSpeller();
-            //
-            connect(ui->startSpeller, SIGNAL(clicked()), Fspeller, SLOT(startTrial()));
-            connect(Fspeller, SIGNAL(markerTag(uint64_t)), cTest, SLOT(sendStimulation(uint64_t)));
-            //
-            Fspeller->setStimulation_duration(ui->stimulusDuration->text().toInt());
-            Fspeller->setIsi(ui->interStimulusDuration->text().toInt());
-            Fspeller->setNr_sequence(ui->numberOfRepetition->text().toInt());
-            Fspeller->setSpelling_mode(ui->spellingModeChoices->currentIndex());
-            Fspeller->setDesired_phrase(ui->desiredPhrase->text());
-            Fspeller->setSpeller_type(spellerType);
-            Fspeller->setFeedbackPort(ui->feedback_port->text().toInt());
-            break;
-        }
-        case speller_type::INVERTED_FACE:
-        {
-            FlashingSpeller *Fspeller = new FlashingSpeller();
-            //
-            connect(ui->startSpeller, SIGNAL(clicked()), Fspeller, SLOT(startTrial()));
-            connect(start_socket, SIGNAL(readyRead()), Fspeller, SLOT(startTrial()));
-            connect(Fspeller, SIGNAL(markerTag(uint64_t)), cTest, SLOT(sendStimulation(uint64_t)));
-            //
-            Fspeller->setStimulation_duration(ui->stimulusDuration->text().toInt());
-            Fspeller->setIsi(ui->interStimulusDuration->text().toInt());
-            Fspeller->setNr_sequence(ui->numberOfRepetition->text().toInt());
-            Fspeller->setSpelling_mode(ui->spellingModeChoices->currentIndex());
-            Fspeller->setDesired_phrase(ui->desiredPhrase->text());
-            Fspeller->setSpeller_type(spellerType);
-            Fspeller->setFeedbackPort(ui->feedback_port->text().toInt());
-            //            buffer->resize(start_socket->pendingDatagramSize());
-            //            qDebug()<< "Start Data" << buffer->data();
-            break;
-        }
-
-        case speller_type::MOTION_BAR:
-        case speller_type::MOTION_FACE:
-        {
-            mVEPSpeller *Mspeller = new mVEPSpeller(spellerType);
-            connect(ui->startSpeller, SIGNAL(clicked()), Mspeller, SLOT(startTrial()));
-            connect(Mspeller, SIGNAL(markerTag(uint64_t)), cTest, SLOT(sendStimulation(uint64_t)));
-
-            Mspeller->setStimulation_duration(ui->stimulusDuration->text().toInt());
-            Mspeller->setIsi(ui->interStimulusDuration->text().toInt());
-            Mspeller->setNr_sequence(ui->numberOfRepetition->text().toInt());
-            Mspeller->setSpelling_mode(ui->spellingModeChoices->currentIndex());
-            Mspeller->setDesired_phrase(ui->desiredPhrase->text());
-            Mspeller->setSpeller_type(spellerType);
-            Mspeller->setFeedbackPort(ui->feedback_port->text().toInt());
-            Mspeller->setAnimTimeUpdateIntervale(ui->stimulusDuration->text().toInt());
-            break;
-        }
-
-        case speller_type::MOVING_FACE:
-        {
-            MovingFace *movingFaceSpeller = new MovingFace();
-            connect(ui->startSpeller, SIGNAL(clicked()), movingFaceSpeller, SLOT(startTrial()));
-            connect(movingFaceSpeller, SIGNAL(markerTag(uint64_t)), cTest, SLOT(sendStimulation(uint64_t)));
-
-            movingFaceSpeller->setStimulation_duration(ui->stimulusDuration->text().toInt());
-            movingFaceSpeller->setIsi(ui->interStimulusDuration->text().toInt());
-            movingFaceSpeller->setNr_sequence(ui->numberOfRepetition->text().toInt());
-            movingFaceSpeller->setSpelling_mode(ui->spellingModeChoices->currentIndex());
-            movingFaceSpeller->setDesired_phrase(ui->desiredPhrase->text());
-            movingFaceSpeller->setSpeller_type(spellerType);
-            movingFaceSpeller->setFeedbackPort(ui->feedback_port->text().toInt());
-
-            break;
-        }
-        case speller_type::COLORED_FACE:
-        case speller_type::INVERTED_COLORED_FACE:
-        {
-            ColoredFace *coloredFaceSpeller = new ColoredFace();
-            connect(ui->startSpeller, SIGNAL(clicked()), coloredFaceSpeller, SLOT(startTrial()));
-            connect(coloredFaceSpeller, SIGNAL(markerTag(uint64_t)), cTest, SLOT(sendStimulation(uint64_t)));
-
-            coloredFaceSpeller->setStimulation_duration(ui->stimulusDuration->text().toInt());
-            coloredFaceSpeller->setIsi(ui->interStimulusDuration->text().toInt());
-            coloredFaceSpeller->setNr_sequence(ui->numberOfRepetition->text().toInt());
-            coloredFaceSpeller->setSpelling_mode(ui->spellingModeChoices->currentIndex());
-            coloredFaceSpeller->setDesired_phrase(ui->desiredPhrase->text());
-            coloredFaceSpeller->setSpeller_type(spellerType);
-            coloredFaceSpeller->setFeedbackPort(ui->feedback_port->text().toInt());
-            break;
-        }
-        }
+        Fspeller->setStimulationDuration(ui->stimulusDuration->text().toInt());
+        Fspeller->setIsi(ui->interStimulusDuration->text().toInt());
+        Fspeller->setNrSequence(ui->numberOfRepetition->text().toInt());
+        Fspeller->setSpellingMode(ui->spellingModeChoices->currentIndex());
+        Fspeller->setDesiredPhrase(ui->desiredPhrase->text());
+        Fspeller->setSpellerType(spellerType);
+        Fspeller->setFeedbackPort(ui->feedback_port->text().toInt());
     }
 }
 
-//TODO
+
 //INIT SSVEP
 void ConfigPanel::on_initSSVEP_clicked()
 {
