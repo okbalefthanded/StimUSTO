@@ -13,21 +13,7 @@
 #include "ssvepgl.h"
 #include "ovtk_stimulations.h"
 #include "utils.h"
-//
-const quint8 CALIBRATION = 0;
-const quint8 COPY_MODE  = 1;
-const quint8 FREE_MODE = 2;
-const quint8 SINGLE  = 3;
-//
-const quint8 PRE_TRIAL = 0;
-const quint8 STIMULUS = 1;
-const quint8 POST_STIMULUS = 2;
-const quint8 FEEDBACK = 3;
-const quint8 POST_TRIAL = 4;
-//
-const uint64_t OVTK_StimulationLabel_Base = 0x00008100;
-//
-static const int REFRESH_RATE = 60;
+
 //
 static const QVector<QVector3D> topPoints =
 {
@@ -40,7 +26,7 @@ static const QVector3D cGray = QVector3D(0.25f, 0.25f, 0.25f);
 static const QVector3D cRed = QVector3D(1.0f, 0.0f, 0.0f);
 static const QVector3D cGreen = QVector3D(0.0f, 1.0f, 0.0f);
 //
-SsvepGL::SsvepGL(quint8 nrelements)
+SsvepGL::SsvepGL(int nrelements)
 {
 
     qDebug()<< Q_FUNC_INFO;
@@ -64,7 +50,7 @@ SsvepGL::SsvepGL(quint8 nrelements)
     feedback_socket = new QUdpSocket(this);
     feedback_socket->bind(QHostAddress::LocalHost, feedbackPort);
 
-    state = PRE_TRIAL;
+    state = trial_state::PRE_TRIAL;
 
 }
 
@@ -95,7 +81,7 @@ void SsvepGL::initializeGL()
     flicker.resize(frequencies.size());
     for (int i=0; i < frequencies.size(); ++i)
     {
-        flicker[i] = utils::gen_flick(frequencies[i], REFRESH_RATE, stimulationDuration);
+        flicker[i] = utils::gen_flick(frequencies[i], config::REFRESH_RATE, stimulationDuration);
     }
 
     // Application-specific initialization
@@ -169,15 +155,15 @@ void SsvepGL::startTrial()
 
     qDebug()<< "[TRIAL START]" << Q_FUNC_INFO;
 
-    if (state == PRE_TRIAL)
+    if (state == trial_state::PRE_TRIAL)
     {
         pre_trial();
     }
-    if (state == STIMULUS)
+    if (state == trial_state::STIMULUS)
     {
         Flickering();
     }
-    if (state == POST_TRIAL)
+    if (state == trial_state::POST_TRIAL)
     {
         post_trial();
     }
@@ -201,14 +187,14 @@ void SsvepGL::pre_trial()
 
         sendMarker(OVTK_StimulationId_TrialStart);
 
-        if (flickering_mode == CALIBRATION)
+        if (flickering_mode == operation_mode::CALIBRATION)
         {
             //            qDebug()<< "highlightTarget";
             highlightTarget();
             //            text_row += desired_phrase[currentLetter];
             //            textRow->setText(text_row);
         }
-        else if(flickering_mode == COPY_MODE)
+        else if(flickering_mode == operation_mode::COPY_MODE)
         {
             highlightTarget();
         }
@@ -227,7 +213,7 @@ void SsvepGL::pre_trial()
         refreshTarget();
         preTrialTimer->stop();
         pre_trial_count = 0;
-        state = STIMULUS;
+        state = trial_state::STIMULUS;
 
     }
 
@@ -243,7 +229,7 @@ void SsvepGL::post_trial()
     //    currentStimulation = 0;
 
     index = 0;
-    state = PRE_TRIAL;
+    state = trial_state::PRE_TRIAL;
     // wait
     int waitMillisec = breakDuration - pre_trial_wait * 1000;
     wait(waitMillisec);
@@ -251,7 +237,7 @@ void SsvepGL::post_trial()
     //    refreshTarget();
 
     if (currentFlicker >= flickeringSequence->sequence.size() &&
-            (flickering_mode == COPY_MODE || flickering_mode == CALIBRATION))
+            (flickering_mode == operation_mode::COPY_MODE || flickering_mode == operation_mode::CALIBRATION))
     {
         qDebug()<< "Experiment End";
         sendMarker(OVTK_StimulationId_ExperimentStop);
@@ -274,7 +260,7 @@ void SsvepGL::Flickering()
         connect(this, SIGNAL(frameSwapped()), this, SLOT(update()));
     }
 
-    sendMarker(OVTK_StimulationLabel_Base + flickeringSequence->sequence[currentFlicker]);
+    sendMarker(config::OVTK_StimulationLabel_Base + flickeringSequence->sequence[currentFlicker]);
     sendMarker(OVTK_StimulationId_VisualSteadyStateStimulationStart);
 
     while(index < flicker[0].size())
@@ -282,7 +268,7 @@ void SsvepGL::Flickering()
         QCoreApplication::processEvents(QEventLoop::AllEvents);
     }
     ++currentFlicker;
-    state = POST_TRIAL;
+    state = trial_state::POST_TRIAL;
 }
 
 void SsvepGL::wait(int millisecondsToWait)

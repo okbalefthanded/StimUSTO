@@ -4,7 +4,6 @@
 #include <QMainWindow>
 #include <QUdpSocket>
 //
-#include "mvepspeller.h"
 #include "ovmarkersender.h"
 
 namespace Ui {
@@ -19,10 +18,10 @@ public:
     explicit ConfigPanel(QWidget *parent = 0);
     ~ConfigPanel();
 //
-    bool onStart;
-    bool onPause;
-    bool onStop;
-    bool onQuit;
+    bool m_onStart;
+    bool m_onPause;
+    bool m_onStop;
+    bool m_onQuit;
 //
 //    int stimulation_duration;
 //    int isi;
@@ -31,8 +30,8 @@ public:
 //    int spelling_mode;
 //    QString desired_phrase;
 
-    OVMarkerSender *cTest;
-    QUdpSocket *start_socket;
+    OVMarkerSender *m_markerSender;
+    QUdpSocket *m_startSocket;
 
 private slots:
     void on_connectOvAsBtn_clicked();
@@ -41,18 +40,12 @@ private slots:
     void on_pauseSpeller_clicked();
     void on_stopSpeller_clicked();
     void on_quitSpeller_clicked();
-
     void on_initSSVEP_clicked();
-
     void on_initHybrid_clicked();
 
 
 private:
     Ui::ConfigPanel *ui;
-
-
-//    mVEPSpeller *speller;
-
 };
 
 #endif // CONFIGPANEL_H

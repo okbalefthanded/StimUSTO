@@ -3,16 +3,12 @@
 //
 #include "configpanel.h"
 #include "ui_configpanel.h"
-#include "test.h"
-#include "mvepspeller.h"
-#include "flashingspeller.h"
-#include "movingface.h"
 #include "ovmarkersender.h"
-#include "ssvep.h"
-#include "coloredface.h"
+#include "speller.h"
 #include "hybridstimulation.h"
 #include "hybridgridstimulation.h"
 #include "ssvepgl.h"
+#include "ssvep.h"
 #include "utils.h"
 //
 
@@ -23,11 +19,7 @@ ConfigPanel::ConfigPanel(QWidget *parent) :
     ui->setupUi(this);
 }
 
-ConfigPanel::~ConfigPanel()
-{
-    delete ui;
 
-}
 //set a TCP socket connection to OpenVibe Acquisition Client
 /**
  * @brief ConfigPanel::on_connectOvAsBtn_clicked
@@ -36,19 +28,19 @@ void ConfigPanel::on_connectOvAsBtn_clicked()
 {
     QString ovAsAddress = ui->addressOvAs->text();
     QString ovTcpTagPort = ui->portOvAs->text();
-    cTest = new OVMarkerSender(this);
+    m_markerSender = new OVMarkerSender(this);
 
-    if (cTest->Connect(ovAsAddress,ovTcpTagPort))
+    if (m_markerSender->Connect(ovAsAddress, ovTcpTagPort))
     {
-        QMessageBox::information(this,"Socket connection","Connected");
+        QMessageBox::information(this, "Socket connection", "Connected");
     }
     else
     {
-        QMessageBox::information(this,"Socket connection","Not Connected");
+        QMessageBox::information(this, "Socket connection", "Not Connected");
     }
 }
 
-//TODO
+
 // init speller
 /**
  * @brief ConfigPanel::on_initSpeller_clicked
@@ -56,37 +48,35 @@ void ConfigPanel::on_connectOvAsBtn_clicked()
 void ConfigPanel::on_initSpeller_clicked()
 {
 
-    QHostAddress sender;
-    quint16 senderPort = 54321;
-    QByteArray *buffer = new QByteArray();
-
+    // QHostAddress sender;
+    // quint16 senderPort = 54321;
+    // QByteArray *buffer = new QByteArray();
     //    buffer->resize(start_socket->pendingDatagramSize());
-    //    //    qDebug() << "buffer size" << buffer->size();
-
+    //    qDebug() << "buffer size" << buffer->size();
     //    start_socket->readDatagram(buffer->data(), buffer->size(), &sender, &senderPort);
 
-    start_socket = new QUdpSocket(this);
-    start_socket->bind(QHostAddress("10.3.65.37"), 54321);
+    m_startSocket = new QUdpSocket(this);
+    m_startSocket->bind(QHostAddress("10.3.65.37"), 54321);
 
-    if(!cTest->connectedOnce)
+    if(!m_markerSender->connectedOnce())
     {
-        QMessageBox::information(this,"Socket connection","Not Connected");
+        QMessageBox::information(this, "Socket connection", "Not Connected");
     }
     else
     {
         int spellerType = ui->spellerType->currentIndex();
-        Speller *Fspeller = new Speller();
+        Speller *fSpeller = new Speller();
 
-        connect(ui->startSpeller, SIGNAL(clicked()), Fspeller, SLOT(startTrial()));
-        connect(Fspeller, SIGNAL(markerTag(uint64_t)), cTest, SLOT(sendStimulation(uint64_t)));
+        connect(ui->startSpeller, SIGNAL(clicked()), fSpeller, SLOT(startTrial()));
+        connect(fSpeller, SIGNAL(markerTag(uint64_t)), m_markerSender, SLOT(sendStimulation(uint64_t)));
 
-        Fspeller->setStimulationDuration(ui->stimulusDuration->text().toInt());
-        Fspeller->setIsi(ui->interStimulusDuration->text().toInt());
-        Fspeller->setNrSequence(ui->numberOfRepetition->text().toInt());
-        Fspeller->setSpellingMode(ui->spellingModeChoices->currentIndex());
-        Fspeller->setDesiredPhrase(ui->desiredPhrase->text());
-        Fspeller->setSpellerType(spellerType);
-        Fspeller->setFeedbackPort(ui->feedback_port->text().toInt());
+        fSpeller->setStimulationDuration(ui->stimulusDuration->text().toInt());
+        fSpeller->setIsi(ui->interStimulusDuration->text().toInt());
+        fSpeller->setNrSequence(ui->numberOfRepetition->text().toInt());
+        fSpeller->setSpellingMode(ui->spellingModeChoices->currentIndex());
+        fSpeller->setDesiredPhrase(ui->desiredPhrase->text());
+        fSpeller->setSpellerType(spellerType);
+        fSpeller->setFeedbackPort(ui->feedback_port->text().toUShort());
     }
 }
 
@@ -97,15 +87,16 @@ void ConfigPanel::on_initSSVEP_clicked()
     qDebug()<<Q_FUNC_INFO;
 
 
-    if(!cTest->connectedOnce)
+    if(!m_markerSender->connectedOnce())
     {
         QMessageBox::information(this,"Socket connection","Not Connected");
     }
 
     else
     {
-        quint8 SSVEPNrElements;
-        quint8 operationMode;
+        int SSVEPNrElements;
+        int operationMode;
+
         if (ui->SSVEP_mode->currentIndex() == operation_mode::SSVEP_SINGLE)
         {
             SSVEPNrElements = 1;
@@ -130,7 +121,7 @@ void ConfigPanel::on_initSSVEP_clicked()
         ssvepStimulation->resize(utils::getScreenSize());
         //
         connect(ui->startSpeller, SIGNAL(clicked()), ssvepStimulation, SLOT(startTrial()));
-        connect(ssvepStimulation, SIGNAL(markerTag(uint64_t)), cTest, SLOT(sendStimulation(uint64_t)));
+        connect(ssvepStimulation, SIGNAL(markerTag(uint64_t)), m_markerSender, SLOT(sendStimulation(uint64_t)));
 
         ssvepStimulation->setFrequencies(ui->Frequencies->text());
         ssvepStimulation->setStimulationDuration(ui->SSVEP_StimDuration->text().toFloat());
@@ -147,7 +138,7 @@ void ConfigPanel::on_initSSVEP_clicked()
 //Start speller
 void ConfigPanel::on_startSpeller_clicked()
 {
-    onStart = true;
+    m_onStart = true;
 }
 
 //TODO
@@ -176,7 +167,7 @@ void ConfigPanel::on_initHybrid_clicked()
 
     int spellerType = ui->spellerType->currentIndex();
 
-    if(!cTest->connectedOnce)
+    if(!m_markerSender->connectedOnce())
     {
         QMessageBox::information(this,"Socket connection","Not Connected");
     }
@@ -186,7 +177,7 @@ void ConfigPanel::on_initHybrid_clicked()
 
         HybridGridStimulation *hybrid = new HybridGridStimulation();
         connect(ui->startSpeller, SIGNAL(clicked()), hybrid, SLOT(startTrial()));
-        connect(hybrid, SIGNAL(markerTag(uint64_t)), cTest, SLOT(sendStimulation(uint64_t)));
+        connect(hybrid, SIGNAL(markerTag(uint64_t)), m_markerSender, SLOT(sendStimulation(uint64_t)));
         //ERP configuration
         hybrid->setERPStimulationDuration(ui->stimulusDuration->text().toInt());
         hybrid->setIsi(ui->interStimulusDuration->text().toInt());
@@ -201,8 +192,14 @@ void ConfigPanel::on_initHybrid_clicked()
         //        hybrid->setSSVEPSequence(ui->SSVEP_Sequence->text().toInt());
         //        hybrid->setFlickeringMode(ui->SSVEP_mode->currentIndex());
         // general configuration
-        hybrid->setFeedbackPort(ui->feedback_port->text().toInt());
+        hybrid->setFeedbackPort(ui->feedback_port->text().toUShort());
     }
+}
+
+ConfigPanel::~ConfigPanel()
+{
+    delete ui;
+
 }
 
 

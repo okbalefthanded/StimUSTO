@@ -5,16 +5,16 @@
 
 
 OVMarkerSender::OVMarkerSender(QObject *parent)
-    : QObject(parent),socket(new QTcpSocket(this))
+    : QObject(parent),m_socket(new QTcpSocket(this))
 {
 
 }
 
 OVMarkerSender::~OVMarkerSender()
 {
-    if (socket->isOpen())
+    if (m_socket->isOpen())
     {
-        socket->close();
+        m_socket->close();
         qDebug() << "Socket Closed";
 
     }
@@ -26,19 +26,19 @@ bool OVMarkerSender::Connect(QString asAddress, QString asTcpTagPort)
 
     qDebug() << "Connection Adress: " << asAddress;
     qDebug() << "Connection Port : " << asTcpTagPort.toInt();
-    socket->connectToHost(asAddress,asTcpTagPort.toInt());
+    m_socket->connectToHost(asAddress, asTcpTagPort.toUShort());
 
-    if(socket->waitForConnected())
+    if(m_socket->waitForConnected())
     {
         qDebug() << "Socket Connection State Connected";
-        OVMarkerSender::connectedOnce = true;
+        m_connectedOnce = true;
         return true;
     }
 
     else
     {
         qDebug() << "Socket Connection State Not Connected";
-        OVMarkerSender::connectedOnce = false;
+        m_connectedOnce = false;
         return false;
     }
 }
@@ -47,13 +47,13 @@ bool OVMarkerSender::sendStimulation(uint64_t ovStimulation)
 
 {
 
-    if ( !connectedOnce)
+    if ( !m_connectedOnce)
     {
         qDebug()<< "Not sending Tag ";
         return false;
     }
 
-    if (!socket->isOpen())
+    if (!m_socket->isOpen())
     {
 
         qDebug()<< "Not sending Tag : Send Stimulation Cannot send stimulation socket is not open";
@@ -68,8 +68,8 @@ bool OVMarkerSender::sendStimulation(uint64_t ovStimulation)
         QDataStream streamovs(&byteovStimulation, QIODevice::WriteOnly);
         streamovs.setByteOrder(QDataStream::LittleEndian);
         streamovs << timeStamp << ovStimulation << timeStamp;
-        OVMarkerSender::socket->write(byteovStimulation);
-        OVMarkerSender::socket->waitForBytesWritten();
+        OVMarkerSender::m_socket->write(byteovStimulation);
+        OVMarkerSender::m_socket->waitForBytesWritten();
     }
 
     catch(...)
@@ -80,4 +80,14 @@ bool OVMarkerSender::sendStimulation(uint64_t ovStimulation)
 
     return true;
 
+}
+
+bool OVMarkerSender::connectedOnce() const
+{
+    return m_connectedOnce;
+}
+
+void OVMarkerSender::setConnectedOnce(bool t_connectedOnce)
+{
+    m_connectedOnce = t_connectedOnce;
 }

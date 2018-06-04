@@ -19,7 +19,7 @@ class SsvepGL : public QOpenGLWindow, protected QOpenGLFunctions
     Q_OBJECT
 
 public:
-    SsvepGL(quint8 nrelements);
+    SsvepGL(int nrelements);
     ~SsvepGL();
 
     void setFrequencies(QString freqs);
@@ -41,9 +41,9 @@ signals:
 private slots:
 
     void startTrial();
-    void pre_trial();
+    void preTrial();
     //    void feedback();
-    void post_trial();
+    void postTrial();
     void Flickering();
     //    void pauseFlashing();
     //    void receiveFeedback();
@@ -66,7 +66,6 @@ private:
     void highlightTarget();
     void refreshTarget();
 
-
     // helpers
     static const qint8 VERTICES_PER_TRIANGLE = 3;
     static const qint8 POINTS_PER_SQUARE = 4;
@@ -74,8 +73,6 @@ private:
     static const qint8 TRIANGLES_PER_SQUARE = 2;
     static const int TUPLESIZE  = 3;
     static const int MAX_ELEMENTS = 4;
-
-
 
     bool firstRun = true;
     int pre_trial_count=0;

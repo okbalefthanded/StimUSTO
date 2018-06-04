@@ -12,12 +12,10 @@ class RandomFlashSequence : public QObject
 public:
     explicit RandomFlashSequence(QObject *parent = 0);
     RandomFlashSequence(int length, int nr_sequences, int min_dist=2, bool repetition=false);
-    QVector<int> sequence;
+
     inline QVector<int> range(int start, int end);
+    QVector<int> sequence;
 
-signals:
-
-public slots:
 };
 
 #endif // RANDOMFLASHSEQUENCE_H

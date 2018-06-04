@@ -68,6 +68,7 @@ namespace config {
 const int start_port = 54321;
 //
 const uint64_t OVTK_StimulationLabel_Base = 0x00008100;
+const int REFRESH_RATE = 60;
 }
 
 #endif // UTILS_H
