@@ -13,20 +13,9 @@
 #include "ssvepgl.h"
 #include "ovtk_stimulations.h"
 #include "utils.h"
-
+#include "glutils.h"
 //
-static const QVector<QVector3D> topPoints =
-{
-    QVector3D(-0.10f, 0.10f, 1.0f), QVector3D(-0.75f, 0.10f, 1.0f),
-    QVector3D(0.55f, 0.10f, 1.0f), QVector3D(-0.10f, 0.80f, 1.0f),
-    QVector3D(-0.10f, -0.55f, 1.0f)
-};
-static const QVector3D cWhite = QVector3D(1.0f, 1.0f, 1.0f);
-static const QVector3D cGray = QVector3D(0.25f, 0.25f, 0.25f);
-static const QVector3D cRed = QVector3D(1.0f, 0.0f, 0.0f);
-static const QVector3D cGreen = QVector3D(0.0f, 1.0f, 0.0f);
-//
-SsvepGL::SsvepGL(int nrelements)
+SsvepGL::SsvepGL(int t_nrElements)
 {
 
     qDebug()<< Q_FUNC_INFO;
@@ -36,21 +25,22 @@ SsvepGL::SsvepGL(int nrelements)
     //       // nr_elements = nrelements - 1;
     //        nr_elements = nrelements;
     //    }
-    nr_elements = nrelements;
+    m_nrElements = t_nrElements;
 
     // set vertices, vertices indeices & colors
     initElements();
 
-    preTrialTimer = new QTimer(this);
-    preTrialTimer->setTimerType(Qt::PreciseTimer);
-    preTrialTimer->setInterval(1000);
-    preTrialTimer->setSingleShot(true);
-    connect(preTrialTimer, SIGNAL(timeout()), this, SLOT(startTrial()) );
+    m_preTrialTimer = new QTimer(this);
+    m_preTrialTimer->setTimerType(Qt::PreciseTimer);
+    m_preTrialTimer->setInterval(1000);
+    m_preTrialTimer->setSingleShot(true);
 
-    feedback_socket = new QUdpSocket(this);
-    feedback_socket->bind(QHostAddress::LocalHost, feedbackPort);
+    connect(m_preTrialTimer, SIGNAL(timeout()), this, SLOT(startTrial()) );
 
-    state = trial_state::PRE_TRIAL;
+    m_feedbackSocket = new QUdpSocket(this);
+    m_feedbackSocket->bind(QHostAddress::LocalHost, m_feedbackPort);
+
+    m_state = trial_state::PRE_TRIAL;
 
 }
 
@@ -61,7 +51,7 @@ void SsvepGL::initializeGL()
 
     // Initialize OpenGL Backend
     initializeOpenGLFunctions();
-    index = 0;
+    m_index = 0;
     // Set global information
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glEnable(GL_FRAMEBUFFER_SRGB);
@@ -78,49 +68,49 @@ void SsvepGL::initializeGL()
 
     // static const int samplesLength = REFRESH_RATE * (stimulationDuration);
 
-    flicker.resize(frequencies.size());
-    for (int i=0; i < frequencies.size(); ++i)
+    m_flicker.resize(m_frequencies.size());
+    for (int i=0; i < m_frequencies.size(); ++i)
     {
-        flicker[i] = utils::gen_flick(frequencies[i], config::REFRESH_RATE, stimulationDuration);
+        m_flicker[i] = utils::gen_flick(m_frequencies[i], config::REFRESH_RATE, m_stimulationDuration);
     }
 
     // Application-specific initialization
     {
         // Create shaders (Do not release until VAO is created)
-        programShader = new QOpenGLShaderProgram();
-        programShader->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/shaders/sh_v.vert");
-        programShader->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/shaders/sh_f.frag");
-        programShader->link();
-        programShader->bind();
+        m_programShader = new QOpenGLShaderProgram();
+        m_programShader->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/src/shaders/sh_v.vert");
+        m_programShader->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/src/shaders/sh_f.frag");
+        m_programShader->link();
+        m_programShader->bind();
 
         // Create buffer (Do not release until VAO is created)
-        vertexBuffer.create();
-        vertexBuffer.bind();
-        vertexBuffer.setUsagePattern(QOpenGLBuffer::StaticDraw);
-        vertexBuffer.allocate(vertices.data(), vertices.count() * sizeof(QVector3D)); //
+        m_vertexBuffer.create();
+        m_vertexBuffer.bind();
+        m_vertexBuffer.setUsagePattern(QOpenGLBuffer::StaticDraw);
+        m_vertexBuffer.allocate(m_vertices.data(), m_vertices.count() * sizeof(QVector3D)); //
 
-        colorBuffer.create();
-        colorBuffer.bind();
-        colorBuffer.setUsagePattern(QOpenGLBuffer::DynamicDraw);
-        colorBuffer.allocate(colors.data(), colors.count() * sizeof(QVector3D));
+        m_colorBuffer.create();
+        m_colorBuffer.bind();
+        m_colorBuffer.setUsagePattern(QOpenGLBuffer::DynamicDraw);
+        m_colorBuffer.allocate(m_colors.data(), m_colors.count() * sizeof(QVector3D));
 
         // Create Vertex Array Object
-        vaObject.create();
+        m_vaObject.create();
 
-        vaObject.bind();
-        vertexBuffer.bind();
-        programShader->enableAttributeArray(0);
-        programShader->setAttributeBuffer(0, GL_FLOAT, 0, TUPLESIZE, 0);
-        colorBuffer.bind();
-        programShader->enableAttributeArray(1);
-        programShader->setAttributeBuffer(1, GL_FLOAT, 0, TUPLESIZE, 0);
-        vaObject.release();
+        m_vaObject.bind();
+        m_vertexBuffer.bind();
+        m_programShader->enableAttributeArray(0);
+        m_programShader->setAttributeBuffer(0, GL_FLOAT, 0, glUtils::TUPLESIZE, 0);
+        m_colorBuffer.bind();
+        m_programShader->enableAttributeArray(1);
+        m_programShader->setAttributeBuffer(1, GL_FLOAT, 0, glUtils::TUPLESIZE, 0);
+        m_vaObject.release();
 
         // Release (unbind) all
-        vaObject.release();
-        vertexBuffer.release();
-        colorBuffer.release();
-        programShader->release();
+        m_vaObject.release();
+        m_vertexBuffer.release();
+        m_colorBuffer.release();
+        m_programShader->release();
     }
 }
 
@@ -137,16 +127,16 @@ void SsvepGL::paintGL()
     //    qDebug()<< Q_FUNC_INFO;
     // clear
     glClear(GL_COLOR_BUFFER_BIT);
-    int nVertices = VERTICES_PER_TRIANGLE * (nr_elements) *TRIANGLES_PER_SQUARE;
+    int nVertices = glUtils::VERTICES_PER_TRIANGLE * (m_nrElements) * glUtils::TRIANGLES_PER_SQUARE;
     // Render using our shader
-    programShader->bind();
+    m_programShader->bind();
     {
-        vaObject.bind();
+        m_vaObject.bind();
         // nr_triangles = 3 * Nr_elments * 2 (3 : vertices per triangle), (2: 2 triangles per rectangle)
-        glDrawElements(GL_TRIANGLES, nVertices, GL_UNSIGNED_INT, vindices.data());
-        vaObject.release();
+        glDrawElements(GL_TRIANGLES, nVertices, GL_UNSIGNED_INT, m_vindices.data());
+        m_vaObject.release();
     }
-    programShader->release();
+    m_programShader->release();
 
 }
 
@@ -155,71 +145,72 @@ void SsvepGL::startTrial()
 
     qDebug()<< "[TRIAL START]" << Q_FUNC_INFO;
 
-    if (state == trial_state::PRE_TRIAL)
+    if (m_state == trial_state::PRE_TRIAL)
     {
-        pre_trial();
+        preTrial();
     }
-    if (state == trial_state::STIMULUS)
+    if (m_state == trial_state::STIMULUS)
     {
         Flickering();
     }
-    if (state == trial_state::POST_TRIAL)
+    if (m_state == trial_state::POST_TRIAL)
     {
-        post_trial();
+        postTrial();
     }
 }
 
-void SsvepGL::pre_trial()
+void SsvepGL::preTrial()
 {
 
     qDebug()<< Q_FUNC_INFO;
 
-    if(firstRun)
+    if(m_firstRun)
     {
         //  qDebug()<< nr_elements << stimulationSequence << stimulationSequence / nr_elements;
-        flickeringSequence = new RandomFlashSequence(nr_elements, stimulationSequence / nr_elements);
-        qDebug()<<"sequence"<<flickeringSequence->sequence;
-        firstRun = false;
+        m_flickeringSequence = new RandomFlashSequence(m_nrElements, m_stimulationSequence / m_nrElements);
+        qDebug()<<"sequence"<<m_flickeringSequence->sequence;
+        m_firstRun = false;
     }
 
-    if (pre_trial_count == 1)
+    if (m_preTrialCount == 1)
     {
 
         sendMarker(OVTK_StimulationId_TrialStart);
 
-        if (flickering_mode == operation_mode::CALIBRATION)
+        if (m_flickeringMode == operation_mode::CALIBRATION ||
+                m_flickeringMode == operation_mode::COPY_MODE)
         {
             //            qDebug()<< "highlightTarget";
             highlightTarget();
             //            text_row += desired_phrase[currentLetter];
             //            textRow->setText(text_row);
         }
-        else if(flickering_mode == operation_mode::COPY_MODE)
-        {
-            highlightTarget();
-        }
+//        else if(m_flickeringMode == operation_mode::COPY_MODE)
+//        {
+//            highlightTarget();
+//        }
     }
-    else if(pre_trial_count == 3)
+    else if(m_preTrialCount == 3)
     {
         refreshTarget();
     }
     //    qDebug()<< "Pre trial timer start";
 
-    preTrialTimer->start();
-    pre_trial_count++;
+    m_preTrialTimer->start();
+    m_preTrialCount++;
 
-    if (pre_trial_count > pre_trial_wait)
+    if (m_preTrialCount > m_preTrialWait)
     {
         refreshTarget();
-        preTrialTimer->stop();
-        pre_trial_count = 0;
-        state = trial_state::STIMULUS;
+        m_preTrialTimer->stop();
+        m_preTrialCount = 0;
+        m_state = trial_state::STIMULUS;
 
     }
 
 }
 
-void SsvepGL::post_trial()
+void SsvepGL::postTrial()
 {
 
     sendMarker(OVTK_StimulationId_TrialStop);
@@ -228,16 +219,16 @@ void SsvepGL::post_trial()
     initElements();
     //    currentStimulation = 0;
 
-    index = 0;
-    state = trial_state::PRE_TRIAL;
+    m_index = 0;
+    m_state = trial_state::PRE_TRIAL;
     // wait
-    int waitMillisec = breakDuration - pre_trial_wait * 1000;
+    int waitMillisec = m_breakDuration - m_preTrialWait * 1000;
     wait(waitMillisec);
 
     //    refreshTarget();
 
-    if (currentFlicker >= flickeringSequence->sequence.size() &&
-            (flickering_mode == operation_mode::COPY_MODE || flickering_mode == operation_mode::CALIBRATION))
+    if (m_currentFlicker >= m_flickeringSequence->sequence.size() &&
+            (m_flickeringMode == operation_mode::COPY_MODE || m_flickeringMode == operation_mode::CALIBRATION))
     {
         qDebug()<< "Experiment End";
         sendMarker(OVTK_StimulationId_ExperimentStop);
@@ -254,21 +245,21 @@ void SsvepGL::Flickering()
 {
     qDebug()<< Q_FUNC_INFO;
 
-    if(index == 0)
+    if(m_index == 0)
     {
         //        qDebug()<< Q_FUNC_INFO << "connecting frameswapped to update" << "index " << index;
         connect(this, SIGNAL(frameSwapped()), this, SLOT(update()));
     }
 
-    sendMarker(config::OVTK_StimulationLabel_Base + flickeringSequence->sequence[currentFlicker]);
+    sendMarker(config::OVTK_StimulationLabel_Base + m_flickeringSequence->sequence[m_currentFlicker]);
     sendMarker(OVTK_StimulationId_VisualSteadyStateStimulationStart);
 
-    while(index < flicker[0].size())
+    while(m_index < m_flicker[0].size())
     {
         QCoreApplication::processEvents(QEventLoop::AllEvents);
     }
-    ++currentFlicker;
-    state = trial_state::POST_TRIAL;
+    ++m_currentFlicker;
+    m_state = trial_state::POST_TRIAL;
 }
 
 void SsvepGL::wait(int millisecondsToWait)
@@ -296,74 +287,74 @@ void SsvepGL::initElements()
     double dy = 0.25;
     int isNullX = 0, isNullY = 0, sx=1;
 
-    if(nr_elements == 1)
+    if(m_nrElements == 1)
     {
-        vertices.resize(POINTS_PER_SQUARE);
-        vertices[0] = topPoints[0];
-        colors.resize(POINTS_PER_SQUARE);
-        colors[0] = cWhite;
-        for(int i=1; i<POINTS_PER_SQUARE; ++i)
+        m_vertices.resize(glUtils::POINTS_PER_SQUARE);
+        m_vertices[0] = refPoints::topPoints[0];
+        m_colors.resize(glUtils::POINTS_PER_SQUARE);
+        m_colors[0] = glColors::white;
+        for(int i=1; i<glUtils::POINTS_PER_SQUARE; ++i)
         {
             // init points
             isNullX = i % 2;
             isNullY = (i+1) % 2;
-            vertices[i].setX(vertices[i-1].x() + (dx * isNullX *sx));
-            vertices[i].setY(vertices[i-1].y() - (dy * isNullY));
-            vertices[i].setZ(topPoints[0].z());
+            m_vertices[i].setX(m_vertices[i-1].x() + (dx * isNullX *sx));
+            m_vertices[i].setY(m_vertices[i-1].y() - (dy * isNullY));
+            m_vertices[i].setZ(refPoints::topPoints[0].z());
             sx--;
             // init colors
-            colors[i] = cWhite;
+            m_colors[i] = glColors::white;
         }
 
     }
     else
     {
         // init vectors
-        int vectorsSize = nr_elements * POINTS_PER_SQUARE;
-        vertices.resize(vectorsSize);
-        for(int i=0; i<vertices.count(); i+=POINTS_PER_SQUARE)
+        int vectorsSize = m_nrElements * glUtils::POINTS_PER_SQUARE;
+        m_vertices.resize(vectorsSize);
+        for(int i=0; i<m_vertices.count(); i+=glUtils::POINTS_PER_SQUARE)
         {
-            vertices[i] = topPoints[i/POINTS_PER_SQUARE];
+            m_vertices[i] = refPoints::topPoints[i/glUtils::POINTS_PER_SQUARE];
             sx = 1;
-            for(int j=i+1; j<i+POINTS_PER_SQUARE; ++j)
+            for(int j=i+1; j<i+glUtils::POINTS_PER_SQUARE; ++j)
             {
                 isNullX = j % 2;
                 isNullY = (j+1) % 2;
-                vertices[j].setX(vertices[j-1].x() + (dx * isNullX * sx));
-                vertices[j].setY(vertices[j-1].y() - (dy * isNullY));
-                vertices[j].setZ(topPoints[0].z());
+                m_vertices[j].setX(m_vertices[j-1].x() + (dx * isNullX * sx));
+                m_vertices[j].setY(m_vertices[j-1].y() - (dy * isNullY));
+                m_vertices[j].setZ(refPoints::topPoints[0].z());
                 sx--;
             }
         }
         // init colors
-        colors = {cGray, cGray, cGray, cGray};
-        colors.resize(vectorsSize);
-        for (int i=POINTS_PER_SQUARE; i<colors.count(); i++)
+        m_colors = {glColors::gray, glColors::gray, glColors::gray, glColors::gray};
+        m_colors.resize(vectorsSize);
+        for (int i=glUtils::POINTS_PER_SQUARE; i<m_colors.count(); i++)
         {
-            colors[i] = cWhite;
+            m_colors[i] = glColors::white;
         }
     }
 
     // init indices
-    vindices.resize(nr_elements*INDICES_PER_SQUARE);
+    m_vindices.resize(m_nrElements*glUtils::INDICES_PER_SQUARE);
     int k=0; int val = 0;
-    for(int i=0; i<(nr_elements*INDICES_PER_SQUARE); i+=INDICES_PER_SQUARE)
+    for(int i=0; i<(m_nrElements*glUtils::INDICES_PER_SQUARE); i+=glUtils::INDICES_PER_SQUARE)
     {
         val = 2*k;
-        vindices[i] =  val;
-        vindices[i+1] = val + 1;
-        vindices[i+2] = val + 2;
-        vindices[i+3] = vindices[i];
-        vindices[i+4] = vindices[i+2];
-        vindices[i+5] = val + 3;
+        m_vindices[i] =  val;
+        m_vindices[i+1] = val + 1;
+        m_vindices[i+2] = val + 2;
+        m_vindices[i+3] = m_vindices[i];
+        m_vindices[i+4] = m_vindices[i+2];
+        m_vindices[i+5] = val + 3;
         k +=2;
     }
 
-    vaObject.bind();
-    colorBuffer.bind();
-    colorBuffer.write(0, colors.data(), colors.count() * sizeof(QVector3D)); // number of vertices to avoid * sizeof QVector3D
-    vaObject.release();
-    colorBuffer.release();
+    m_vaObject.bind();
+    m_colorBuffer.bind();
+    m_colorBuffer.write(0, m_colors.data(), m_colors.count() * sizeof(QVector3D)); // number of vertices to avoid * sizeof QVector3D
+    m_vaObject.release();
+    m_colorBuffer.release();
 
     QOpenGLWindow::update();
 }
@@ -373,25 +364,25 @@ void SsvepGL::highlightTarget()
 
     qDebug()<< Q_FUNC_INFO;
 
-    if(nr_elements == 1)
+    if(m_nrElements == 1)
     {
-        colors = {cGreen, cGreen, cGreen, cGreen};
+        m_colors = {glColors::green, glColors::green, glColors::green, glColors::green};
     }
     else
     {
-        int tmp = flickeringSequence->sequence[currentFlicker]-1;
-        int squareIndex = tmp+(VERTICES_PER_TRIANGLE*tmp);
-        colors[squareIndex] = cGreen;
-        colors[squareIndex + 1] = cGreen;
-        colors[squareIndex + 2] = cGreen;
-        colors[squareIndex + 3] = cGreen;
+        int tmp = m_flickeringSequence->sequence[m_currentFlicker]-1;
+        int squareIndex = tmp+(glUtils::VERTICES_PER_TRIANGLE*tmp);
+        m_colors[squareIndex] = glColors::green;
+        m_colors[squareIndex + 1] = glColors::green;
+        m_colors[squareIndex + 2] = glColors::green;
+        m_colors[squareIndex + 3] = glColors::green;
     }
 
-    vaObject.bind();
-    colorBuffer.bind();
-    colorBuffer.write(0, colors.data(), colors.count() * sizeof(QVector3D)); // number of vertices to avoid * sizeof QVector3D
-    vaObject.release();
-    colorBuffer.release();
+    m_vaObject.bind();
+    m_colorBuffer.bind();
+    m_colorBuffer.write(0, m_colors.data(), m_colors.count() * sizeof(QVector3D)); // number of vertices to avoid * sizeof QVector3D
+    m_vaObject.release();
+    m_colorBuffer.release();
     //     Schedule a redraw
     QOpenGLWindow::update();
 }
@@ -400,34 +391,34 @@ void SsvepGL::refreshTarget()
 {
 
     qDebug()<< Q_FUNC_INFO;
-    if(nr_elements == 1)
+    if(m_nrElements == 1)
     {
-        colors = {cWhite, cWhite, cWhite, cWhite};
+        m_colors = {glColors::white, glColors::white, glColors::white, glColors::white};
     }
     else
     {
-        if(flickeringSequence->sequence[currentFlicker] == 1)
+        if(m_flickeringSequence->sequence[m_currentFlicker] == 1)
         {
-            colors[0] = cGray;
-            colors[1] = cGray;
-            colors[2] = cGray;
-            colors[3] = cGray;
+            m_colors[0] = glColors::gray;
+            m_colors[1] = glColors::gray;
+            m_colors[2] = glColors::gray;
+            m_colors[3] = glColors::gray;
         }
         else
         {
-            int tmp = flickeringSequence->sequence[currentFlicker]-1;
-            int squareIndex = tmp+(VERTICES_PER_TRIANGLE*tmp);
-            colors[squareIndex] = cWhite;
-            colors[squareIndex + 1] = cWhite;
-            colors[squareIndex + 2] = cWhite;
-            colors[squareIndex + 3] = cWhite;
+            int tmp = m_flickeringSequence->sequence[m_currentFlicker]-1;
+            int squareIndex = tmp+(glUtils::VERTICES_PER_TRIANGLE*tmp);
+            m_colors[squareIndex] = glColors::white;
+            m_colors[squareIndex + 1] = glColors::white;
+            m_colors[squareIndex + 2] = glColors::white;
+            m_colors[squareIndex + 3] = glColors::white;
         }
     }
-    vaObject.bind();
-    colorBuffer.bind();
-    colorBuffer.write(0, colors.data(), colors.count() * sizeof(QVector3D)); // number of vertices to avoid * sizeof QVector3D
-    vaObject.release();
-    colorBuffer.release();
+    m_vaObject.bind();
+    m_colorBuffer.bind();
+    m_colorBuffer.write(0, m_colors.data(), m_colors.count() * sizeof(QVector3D)); // number of vertices to avoid * sizeof QVector3D
+    m_vaObject.release();
+    m_colorBuffer.release();
     //     Schedule a redraw
     QOpenGLWindow::update();
 }
@@ -435,29 +426,29 @@ void SsvepGL::refreshTarget()
 void SsvepGL::update()
 {
 
-    qDebug()<< "[update ]Index : "<< index << "current time: " << QTime::currentTime().msec();
+    qDebug()<< "[update ]Index : "<< m_index << "current time: " << QTime::currentTime().msec();
     int k;
 
-    if(nr_elements == 1)
+    if(m_nrElements == 1)
     { k = 0;}
     else
-    {k = POINTS_PER_SQUARE;}
+    {k = glUtils::POINTS_PER_SQUARE;}
 
-    for(int i = 0; i<flicker.size() ;++i)
+    for(int i = 0; i<m_flicker.size() ;++i)
     {
-        colors[k]   = QVector3D(flicker[i][index], flicker[i][index], flicker[i][index]);
-        colors[k+1] = QVector3D(flicker[i][index], flicker[i][index], flicker[i][index]);
-        colors[k+2] = QVector3D(flicker[i][index], flicker[i][index], flicker[i][index]);
-        colors[k+3] = QVector3D(flicker[i][index], flicker[i][index], flicker[i][index]);
-        k += POINTS_PER_SQUARE;
+        m_colors[k]   = QVector3D(m_flicker[i][m_index], m_flicker[i][m_index], m_flicker[i][m_index]);
+        m_colors[k+1] = QVector3D(m_flicker[i][m_index], m_flicker[i][m_index], m_flicker[i][m_index]);
+        m_colors[k+2] = QVector3D(m_flicker[i][m_index], m_flicker[i][m_index], m_flicker[i][m_index]);
+        m_colors[k+3] = QVector3D(m_flicker[i][m_index], m_flicker[i][m_index], m_flicker[i][m_index]);
+        k += glUtils::POINTS_PER_SQUARE;
     }
 
-    vaObject.bind();
-    colorBuffer.bind();
-    colorBuffer.write(0, colors.data(), colors.count() * sizeof(QVector3D)); // number of vertices to avoid * sizeof QVector3D
-    vaObject.release();
-    colorBuffer.release();
-    ++index;
+    m_vaObject.bind();
+    m_colorBuffer.bind();
+    m_colorBuffer.write(0, m_colors.data(), m_colors.count() * sizeof(QVector3D)); // number of vertices to avoid * sizeof QVector3D
+    m_vaObject.release();
+    m_colorBuffer.release();
+    ++m_index;
     // Schedule a redraw
     QOpenGLWindow::update();
 }
@@ -470,47 +461,47 @@ void SsvepGL::setFrequencies(QString freqs)
 
     QStringList freqsList = freqs.split(',');
 
-    if (nr_elements == 1)
+    if (m_nrElements == 1)
     {
 
         //        frequencies[0] = freqsList[0].toDouble();
-        frequencies.append(freqsList[0].toDouble());
+        m_frequencies.append(freqsList[0].toDouble());
     }
     else
     {
         foreach(QString str, freqsList)
         {
 
-            frequencies.append(str.toDouble());
+            m_frequencies.append(str.toDouble());
         }
     }
 
 }
 
-void SsvepGL::setFlickeringMode(int mode)
+void SsvepGL::setFlickeringMode(int t_mode)
 {
-    flickering_mode = mode;
+    m_flickeringMode = t_mode;
 }
 
-void SsvepGL::setStimulationDuration(float stimDuration)
+void SsvepGL::setStimulationDuration(float t_stimDuration)
 {
-    stimulationDuration = stimDuration;
+    m_stimulationDuration = t_stimDuration;
 }
 
-void SsvepGL::setBreakDuration(int brkDuration)
+void SsvepGL::setBreakDuration(int t_brkDuration)
 {
-    breakDuration = brkDuration;
-    pre_trial_wait = brkDuration;
+    m_breakDuration = t_brkDuration;
+    m_preTrialWait = t_brkDuration;
 }
 
-void SsvepGL::setSequence(int sequence)
+void SsvepGL::setSequence(int t_sequence)
 {
-    stimulationSequence = sequence;
+    m_stimulationSequence = t_sequence;
 }
 
-void SsvepGL::setFeedbackPort(int port)
+void SsvepGL::setFeedbackPort(int t_port)
 {
-    feedbackPort = port;
+    m_feedbackPort = t_port;
 }
 
 SsvepGL::~SsvepGL()

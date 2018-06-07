@@ -40,7 +40,8 @@ HEADERS  += include\configpanel.h \
     include\ssvepgl.h \
     include\utils.h \
     include\speller.h \
-    include\test.h
+    include\test.h \
+    include\glutils.h
 
 INCLUDEPATH += include\
 
@@ -55,6 +56,6 @@ RESOURCES +=  assets\asset.qrc
 
 DISTFILES += \
     MyOVBox.py \
-    shaders/sh_v.vert \
-    shaders/sh_f.frag \
+    src\shaders\sh_v.vert \
+    src\shaders\sh_f.frag \
     .gitignore

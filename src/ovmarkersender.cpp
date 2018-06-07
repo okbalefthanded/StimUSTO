@@ -5,7 +5,7 @@
 
 
 OVMarkerSender::OVMarkerSender(QObject *parent)
-    : QObject(parent),m_socket(new QTcpSocket(this))
+    : QObject(parent), m_socket(new QTcpSocket(this))
 {
 
 }
@@ -18,15 +18,16 @@ OVMarkerSender::~OVMarkerSender()
         qDebug() << "Socket Closed";
 
     }
-
 }
 
-bool OVMarkerSender::Connect(QString asAddress, QString asTcpTagPort)
+bool OVMarkerSender::Connect(QString t_asAddress, QString t_asTcpTagPort)
 {
 
-    qDebug() << "Connection Adress: " << asAddress;
-    qDebug() << "Connection Port : " << asTcpTagPort.toInt();
-    m_socket->connectToHost(asAddress, asTcpTagPort.toUShort());
+
+    qDebug() << "Connection Adress: " << t_asAddress;
+    qDebug() << "Connection Port : " << t_asTcpTagPort;
+
+    m_socket->connectToHost(t_asAddress, t_asTcpTagPort.toUShort());
 
     if(m_socket->waitForConnected())
     {
@@ -43,7 +44,7 @@ bool OVMarkerSender::Connect(QString asAddress, QString asTcpTagPort)
     }
 }
 
-bool OVMarkerSender::sendStimulation(uint64_t ovStimulation)
+bool OVMarkerSender::sendStimulation(uint64_t t_ovStimulation)
 
 {
 
@@ -67,9 +68,9 @@ bool OVMarkerSender::sendStimulation(uint64_t ovStimulation)
         QByteArray byteovStimulation;
         QDataStream streamovs(&byteovStimulation, QIODevice::WriteOnly);
         streamovs.setByteOrder(QDataStream::LittleEndian);
-        streamovs << timeStamp << ovStimulation << timeStamp;
-        OVMarkerSender::m_socket->write(byteovStimulation);
-        OVMarkerSender::m_socket->waitForBytesWritten();
+        streamovs << timeStamp << t_ovStimulation << timeStamp;
+        m_socket->write(byteovStimulation);
+        m_socket->waitForBytesWritten();
     }
 
     catch(...)

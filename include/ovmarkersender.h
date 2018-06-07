@@ -13,17 +13,14 @@ public:
 
     explicit OVMarkerSender(QObject *parent = 0);
     ~OVMarkerSender();
-    bool Connect(QString asAddress, QString asTcpTagPort);
-
-
-
+    bool Connect(QString t_asAddress, QString t_asTcpTagPort);
     bool connectedOnce() const;
     void setConnectedOnce(bool t_connectedOnce);
 
 signals:
 
 public slots:
-    bool sendStimulation(uint64_t ovStimulation);
+    bool sendStimulation(uint64_t t_ovStimulation);
 
 
 private :
