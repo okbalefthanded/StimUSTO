@@ -5,7 +5,7 @@
 #include <QUdpSocket>
 //
 #include "ovmarkersender.h"
-
+#include "speller.h"
 namespace Ui {
 class ConfigPanel;
 }
@@ -45,6 +45,7 @@ private slots:
 
 
 private:
+    void initSpeller(Speller *t_sp, int t_spellerType);
     Ui::ConfigPanel *ui;
 };
 

@@ -41,9 +41,11 @@ Speller::Speller(QWidget *parent) :
 
     m_stimTimer->setTimerType(Qt::PreciseTimer);
     m_stimTimer->setSingleShot(true);
+    m_stimTimer->setInterval(100); //default value
 
     m_isiTimer->setTimerType(Qt::PreciseTimer);
     m_isiTimer->setSingleShot(true);
+    m_isiTimer->setInterval(100); //default value
 
     m_preTrialTimer->setTimerType(Qt::PreciseTimer);
     m_preTrialTimer->setInterval(1000);
@@ -82,71 +84,19 @@ void Speller::startTrial()
 }
 
 void Speller::startFlashing()
-{
-    sendMarker(OVTK_StimulationId_VisualStimulationStart);
-    sendMarker(config::OVTK_StimulationLabel_Base + m_flashingSequence->sequence[m_currentStimulation]);
-
-    // send target marker
-    if (m_spellingMode == operation_mode::CALIBRATION ||
-            m_spellingMode == operation_mode::COPY_MODE)
-    {
-        if (isTarget())
-        {
-            // qDebug()<< desired_phrase[currentLetter];
-            sendMarker(OVTK_StimulationId_Target);
-        }
-        else
-        {
-            sendMarker(OVTK_StimulationId_NonTarget);
-        }
-    }
-
-    switch(m_spellerType)
-    {
-    case speller_type::FLASHING_SPELLER:
-    {
-        stimulationFlashing();
-        break;
-    }
-    case speller_type::FACES_SPELLER:
-    {
-        stimulationFace();
-        break;
-    }
-    case speller_type::INVERTED_FACE:
-    {
-        stimulationInvertedFace();
-        break;
-    }
-    case speller_type::COLORED_FACE :
-    {
-        stimulationColoredFace();
-        break;
-    }
-    case speller_type::INVERTED_COLORED_FACE:
-    {
-        stimulationInvertedColoredFace();
-        break;
-    }
-    }
-
-    m_stimTimer->start();
-    m_isiTimer->stop();
-    m_state = trial_state::POST_STIMULUS;
-}
+{}
 
 void Speller::pauseFlashing()
 {
-    //    qDebug()<< Q_FUNC_INFO;
+    //      qDebug()<< Q_FUNC_INFO;
     // sendMarker(OVTK_StimulationId_VisualStimulationStop);
     this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
             widget()->setStyleSheet("QLabel { color : gray; font: 40pt }");
 
-    m_stimTimer->stop();
-    m_isiTimer->start();
+    switchStimulationTimers();
     //    qDebug("Isi Timer started");
     ++m_currentStimulation;
-    m_state = trial_state::STIMULUS;
+
 
     if (m_currentStimulation >= m_flashingSequence->sequence.count())
     {
@@ -369,154 +319,41 @@ void Speller::wait(int t_millisecondsToWait)
     }
 }
 
-void Speller::stimulationFlashing()
+void Speller::sendStimulationInfo()
 {
-    this->layout()
-            ->itemAt(m_flashingSequence->sequence[m_currentStimulation])
-            ->widget()
-            ->setStyleSheet("QLabel { color : white; font: 60pt }");
+    sendMarker(OVTK_StimulationId_VisualStimulationStart);
+    sendMarker(config::OVTK_StimulationLabel_Base + m_flashingSequence->sequence[m_currentStimulation]);
+
+    // send target marker
+    if (m_spellingMode == operation_mode::CALIBRATION ||
+            m_spellingMode == operation_mode::COPY_MODE)
+    {
+        if (isTarget())
+        {
+            // qDebug()<< desired_phrase[currentLetter];
+            sendMarker(OVTK_StimulationId_Target);
+        }
+        else
+        {
+            sendMarker(OVTK_StimulationId_NonTarget);
+        }
+    }
 }
 
-void Speller::stimulationFace()
+void Speller::switchStimulationTimers()
 {
-    this->layout()
-            ->itemAt(m_flashingSequence->sequence[m_currentStimulation])
-            ->widget()
-            ->setStyleSheet("image: url(:/images/bennabi_face.png)");
-}
-
-void Speller::stimulationColoredFace()
-{
-    switch (m_flashingSequence->sequence[m_currentStimulation])
+    if(m_state == trial_state::STIMULUS)
     {
-    case 1:
+        m_stimTimer->start();
+        m_isiTimer->stop();
+        m_state = trial_state::POST_STIMULUS;
+    }
+        else if(trial_state::POST_STIMULUS)
     {
-        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
-                widget()->setStyleSheet("image: url(:/images/bennabi_face_blue.png)");
-        break;
+        m_stimTimer->stop();
+        m_isiTimer->start();
+        m_state = trial_state::STIMULUS;
     }
-    case 2:
-    {
-        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
-                widget()->setStyleSheet("image: url(:/images/bennabi_face_green.png)");
-        break;
-    }
-    case 3:
-    {
-        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
-                widget()->setStyleSheet("image: url(:/images/bennabi_face_red.png)");
-        break;
-    }
-    case 4:
-    {
-        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
-                widget()->setStyleSheet("image: url(:/images/bennabi_face_brown.png)");
-        break;
-    }
-    case 5:
-    {
-        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
-                widget()->setStyleSheet("image: url(:/images/bennabi_face_cyan.png)");
-        break;
-    }
-    case 6:
-    {
-        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
-                widget()->setStyleSheet("image: url(:/images/bennabi_face.png)");
-        break;
-    }
-    case 7:
-    {
-        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
-                widget()->setStyleSheet("image: url(:/images/bennabi_face_yellow.png)");
-        break;
-    }
-    case 8:
-    {
-        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
-                widget()->setStyleSheet("image: url(:/images/bennabi_face_orange.png)");
-        break;
-    }
-    case 9:
-    {
-        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
-                widget()->setStyleSheet("image: url(:/images/bennabi_face_magenta.png)");
-        break;
-    }
-
-    }
-
-}
-
-void Speller::stimulationInvertedFace()
-{
-    this->layout()
-            ->itemAt(m_flashingSequence->sequence[m_currentStimulation])
-            ->widget()
-            ->setStyleSheet("image: url(:/images/bennabi_face_inverted.png)");
-}
-
-void Speller::stimulationInvertedColoredFace()
-{
-    switch (m_flashingSequence->sequence[m_currentStimulation])
-    {
-    case 1:
-    {
-        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
-                widget()->setStyleSheet("image: url(:/images/bennabi_face_blue_inverted.png)");
-        break;
-    }
-    case 2:
-    {
-        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
-                widget()->setStyleSheet("image: url(:/images/bennabi_face_green_inverted.png)");
-        break;
-    }
-    case 3:
-    {
-        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
-                widget()->setStyleSheet("image: url(:/images/bennabi_face_red_inverted.png)");
-        break;
-    }
-    case 4:
-    {
-        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
-                widget()->setStyleSheet("image: url(:/images/bennabi_face_brown_inverted.png)");
-        break;
-    }
-    case 5:
-    {
-        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
-                widget()->setStyleSheet("image: url(:/images/bennabi_face_cyan_inverted.png)");
-        break;
-    }
-    case 6:
-    {
-        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
-                widget()->setStyleSheet("image: url(:/images/bennabi_face_inverted.png)");
-        break;
-    }
-    case 7:
-    {
-        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
-                widget()->setStyleSheet("image: url(:/images/bennabi_face_yellow_inverted.png)");
-        break;
-    }
-    case 8:
-    {
-        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
-                widget()->setStyleSheet("image: url(:/images/bennabi_face_orange_inverted.png)");
-        break;
-    }
-    case 9:
-    {
-        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
-                widget()->setStyleSheet("image: url(:/images/bennabi_face_magenta_inverted.png)");
-        break;
-    }
-
-    }
-
 }
 
 /* Setters */

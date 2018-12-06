@@ -11,7 +11,10 @@
 #include "ssvep.h"
 #include "utils.h"
 //
-
+#include "demoface.h"
+#include "flashingspeller.h"
+#include "facespeller.h"
+//
 ConfigPanel::ConfigPanel(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::ConfigPanel)
@@ -65,18 +68,23 @@ void ConfigPanel::on_initSpeller_clicked()
     else
     {
         int spellerType = ui->spellerType->currentIndex();
-        Speller *fSpeller = new Speller();
 
-        connect(ui->startSpeller, SIGNAL(clicked()), fSpeller, SLOT(startTrial()));
-        connect(fSpeller, SIGNAL(markerTag(uint64_t)), m_markerSender, SLOT(sendStimulation(uint64_t)));
+        switch(spellerType)
+        {
+        case speller_type::FLASHING_SPELLER:
+        {
+            FlashingSpeller *flashSpeller = new FlashingSpeller();
+            initSpeller(flashSpeller, spellerType);
+            break;
+        }
 
-        fSpeller->setStimulationDuration(ui->stimulusDuration->text().toInt());
-        fSpeller->setIsi(ui->interStimulusDuration->text().toInt());
-        fSpeller->setNrSequence(ui->numberOfRepetition->text().toInt());
-        fSpeller->setSpellingMode(ui->spellingModeChoices->currentIndex());
-        fSpeller->setDesiredPhrase(ui->desiredPhrase->text());
-        fSpeller->setSpellerType(spellerType);
-        fSpeller->setFeedbackPort(ui->feedback_port->text().toUShort());
+        case speller_type::FACES_SPELLER ... speller_type::INVERTED_COLORED_FACE: //mingw/gcc only
+        {
+            FaceSpeller *faceSpeller = new FaceSpeller();
+            initSpeller(faceSpeller, spellerType);
+            break;
+        }
+        }
     }
 }
 
@@ -194,6 +202,19 @@ void ConfigPanel::on_initHybrid_clicked()
         // general configuration
         hybrid->setFeedbackPort(ui->feedback_port->text().toUShort());
     }
+}
+
+void ConfigPanel::initSpeller(Speller *t_sp, int t_spellerType)
+{
+    connect(ui->startSpeller, SIGNAL(clicked()), t_sp, SLOT(startTrial()));
+    connect(t_sp, SIGNAL(markerTag(uint64_t)), m_markerSender, SLOT(sendStimulation(uint64_t)));
+    t_sp->setStimulationDuration(ui->stimulusDuration->text().toInt());
+    t_sp->setIsi(ui->interStimulusDuration->text().toInt());
+    t_sp->setNrSequence(ui->numberOfRepetition->text().toInt());
+    t_sp->setSpellingMode(ui->spellingModeChoices->currentIndex());
+    t_sp->setDesiredPhrase(ui->desiredPhrase->text());
+    t_sp->setSpellerType(t_spellerType);
+    t_sp->setFeedbackPort(ui->feedback_port->text().toUShort());
 }
 
 ConfigPanel::~ConfigPanel()

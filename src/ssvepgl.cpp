@@ -253,7 +253,7 @@ void SsvepGL::Flickering()
 
     sendMarker(config::OVTK_StimulationLabel_Base + m_flickeringSequence->sequence[m_currentFlicker]);
     sendMarker(OVTK_StimulationId_VisualSteadyStateStimulationStart);
-
+    qDebug()<<"Stimulation "<<m_flickeringSequence->sequence[m_currentFlicker];
     while(m_index < m_flicker[0].size())
     {
         QCoreApplication::processEvents(QEventLoop::AllEvents);
@@ -391,6 +391,7 @@ void SsvepGL::refreshTarget()
 {
 
     qDebug()<< Q_FUNC_INFO;
+
     if(m_nrElements == 1)
     {
         m_colors = {glColors::white, glColors::white, glColors::white, glColors::white};
@@ -399,6 +400,7 @@ void SsvepGL::refreshTarget()
     {
         if(m_flickeringSequence->sequence[m_currentFlicker] == 1)
         {
+           // center rectangle for idle state
             m_colors[0] = glColors::gray;
             m_colors[1] = glColors::gray;
             m_colors[2] = glColors::gray;
@@ -426,7 +428,7 @@ void SsvepGL::refreshTarget()
 void SsvepGL::update()
 {
 
-    qDebug()<< "[update ]Index : "<< m_index << "current time: " << QTime::currentTime().msec();
+    //    qDebug()<< "[update ]Index : "<< m_index << "current time: " << QTime::currentTime().msec();
     int k;
 
     if(m_nrElements == 1)

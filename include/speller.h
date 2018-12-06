@@ -9,6 +9,7 @@
 //
 #include "randomflashsequence.h"
 #include "matrixlayout.h"
+#include "utils.h"
 //
 
 namespace Ui {
@@ -40,7 +41,7 @@ protected slots:
     void preTrial();
     void feedback();
     void postTrial();
-    void startFlashing();
+    virtual void startFlashing();
     void pauseFlashing();
     void receiveFeedback();
     void createLayout();
@@ -54,19 +55,13 @@ public slots:
         emit markerTag(t_ovStimulation);
     }
 
-private:
-
-    void stimulationFlashing();
-    void stimulationFace();
-    void stimulationColoredFace();
-    void stimulationInvertedFace();
-    void stimulationInvertedColoredFace();
-
 protected:
 
     bool isTarget();
     void highlightTarget();
     void refreshTarget();
+    void sendStimulationInfo();
+    void switchStimulationTimers();
 
     Ui::Speller *ui;
 
@@ -85,17 +80,17 @@ protected:
     bool m_running = true;
     int  m_state;
 
-    int m_stimulationDuration;
-    int m_isi;
-    int m_nrSequence;
+    int m_stimulationDuration = 100;
+    int m_isi = 100;
+    int m_nrSequence = 5;
     int m_nrTrials;
-    int m_spellingMode;
-    int m_spellerType;
+    int m_spellingMode = operation_mode::CALIBRATION;
+    int m_spellerType = speller_type::FLASHING_SPELLER;
     int m_preTrialWait = 2; // 2 seconds
     int m_preTrialCount = 0;
     quint16 m_feedbackPort = 12345;
 
-    QString m_desiredPhrase;
+    QString m_desiredPhrase= "12345";
     QString m_text;
     QImage *m_faceStimuli;
     QList<QString> m_presentedLetters;

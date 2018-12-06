@@ -26,7 +26,9 @@ SOURCES += src\main.cpp\
     src\ssvepgl.cpp \
     src\utils.cpp \
     src\speller.cpp \
-    src\test.cpp
+    src\test.cpp \
+    src/flashingspeller.cpp \
+    src/facespeller.cpp
 
 HEADERS  += include\configpanel.h \
     include\ovtk_stimulations.h \
@@ -41,7 +43,10 @@ HEADERS  += include\configpanel.h \
     include\utils.h \
     include\speller.h \
     include\test.h \
-    include\glutils.h
+    include\glutils.h \
+    src/flashingspeller.h \
+    include/flashingspeller.h \
+    include/facespeller.h
 
 INCLUDEPATH += include\
 
