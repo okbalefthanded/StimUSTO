@@ -1,0 +1,10 @@
+{
+    "breakDuration": 50,
+    "desiredPhrase": "123456789",
+    "experimentMode": 0,
+    "flashingMode": 0,
+    "nrSequences": 10,
+    "paradigmType": 0,
+    "stimulationDuration": 100,
+    "stimulationType": 2
+}

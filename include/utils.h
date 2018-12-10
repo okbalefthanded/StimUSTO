@@ -31,8 +31,17 @@ qint8 sign(double value);
 QSize getScreenSize();
 
 }
-
-
+//
+namespace paradigm_type{
+const quint8 ERP = 0;
+const quint8 SSVEP = 1;
+const quint8 HYBRID = 2;
+}
+//
+namespace flashing_mode {
+const quint8 SC = 0;
+const quint8 RC = 1;
+}
 namespace speller_type {
 // speller types
 const quint8 FLASHING_SPELLER = 0;

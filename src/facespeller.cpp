@@ -2,6 +2,7 @@
 #include <QTimer>
 //
 #include "facespeller.h"
+#include "erp.h"
 #include "ovtk_stimulations.h"
 #include "utils.h"
 //
@@ -34,6 +35,22 @@ void FaceSpeller::startFlashing()
     }
 
     switchStimulationTimers();
+}
+
+void FaceSpeller::initSpeller(ERP prdg)
+{
+
+    m_stimulationDuration = prdg.stimulationDuration();
+    m_isi = prdg.breakDuration();
+    m_nrSequence = prdg.nrSequences();
+    m_spellingMode = prdg.experimentMode();
+    m_desiredPhrase = prdg.desiredPhrase();
+    m_spellerType = prdg.stimulationType();
+    m_feedbackPort = 12345;
+
+    m_stimTimer->setInterval(m_stimulationDuration);
+    m_isiTimer->setInterval(m_isi);
+
 }
 
 void FaceSpeller::stimulationFace()

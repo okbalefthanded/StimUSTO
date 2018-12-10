@@ -9,6 +9,7 @@
 //
 #include "randomflashsequence.h"
 #include "matrixlayout.h"
+#include "paradigm.h"
 #include "utils.h"
 //
 
@@ -23,6 +24,7 @@ class Speller : public QWidget
 public:
     explicit Speller(QWidget *parent = 0);
     ~Speller();
+    virtual void initSpeller(Paradigm prdg);
     void setStimulationDuration(int t_stimDuration);
     void setIsi(int t_isi);
     void setNrSequence(int t_nrSequence);

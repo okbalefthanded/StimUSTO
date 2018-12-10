@@ -3,9 +3,12 @@
 //
 #include <QMainWindow>
 #include <QUdpSocket>
+#include <QTimer>
 //
 #include "ovmarkersender.h"
 #include "speller.h"
+#include "paradigm.h"
+//
 namespace Ui {
 class ConfigPanel;
 }
@@ -33,6 +36,12 @@ public:
     OVMarkerSender *m_markerSender;
     QUdpSocket *m_startSocket;
 
+    QString getConfigFile() const;
+    void setConfigFile(const QString &value);
+
+    bool getNoGui() const;
+    void setNoGui(bool value);
+
 private slots:
     void on_connectOvAsBtn_clicked();
     void on_initSpeller_clicked();
@@ -45,8 +54,10 @@ private slots:
 
 
 private:
-    void initSpeller(Speller *t_sp, int t_spellerType);
+    void connectSpeller(Speller *t_sp, QTimer *timer);
     Ui::ConfigPanel *ui;
+    QString configFile;
+    bool noGui;
 };
 
 #endif // CONFIGPANEL_H

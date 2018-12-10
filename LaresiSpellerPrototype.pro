@@ -6,7 +6,7 @@
 
 QT       += core gui network opengl
 
-CONFIG += c++11
+CONFIG += c++11 console
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -28,7 +28,10 @@ SOURCES += src\main.cpp\
     src\speller.cpp \
     src\test.cpp \
     src/flashingspeller.cpp \
-    src/facespeller.cpp
+    src/facespeller.cpp \
+    src/paradigm.cpp \
+    src/erp.cpp \
+    src/jsonserializer.cpp
 
 HEADERS  += include\configpanel.h \
     include\ovtk_stimulations.h \
@@ -44,9 +47,13 @@ HEADERS  += include\configpanel.h \
     include\speller.h \
     include\test.h \
     include\glutils.h \
-    src/flashingspeller.h \
     include/flashingspeller.h \
-    include/facespeller.h
+    include/facespeller.h \
+    include/paradigm.h \
+    include/erp.h \
+    include/serializable.h \
+    include/serializer.h \
+    include/jsonserializer.h
 
 INCLUDEPATH += include\
 
