@@ -1,5 +1,6 @@
 #include <QJsonDocument>
 #include <QFile>
+#include <QDebug>
 //
 #include "jsonserializer.h"
 //

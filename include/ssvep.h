@@ -1,88 +1,27 @@
 #ifndef SSVEP_H
 #define SSVEP_H
 //
-#include <QWidget>
-#include <QTimer>
-#include <QUdpSocket>
-#include <QLabel>
-#include <QTimer>
+#include "paradigm.h"
 //
-#include "randomflashsequence.h"
-
-namespace Ui {
-class Ssvep;
-}
-
-class Ssvep : public QWidget
+class SSVEP : public Paradigm
 {
-    Q_OBJECT
-
 public:
-    explicit Ssvep(quint8 nrElements = 1, QWidget *parent = 0);
-    ~Ssvep();
+    explicit SSVEP();
+    explicit SSVEP(quint8 mode, quint8 type, int dur, quint8 bDur, quint8 nrSeq, QString phrase, quint8 nElements,
+                   QString frequnecies);
 
-    void setFrequencies(QString freqs);
-    void setFlickeringMode(int mode);
-    void setStimulationDuration(float stimDuration);
-    void setBreakDuration(int brkDuration);
-    void setSequence(int sequence);
-    void setFeedbackPort(int port);
+    QVariant toVariant() const override;
+    void fromVariant(const QVariant& variant) override;
 
+    quint8 nrElements() const;
+    void setNrElements(const quint8 &nrElements);
 
-signals:
-    void markerTag(uint64_t ovStimulation);
-
-private slots:
-
-    void startTrial();
-    void pre_trial();
-    //    void feedback();
-    void post_trial();
-    void Flickering();
-    //    void pauseFlashing();
-    //    void receiveFeedback();
-
-public slots:
-
-    void wait(int millisecondsToWait);
-    void create_layout();
-    //    void refresh_layout();
-
-    //
-    void sendMarker(uint64_t ovStimulation){
-        emit markerTag(ovStimulation);
-    }
-
-
+    QString frequencies() const;
+    void setFrequencies(const QString &frequencies);
 
 private:
-
-    //    bool isTarget();
-    void highlightTarget();
-    void refreshTarget();
-
-    bool firstRun = true;
-    int pre_trial_count=0;
-    int pre_trial_wait;
-    int currentFlicker=0;
-    int state;
-    int flickering_mode;
-    int nr_elements;
-    QLabel *textRow;
-    QList<float> frequencies;
-    float stimulationDuration;
-    int stimulationSequence;
-    int breakDuration;
-
-    quint16 feedbackPort = 12345;
-
-    Ui::Ssvep *ui;
-
-    QUdpSocket *feedback_socket;
-    // Timers
-    QTimer *preTrialTimer;
-
-    RandomFlashSequence *flickeringSequence;
+    quint8 m_nrElements;
+    QString m_frequencies;
 
 };
 

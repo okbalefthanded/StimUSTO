@@ -13,13 +13,14 @@
 #include <QOpenGLShaderProgram>
 //
 #include "randomflashsequence.h"
+#include "ssvep.h"
 //
 class SsvepGL : public QOpenGLWindow, protected QOpenGLFunctions
 {
     Q_OBJECT
 
 public:
-    SsvepGL(int t_nrElements);
+    SsvepGL(SSVEP paradigm);
     ~SsvepGL();
 
     void setFrequencies(QString t_freqs);

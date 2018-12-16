@@ -64,7 +64,7 @@ Speller::Speller(QWidget *parent) :
 void Speller::startTrial()
 {
     qDebug()<< "[TRIAL START]" << Q_FUNC_INFO;
-    qDebug()<< "[TRIAL START]" << m_isi;
+
     if (m_state == trial_state::PRE_TRIAL)
     {
 
@@ -83,8 +83,7 @@ void Speller::startTrial()
     }
 }
 
-void Speller::startFlashing()
-{}
+void Speller::startFlashing(){}
 
 void Speller::pauseFlashing()
 {
@@ -450,7 +449,4 @@ Speller::~Speller()
     delete ui;
 }
 
-void Speller::initSpeller(Paradigm prdg)
-{
-
-}
+void Speller::initSpeller(Paradigm prdg){}

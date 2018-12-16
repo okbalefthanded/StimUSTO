@@ -11,8 +11,8 @@ public:
     explicit Paradigm();
     ~Paradigm();
 
-    QVariant toVariant()  const override {}
-    void fromVariant(const QVariant& variant)  override {}
+    QVariant toVariant()  const override;
+    void fromVariant(const QVariant& variant)  override;
 
     int experimentMode() const;
     void setExperimentMode(int t_experimentMode);

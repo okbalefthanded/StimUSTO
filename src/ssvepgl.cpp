@@ -15,7 +15,7 @@
 #include "utils.h"
 #include "glutils.h"
 //
-SsvepGL::SsvepGL(int t_nrElements)
+SsvepGL::SsvepGL(SSVEP paradigm)
 {
 
     qDebug()<< Q_FUNC_INFO;
@@ -25,7 +25,14 @@ SsvepGL::SsvepGL(int t_nrElements)
     //       // nr_elements = nrelements - 1;
     //        nr_elements = nrelements;
     //    }
-    m_nrElements = t_nrElements;
+    m_nrElements = paradigm.nrElements();
+
+    setFrequencies(paradigm.frequencies());
+    setStimulationDuration(paradigm.stimulationDuration());
+    setBreakDuration(paradigm.breakDuration());
+    setSequence(paradigm.nrSequences());
+    setFlickeringMode(paradigm.experimentMode());
+    setFeedbackPort(12345);
 
     // set vertices, vertices indeices & colors
     initElements();
@@ -247,7 +254,7 @@ void SsvepGL::Flickering()
 
     if(m_index == 0)
     {
-        //        qDebug()<< Q_FUNC_INFO << "connecting frameswapped to update" << "index " << index;
+        // qDebug()<< Q_FUNC_INFO << "connecting frameswapped to update" << "index " << index;
         connect(this, SIGNAL(frameSwapped()), this, SLOT(update()));
     }
 

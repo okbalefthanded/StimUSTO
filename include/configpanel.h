@@ -8,6 +8,7 @@
 #include "ovmarkersender.h"
 #include "speller.h"
 #include "paradigm.h"
+#include "ssvepgl.h"
 //
 namespace Ui {
 class ConfigPanel;
@@ -43,6 +44,7 @@ public:
     void setNoGui(bool value);
 
 private slots:
+    void startExperiment();
     void on_connectOvAsBtn_clicked();
     void on_initSpeller_clicked();
     void on_startSpeller_clicked();
@@ -55,6 +57,7 @@ private slots:
 
 private:
     void connectSpeller(Speller *t_sp, QTimer *timer);
+    void connectSSVEP(SsvepGL *ssvep, QTimer *timer);
     Ui::ConfigPanel *ui;
     QString configFile;
     bool noGui;

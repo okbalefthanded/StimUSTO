@@ -9,12 +9,14 @@
 #include "hybridstimulation.h"
 #include "hybridgridstimulation.h"
 #include "ssvepgl.h"
-#include "ssvep.h"
+//#include "ssvep_timer.h"
 #include "utils.h"
+#include "paradigm.h"
 //
 #include "flashingspeller.h"
 #include "facespeller.h"
 #include "erp.h"
+#include "ssvep.h"
 #include "jsonserializer.h"
 //
 ConfigPanel::ConfigPanel(QWidget *parent) :
@@ -47,6 +49,22 @@ void ConfigPanel::on_connectOvAsBtn_clicked()
     }
 }
 
+void ConfigPanel::startExperiment()
+{
+    JsonSerializer jSerializer;
+    Paradigm paradigm;
+    jSerializer.load(paradigm, configFile);
+    quint8  paradigmType = paradigm.type();
+
+    if(paradigmType == paradigm_type::ERP)
+    {
+        on_initSpeller_clicked();
+    }
+    else if(paradigmType == paradigm_type::SSVEP)
+    {
+        on_initSSVEP_clicked();
+    }
+}
 
 // init speller
 /**
@@ -68,8 +86,7 @@ void ConfigPanel::on_initSpeller_clicked()
 
     int spellerType = 0;
     ERP paradigm;
-    qDebug()<< "par "<<paradigm.stimulationType();
-    qDebug()<< "brk "<<paradigm.breakDuration();
+
     if(noGui)
     {
         m_markerSender = new OVMarkerSender(this);
@@ -78,9 +95,7 @@ void ConfigPanel::on_initSpeller_clicked()
             qDebug()<< "Connection to OpenVibe acquisition server failed";
         }
         JsonSerializer jSerializer;
-//        ERP paradigm;
         jSerializer.load(paradigm, configFile);
-        qDebug()<< "brk "<<paradigm.breakDuration();
         spellerType = paradigm.stimulationType();
     }
 
@@ -105,7 +120,7 @@ void ConfigPanel::on_initSpeller_clicked()
     else
     {
         QTimer *launchTimer = new QTimer();
-        launchTimer->setInterval(5000);
+        launchTimer->setInterval(10000);
         launchTimer->setSingleShot(true);
 
 
@@ -114,10 +129,8 @@ void ConfigPanel::on_initSpeller_clicked()
         case speller_type::FLASHING_SPELLER:
         {
 
-            // JsonSerializer::save(ferp, fp, "");
             FlashingSpeller *flashSpeller = new FlashingSpeller();
             flashSpeller->initSpeller(paradigm);
-            //            initSpeller(flashSpeller, spellerType, paradigm, launchTimer);
             connectSpeller(flashSpeller, launchTimer);
             break;
         }
@@ -126,7 +139,6 @@ void ConfigPanel::on_initSpeller_clicked()
         {
             FaceSpeller *faceSpeller = new FaceSpeller();
             faceSpeller->initSpeller(paradigm);
-            //            initSpeller(faceSpeller, spellerType, paradigm, launchTimer);
             connectSpeller(faceSpeller, launchTimer);
             break;
         }
@@ -138,14 +150,21 @@ void ConfigPanel::on_initSpeller_clicked()
 //INIT SSVEP
 void ConfigPanel::on_initSSVEP_clicked()
 {
-    qDebug()<<Q_FUNC_INFO;
 
+    SSVEP *ssvepParadigm = new SSVEP();
 
-    if(!m_markerSender->connectedOnce())
+    if(noGui)
     {
-        QMessageBox::information(this,"Socket connection","Not Connected");
-    }
+        m_markerSender = new OVMarkerSender(this);
+        if(!m_markerSender->Connect("127.0.0.1", "15361"))
+        {
+            qDebug()<< "Connection to OpenVibe acquisition server failed";
+        }
 
+        JsonSerializer jSerializer;
+        jSerializer.load(*ssvepParadigm, configFile);
+
+    }
     else
     {
         int SSVEPNrElements;
@@ -163,28 +182,41 @@ void ConfigPanel::on_initSSVEP_clicked()
             operationMode = ui->SSVEP_mode->currentIndex();
         }
 
+        ssvepParadigm = new SSVEP(operationMode,
+                                  paradigm_type::SSVEP,
+                                  ui->SSVEP_StimDuration->text().toFloat(),
+                                  ui->SSVEP_BreakDuration->text().toFloat(),
+                                  ui->SSVEP_Sequence->text().toInt(),
+                                  "",
+                                  SSVEPNrElements,
+                                  ui->Frequencies->text());
+
+    }
+    if(!m_markerSender->connectedOnce())
+    {
+        QMessageBox::information(this,"Socket connection","Not Connected");
+    }
+
+    else
+    {
         QSurfaceFormat format;
         format.setRenderableType(QSurfaceFormat::OpenGL);
         format.setProfile(QSurfaceFormat::CoreProfile);
         format.setVersion(3,3);
 
-        SsvepGL *ssvepStimulation = new SsvepGL(SSVEPNrElements);
-
+        SsvepGL *ssvepStimulation = new SsvepGL(*ssvepParadigm);
         ssvepStimulation->setFormat(format);
         // ssvepStimulation->resize(QSize(1000, 700));//temporaty size;
         ssvepStimulation->resize(utils::getScreenSize());
         //
-        connect(ui->startSpeller, SIGNAL(clicked()), ssvepStimulation, SLOT(startTrial()));
-        connect(ssvepStimulation, SIGNAL(markerTag(uint64_t)), m_markerSender, SLOT(sendStimulation(uint64_t)));
+        QTimer *launchTimer = new QTimer();
+        launchTimer->setInterval(10000);
+        launchTimer->setSingleShot(true);
 
-        ssvepStimulation->setFrequencies(ui->Frequencies->text());
-        ssvepStimulation->setStimulationDuration(ui->SSVEP_StimDuration->text().toFloat());
-        ssvepStimulation->setBreakDuration(ui->SSVEP_BreakDuration->text().toInt());
-        ssvepStimulation->setSequence(ui->SSVEP_Sequence->text().toInt());
-        ssvepStimulation->setFlickeringMode(operationMode);
-        ssvepStimulation->setFeedbackPort(ui->feedback_port->text().toInt());
-        //
+        connectSSVEP(ssvepStimulation, launchTimer);
+
         ssvepStimulation->show();
+
     }
 }
 
@@ -250,57 +282,28 @@ void ConfigPanel::on_initHybrid_clicked()
     }
 }
 
-//void ConfigPanel::initSpeller(Speller *t_sp, int t_spellerType, Paradigm prdg, QTimer *timer)
 void ConfigPanel::connectSpeller(Speller *t_sp, QTimer *timer)
 {
-
     connect(ui->startSpeller, SIGNAL(clicked()), t_sp, SLOT(startTrial()));
     connect(t_sp, SIGNAL(markerTag(uint64_t)), m_markerSender, SLOT(sendStimulation(uint64_t)));
     connect(timer, SIGNAL(timeout()), t_sp, SLOT(startTrial()));
-    /*
-    JsonSerializer jSerializer;
+
+    timer->start();
+}
+
+void ConfigPanel::connectSSVEP(SsvepGL *ssvep, QTimer *timer)
+{
+    connect(ssvep, SIGNAL(markerTag(uint64_t)), m_markerSender, SLOT(sendStimulation(uint64_t)));
 
     if(noGui)
     {
-        //        ERP ferp;
-        jSerializer.load(prdg, configFile);
-        t_sp->initSpeller(prdg);
-        /*
-        t_sp->setStimulationDuration(ferp.stimulationDuration());
-        t_sp->setIsi(ferp.breakDuration());
-        t_sp->setNrSequence(ferp.nrSequences());
-        t_sp->setDesiredPhrase(ferp.desiredPhrase());
-        t_sp->setSpellingMode(ferp.experimentMode());
-        t_sp->setSpellerType(t_spellerType);
-        t_sp->setFeedbackPort(12345);
-        */
-  /*  }
+        connect(timer, SIGNAL(timeout()), ssvep, SLOT(startTrial()));
+        timer->start();
+    }
     else
     {
-        ERP ferp(ui->spellingModeChoices->currentIndex(),
-                 paradigm_type::ERP,
-                 ui->stimulusDuration->text().toInt(),
-                 ui->interStimulusDuration->text().toInt(),
-                 ui->numberOfRepetition->text().toInt(),
-                 ui->desiredPhrase->text(),
-                 t_spellerType,
-                 flashing_mode::SC);
-        QString fp = "default.json";
-        jSerializer.save(ferp, fp, "");
-        t_sp->initSpeller(ferp);
-        /*   t_sp->setStimulationDuration(ui->stimulusDuration->text().toInt());
-        t_sp->setIsi(ui->interStimulusDuration->text().toInt());
-        t_sp->setNrSequence(ui->numberOfRepetition->text().toInt());
-        t_sp->setSpellingMode(ui->spellingModeChoices->currentIndex());
-        t_sp->setDesiredPhrase(ui->desiredPhrase->text());
-        t_sp->setSpellerType(t_spellerType);
-        t_sp->setFeedbackPort(ui->feedback_port->text().toUShort());
-        */
-//    }
-
-
-    qDebug()<< "[Config panel] [init speller] starting timer";
-    timer->start();
+        connect(ui->startSpeller, SIGNAL(clicked()), ssvep, SLOT(startTrial()));
+    }
 }
 
 bool ConfigPanel::getNoGui() const

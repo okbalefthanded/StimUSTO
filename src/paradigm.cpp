@@ -17,11 +17,29 @@ Paradigm::Paradigm():
 
 }
 
-Paradigm::~Paradigm()
+QVariant Paradigm::toVariant() const
 {
+    QVariantMap map;
 
+    map.insert("experimentMode", m_experimentMode);
+    map.insert("paradigmType", m_type);
+    map.insert("stimulationDuration", m_stimulationDuration);
+    map.insert("breakDuration", m_breakDuration);
+    map.insert("nrSequences", m_nrSequences);
+    map.insert("desiredPhrase", m_desiredPhrase);
+    return map;
 }
 
+void Paradigm::fromVariant(const QVariant &variant)
+{
+    QVariantMap map = variant.toMap();
+    m_experimentMode = map.value("experimentMode").toInt();
+    m_type = map.value("paradigmType").toInt();
+    m_stimulationDuration = map.value("stimulationDuration").toInt();
+    m_breakDuration = map.value("breakDuration").toInt();
+    m_nrSequences = map.value("nrSequences").toInt();
+    m_desiredPhrase = map.value("desiredPhrase").toString();
+}
 
 int Paradigm::experimentMode() const
 {
@@ -81,4 +99,9 @@ QString Paradigm::desiredPhrase() const
 void Paradigm::setDesiredPhrase(const QString &t_desiredPhrase)
 {
     m_desiredPhrase = t_desiredPhrase;
+}
+
+Paradigm::~Paradigm()
+{
+
 }

@@ -40,7 +40,8 @@ int main(int argc, char *argv[])
         launchTimer->setInterval(1000);
         launchTimer->setSingleShot(true);
 
-        QObject::connect(launchTimer, SIGNAL(timeout()), &w, SLOT(on_initSpeller_clicked()));
+        // QObject::connect(launchTimer, SIGNAL(timeout()), &w, SLOT(on_initSpeller_clicked()));
+        QObject::connect(launchTimer, SIGNAL(timeout()), &w, SLOT(startExperiment()));
         launchTimer->start();
     }
     else

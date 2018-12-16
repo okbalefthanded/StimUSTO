@@ -19,7 +19,6 @@ SOURCES += src\main.cpp\
     src\matrixlayout.cpp \
     src\ovmarkersender.cpp \
     src\randomflashsequence.cpp \
-    src\ssvep.cpp \
     src\hybridstimulation.cpp \
     src\ellipselayout.cpp \
     src\hybridgridstimulation.cpp \
@@ -31,14 +30,14 @@ SOURCES += src\main.cpp\
     src/facespeller.cpp \
     src/paradigm.cpp \
     src/erp.cpp \
-    src/jsonserializer.cpp
+    src/jsonserializer.cpp \
+    src/ssvep.cpp
 
 HEADERS  += include\configpanel.h \
     include\ovtk_stimulations.h \
     include\matrixlayout.h \
     include\ovmarkersender.h \
     include\randomflashsequence.h \
-    include\ssvep.h \
     include\hybridstimulation.h \
     include\ellipselayout.h \
     include\hybridgridstimulation.h \
@@ -53,7 +52,8 @@ HEADERS  += include\configpanel.h \
     include/erp.h \
     include/serializable.h \
     include/serializer.h \
-    include/jsonserializer.h
+    include/jsonserializer.h \
+    include/ssvep.h
 
 INCLUDEPATH += include\
 
