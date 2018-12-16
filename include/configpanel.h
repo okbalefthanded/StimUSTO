@@ -26,13 +26,6 @@ public:
     bool m_onPause;
     bool m_onStop;
     bool m_onQuit;
-//
-//    int stimulation_duration;
-//    int isi;
-//    int nr_sequence;
-//    int nr_trials;
-//    int spelling_mode;
-//    QString desired_phrase;
 
     OVMarkerSender *m_markerSender;
     QUdpSocket *m_startSocket;
@@ -54,10 +47,9 @@ private slots:
     void on_initSSVEP_clicked();
     void on_initHybrid_clicked();
 
-
 private:
-    void connectSpeller(Speller *t_sp, QTimer *timer);
-    void connectSSVEP(SsvepGL *ssvep, QTimer *timer);
+    void initParadigm(Paradigm *prdg);
+    void connectParadigm(QObject *pr, QTimer *timer);
     Ui::ConfigPanel *ui;
     QString configFile;
     bool noGui;

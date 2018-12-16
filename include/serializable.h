@@ -4,6 +4,7 @@
 #include <QVariant>
 
 class Serializable {
+
 public:
     virtual ~Serializable() {}
     virtual QVariant toVariant() const = 0;

@@ -80,37 +80,30 @@ void ConfigPanel::on_initSpeller_clicked()
     //    qDebug() << "buffer size" << buffer->size();
     //    start_socket->readDatagram(buffer->data(), buffer->size(), &sender, &senderPort);
 
-    m_startSocket = new QUdpSocket(this);
-    m_startSocket->bind(QHostAddress("10.3.65.37"), 54321);
-
+    // m_startSocket = new QUdpSocket(this);
+    // m_startSocket->bind(QHostAddress("10.3.65.37"), 54321);
 
     int spellerType = 0;
-    ERP paradigm;
+
+    ERP *erpParadigm = new ERP();
 
     if(noGui)
     {
-        m_markerSender = new OVMarkerSender(this);
-        if(!m_markerSender->Connect("127.0.0.1", "15361"))
-        {
-            qDebug()<< "Connection to OpenVibe acquisition server failed";
-        }
-        JsonSerializer jSerializer;
-        jSerializer.load(paradigm, configFile);
-        spellerType = paradigm.stimulationType();
+        initParadigm(erpParadigm);
+        spellerType = erpParadigm->stimulationType();
     }
 
     else
     {
         spellerType = ui->spellerType->currentIndex();
-        ERP paradigm(ui->spellingModeChoices->currentIndex(),
-                     paradigm_type::ERP,
-                     ui->stimulusDuration->text().toInt(),
-                     ui->interStimulusDuration->text().toInt(),
-                     ui->numberOfRepetition->text().toInt(),
-                     ui->desiredPhrase->text(),
-                     spellerType,
-                     flashing_mode::SC);
-
+        erpParadigm = new ERP(ui->spellingModeChoices->currentIndex(),
+                              paradigm_type::ERP,
+                              ui->stimulusDuration->text().toInt(),
+                              ui->interStimulusDuration->text().toInt(),
+                              ui->numberOfRepetition->text().toInt(),
+                              ui->desiredPhrase->text(),
+                              spellerType,
+                              flashing_mode::SC);
     }
 
     if(!m_markerSender->connectedOnce())
@@ -123,23 +116,21 @@ void ConfigPanel::on_initSpeller_clicked()
         launchTimer->setInterval(10000);
         launchTimer->setSingleShot(true);
 
-
         switch(spellerType)
         {
         case speller_type::FLASHING_SPELLER:
         {
-
             FlashingSpeller *flashSpeller = new FlashingSpeller();
-            flashSpeller->initSpeller(paradigm);
-            connectSpeller(flashSpeller, launchTimer);
+            flashSpeller->initSpeller(erpParadigm);
+            connectParadigm(flashSpeller, launchTimer);
             break;
         }
 
         case speller_type::FACES_SPELLER ... speller_type::INVERTED_COLORED_FACE: //mingw/gcc only
         {
             FaceSpeller *faceSpeller = new FaceSpeller();
-            faceSpeller->initSpeller(paradigm);
-            connectSpeller(faceSpeller, launchTimer);
+            faceSpeller->initSpeller(erpParadigm);
+            connectParadigm(faceSpeller, launchTimer);
             break;
         }
         }
@@ -155,15 +146,7 @@ void ConfigPanel::on_initSSVEP_clicked()
 
     if(noGui)
     {
-        m_markerSender = new OVMarkerSender(this);
-        if(!m_markerSender->Connect("127.0.0.1", "15361"))
-        {
-            qDebug()<< "Connection to OpenVibe acquisition server failed";
-        }
-
-        JsonSerializer jSerializer;
-        jSerializer.load(*ssvepParadigm, configFile);
-
+        initParadigm(ssvepParadigm);
     }
     else
     {
@@ -213,8 +196,7 @@ void ConfigPanel::on_initSSVEP_clicked()
         launchTimer->setInterval(10000);
         launchTimer->setSingleShot(true);
 
-        connectSSVEP(ssvepStimulation, launchTimer);
-
+        connectParadigm(ssvepStimulation, launchTimer);
         ssvepStimulation->show();
 
     }
@@ -282,27 +264,30 @@ void ConfigPanel::on_initHybrid_clicked()
     }
 }
 
-void ConfigPanel::connectSpeller(Speller *t_sp, QTimer *timer)
+void ConfigPanel::initParadigm(Paradigm *prdg)
 {
-    connect(ui->startSpeller, SIGNAL(clicked()), t_sp, SLOT(startTrial()));
-    connect(t_sp, SIGNAL(markerTag(uint64_t)), m_markerSender, SLOT(sendStimulation(uint64_t)));
-    connect(timer, SIGNAL(timeout()), t_sp, SLOT(startTrial()));
+    m_markerSender = new OVMarkerSender(this);
+    if(!m_markerSender->Connect("127.0.0.1", "15361"))
+    {
+        qDebug()<< "Connection to OpenVibe acquisition server failed";
+    }
 
-    timer->start();
+    JsonSerializer jSerializer;
+    jSerializer.load(*prdg, configFile);
 }
 
-void ConfigPanel::connectSSVEP(SsvepGL *ssvep, QTimer *timer)
+void ConfigPanel::connectParadigm(QObject *pr, QTimer *timer)
 {
-    connect(ssvep, SIGNAL(markerTag(uint64_t)), m_markerSender, SLOT(sendStimulation(uint64_t)));
+    connect(pr, SIGNAL(markerTag(uint64_t)), m_markerSender, SLOT(sendStimulation(uint64_t)));
 
     if(noGui)
     {
-        connect(timer, SIGNAL(timeout()), ssvep, SLOT(startTrial()));
+        connect(timer, SIGNAL(timeout()), pr, SLOT(startTrial()));
         timer->start();
     }
     else
     {
-        connect(ui->startSpeller, SIGNAL(clicked()), ssvep, SLOT(startTrial()));
+        connect(ui->startSpeller, SIGNAL(clicked()), pr, SLOT(startTrial()));
     }
 }
 

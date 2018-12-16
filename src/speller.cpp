@@ -449,4 +449,4 @@ Speller::~Speller()
     delete ui;
 }
 
-void Speller::initSpeller(Paradigm prdg){}
+void Speller::initSpeller(Paradigm *prdg){}

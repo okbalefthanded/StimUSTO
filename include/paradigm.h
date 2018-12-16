@@ -6,6 +6,8 @@
 //
 class Paradigm : public Serializable
 {
+
+
 public:
     explicit Paradigm(quint8 mode, quint8 type, int dur, quint8 bDur, quint8 nrSeq, QString phrase);
     explicit Paradigm();

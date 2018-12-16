@@ -20,11 +20,6 @@ SsvepGL::SsvepGL(SSVEP paradigm)
 
     qDebug()<< Q_FUNC_INFO;
 
-    //    if( nrelements <= MAX_ELEMENTS)
-    //    {
-    //       // nr_elements = nrelements - 1;
-    //        nr_elements = nrelements;
-    //    }
     m_nrElements = paradigm.nrElements();
 
     setFrequencies(paradigm.frequencies());
@@ -466,7 +461,7 @@ void SsvepGL::update()
 // Setters
 void SsvepGL::setFrequencies(QString freqs)
 {
-    qDebug()<< Q_FUNC_INFO;
+//    qDebug()<< Q_FUNC_INFO;
 
     QStringList freqsList = freqs.split(',');
 
