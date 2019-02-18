@@ -14,6 +14,6 @@ public:
               const QString& rootName) override;
     void load(Serializable& serializable,
               const QString& filepath) override;
-};
+}   ;
 
 #endif // JSONSERIALIZER_H

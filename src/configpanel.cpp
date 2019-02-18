@@ -172,7 +172,8 @@ void ConfigPanel::on_initSSVEP_clicked()
                                   ui->SSVEP_Sequence->text().toInt(),
                                   "",
                                   SSVEPNrElements,
-                                  ui->Frequencies->text());
+                                  ui->Frequencies->text(),
+                                  ui->SSVEP_Stimulation->currentIndex());
 
     }
     if(!m_markerSender->connectedOnce())

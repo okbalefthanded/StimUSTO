@@ -11,9 +11,9 @@ SSVEP::SSVEP() : Paradigm (),
 
 SSVEP::SSVEP(quint8 mode, quint8 type, int dur, quint8 bDur,
              quint8 nrSeq, QString phrase, quint8 nElements,
-             QString frequnecies):
+             QString frequnecies, quint8 stimulationMode):
     Paradigm(mode, type, dur, bDur, nrSeq, phrase),
-    m_nrElements(nElements), m_frequencies(frequnecies)
+    m_nrElements(nElements), m_frequencies(frequnecies), m_stimulationMode(stimulationMode)
 {
 }
 
@@ -45,6 +45,7 @@ void SSVEP::fromVariant(const QVariant &variant)
     m_desiredPhrase = map.value("desiredPhrase").toString();
     m_nrElements = map.value("nrElements").toInt();
     m_frequencies = map.value("frequencies").toString();
+    m_stimulationMode = map.value("stimulationMode").toInt();
 }
 
 quint8 SSVEP::nrElements() const
@@ -65,4 +66,14 @@ QString SSVEP::frequencies() const
 void SSVEP::setFrequencies(const QString &frequencies)
 {
     m_frequencies = frequencies;
+}
+
+quint8 SSVEP::stimulationMode() const
+{
+    return m_stimulationMode;
+}
+
+void SSVEP::setStimulationMode(const quint8 &stimulationMode)
+{
+    m_stimulationMode = stimulationMode;
 }

@@ -29,8 +29,10 @@ public:
     void setBreakDuration(int t_brkDuration);
     void setSequence(int t_sequence);
     void setFeedbackPort(int t_port);
+    void setStimulationMode(const quint8 t_stimulationMode);
 
     // QOpenGLWindow interface
+
 protected:
     void initializeGL();
     void resizeGL(int w, int h);
@@ -88,6 +90,7 @@ private:
     float m_stimulationDuration;
     int m_stimulationSequence;
     int m_breakDuration;
+    quint8 m_stimulationMode;
 
     quint16 m_feedbackPort = 12345;
 
@@ -106,7 +109,8 @@ private:
 
     int m_index;
     //
-    QVector <QVector <int>> m_flicker;
+    // QVector <QVector <int>> m_flicker;
+    QVector <QVector <double>> m_flicker;
     QVector<QVector3D> m_vertices;
     QVector<QVector3D> m_colors;
     QVector<int> m_vindices;

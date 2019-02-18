@@ -7,7 +7,6 @@
 #include <QScreen>
 
 namespace utils {
-
 //
 static QChar letters[6][6] = {
     {'A','B','C','D','E','F'},
@@ -18,11 +17,14 @@ static QChar letters[6][6] = {
     {'4','5','6','7','8','9'},
 };
 
+// rectangle flickering
+QVector<double> gen_flick(double freq, int refreshRate, float length, quint8 stimMode);
+
 // rectangle flickering : ON/OFF
-QVector<int> gen_flick(double freq, int refreshRate, float length);
+QVector<double> gen_flick_on_off(double freq, int refreshRate, float length);
 
 // sampled sinusoidal flickering
-QVector<double> gen_flick_sin(double freq, int refreshRate, int length);
+QVector<double> gen_flick_sin(double freq, int refreshRate, float length);
 
 //
 qint8 sign(double value);
@@ -71,6 +73,11 @@ const quint8 STIMULUS = 1;
 const quint8 POST_STIMULUS = 2;
 const quint8 FEEDBACK = 3;
 const quint8 POST_TRIAL = 4;
+}
+//
+namespace frequency_stimulation {
+const quint8 ON_OFF = 0;
+const quint8 SIN = 1;
 }
 
 namespace config {

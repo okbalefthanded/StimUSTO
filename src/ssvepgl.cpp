@@ -28,6 +28,7 @@ SsvepGL::SsvepGL(SSVEP paradigm)
     setSequence(paradigm.nrSequences());
     setFlickeringMode(paradigm.experimentMode());
     setFeedbackPort(12345);
+    setStimulationMode(paradigm.stimulationMode());
 
     // set vertices, vertices indeices & colors
     initElements();
@@ -73,7 +74,8 @@ void SsvepGL::initializeGL()
     m_flicker.resize(m_frequencies.size());
     for (int i=0; i < m_frequencies.size(); ++i)
     {
-        m_flicker[i] = utils::gen_flick(m_frequencies[i], config::REFRESH_RATE, m_stimulationDuration);
+        m_flicker[i] = utils::gen_flick(m_frequencies[i], config::REFRESH_RATE, m_stimulationDuration, m_stimulationMode);
+        //  m_flicker[i] = utils::gen_flick_sin(m_frequencies[i], config::REFRESH_RATE, m_stimulationDuration);
     }
 
     // Application-specific initialization
@@ -187,10 +189,10 @@ void SsvepGL::preTrial()
             //            text_row += desired_phrase[currentLetter];
             //            textRow->setText(text_row);
         }
-//        else if(m_flickeringMode == operation_mode::COPY_MODE)
-//        {
-//            highlightTarget();
-//        }
+        //        else if(m_flickeringMode == operation_mode::COPY_MODE)
+        //        {
+        //            highlightTarget();
+        //        }
     }
     else if(m_preTrialCount == 3)
     {
@@ -255,7 +257,9 @@ void SsvepGL::Flickering()
 
     sendMarker(config::OVTK_StimulationLabel_Base + m_flickeringSequence->sequence[m_currentFlicker]);
     sendMarker(OVTK_StimulationId_VisualSteadyStateStimulationStart);
+
     qDebug()<<"Stimulation "<<m_flickeringSequence->sequence[m_currentFlicker];
+
     while(m_index < m_flicker[0].size())
     {
         QCoreApplication::processEvents(QEventLoop::AllEvents);
@@ -402,7 +406,7 @@ void SsvepGL::refreshTarget()
     {
         if(m_flickeringSequence->sequence[m_currentFlicker] == 1)
         {
-           // center rectangle for idle state
+            // center rectangle for idle state
             m_colors[0] = glColors::gray;
             m_colors[1] = glColors::gray;
             m_colors[2] = glColors::gray;
@@ -427,10 +431,15 @@ void SsvepGL::refreshTarget()
     QOpenGLWindow::update();
 }
 
+void SsvepGL::setStimulationMode(const quint8 t_stimulationMode)
+{
+    m_stimulationMode = t_stimulationMode;
+}
+
 void SsvepGL::update()
 {
 
-    //    qDebug()<< "[update ]Index : "<< m_index << "current time: " << QTime::currentTime().msec();
+    qDebug()<< "[update ]Index : "<< m_index << "current time: " << QTime::currentTime().msec();
     int k;
 
     if(m_nrElements == 1)
@@ -461,7 +470,7 @@ void SsvepGL::update()
 // Setters
 void SsvepGL::setFrequencies(QString freqs)
 {
-//    qDebug()<< Q_FUNC_INFO;
+    //    qDebug()<< Q_FUNC_INFO;
 
     QStringList freqsList = freqs.split(',');
 

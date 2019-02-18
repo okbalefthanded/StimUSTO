@@ -1,14 +1,30 @@
+#include <QtMath>
+#include <QDebug>
+//
 #include "utils.h"
-
+//
 namespace utils {
 // rectangle flickering : ON/OFF
-QVector<int> gen_flick(double freq, int refreshRate, float length)
+QVector<double> gen_flick(double freq, int refreshRate, float length, quint8 stimMode)
+{
+
+    if(stimMode == frequency_stimulation::ON_OFF)
+    {
+        return gen_flick_on_off(freq, refreshRate, length);
+    }
+    else if( stimMode == frequency_stimulation::SIN)
+    {
+        return gen_flick_sin(freq, refreshRate, length);
+    }
+}
+
+//
+QVector<double> gen_flick_on_off(double freq, int refreshRate, float length)
 {
     //    int samples = refreshRate * (length / 1000);
     int samples = refreshRate * length;
-    int period = refreshRate / freq;
-    QVector<int> temp(period, 1);
-    QVector<int> v;
+    int period = refreshRate / freq;QVector<double> temp(period, 1);
+    QVector<double> v;
 
     for(int idx = period / 2; idx<period; idx++)
     {
@@ -25,11 +41,21 @@ QVector<int> gen_flick(double freq, int refreshRate, float length)
     return v;
 }
 
-// TODO
 // sampled sinusoidal flickering
-QVector<double> gen_flick_sin(double freq, int refreshRate, int length)
+// implement the Sampled sinusoidal frequency modulation method
+// X. Chen, Z. Chen, S. Gao, and X. Gao, “A high-ITR SSVEP-based BCI speller,”
+// Taylor Fr. Brain Comput. InterfacesBrain-Computer Interfaces, vol. 1, no. 3–4, pp. 181–191, 2014.
+QVector<double> gen_flick_sin(double freq, int refreshRate, float length)
 {
+    int samples = refreshRate * int(length);
+    QVector<double> stim(samples, 0);
 
+    for(int index = 0; index < samples; index++)
+    {
+        stim[index] = 0.5 * (1 + qSin(2*M_PI*freq*(index/float(refreshRate))));
+    }
+
+    return stim;
 }
 
 //
@@ -52,8 +78,6 @@ QSize getScreenSize()
     {
         return pluggedScreens.first()->size();
     }
-
-
 }
 }
 
