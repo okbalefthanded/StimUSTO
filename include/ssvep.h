@@ -8,7 +8,7 @@ class SSVEP : public Paradigm
 
 public:
     explicit SSVEP();
-    explicit SSVEP(quint8 mode, quint8 type, int dur, quint8 bDur, quint8 nrSeq, QString phrase, quint8 nElements,
+    explicit SSVEP(quint8 mode, quint8 control, quint8 type, int dur, quint8 bDur, quint8 nrSeq, QString phrase, quint8 nElements,
                    QString frequnecies, quint8 stimulationMode);
 
     QVariant toVariant() const override;

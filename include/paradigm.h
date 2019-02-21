@@ -9,7 +9,7 @@ class Paradigm : public Serializable
 
 
 public:
-    explicit Paradigm(quint8 mode, quint8 type, int dur, quint8 bDur, quint8 nrSeq, QString phrase);
+    explicit Paradigm(quint8 mode, quint8 control, quint8 type, int dur, quint8 bDur, quint8 nrSeq, QString phrase);
     explicit Paradigm();
     ~Paradigm();
 
@@ -34,8 +34,12 @@ public:
     QString desiredPhrase() const;
     void setDesiredPhrase(const QString &t_desiredPhrase);
 
+    quint8 controlMode() const;
+    void setControlMode(const int t_controlMode);
+
 protected:
     quint8 m_experimentMode;
+    quint8 m_controlMode;
     quint8 m_type;
     int m_stimulationDuration;
     int m_breakDuration; // isi for ERP, break for SSVEP

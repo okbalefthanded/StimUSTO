@@ -21,7 +21,7 @@ SsvepGL::SsvepGL(SSVEP paradigm)
     qDebug()<< Q_FUNC_INFO;
 
     m_nrElements = paradigm.nrElements();
-
+    setControlMode(paradigm.controlMode());
     setFrequencies(paradigm.frequencies());
     setStimulationDuration(paradigm.stimulationDuration());
     setBreakDuration(paradigm.breakDuration());
@@ -75,7 +75,6 @@ void SsvepGL::initializeGL()
     for (int i=0; i < m_frequencies.size(); ++i)
     {
         m_flicker[i] = utils::gen_flick(m_frequencies[i], config::REFRESH_RATE, m_stimulationDuration, m_stimulationMode);
-        //  m_flicker[i] = utils::gen_flick_sin(m_frequencies[i], config::REFRESH_RATE, m_stimulationDuration);
     }
 
     // Application-specific initialization
@@ -217,7 +216,7 @@ void SsvepGL::preTrial()
 void SsvepGL::postTrial()
 {
 
-    sendMarker(OVTK_StimulationId_TrialStop);
+    //    sendMarker(OVTK_StimulationId_TrialStop);
     //    qDebug()<< Q_FUNC_INFO << "disconnecting frameswapped to update "<<"index"<< index;
     disconnect(this, SIGNAL(frameSwapped()), this, SLOT(update()));
     initElements();
@@ -253,10 +252,13 @@ void SsvepGL::Flickering()
     {
         // qDebug()<< Q_FUNC_INFO << "connecting frameswapped to update" << "index " << index;
         connect(this, SIGNAL(frameSwapped()), this, SLOT(update()));
+        //        qDebug()<< Q_FUNC_INFO << "[update ]Index (first): "<< m_index << "current time: " << QTime::currentTime().msec();
     }
 
-    sendMarker(config::OVTK_StimulationLabel_Base + m_flickeringSequence->sequence[m_currentFlicker]);
-    sendMarker(OVTK_StimulationId_VisualSteadyStateStimulationStart);
+    //    sendMarker(config::OVTK_StimulationLabel_Base + m_flickeringSequence->sequence[m_currentFlicker]);
+    //    sendMarker(OVTK_StimulationId_VisualSteadyStateStimulationStart);
+    //    qDebug()<< Q_FUNC_INFO << "markers sent" << "current time: " << QTime::currentTime().msec();
+
 
     qDebug()<<"Stimulation "<<m_flickeringSequence->sequence[m_currentFlicker];
 
@@ -264,6 +266,9 @@ void SsvepGL::Flickering()
     {
         QCoreApplication::processEvents(QEventLoop::AllEvents);
     }
+
+    sendMarker(OVTK_StimulationId_TrialStop);
+    //    qDebug()<< Q_FUNC_INFO << "[update ]Index (last) : "<< m_index << "current time: " << QTime::currentTime().msec();
     ++m_currentFlicker;
     m_state = trial_state::POST_TRIAL;
 }
@@ -318,27 +323,42 @@ void SsvepGL::initElements()
         // init vectors
         int vectorsSize = m_nrElements * glUtils::POINTS_PER_SQUARE;
         m_vertices.resize(vectorsSize);
-        for(int i=0; i<m_vertices.count(); i+=glUtils::POINTS_PER_SQUARE)
+        initRects();
+        initColors();
+
+
+        /*
+        // synchrounous mode : no idle state
+        if(m_controlMode == control_mode::SYNC)
         {
-            m_vertices[i] = refPoints::topPoints[i/glUtils::POINTS_PER_SQUARE];
-            sx = 1;
-            for(int j=i+1; j<i+glUtils::POINTS_PER_SQUARE; ++j)
+            initRects();
+            initColors();
+        }
+        // asynchrounous mode : with idle state
+        else{
+
+            //            for(int i=0; i<m_vertices.count(); i+=glUtils::POINTS_PER_SQUARE)
+            //            {
+            //                m_vertices[i] = refPoints::topPoints[i/glUtils::POINTS_PER_SQUARE];
+            //                sx = 1;
+            //                for(int j=i+1; j<i+glUtils::POINTS_PER_SQUARE; ++j)
+            //                {
+            //                    isNullX = j % 2;
+            //                    isNullY = (j+1) % 2;
+            //                    m_vertices[j].setX(m_vertices[j-1].x() + (dx * isNullX * sx));
+            //                    m_vertices[j].setY(m_vertices[j-1].y() - (dy * isNullY));
+            //                    m_vertices[j].setZ(refPoints::topPoints[0].z());
+            //                    sx--;
+            //                }
+            //            }
+            // init colors
+            m_colors = {glColors::gray, glColors::gray, glColors::gray, glColors::gray};
+            m_colors.resize(vectorsSize);
+            for (int i=glUtils::POINTS_PER_SQUARE; i<m_colors.count(); i++)
             {
-                isNullX = j % 2;
-                isNullY = (j+1) % 2;
-                m_vertices[j].setX(m_vertices[j-1].x() + (dx * isNullX * sx));
-                m_vertices[j].setY(m_vertices[j-1].y() - (dy * isNullY));
-                m_vertices[j].setZ(refPoints::topPoints[0].z());
-                sx--;
+                m_colors[i] = glColors::white;
             }
-        }
-        // init colors
-        m_colors = {glColors::gray, glColors::gray, glColors::gray, glColors::gray};
-        m_colors.resize(vectorsSize);
-        for (int i=glUtils::POINTS_PER_SQUARE; i<m_colors.count(); i++)
-        {
-            m_colors[i] = glColors::white;
-        }
+        } */
     }
 
     // init indices
@@ -365,6 +385,58 @@ void SsvepGL::initElements()
     QOpenGLWindow::update();
 }
 
+void SsvepGL::initRects()
+{
+    double dx = 0.2;
+    double dy = 0.25;
+    int isNullX = 0, isNullY = 0, sx=1;
+
+    for(int i=0; i<m_vertices.count(); i+=glUtils::POINTS_PER_SQUARE)
+    {
+        m_vertices[i] = refPoints::topPoints[i/glUtils::POINTS_PER_SQUARE];
+        sx = 1;
+        for(int j=i+1; j<i+glUtils::POINTS_PER_SQUARE; ++j)
+        {
+            isNullX = j % 2;
+            isNullY = (j+1) % 2;
+            m_vertices[j].setX(m_vertices[j-1].x() + (dx * isNullX * sx));
+            m_vertices[j].setY(m_vertices[j-1].y() - (dy * isNullY));
+            m_vertices[j].setZ(refPoints::topPoints[0].z());
+            sx--;
+        }
+    }
+}
+
+void SsvepGL::initColors()
+{
+    qDebug()<< Q_FUNC_INFO;
+
+    int vectorsSize = m_nrElements * glUtils::POINTS_PER_SQUARE;
+    m_colors.resize(vectorsSize);
+
+    if(m_controlMode == control_mode::SYNC)
+    {
+        qDebug()<< "[control mode] : SYNC" ;
+        qDebug()<< "[colors : ]" << m_colors.count();
+        for (int i=0; i<m_colors.count(); i++)
+        {
+            m_colors[i] = glColors::white;
+        }
+    }
+    else
+    {
+        qDebug()<< "[control mode] : ASYNC" ;
+        // init colors
+        m_colors = {glColors::gray, glColors::gray, glColors::gray, glColors::gray};
+        // m_colors.resize(vectorsSize);
+        for (int i=glUtils::POINTS_PER_SQUARE; i<m_colors.count(); i++)
+        {
+            m_colors[i] = glColors::white;
+        }
+    }
+
+}
+
 void SsvepGL::highlightTarget()
 {
 
@@ -377,7 +449,7 @@ void SsvepGL::highlightTarget()
     else
     {
         int tmp = m_flickeringSequence->sequence[m_currentFlicker]-1;
-        int squareIndex = tmp+(glUtils::VERTICES_PER_TRIANGLE*tmp);
+        int squareIndex = tmp + (glUtils::VERTICES_PER_TRIANGLE*tmp);
         m_colors[squareIndex] = glColors::green;
         m_colors[squareIndex + 1] = glColors::green;
         m_colors[squareIndex + 2] = glColors::green;
@@ -404,22 +476,37 @@ void SsvepGL::refreshTarget()
     }
     else
     {
-        if(m_flickeringSequence->sequence[m_currentFlicker] == 1)
-        {
-            // center rectangle for idle state
-            m_colors[0] = glColors::gray;
-            m_colors[1] = glColors::gray;
-            m_colors[2] = glColors::gray;
-            m_colors[3] = glColors::gray;
-        }
-        else
+        if(m_controlMode == control_mode::SYNC)
         {
             int tmp = m_flickeringSequence->sequence[m_currentFlicker]-1;
-            int squareIndex = tmp+(glUtils::VERTICES_PER_TRIANGLE*tmp);
+            //            int squareIndex = tmp+(glUtils::VERTICES_PER_TRIANGLE*tmp);
+            int squareIndex = tmp;
             m_colors[squareIndex] = glColors::white;
             m_colors[squareIndex + 1] = glColors::white;
             m_colors[squareIndex + 2] = glColors::white;
             m_colors[squareIndex + 3] = glColors::white;
+        }
+        else
+        {
+
+            if(m_flickeringSequence->sequence[m_currentFlicker] == 1)
+            {
+                // center rectangle for idle state
+                m_colors[0] = glColors::gray;
+                m_colors[1] = glColors::gray;
+                m_colors[2] = glColors::gray;
+                m_colors[3] = glColors::gray;
+            }
+            else
+            {
+                int tmp = m_flickeringSequence->sequence[m_currentFlicker]-1;
+                int squareIndex = tmp+(glUtils::VERTICES_PER_TRIANGLE*tmp);
+                m_colors[squareIndex] = glColors::white;
+                m_colors[squareIndex + 1] = glColors::white;
+                m_colors[squareIndex + 2] = glColors::white;
+                m_colors[squareIndex + 3] = glColors::white;
+            }
+
         }
     }
     m_vaObject.bind();
@@ -431,7 +518,14 @@ void SsvepGL::refreshTarget()
     QOpenGLWindow::update();
 }
 
-void SsvepGL::setStimulationMode(const quint8 t_stimulationMode)
+
+
+void SsvepGL::setControlMode(quint8 t_controlMode)
+{
+    m_controlMode = t_controlMode;
+}
+
+void SsvepGL::setStimulationMode(quint8 t_stimulationMode)
 {
     m_stimulationMode = t_stimulationMode;
 }
@@ -439,14 +533,32 @@ void SsvepGL::setStimulationMode(const quint8 t_stimulationMode)
 void SsvepGL::update()
 {
 
-    qDebug()<< "[update ]Index : "<< m_index << "current time: " << QTime::currentTime().msec();
+    //    qDebug()<< "[update ]Index : "<< m_index << "current time: " << QTime::currentTime().msec();
+
+
+    if(m_index == 0)
+    {
+        sendMarker(config::OVTK_StimulationLabel_Base + m_flickeringSequence->sequence[m_currentFlicker]);
+        // sendMarker(OVTK_StimulationId_VisualSteadyStateStimulationStart);
+    }
+
     int k;
 
     if(m_nrElements == 1)
-    { k = 0;}
+    {
+        k = 0;
+    }
     else
-    {k = glUtils::POINTS_PER_SQUARE;}
-
+    {
+        if (m_controlMode == control_mode::SYNC)
+        {
+            k = 0;
+        }
+        else
+        {
+            k = glUtils::POINTS_PER_SQUARE;
+        }
+    }
     for(int i = 0; i<m_flicker.size() ;++i)
     {
         m_colors[k]   = QVector3D(m_flicker[i][m_index], m_flicker[i][m_index], m_flicker[i][m_index]);

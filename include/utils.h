@@ -55,7 +55,12 @@ const quint8 INVERTED_COLORED_FACE = 4;
 //const quint8 MOTION_FACE = 3;
 //const quint8 MOVING_FACE = 4;
 const quint8 SSVEP = 5;
+}
 
+namespace control_mode {
+// control mode : synchronous / asynchronous
+const quint8 SYNC = 0;
+const quint8 ASYNC = 1;
 }
 
 namespace operation_mode {

@@ -24,8 +24,6 @@ ConfigPanel::ConfigPanel(QWidget *parent) :
     ui(new Ui::ConfigPanel)
 {
     ui->setupUi(this);
-
-
 }
 
 
@@ -97,6 +95,7 @@ void ConfigPanel::on_initSpeller_clicked()
     {
         spellerType = ui->spellerType->currentIndex();
         erpParadigm = new ERP(ui->spellingModeChoices->currentIndex(),
+                              control_mode::SYNC, // TODO : implement async ERP control mode
                               paradigm_type::ERP,
                               ui->stimulusDuration->text().toInt(),
                               ui->interStimulusDuration->text().toInt(),
@@ -153,19 +152,25 @@ void ConfigPanel::on_initSSVEP_clicked()
         int SSVEPNrElements;
         int operationMode;
 
-        if (ui->SSVEP_mode->currentIndex() == operation_mode::SSVEP_SINGLE)
+        QStringList freqsList = ui->Frequencies->text().split(',');
+        operationMode = ui->SSVEP_Mode->currentIndex();
+
+        if (operationMode == operation_mode::SSVEP_SINGLE)
         {
             SSVEPNrElements = 1;
             operationMode = operation_mode::CALIBRATION;
         }
-        else
+        else if(ui->SSVEP_Control->currentIndex() == control_mode::SYNC)
         {
-            QStringList freqsList = ui->Frequencies->text().split(',');
+            SSVEPNrElements = freqsList.count();
+        }
+            else
+        {
             SSVEPNrElements = freqsList.count() + 1;
-            operationMode = ui->SSVEP_mode->currentIndex();
         }
 
         ssvepParadigm = new SSVEP(operationMode,
+                                  ui->SSVEP_Control->currentIndex(),
                                   paradigm_type::SSVEP,
                                   ui->SSVEP_StimDuration->text().toFloat(),
                                   ui->SSVEP_BreakDuration->text().toFloat(),
@@ -175,6 +180,7 @@ void ConfigPanel::on_initSSVEP_clicked()
                                   ui->Frequencies->text(),
                                   ui->SSVEP_Stimulation->currentIndex());
 
+    qDebug() << Q_FUNC_INFO << "control mode" << ui->SSVEP_Control->currentIndex();
     }
     if(!m_markerSender->connectedOnce())
     {

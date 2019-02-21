@@ -9,10 +9,10 @@ SSVEP::SSVEP() : Paradigm (),
 {
 }
 
-SSVEP::SSVEP(quint8 mode, quint8 type, int dur, quint8 bDur,
+SSVEP::SSVEP(quint8 mode, quint8 control, quint8 type, int dur, quint8 bDur,
              quint8 nrSeq, QString phrase, quint8 nElements,
              QString frequnecies, quint8 stimulationMode):
-    Paradigm(mode, type, dur, bDur, nrSeq, phrase),
+    Paradigm(mode, control, type, dur, bDur, nrSeq, phrase),
     m_nrElements(nElements), m_frequencies(frequnecies), m_stimulationMode(stimulationMode)
 {
 }
@@ -22,6 +22,7 @@ QVariant SSVEP::toVariant() const
     QVariantMap map;
 
     map.insert("experimentMode", m_experimentMode);
+    map.insert("controlMode", m_controlMode);
     map.insert("paradigmType", m_type);
     map.insert("stimulationDuration", m_stimulationDuration);
     map.insert("breakDuration", m_breakDuration);
@@ -38,6 +39,7 @@ void SSVEP::fromVariant(const QVariant &variant)
 
     QVariantMap map = variant.toMap();
     m_experimentMode = map.value("experimentMode").toInt();
+    m_controlMode = map.value("controlMode").toInt();
     m_type = map.value("paradigmType").toInt();
     m_stimulationDuration = map.value("stimulationDuration").toInt();
     m_breakDuration = map.value("breakDuration").toInt();

@@ -23,16 +23,16 @@ public:
     SsvepGL(SSVEP paradigm);
     ~SsvepGL();
 
+    void setControlMode(quint8 t_controlMode);
     void setFrequencies(QString t_freqs);
     void setFlickeringMode(int t_mode);
     void setStimulationDuration(float t_stimDuration);
     void setBreakDuration(int t_brkDuration);
     void setSequence(int t_sequence);
     void setFeedbackPort(int t_port);
-    void setStimulationMode(const quint8 t_stimulationMode);
+    void setStimulationMode(quint8 t_stimulationMode);
 
     // QOpenGLWindow interface
-
 protected:
     void initializeGL();
     void resizeGL(int w, int h);
@@ -58,6 +58,8 @@ public slots:
     //    void create_layout();
     //    void refresh_layout();
     void initElements();
+    void initRects();
+    void initColors();
     //
     void sendMarker(uint64_t ovStimulation){
         emit markerTag(ovStimulation);
@@ -70,12 +72,12 @@ private:
     void refreshTarget();
 
     // helpers
-//    static const qint8 VERTICES_PER_TRIANGLE = 3;
-//    static const qint8 POINTS_PER_SQUARE = 4;
-//    static const qint8 INDICES_PER_SQUARE = 6;
-//    static const qint8 TRIANGLES_PER_SQUARE = 2;
-//    static const int TUPLESIZE  = 3;
-//    static const int MAX_ELEMENTS = 4;
+    //    static const qint8 VERTICES_PER_TRIANGLE = 3;
+    //    static const qint8 POINTS_PER_SQUARE = 4;
+    //    static const qint8 INDICES_PER_SQUARE = 6;
+    //    static const qint8 TRIANGLES_PER_SQUARE = 2;
+    //    static const int TUPLESIZE  = 3;
+    //    static const int MAX_ELEMENTS = 4;
 
     bool m_firstRun = true;
     int m_preTrialCount=0;
@@ -91,6 +93,7 @@ private:
     int m_stimulationSequence;
     int m_breakDuration;
     quint8 m_stimulationMode;
+    quint8 m_controlMode;
 
     quint16 m_feedbackPort = 12345;
 

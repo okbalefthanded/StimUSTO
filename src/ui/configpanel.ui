@@ -483,7 +483,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="SSVEP_mode">
+       <widget class="QComboBox" name="SSVEP_Mode">
         <item>
          <property name="text">
           <string>Calibration</string>
@@ -516,6 +516,20 @@
         <item>
          <property name="text">
           <string>Sinusoidal</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="SSVEP_Control">
+        <item>
+         <property name="text">
+          <string>Sync</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Async</string>
          </property>
         </item>
        </widget>
@@ -571,6 +585,13 @@
        <widget class="QLabel" name="label_11">
         <property name="text">
          <string>Stimulation</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_12">
+        <property name="text">
+         <string>operation</string>
         </property>
        </widget>
       </item>
