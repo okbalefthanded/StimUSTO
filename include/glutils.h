@@ -20,6 +20,7 @@ static const QVector3D white = QVector3D(1.0f, 1.0f, 1.0f);
 static const QVector3D gray = QVector3D(0.25f, 0.25f, 0.25f);
 static const QVector3D red = QVector3D(1.0f, 0.0f, 0.0f);
 static const QVector3D green = QVector3D(0.0f, 1.0f, 0.0f);
+static const QVector3D orange = QVector3D(1.0f, 0.5f, 0.0f);
 }
 
 namespace refPoints

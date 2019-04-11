@@ -31,7 +31,7 @@ SOURCES += src\main.cpp\
     src/paradigm.cpp \
     src/erp.cpp \
     src/jsonserializer.cpp \
-    src/ssvep.cpp
+    src/ssvep.cpp \
 
 HEADERS  += include\configpanel.h \
     include\ovtk_stimulations.h \
@@ -53,7 +53,7 @@ HEADERS  += include\configpanel.h \
     include/serializable.h \
     include/serializer.h \
     include/jsonserializer.h \
-    include/ssvep.h
+    include/ssvep.h \
 
 INCLUDEPATH += include\
 
@@ -70,4 +70,10 @@ DISTFILES += \
     MyOVBox.py \
     src\shaders\sh_v.vert \
     src\shaders\sh_f.frag \
-    .gitignore
+    config/default.json \
+    config/facespeller_calib.json \
+    config/facespeller_online.json \
+    config/ssvep_calib.json \
+    config/ssvep_online.json \
+    README.md \
+    src/pyscripts/MyOVBox.py

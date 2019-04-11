@@ -213,6 +213,35 @@ void SsvepGL::preTrial()
 
 }
 
+void SsvepGL::feedback()
+{
+    qDebug()<< Q_FUNC_INFO;
+
+    receiveFeedback();
+
+    if(m_flickeringMode == operation_mode::COPY_MODE)
+    {
+        //
+        qDebug()<< Q_FUNC_INFO << "current flicker" << m_flickeringSequence->sequence[m_currentFlicker];
+        qDebug()<< Q_FUNC_INFO << "current feddback " << m_sessionFeedback[m_currentFlicker-1].digitValue();
+
+        if(m_sessionFeedback[m_currentFlicker] == m_flickeringSequence->sequence[m_currentFlicker])
+        {
+
+            highlightFeedback(glColors::red, m_flickeringSequence->sequence[m_currentFlicker]);
+        }
+        else
+        {
+            highlightFeedback(glColors::orange, m_sessionFeedback[m_currentFlicker-1].digitValue());
+        }
+    }
+    else if(m_flickeringMode == operation_mode::FREE_MODE)
+    {
+        //
+        highlightFeedback(glColors::red, m_sessionFeedback[m_currentFlicker-1].digitValue());
+    }
+}
+
 void SsvepGL::postTrial()
 {
 
@@ -224,6 +253,19 @@ void SsvepGL::postTrial()
 
     m_index = 0;
     m_state = trial_state::PRE_TRIAL;
+
+    // feedback
+    if(m_flickeringMode == operation_mode::COPY_MODE || m_flickeringMode == operation_mode::FREE_MODE)
+    {
+
+        qDebug() << Q_FUNC_INFO << "lets do feedback";
+        feedback();
+    }
+
+    // feedback for 1 sec & refresh
+    wait(1000);
+    refresh(m_sessionFeedback[m_currentFlicker-1].digitValue());
+
     // wait
     int waitMillisec = m_breakDuration - m_preTrialWait * 1000;
     wait(waitMillisec);
@@ -271,6 +313,26 @@ void SsvepGL::Flickering()
     //    qDebug()<< Q_FUNC_INFO << "[update ]Index (last) : "<< m_index << "current time: " << QTime::currentTime().msec();
     ++m_currentFlicker;
     m_state = trial_state::POST_TRIAL;
+}
+
+void SsvepGL::receiveFeedback()
+{
+    qDebug()<< Q_FUNC_INFO;
+
+    // wait for OV python script to write in UDP feedback socket
+    wait(200);
+    QHostAddress sender;
+    quint16 senderPort;
+    QByteArray *buffer = new QByteArray();
+
+    buffer->resize(m_feedbackSocket->pendingDatagramSize());
+    qDebug() << "buffer size" << buffer->size();
+
+    m_feedbackSocket->readDatagram(buffer->data(), buffer->size(), &sender, &senderPort);
+    //    feedback_socket->waitForBytesWritten();
+    m_sessionFeedback += buffer->data();
+    qDebug()<< Q_FUNC_INFO << "session feedback" << m_sessionFeedback;
+    qDebug()<< Q_FUNC_INFO << "Feedback Data" << buffer->data();
 }
 
 void SsvepGL::wait(int millisecondsToWait)
@@ -518,6 +580,45 @@ void SsvepGL::refreshTarget()
     QOpenGLWindow::update();
 }
 
+void SsvepGL::highlightFeedback(QVector3D feedbackColor, int feebdackIndex)
+{
+
+    qDebug()<< Q_FUNC_INFO << "[icon to highlight] "<< feebdackIndex;
+    //int tmp = feebdackIndex;
+    int squareIndex = feebdackIndex + (glUtils::VERTICES_PER_TRIANGLE*feebdackIndex);
+    m_colors[squareIndex] = feedbackColor;
+    m_colors[squareIndex + 1] = feedbackColor;
+    m_colors[squareIndex + 2] = feedbackColor;
+    m_colors[squareIndex + 3] = feedbackColor;
+
+    m_vaObject.bind();
+    m_colorBuffer.bind();
+    m_colorBuffer.write(0, m_colors.data(), m_colors.count() * sizeof(QVector3D)); // number of vertices to avoid * sizeof QVector3D
+    m_vaObject.release();
+    m_colorBuffer.release();
+    //     Schedule a redraw
+    QOpenGLWindow::update();
+}
+
+void SsvepGL::refresh(int feedbackIndex)
+{
+    qDebug()<< Q_FUNC_INFO << "[icon to highlight] "<< feedbackIndex;
+
+    int squareIndex = feedbackIndex + (glUtils::VERTICES_PER_TRIANGLE*feedbackIndex);
+    m_colors[squareIndex] = glColors::white;
+    m_colors[squareIndex + 1] = glColors::white;
+    m_colors[squareIndex + 2] = glColors::white;
+    m_colors[squareIndex + 3] = glColors::white;
+
+    m_vaObject.bind();
+    m_colorBuffer.bind();
+    m_colorBuffer.write(0, m_colors.data(), m_colors.count() * sizeof(QVector3D)); // number of vertices to avoid * sizeof QVector3D
+    m_vaObject.release();
+    m_colorBuffer.release();
+    //     Schedule a redraw
+    QOpenGLWindow::update();
+}
+
 
 
 void SsvepGL::setControlMode(quint8 t_controlMode)
@@ -539,7 +640,7 @@ void SsvepGL::update()
     if(m_index == 0)
     {
         sendMarker(config::OVTK_StimulationLabel_Base + m_flickeringSequence->sequence[m_currentFlicker]);
-        // sendMarker(OVTK_StimulationId_VisualSteadyStateStimulationStart);
+        sendMarker(OVTK_StimulationId_VisualSteadyStateStimulationStart);
     }
 
     int k;

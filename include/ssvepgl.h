@@ -11,6 +11,7 @@
 #include <QOpenGLBuffer>
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLShaderProgram>
+#include <QVector3D>
 //
 #include "randomflashsequence.h"
 #include "ssvep.h"
@@ -45,11 +46,11 @@ private slots:
 
     void startTrial();
     void preTrial();
-    //    void feedback();
+    void feedback();
     void postTrial();
     void Flickering();
     //    void pauseFlashing();
-    //    void receiveFeedback();
+    void receiveFeedback();
     void update();
 
 public slots:
@@ -70,6 +71,8 @@ private:
     //    bool isTarget();
     void highlightTarget();
     void refreshTarget();
+    void highlightFeedback(QVector3D feedbackColor, int feebdackIndex);
+    void refresh(int feedbackIndex);
 
     // helpers
     //    static const qint8 VERTICES_PER_TRIANGLE = 3;
@@ -96,6 +99,7 @@ private:
     quint8 m_controlMode;
 
     quint16 m_feedbackPort = 12345;
+    QString m_sessionFeedback;
 
     QUdpSocket *m_feedbackSocket;
     // Timers

@@ -51,10 +51,10 @@ const quint8 FACES_SPELLER = 1;
 const quint8 INVERTED_FACE = 2;
 const quint8 COLORED_FACE = 3;
 const quint8 INVERTED_COLORED_FACE = 4;
+const quint8 SSVEP = 5;
 //const quint8 MOTION_BAR = 2;
 //const quint8 MOTION_FACE = 3;
 //const quint8 MOVING_FACE = 4;
-const quint8 SSVEP = 5;
 }
 
 namespace control_mode {
