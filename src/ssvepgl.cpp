@@ -50,7 +50,7 @@ SsvepGL::SsvepGL(SSVEP paradigm)
 void SsvepGL::initializeGL()
 {
 
-    qDebug()<< Q_FUNC_INFO;
+    // qDebug()<< Q_FUNC_INFO;
 
     // Initialize OpenGL Backend
     initializeOpenGLFunctions();
@@ -196,6 +196,7 @@ void SsvepGL::preTrial()
     else if(m_preTrialCount == 3)
     {
         refreshTarget();
+
     }
     //    qDebug()<< "Pre trial timer start";
 
@@ -225,20 +226,22 @@ void SsvepGL::feedback()
         qDebug()<< Q_FUNC_INFO << "current flicker" << m_flickeringSequence->sequence[m_currentFlicker];
         qDebug()<< Q_FUNC_INFO << "current feddback " << m_sessionFeedback[m_currentFlicker-1].digitValue();
 
-        if(m_sessionFeedback[m_currentFlicker] == m_flickeringSequence->sequence[m_currentFlicker])
+        if(m_sessionFeedback[m_currentFlicker-1].digitValue() == m_flickeringSequence->sequence[m_currentFlicker])
         {
 
-            highlightFeedback(glColors::red, m_flickeringSequence->sequence[m_currentFlicker]);
+            qDebug()<< "Correct: turns into RED color";
+
+            highlightFeedback(glColors::red, m_flickeringSequence->sequence[m_currentFlicker]-1);
         }
         else
         {
-            highlightFeedback(glColors::orange, m_sessionFeedback[m_currentFlicker-1].digitValue());
+            highlightFeedback(glColors::orange, m_sessionFeedback[m_currentFlicker-1].digitValue()-1);
         }
     }
     else if(m_flickeringMode == operation_mode::FREE_MODE)
     {
         //
-        highlightFeedback(glColors::red, m_sessionFeedback[m_currentFlicker-1].digitValue());
+        highlightFeedback(glColors::red, m_sessionFeedback[m_currentFlicker-1].digitValue()-1);
     }
 }
 
@@ -264,7 +267,7 @@ void SsvepGL::postTrial()
 
     // feedback for 1 sec & refresh
     wait(1000);
-    refresh(m_sessionFeedback[m_currentFlicker-1].digitValue());
+    refresh(m_sessionFeedback[m_currentFlicker-1].digitValue()-1);
 
     // wait
     int waitMillisec = m_breakDuration - m_preTrialWait * 1000;
@@ -282,6 +285,7 @@ void SsvepGL::postTrial()
     }
     else
     {
+        ++m_currentFlicker;
         startTrial();
     }
 }
@@ -311,7 +315,7 @@ void SsvepGL::Flickering()
 
     sendMarker(OVTK_StimulationId_TrialStop);
     //    qDebug()<< Q_FUNC_INFO << "[update ]Index (last) : "<< m_index << "current time: " << QTime::currentTime().msec();
-    ++m_currentFlicker;
+    //++m_currentFlicker;
     m_state = trial_state::POST_TRIAL;
 }
 
@@ -320,7 +324,7 @@ void SsvepGL::receiveFeedback()
     qDebug()<< Q_FUNC_INFO;
 
     // wait for OV python script to write in UDP feedback socket
-    wait(200);
+    wait(500);
     QHostAddress sender;
     quint16 senderPort;
     QByteArray *buffer = new QByteArray();
@@ -329,7 +333,7 @@ void SsvepGL::receiveFeedback()
     qDebug() << "buffer size" << buffer->size();
 
     m_feedbackSocket->readDatagram(buffer->data(), buffer->size(), &sender, &senderPort);
-    //    feedback_socket->waitForBytesWritten();
+    m_feedbackSocket->waitForBytesWritten();
     m_sessionFeedback += buffer->data();
     qDebug()<< Q_FUNC_INFO << "session feedback" << m_sessionFeedback;
     qDebug()<< Q_FUNC_INFO << "Feedback Data" << buffer->data();
@@ -338,7 +342,7 @@ void SsvepGL::receiveFeedback()
 void SsvepGL::wait(int millisecondsToWait)
 {
 
-    qDebug()<< Q_FUNC_INFO;
+    qDebug()<< Q_FUNC_INFO << "wait duration:" << millisecondsToWait;
 
     // from stackoverflow question:
     // http://stackoverflow.com/questions/3752742/how-do-i-create-a-pause-wait-function-using-qt

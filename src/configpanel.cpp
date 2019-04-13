@@ -196,8 +196,16 @@ void ConfigPanel::on_initSSVEP_clicked()
 
         SsvepGL *ssvepStimulation = new SsvepGL(*ssvepParadigm);
         ssvepStimulation->setFormat(format);
-        // ssvepStimulation->resize(QSize(1000, 700));//temporaty size;
-        ssvepStimulation->resize(utils::getScreenSize());
+
+        if(QGuiApplication::screens().size() == 2)
+        {
+            ssvepStimulation->resize(utils::getScreenSize());
+        }
+        else
+        {
+            ssvepStimulation->resize(QSize(800, 600)); //temporaty size;
+        }
+
         //
         QTimer *launchTimer = new QTimer();
         launchTimer->setInterval(10000);
