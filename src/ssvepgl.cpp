@@ -10,6 +10,7 @@
 #include <QtMath>
 #include <Qapplication>
 #include <QDateTime>
+#include <QDir>
 //
 #include "ssvepgl.h"
 #include "ovtk_stimulations.h"
@@ -44,7 +45,16 @@ SsvepGL::SsvepGL(SSVEP paradigm)
 
     m_feedbackSocket = new QUdpSocket(this);
     m_feedbackSocket->bind(QHostAddress::LocalHost, m_feedbackPort);
-
+    connect(m_feedbackSocket, SIGNAL(readyRead()), this, SLOT(receiveFeedback()));
+    //
+    QDir logsDir(QCoreApplication::applicationDirPath() + "/logs");
+    if(!logsDir.exists())
+    {
+        logsDir.mkdir(logsDir.path());
+    }
+    QString fileName =  logsDir.filePath("ssvep_online" +QDateTime::currentDateTime().toString("dd_MM_yyyy_hh_mm_ss")+".txt");
+    log = new Logger(this, fileName);
+    //
     m_state = trial_state::PRE_TRIAL;
 
 }
@@ -148,7 +158,7 @@ void SsvepGL::paintGL()
 void SsvepGL::startTrial()
 {
 
-    qDebug()<< "[TRIAL START]" << Q_FUNC_INFO;
+    qDebug()<< "[TRIAL START]" <<"n trial:" << m_currentFlicker << Q_FUNC_INFO;
 
     if (m_state == trial_state::PRE_TRIAL)
     {
@@ -220,7 +230,8 @@ void SsvepGL::feedback()
 {
     qDebug()<< Q_FUNC_INFO;
 
-    receiveFeedback();
+    // receiveFeedback();
+    m_feedbackSocket->waitForReadyRead(1000);
 
     if(m_flickeringMode == operation_mode::COPY_MODE)
     {
@@ -230,8 +241,6 @@ void SsvepGL::feedback()
 
         if(m_sessionFeedback[m_currentFlicker-1].digitValue() == m_flickeringSequence->sequence[m_currentFlicker])
         {
-
-            qDebug()<< "Correct: turns into RED color";
 
             highlightFeedback(glColors::red, m_flickeringSequence->sequence[m_currentFlicker]-1);
         }
@@ -254,7 +263,6 @@ void SsvepGL::postTrial()
     //    qDebug()<< Q_FUNC_INFO << "disconnecting frameswapped to update "<<"index"<< index;
     disconnect(this, SIGNAL(frameSwapped()), this, SLOT(update()));
     initElements();
-    //    currentStimulation = 0;
 
     m_index = 0;
     m_state = trial_state::PRE_TRIAL;
@@ -265,30 +273,34 @@ void SsvepGL::postTrial()
 
         qDebug() << Q_FUNC_INFO << "lets do feedback";
         feedback();
+        // feedback for 1 sec & refresh
+        wait(1000);
+        refresh(m_sessionFeedback[m_currentFlicker-1].digitValue()-1);
     }
 
-    // feedback for 1 sec & refresh
-    wait(1000);
-    refresh(m_sessionFeedback[m_currentFlicker-1].digitValue()-1);
+    else // calibration mode
+    {
+        refreshTarget();
+    }
 
     // wait
     int waitMillisec = m_breakDuration - m_preTrialWait * 1000;
     wait(waitMillisec);
 
     //    refreshTarget();
+    ++m_currentFlicker;
 
-    if (m_currentFlicker >= m_flickeringSequence->sequence.size() &&
+    if (m_currentFlicker < m_flickeringSequence->sequence.size() &&
             (m_flickeringMode == operation_mode::COPY_MODE || m_flickeringMode == operation_mode::CALIBRATION))
+    {
+        startTrial();
+    }
+    else
     {
         qDebug()<< "Experiment End";
         sendMarker(OVTK_StimulationId_ExperimentStop);
         wait(2000);
         this->close();
-    }
-    else
-    {
-        ++m_currentFlicker;
-        startTrial();
     }
 }
 
@@ -326,20 +338,23 @@ void SsvepGL::receiveFeedback()
     qDebug()<< Q_FUNC_INFO;
 
     // wait for OV python script to write in UDP feedback socket
-    wait(500);
+    // wait(500);
     QHostAddress sender;
     quint16 senderPort;
     QByteArray *buffer = new QByteArray();
 
     buffer->resize(m_feedbackSocket->pendingDatagramSize());
     qDebug() << "buffer size" << buffer->size();
-
-    m_feedbackSocket->readDatagram(buffer->data(), buffer->size(), &sender, &senderPort);
-    m_feedbackSocket->waitForBytesWritten();
-    qDebug()<< "Current time:" << QDateTime::currentDateTime();
+    while(m_feedbackSocket->hasPendingDatagrams())
+    {
+        m_feedbackSocket->readDatagram(buffer->data(), buffer->size(), &sender, &senderPort);
+        qDebug()<< Q_FUNC_INFO << "Feedback Data" << buffer->data();
+    }
+    log->write(buffer->data());
     m_sessionFeedback += buffer->data();
+
     qDebug()<< Q_FUNC_INFO << "session feedback" << m_sessionFeedback;
-    qDebug()<< Q_FUNC_INFO << "Feedback Data" << buffer->data();
+    // qDebug()<< Q_FUNC_INFO << "Feedback Data" << buffer->data();
 }
 
 void SsvepGL::wait(int millisecondsToWait)

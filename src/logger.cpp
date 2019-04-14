@@ -22,7 +22,7 @@ void Logger::write(const QString & value)
     out.setCodec("UTF-8");
     if(file != 0)
     {
-        out << text;
+        out << text + "\n";
     }
 
 }
