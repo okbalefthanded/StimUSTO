@@ -32,6 +32,7 @@ SOURCES += src\main.cpp\
     src/erp.cpp \
     src/jsonserializer.cpp \
     src/ssvep.cpp \
+    src/logger.cpp
 
 HEADERS  += include\configpanel.h \
     include\ovtk_stimulations.h \
@@ -54,6 +55,7 @@ HEADERS  += include\configpanel.h \
     include/serializer.h \
     include/jsonserializer.h \
     include/ssvep.h \
+    include/logger.h
 
 INCLUDEPATH += include\
 

@@ -15,6 +15,7 @@
 //
 #include "randomflashsequence.h"
 #include "ssvep.h"
+#include "logger.h"
 //
 class SsvepGL : public QOpenGLWindow, protected QOpenGLFunctions
 {
@@ -106,6 +107,9 @@ private:
     QTimer *m_preTrialTimer;
 
     RandomFlashSequence *m_flickeringSequence;
+
+    // logger
+    Logger *log;
 
     // OpenGL State Information
     QOpenGLBuffer m_vertexBuffer; //vbo

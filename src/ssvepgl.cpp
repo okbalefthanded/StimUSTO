@@ -9,11 +9,13 @@
 #include <windows.h>
 #include <QtMath>
 #include <Qapplication>
+#include <QDateTime>
 //
 #include "ssvepgl.h"
 #include "ovtk_stimulations.h"
 #include "utils.h"
 #include "glutils.h"
+
 //
 SsvepGL::SsvepGL(SSVEP paradigm)
 {
@@ -334,6 +336,7 @@ void SsvepGL::receiveFeedback()
 
     m_feedbackSocket->readDatagram(buffer->data(), buffer->size(), &sender, &senderPort);
     m_feedbackSocket->waitForBytesWritten();
+    qDebug()<< "Current time:" << QDateTime::currentDateTime();
     m_sessionFeedback += buffer->data();
     qDebug()<< Q_FUNC_INFO << "session feedback" << m_sessionFeedback;
     qDebug()<< Q_FUNC_INFO << "Feedback Data" << buffer->data();
