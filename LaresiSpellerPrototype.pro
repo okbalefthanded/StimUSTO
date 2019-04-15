@@ -75,7 +75,7 @@ DISTFILES += \
     config/default.json \
     config/facespeller_calib.json \
     config/facespeller_online.json \
-    config/ssvep_calib.json \
-    config/ssvep_online.json \
     README.md \
-    src/pyscripts/MyOVBox.py
+    src/pyscripts/MyOVBox.py \
+    config/ssvep_online_sync.json \
+    config/ssvep_calib_sync.json

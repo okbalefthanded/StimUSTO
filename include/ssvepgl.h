@@ -74,6 +74,7 @@ private:
     void refreshTarget();
     void highlightFeedback(QVector3D feedbackColor, int feebdackIndex);
     void refresh(int feedbackIndex);
+    void initLogger();
 
     // helpers
     //    static const qint8 VERTICES_PER_TRIANGLE = 3;
