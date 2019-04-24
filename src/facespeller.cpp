@@ -8,6 +8,7 @@
 //
 void FaceSpeller::startFlashing()
 {
+
     sendStimulationInfo();
 
     switch(m_spellerType)

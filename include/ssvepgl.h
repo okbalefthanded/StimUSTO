@@ -54,35 +54,29 @@ private slots:
     void receiveFeedback();
     void update();
 
+    void initElements();
+    void initRects();
+    void initColors();
+    void initIndices();
+
 public slots:
 
     void wait(int millisecondsToWait);
     //    void create_layout();
     //    void refresh_layout();
-    void initElements();
-    void initRects();
-    void initColors();
     //
     void sendMarker(uint64_t ovStimulation){
         emit markerTag(ovStimulation);
     }
 
 private:
-    //
     //    bool isTarget();
     void highlightTarget();
     void refreshTarget();
     void highlightFeedback(QVector3D feedbackColor, int feebdackIndex);
     void refresh(int feedbackIndex);
     void initLogger();
-
-    // helpers
-    //    static const qint8 VERTICES_PER_TRIANGLE = 3;
-    //    static const qint8 POINTS_PER_SQUARE = 4;
-    //    static const qint8 INDICES_PER_SQUARE = 6;
-    //    static const qint8 TRIANGLES_PER_SQUARE = 2;
-    //    static const int TUPLESIZE  = 3;
-    //    static const int MAX_ELEMENTS = 4;
+    void scheduleRedraw();
 
     bool m_firstRun = true;
     int m_preTrialCount=0;
@@ -90,9 +84,8 @@ private:
     int m_currentFlicker=0;
     int m_state;
     int m_flickeringMode;
-    int m_nrElements;
-    //= MAX_ELEMENTS;
-    QLabel *m_textRow;
+    int m_nrElements; // = MAX_ELEMENT
+
     QList<double> m_frequencies;
     float m_stimulationDuration;
     int m_stimulationSequence;

@@ -408,28 +408,10 @@ void SsvepGL::initElements()
         } */
     }
 
-    // init indices
-    m_vindices.resize(m_nrElements*glUtils::INDICES_PER_SQUARE);
-    int k=0; int val = 0;
-    for(int i=0; i<(m_nrElements*glUtils::INDICES_PER_SQUARE); i+=glUtils::INDICES_PER_SQUARE)
-    {
-        val = 2*k;
-        m_vindices[i] =  val;
-        m_vindices[i+1] = val + 1;
-        m_vindices[i+2] = val + 2;
-        m_vindices[i+3] = m_vindices[i];
-        m_vindices[i+4] = m_vindices[i+2];
-        m_vindices[i+5] = val + 3;
-        k +=2;
-    }
 
-    m_vaObject.bind();
-    m_colorBuffer.bind();
-    m_colorBuffer.write(0, m_colors.data(), m_colors.count() * sizeof(QVector3D)); // number of vertices to avoid * sizeof QVector3D
-    m_vaObject.release();
-    m_colorBuffer.release();
-
-    QOpenGLWindow::update();
+    initIndices();
+    //
+    scheduleRedraw();
 }
 
 void SsvepGL::initRects()
@@ -481,6 +463,24 @@ void SsvepGL::initColors()
     }
 }
 
+void SsvepGL::initIndices()
+{
+    // init indices
+    m_vindices.resize(m_nrElements*glUtils::INDICES_PER_SQUARE);
+    int k=0; int val = 0;
+    for(int i=0; i<(m_nrElements*glUtils::INDICES_PER_SQUARE); i+=glUtils::INDICES_PER_SQUARE)
+    {
+        val = 2*k;
+        m_vindices[i] =  val;
+        m_vindices[i+1] = val + 1;
+        m_vindices[i+2] = val + 2;
+        m_vindices[i+3] = m_vindices[i];
+        m_vindices[i+4] = m_vindices[i+2];
+        m_vindices[i+5] = val + 3;
+        k +=2;
+    }
+}
+
 void SsvepGL::highlightTarget()
 {
 
@@ -498,13 +498,8 @@ void SsvepGL::highlightTarget()
         m_colors[squareIndex + 3] = glColors::green;
     }
 
-    m_vaObject.bind();
-    m_colorBuffer.bind();
-    m_colorBuffer.write(0, m_colors.data(), m_colors.count() * sizeof(QVector3D)); // number of vertices to avoid * sizeof QVector3D
-    m_vaObject.release();
-    m_colorBuffer.release();
-    //     Schedule a redraw
-    QOpenGLWindow::update();
+    scheduleRedraw();
+
 }
 
 void SsvepGL::refreshTarget()
@@ -549,13 +544,9 @@ void SsvepGL::refreshTarget()
 
         }
     }
-    m_vaObject.bind();
-    m_colorBuffer.bind();
-    m_colorBuffer.write(0, m_colors.data(), m_colors.count() * sizeof(QVector3D)); // number of vertices to avoid * sizeof QVector3D
-    m_vaObject.release();
-    m_colorBuffer.release();
-    //     Schedule a redraw
-    QOpenGLWindow::update();
+    scheduleRedraw();
+
+
 }
 
 void SsvepGL::highlightFeedback(QVector3D feedbackColor, int feebdackIndex)
@@ -567,13 +558,9 @@ void SsvepGL::highlightFeedback(QVector3D feedbackColor, int feebdackIndex)
     m_colors[squareIndex + 2] = feedbackColor;
     m_colors[squareIndex + 3] = feedbackColor;
 
-    m_vaObject.bind();
-    m_colorBuffer.bind();
-    m_colorBuffer.write(0, m_colors.data(), m_colors.count() * sizeof(QVector3D)); // number of vertices to avoid * sizeof QVector3D
-    m_vaObject.release();
-    m_colorBuffer.release();
-    //     Schedule a redraw
-    QOpenGLWindow::update();
+   scheduleRedraw();
+
+
 }
 
 void SsvepGL::refresh(int feedbackIndex)
@@ -585,13 +572,8 @@ void SsvepGL::refresh(int feedbackIndex)
     m_colors[squareIndex + 2] = glColors::white;
     m_colors[squareIndex + 3] = glColors::white;
 
-    m_vaObject.bind();
-    m_colorBuffer.bind();
-    m_colorBuffer.write(0, m_colors.data(), m_colors.count() * sizeof(QVector3D)); // number of vertices to avoid * sizeof QVector3D
-    m_vaObject.release();
-    m_colorBuffer.release();
-    // Schedule a redraw
-    QOpenGLWindow::update();
+    scheduleRedraw();
+
 }
 
 void SsvepGL::initLogger()
@@ -614,6 +596,17 @@ void SsvepGL::initLogger()
     }
 
     log = new Logger(this, fileName);
+}
+
+void SsvepGL::scheduleRedraw()
+{
+    m_vaObject.bind();
+    m_colorBuffer.bind();
+    m_colorBuffer.write(0, m_colors.data(), m_colors.count() * sizeof(QVector3D)); // number of vertices to avoid * sizeof QVector3D
+    m_vaObject.release();
+    m_colorBuffer.release();
+
+    QOpenGLWindow::update();
 }
 
 void SsvepGL::setControlMode(quint8 t_controlMode)
@@ -664,14 +657,8 @@ void SsvepGL::update()
         k += glUtils::POINTS_PER_SQUARE;
     }
 
-    m_vaObject.bind();
-    m_colorBuffer.bind();
-    m_colorBuffer.write(0, m_colors.data(), m_colors.count() * sizeof(QVector3D)); // number of vertices to avoid * sizeof QVector3D
-    m_vaObject.release();
-    m_colorBuffer.release();
     ++m_index;
-    // Schedule a redraw
-    QOpenGLWindow::update();
+    scheduleRedraw();
 }
 
 // Setters

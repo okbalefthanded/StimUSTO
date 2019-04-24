@@ -21,12 +21,13 @@ Speller::Speller(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Speller)
 {
+
     ui->setupUi(this);
 
     this->show();
 
-    if(qApp->screens().count() == 2){
-
+    if(qApp->screens().count() == 2)
+    {
         this->windowHandle()->setScreen(qApp->screens().last());
         this->showFullScreen();
     }
@@ -100,17 +101,9 @@ void Speller::pauseFlashing()
     if (m_currentStimulation >= m_flashingSequence->sequence.count())
     {
         ++m_currentLetter;
-        //        qDebug("STOPPED: isi Timer & Stim timer");
         m_isiTimer->stop();
         m_stimTimer->stop();
 
-        //        if(m_currentLetter >= desired_phrase.length())
-        //        {
-        //            qDebug("Experiment End");
-
-        //        }
-        //        else
-        //        {
         wait(1000);
         sendMarker(OVTK_StimulationId_TrialStop);
         m_state = trial_state::FEEDBACK;
@@ -146,7 +139,6 @@ void Speller::preTrial()
             highlightTarget();
         }
     }
-    //    qDebug()<< "Pre trial timer start";
 
     m_preTrialTimer->start();
     ++m_preTrialCount;
@@ -224,12 +216,12 @@ void Speller::receiveFeedback()
     QByteArray *buffer = new QByteArray();
 
     buffer->resize(m_feedbackSocket->pendingDatagramSize());
-    qDebug() << "buffer size" << buffer->size();
+    // qDebug() << "buffer size" << buffer->size();
 
     m_feedbackSocket->readDatagram(buffer->data(), buffer->size(), &sender, &senderPort);
     //    feedback_socket->waitForBytesWritten();
     m_text += buffer->data();
-    qDebug()<< "Feedback Data" << buffer->data();
+    // qDebug()<< "Feedback Data" << buffer->data();
 }
 
 bool Speller::isTarget()
