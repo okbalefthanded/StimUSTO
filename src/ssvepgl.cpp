@@ -22,6 +22,7 @@ SsvepGL::SsvepGL(SSVEP paradigm)
 {
 
     m_nrElements = paradigm.nrElements();
+    qDebug()<< Q_FUNC_INFO << "[nr elements]" << m_nrElements;
     setControlMode(paradigm.controlMode());
     setFrequencies(paradigm.frequencies());
     setStimulationDuration(paradigm.stimulationDuration());
@@ -342,7 +343,7 @@ void SsvepGL::initElements()
 {
 
     double dx = 0.2;
-    double dy = 0.25;
+    double dy = 0.2;
     int isNullX = 0, isNullY = 0, sx=1;
 
     if(m_nrElements == 1)
@@ -373,42 +374,8 @@ void SsvepGL::initElements()
         initRects();
         initColors();
 
-
-        /*
-        // synchrounous mode : no idle state
-        if(m_controlMode == control_mode::SYNC)
-        {
-            initRects();
-            initColors();
-        }
-        // asynchrounous mode : with idle state
-        else{
-
-            //            for(int i=0; i<m_vertices.count(); i+=glUtils::POINTS_PER_SQUARE)
-            //            {
-            //                m_vertices[i] = refPoints::topPoints[i/glUtils::POINTS_PER_SQUARE];
-            //                sx = 1;
-            //                for(int j=i+1; j<i+glUtils::POINTS_PER_SQUARE; ++j)
-            //                {
-            //                    isNullX = j % 2;
-            //                    isNullY = (j+1) % 2;
-            //                    m_vertices[j].setX(m_vertices[j-1].x() + (dx * isNullX * sx));
-            //                    m_vertices[j].setY(m_vertices[j-1].y() - (dy * isNullY));
-            //                    m_vertices[j].setZ(refPoints::topPoints[0].z());
-            //                    sx--;
-            //                }
-            //            }
-            // init colors
-            m_colors = {glColors::gray, glColors::gray, glColors::gray, glColors::gray};
-            m_colors.resize(vectorsSize);
-            for (int i=glUtils::POINTS_PER_SQUARE; i<m_colors.count(); i++)
-            {
-                m_colors[i] = glColors::white;
-            }
-        } */
     }
-
-
+    //
     initIndices();
     //
     scheduleRedraw();
@@ -417,12 +384,25 @@ void SsvepGL::initElements()
 void SsvepGL::initRects()
 {
     double dx = 0.2;
-    double dy = 0.25;
+    double dy = 0.2;
     int isNullX = 0, isNullY = 0, sx=1;
+    int offset;
 
-    for(int i=0; i<m_vertices.count(); i+=glUtils::POINTS_PER_SQUARE)
+    if(m_controlMode == control_mode::SYNC)
     {
-        m_vertices[i] = refPoints::topPoints[i/glUtils::POINTS_PER_SQUARE];
+
+        offset = glUtils::POINTS_PER_SQUARE;
+    }
+    else
+    {
+
+        offset = 0;
+    }
+
+    for(int i=0;i<m_vertices.count(); i+=glUtils::POINTS_PER_SQUARE)
+    {
+        m_vertices[i] = refPoints::topPoints[(i+offset)/glUtils::POINTS_PER_SQUARE];
+        qDebug()<< Q_FUNC_INFO << "vertices " <<  m_vertices[i];
         sx = 1;
         for(int j=i+1; j<i+glUtils::POINTS_PER_SQUARE; ++j)
         {
@@ -434,6 +414,8 @@ void SsvepGL::initRects()
             sx--;
         }
     }
+
+
 }
 
 void SsvepGL::initColors()
@@ -444,7 +426,6 @@ void SsvepGL::initColors()
 
     if(m_controlMode == control_mode::SYNC)
     {
-        qDebug()<< "[control mode] : SYNC" ;
         for (int i=0; i<m_colors.count(); i++)
         {
             m_colors[i] = glColors::white;
@@ -452,10 +433,9 @@ void SsvepGL::initColors()
     }
     else
     {
-        qDebug()<< "[control mode] : ASYNC" ;
         // init colors
         m_colors = {glColors::gray, glColors::gray, glColors::gray, glColors::gray};
-        // m_colors.resize(vectorsSize);
+        m_colors.resize(vectorsSize);
         for (int i=glUtils::POINTS_PER_SQUARE; i<m_colors.count(); i++)
         {
             m_colors[i] = glColors::white;
@@ -609,16 +589,6 @@ void SsvepGL::scheduleRedraw()
     QOpenGLWindow::update();
 }
 
-void SsvepGL::setControlMode(quint8 t_controlMode)
-{
-    m_controlMode = t_controlMode;
-}
-
-void SsvepGL::setStimulationMode(quint8 t_stimulationMode)
-{
-    m_stimulationMode = t_stimulationMode;
-}
-
 void SsvepGL::update()
 {
 
@@ -662,6 +632,16 @@ void SsvepGL::update()
 }
 
 // Setters
+void SsvepGL::setControlMode(quint8 t_controlMode)
+{
+    m_controlMode = t_controlMode;
+}
+
+void SsvepGL::setStimulationMode(quint8 t_stimulationMode)
+{
+    m_stimulationMode = t_stimulationMode;
+}
+
 void SsvepGL::setFrequencies(QString freqs)
 {
 
