@@ -22,7 +22,7 @@ SsvepGL::SsvepGL(SSVEP paradigm)
 {
 
     m_nrElements = paradigm.nrElements();
-    qDebug()<< Q_FUNC_INFO << "[nr elements]" << m_nrElements;
+
     setControlMode(paradigm.controlMode());
     setFrequencies(paradigm.frequencies());
     setStimulationDuration(paradigm.stimulationDuration());
@@ -184,7 +184,7 @@ void SsvepGL::preTrial()
         }
 
     }
-    else if(m_preTrialCount == 3)
+    else if(m_preTrialCount == 2)
     {
         refreshTarget();
     }
@@ -383,8 +383,12 @@ void SsvepGL::initElements()
 
 void SsvepGL::initRects()
 {
-    double dx = 0.2;
-    double dy = 0.2;
+    double pixelSize = 250.0; // length of a stimulus vertex in pixels (150x150 square)
+    // double dx = 0.2;
+    // double dy = 0.2;
+    QSize screenSize = utils::getScreenSize();
+    double dx = pixelSize / screenSize.width();
+    double dy = pixelSize / screenSize.height();
     int isNullX = 0, isNullY = 0, sx=1;
     int offset;
 
@@ -402,7 +406,6 @@ void SsvepGL::initRects()
     for(int i=0;i<m_vertices.count(); i+=glUtils::POINTS_PER_SQUARE)
     {
         m_vertices[i] = refPoints::topPoints[(i+offset)/glUtils::POINTS_PER_SQUARE];
-        qDebug()<< Q_FUNC_INFO << "vertices " <<  m_vertices[i];
         sx = 1;
         for(int j=i+1; j<i+glUtils::POINTS_PER_SQUARE; ++j)
         {
@@ -414,7 +417,6 @@ void SsvepGL::initRects()
             sx--;
         }
     }
-
 
 }
 
@@ -493,9 +495,11 @@ void SsvepGL::refreshTarget()
     {
         if(m_controlMode == control_mode::SYNC)
         {
-            int tmp = m_flickeringSequence->sequence[m_currentFlicker]-1;
-            //            int squareIndex = tmp+(glUtils::VERTICES_PER_TRIANGLE*tmp);
-            int squareIndex = tmp;
+
+            int tmp = m_flickeringSequence->sequence[m_currentFlicker] - 1;
+            int squareIndex = tmp+(glUtils::VERTICES_PER_TRIANGLE*tmp);
+            qDebug()<< Q_FUNC_INFO << "squareIdx " << tmp;
+//            int squareIndex = tmp;
             m_colors[squareIndex] = glColors::white;
             m_colors[squareIndex + 1] = glColors::white;
             m_colors[squareIndex + 2] = glColors::white;

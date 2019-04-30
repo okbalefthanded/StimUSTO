@@ -203,7 +203,7 @@ void ConfigPanel::on_initSSVEP_clicked()
         }
         else
         {
-            ssvepStimulation->resize(QSize(800, 600)); //temporaty size;
+            ssvepStimulation->resize(QSize(1366, 768)); //temporaty size;
         }
 
         //

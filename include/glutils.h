@@ -28,7 +28,7 @@ namespace refPoints
 static const QVector<QVector3D> topPoints =
 {
     QVector3D(-0.10f, 0.10f, 1.0f), QVector3D(-0.75f, 0.10f, 1.0f),
-    QVector3D(0.55f, 0.10f, 1.0f), QVector3D(-0.10f, 0.80f, 1.0f),
+    QVector3D(0.55f, 0.10f, 1.0f), QVector3D(-0.10f, 0.75f, 1.0f),
     QVector3D(-0.10f, -0.55f, 1.0f)
 };
 }
