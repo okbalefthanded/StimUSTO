@@ -9,6 +9,7 @@ Stimulus presentation platefrom developed at the LARESI Lab (work in progress)
 
 - SSVEP paradigm available:
 - - On/OFF 
+- - Sampled Sinusoidal Stimulation
 
 - Hybrid Paraidgm available:
 -- ERP/SSVEP
