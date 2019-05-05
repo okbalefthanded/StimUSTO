@@ -124,7 +124,7 @@ void SsvepGL::resizeGL(int w, int h)
     //TODO
     //    (void)w;
     //    (void)h;
-    initElements();
+   // initElements();
 }
 
 void SsvepGL::paintGL()
@@ -498,7 +498,7 @@ void SsvepGL::refreshTarget()
 
             int tmp = m_flickeringSequence->sequence[m_currentFlicker] - 1;
             int squareIndex = tmp+(glUtils::VERTICES_PER_TRIANGLE*tmp);
-            qDebug()<< Q_FUNC_INFO << "squareIdx " << tmp;
+            // qDebug()<< Q_FUNC_INFO << "squareIdx " << tmp;
 //            int squareIndex = tmp;
             m_colors[squareIndex] = glColors::white;
             m_colors[squareIndex + 1] = glColors::white;

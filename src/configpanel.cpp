@@ -125,7 +125,11 @@ void ConfigPanel::on_initSpeller_clicked()
             break;
         }
 
-        case speller_type::FACES_SPELLER ... speller_type::INVERTED_COLORED_FACE: //mingw/gcc only
+            // case speller_type::FACES_SPELLER ... speller_type::INVERTED_COLORED_FACE: //mingw/gcc only
+        case speller_type::FACES_SPELLER:
+        case speller_type::INVERTED_FACE:
+        case speller_type::COLORED_FACE:
+        case speller_type::INVERTED_COLORED_FACE:
         {
             FaceSpeller *faceSpeller = new FaceSpeller();
             faceSpeller->initSpeller(erpParadigm);
@@ -164,7 +168,7 @@ void ConfigPanel::on_initSSVEP_clicked()
         {
             SSVEPNrElements = freqsList.count();
         }
-            else
+        else
         {
             SSVEPNrElements = freqsList.count() + 1;
         }
@@ -180,7 +184,7 @@ void ConfigPanel::on_initSSVEP_clicked()
                                   ui->Frequencies->text(),
                                   ui->SSVEP_Stimulation->currentIndex());
 
-    qDebug() << Q_FUNC_INFO << "control mode" << ui->SSVEP_Control->currentIndex();
+        qDebug() << Q_FUNC_INFO << "control mode" << ui->SSVEP_Control->currentIndex();
     }
     if(!m_markerSender->connectedOnce())
     {
@@ -192,7 +196,8 @@ void ConfigPanel::on_initSSVEP_clicked()
         QSurfaceFormat format;
         format.setRenderableType(QSurfaceFormat::OpenGL);
         format.setProfile(QSurfaceFormat::CoreProfile);
-        format.setVersion(3,3);
+        // format.setVersion(3,3);
+        format.setVersion(3,0); // ANGLE supports ES 3.0, higher versions raise exceptions
 
         SsvepGL *ssvepStimulation = new SsvepGL(*ssvepParadigm);
         ssvepStimulation->setFormat(format);
