@@ -32,7 +32,8 @@ int main(int argc, char *argv[])
     if(optionParser->value("nogui")=="True")
     {
         qDebug()<< "nogui" << optionParser->value("nogui");
-        qDebug()<< "file" << optionParser->value("file");
+        qDebug()<< "file" << optionParser->value("file");    
+        //
         w.setConfigFile(optionParser->value("file"));
         w.setNoGui(true);
         w.hide();

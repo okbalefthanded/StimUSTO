@@ -6,7 +6,7 @@
 #include "ui_configpanel.h"
 #include "ovmarkersender.h"
 #include "speller.h"
-#include "hybridstimulation.h"
+#include "hybridelipsestimulation.h"
 #include "hybridgridstimulation.h"
 #include "ssvepgl.h"
 //#include "ssvep_timer.h"
@@ -62,6 +62,13 @@ void ConfigPanel::startExperiment()
     {
         on_initSSVEP_clicked();
     }
+    else if(paradigmType == paradigm_type::HYBRID)
+    {
+        // hybrid
+        on_initHybrid_clicked();
+    }
+
+
 }
 
 // init speller
@@ -253,7 +260,7 @@ void ConfigPanel::on_quitSpeller_clicked()
 void ConfigPanel::on_initHybrid_clicked()
 {
 
-    int spellerType = ui->spellerType->currentIndex();
+   //  int spellerType = ui->spellerType->currentIndex();
 
     if(!m_markerSender->connectedOnce())
     {
@@ -263,24 +270,24 @@ void ConfigPanel::on_initHybrid_clicked()
     {
         //        HybridStimulation *hybrid = new HybridStimulation();
 
-        HybridGridStimulation *hybrid = new HybridGridStimulation();
-        connect(ui->startSpeller, SIGNAL(clicked()), hybrid, SLOT(startTrial()));
-        connect(hybrid, SIGNAL(markerTag(uint64_t)), m_markerSender, SLOT(sendStimulation(uint64_t)));
+        //        HybridGridStimulation *hybrid = new HybridGridStimulation();
+        //        connect(ui->startSpeller, SIGNAL(clicked()), hybrid, SLOT(startTrial()));
+        //        connect(hybrid, SIGNAL(markerTag(uint64_t)), m_markerSender, SLOT(sendStimulation(uint64_t)));
         //ERP configuration
-        hybrid->setERPStimulationDuration(ui->stimulusDuration->text().toInt());
-        hybrid->setIsi(ui->interStimulusDuration->text().toInt());
-        hybrid->setERPNrSequence(ui->numberOfRepetition->text().toInt());
-        hybrid->setOperationMode(ui->spellingModeChoices->currentIndex());
-        hybrid->setDesiredSequence(ui->desiredPhrase->text());
-        hybrid->setERPStimulationType(spellerType);
+        //        hybrid->setERPStimulationDuration(ui->stimulusDuration->text().toInt());
+        //        hybrid->setIsi(ui->interStimulusDuration->text().toInt());
+        //        hybrid->setERPNrSequence(ui->numberOfRepetition->text().toInt());
+        //        hybrid->setOperationMode(ui->spellingModeChoices->currentIndex());
+        //        hybrid->setDesiredSequence(ui->desiredPhrase->text());
+        //        hybrid->setERPStimulationType(spellerType);
         //SSVEP configuration
-        hybrid->setFrequencies(ui->Frequencies->text());
-        hybrid->setSSVEPStimulationDuration(ui->SSVEP_StimDuration->text().toInt());
+        // hybrid->setFrequencies(ui->Frequencies->text());
+        // hybrid->setSSVEPStimulationDuration(ui->SSVEP_StimDuration->text().toInt());
         //        hybrid->setBreakDuration(ui->SSVEP_BreakDuration->text().toInt());
         //        hybrid->setSSVEPSequence(ui->SSVEP_Sequence->text().toInt());
         //        hybrid->setFlickeringMode(ui->SSVEP_mode->currentIndex());
         // general configuration
-        hybrid->setFeedbackPort(ui->feedback_port->text().toUShort());
+        // hybrid->setFeedbackPort(ui->feedback_port->text().toUShort());
     }
 }
 

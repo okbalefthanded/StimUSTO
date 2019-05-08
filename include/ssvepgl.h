@@ -34,6 +34,7 @@ public:
     void setFeedbackPort(int t_port);
     void setStimulationMode(quint8 t_stimulationMode);
 
+friend class Hybrid;
     // QOpenGLWindow interface
 protected:
     void initializeGL();

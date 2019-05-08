@@ -34,13 +34,14 @@ public:
     void setSpellerType(int t_spellerType);
     void setFeedbackPort(quint16 t_feedbackPort);
 
+friend class Hybrid;
 signals:
     void markerTag(uint64_t t_ovStimulation);
 
 protected slots:
 
-    void startTrial();
     void preTrial();
+    void startTrial();    
     void feedback();
     void postTrial();
     virtual void startFlashing();

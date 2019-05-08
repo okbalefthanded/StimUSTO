@@ -183,7 +183,6 @@ void Speller::postTrial()
 {
     qDebug()<< Q_FUNC_INFO;
 
-
     m_currentStimulation = 0;
     m_state = trial_state::PRE_TRIAL;
     // wait

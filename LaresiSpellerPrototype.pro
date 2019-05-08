@@ -15,11 +15,12 @@ TEMPLATE = app
 
 
 SOURCES += src\main.cpp\
+    src/hybrid.cpp \
+    src/hybridstimulation.cpp \
         src\configpanel.cpp \
     src\matrixlayout.cpp \
     src\ovmarkersender.cpp \
     src\randomflashsequence.cpp \
-    src\hybridstimulation.cpp \
     src\ellipselayout.cpp \
     src\hybridgridstimulation.cpp \
     src\ssvepgl.cpp \
@@ -35,11 +36,12 @@ SOURCES += src\main.cpp\
     src/logger.cpp
 
 HEADERS  += include\configpanel.h \
+    include/hybrid.h \
+    include/hybridstimulation.h \
     include\ovtk_stimulations.h \
     include\matrixlayout.h \
     include\ovmarkersender.h \
     include\randomflashsequence.h \
-    include\hybridstimulation.h \
     include\ellipselayout.h \
     include\hybridgridstimulation.h \
     include\ssvepgl.h \
