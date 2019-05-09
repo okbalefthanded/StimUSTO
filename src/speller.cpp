@@ -23,8 +23,9 @@ Speller::Speller(QWidget *parent) :
 {
 
     ui->setupUi(this);
-
+    this->setProperty("windowTitle", "ERP Speller");
     this->show();
+
 
     if(qApp->screens().count() == 2)
     {
@@ -440,4 +441,4 @@ Speller::~Speller()
     delete ui;
 }
 
-void Speller::initSpeller(Paradigm *prdg){}
+void Speller::initSpeller(ERP *prdg){}

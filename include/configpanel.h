@@ -4,11 +4,14 @@
 #include <QMainWindow>
 #include <QUdpSocket>
 #include <QTimer>
+#include <serializable.h>
 //
 #include "ovmarkersender.h"
 #include "speller.h"
-#include "paradigm.h"
 #include "ssvepgl.h"
+#include "paradigm.h"
+#include "erp.h"
+#include "ssvep.h"
 //
 namespace Ui {
 class ConfigPanel;
@@ -47,8 +50,14 @@ private slots:
     void on_initSSVEP_clicked();
     void on_initHybrid_clicked();
 
+
 private:
-    void initParadigm(Paradigm *prdg);
+    void initParadigmJSon(Paradigm *prdg);
+    ERP *initParadigmERPGui();
+    SSVEP *initParadigmSSVEPGui();
+    Speller *createSpeller(int t_spellerType);
+    SsvepGL *createSSVEP(SSVEP *t_ssvep);
+    void connectStimulation(QObject *t_obj);
     void connectParadigm(QObject *pr, QTimer *timer);
     Ui::ConfigPanel *ui;
     QString configFile;

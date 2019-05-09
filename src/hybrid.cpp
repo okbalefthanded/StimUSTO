@@ -6,14 +6,48 @@
 
 Hybrid::Hybrid()
 {
+    m_type = paradigm_type::HYBRID;
+
     m_ERPparadigm = new ERP();
     m_SSVEPparadigm = new SSVEP();
 }
+
+Hybrid::Hybrid(ERP *erp, SSVEP *ssvep)
+{
+
+    m_type = paradigm_type::HYBRID;
+
+    m_ERPparadigm = new ERP(erp->experimentMode(),
+                            erp->controlMode(),
+                            erp->type(),
+                            erp->stimulationDuration(),
+                            erp->breakDuration(),
+                            erp->nrSequences(),
+                            erp->desiredPhrase(),
+                            erp->stimulationType(),
+                            erp->flashingMode()
+                            );
+
+    m_SSVEPparadigm = new SSVEP(ssvep->experimentMode(),
+                                ssvep->controlMode(),
+                                ssvep->type(),
+                                ssvep->stimulationDuration(),
+                                ssvep->breakDuration(),
+                                ssvep->nrSequences(),
+                                ssvep->desiredPhrase(),
+                                ssvep->nrElements(),
+                                ssvep->frequencies(),
+                                ssvep->stimulationMode()
+                                );
+}
+
+
 
 QVariant Hybrid::toVariant() const
 {
     QVariantMap map;
 
+    map.insert("paradigmType", m_type);
     // ERP config
     map.insert("ERP_breakDuration", m_ERPparadigm->breakDuration());
     map.insert("ERP_desiredPhrase", m_ERPparadigm->desiredPhrase());
@@ -42,6 +76,7 @@ QVariant Hybrid::toVariant() const
 void Hybrid::fromVariant(const QVariant &variant)
 {
     QVariantMap map = variant.toMap();
+    // m_type = map.value("paradigymType").toUInt();
     // ERP config
     m_ERPparadigm->setExperimentMode(map.value("ERP_experimentMode").toInt());
     m_ERPparadigm->setControlMode(map.value("ERP_controlMode").toInt());
@@ -63,4 +98,9 @@ void Hybrid::fromVariant(const QVariant &variant)
     m_SSVEPparadigm->setNrElements(map.value("SSVEP_nrElements").toInt());
     m_SSVEPparadigm->setFrequencies(map.value("SSVEP_frequencies").toString());
     m_SSVEPparadigm->setStimulationMode(map.value("SSVEP_stimulationMode").toInt());
+}
+
+Hybrid::~Hybrid()
+{
+
 }
