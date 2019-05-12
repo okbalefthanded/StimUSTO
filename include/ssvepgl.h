@@ -35,6 +35,8 @@ public:
     void setStimulationMode(quint8 t_stimulationMode);
 
 friend class Hybrid;
+friend class HybridStimulation;
+
     // QOpenGLWindow interface
 protected:
     void initializeGL();
@@ -43,6 +45,7 @@ protected:
 
 signals:
     void markerTag(uint64_t ovStimulation);
+    void slotTerminated();
 
 private slots:
 
@@ -80,6 +83,7 @@ private:
     void scheduleRedraw();
 
     bool m_firstRun = true;
+    bool m_stateFinished = true;
     int m_preTrialCount=0;
     int m_preTrialWait;
     int m_currentFlicker=0;

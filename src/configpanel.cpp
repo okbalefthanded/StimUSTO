@@ -66,7 +66,6 @@ void ConfigPanel::startExperiment()
     }
     else if(paradigmType == paradigm_type::HYBRID)
     {
-
         on_initHybrid_clicked();
     }
 
@@ -213,7 +212,7 @@ void ConfigPanel::on_initHybrid_clicked()
         launchTimer->setSingleShot(true);
 
         // HybridStimulation *hybrid = new HybridStimulation(hybridParadigm);
-        Speller *speller = createSpeller(hybridParadigm->m_ERPparadigm->type());
+        Speller *speller = createSpeller(hybridParadigm->m_ERPparadigm->stimulationType());
         speller->initSpeller(hybridParadigm->m_ERPparadigm);
         SsvepGL *ssvepStimulation = createSSVEP(hybridParadigm->m_SSVEPparadigm);
         HybridStimulation *hybrid = new HybridStimulation(hybridParadigm, speller, ssvepStimulation);
@@ -265,6 +264,7 @@ Speller *ConfigPanel::createSpeller(int t_spellerType)
     {
         FlashingSpeller *flashSpeller = new FlashingSpeller();
         connectStimulation(flashSpeller);
+        // qDebug()<< Q_FUNC_INFO << "returning a FlashSpeller";
         /* flashSpeller->initSpeller(erpParadigm);
         connectParadigm(flashSpeller, launchTimer);*/
         return flashSpeller;
@@ -279,7 +279,7 @@ Speller *ConfigPanel::createSpeller(int t_spellerType)
     {
         FaceSpeller *faceSpeller = new FaceSpeller();
         connectStimulation(faceSpeller);
-        qDebug()<< Q_FUNC_INFO << "returning a FaceSpeller";
+        // qDebug()<< Q_FUNC_INFO << "returning a FaceSpeller";
         return  faceSpeller;
         //  faceSpeller->initSpeller(erpParadigm);
         //  connectParadigm(faceSpeller, launchTimer);
@@ -374,7 +374,6 @@ void ConfigPanel::connectStimulation(QObject *t_obj)
 
 void ConfigPanel::connectParadigm(QObject *pr, QTimer *timer)
 {
-
 
     if(noGui)
     {

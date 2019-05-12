@@ -35,8 +35,11 @@ public:
     void setFeedbackPort(quint16 t_feedbackPort);
 
 friend class Hybrid;
+friend class HybridStimulation;
+
 signals:
     void markerTag(uint64_t t_ovStimulation);
+    void slotTerminated();
 
 protected slots:
 
@@ -93,7 +96,7 @@ protected:
     int m_preTrialCount = 0;
     quint16 m_feedbackPort = 12345;
 
-    QString m_desiredPhrase= "12345";
+    QString m_desiredPhrase= "";
     QString m_text;
     QImage *m_faceStimuli;
     QList<QString> m_presentedLetters;

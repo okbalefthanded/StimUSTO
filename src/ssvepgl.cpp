@@ -21,6 +21,12 @@
 SsvepGL::SsvepGL(SSVEP paradigm)
 {
 
+    if(qApp->screens().count() == 2)
+    {
+        this->setScreen(qApp->screens().last());
+      //  this->showFullScreen();
+    }
+
     m_nrElements = paradigm.nrElements();
 
     setControlMode(paradigm.controlMode());
@@ -62,12 +68,13 @@ void SsvepGL::initializeGL()
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glEnable(GL_FRAMEBUFFER_SRGB);
 
-    if(  QGuiApplication::screens().size() == 2)
+    if(QGuiApplication::screens().size() == 2)
     {
         this->setScreen(QGuiApplication::screens().last());
         this->showFullScreen();
     }
 
+    //this->showFullScreen();
     // set vertices, vertices indeices & colors
     // initElements();
 
@@ -147,6 +154,7 @@ void SsvepGL::paintGL()
 
 void SsvepGL::startTrial()
 {
+    qDebug()<< "[TRIAL START]" << Q_FUNC_INFO;
 
     if (m_state == trial_state::PRE_TRIAL)
     {
@@ -236,9 +244,16 @@ void SsvepGL::postTrial()
     ++m_currentFlicker;
 
     if (m_currentFlicker < m_flickeringSequence->sequence.size() &&
+            m_flickeringSequence->sequence.length() != 1 &&
             (m_flickeringMode == operation_mode::COPY_MODE || m_flickeringMode == operation_mode::CALIBRATION))
     {
         startTrial();
+    }
+    else if (m_flickeringSequence->sequence.length() == 1)
+    {
+        m_currentFlicker = 0;
+        emit(slotTerminated());
+        return;
     }
     else
     {

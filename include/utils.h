@@ -26,6 +26,9 @@ QVector<double> gen_flick_on_off(double freq, int refreshRate, float length);
 // sampled sinusoidal flickering
 QVector<double> gen_flick_sin(double freq, int refreshRate, float length);
 
+
+// joint frequency-phase modulation
+// TODO
 //
 qint8 sign(double value);
 

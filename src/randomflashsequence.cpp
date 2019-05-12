@@ -59,4 +59,16 @@ QVector<int> RandomFlashSequence::range(int start, int end)
     return list;
 }
 
+QString RandomFlashSequence::toString()
+{
+    QString seqStr;
+
+    for (int i=0;i<sequence.length();i++)
+    {
+        seqStr += QString::number(sequence[i]);
+    }
+
+    return seqStr;
+}
+
 

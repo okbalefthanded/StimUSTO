@@ -17,7 +17,7 @@ TEMPLATE = app
 SOURCES += src\main.cpp\
     src/hybrid.cpp \
     src/hybridstimulation.cpp \
-        src\configpanel.cpp \
+    src\configpanel.cpp \
     src\matrixlayout.cpp \
     src\ovmarkersender.cpp \
     src\randomflashsequence.cpp \

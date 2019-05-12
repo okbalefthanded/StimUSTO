@@ -48,11 +48,12 @@ QVariant Hybrid::toVariant() const
     QVariantMap map;
 
     map.insert("paradigmType", m_type);
+    map.insert("experimentMode", m_experimentMode);
     // ERP config
     map.insert("ERP_breakDuration", m_ERPparadigm->breakDuration());
     map.insert("ERP_desiredPhrase", m_ERPparadigm->desiredPhrase());
-    map.insert("ERP_experimentMode",m_ERPparadigm->experimentMode());
-    // map.insert("SSVEP_controlMode", m_ERPparadigm->controlMode());
+    map.insert("ERP_experimentMode",m_experimentMode);
+    // map.insert("ERP_controlMode", m_ERPparadigm->controlMode());
     map.insert("ERP_flashingMode", m_ERPparadigm->flashingMode());
     map.insert("ERP_nrSequences", m_ERPparadigm->nrSequences());
     map.insert("ERP_paradigmType", m_ERPparadigm->type());
@@ -61,7 +62,7 @@ QVariant Hybrid::toVariant() const
     // SSVEP config
     map.insert("SSVEP_breakDuration", m_SSVEPparadigm->breakDuration());
     map.insert("SSVEP_desiredPhrase", m_SSVEPparadigm->desiredPhrase());
-    map.insert("SSVEP_experimentMode", m_SSVEPparadigm->experimentMode());
+    map.insert("SSVEP_experimentMode", m_experimentMode);
     map.insert("SSVEP_controlMode", m_SSVEPparadigm->controlMode());
     map.insert("SSVEP_frequencies", m_SSVEPparadigm->frequencies());
     map.insert("SSVEP_nrElements", m_SSVEPparadigm->nrElements());
@@ -76,9 +77,11 @@ QVariant Hybrid::toVariant() const
 void Hybrid::fromVariant(const QVariant &variant)
 {
     QVariantMap map = variant.toMap();
-    // m_type = map.value("paradigymType").toUInt();
+
+    m_type = map.value("paradigymType").toUInt();
+    m_experimentMode = map.value("experimentMode").toUInt();
     // ERP config
-    m_ERPparadigm->setExperimentMode(map.value("ERP_experimentMode").toInt());
+    m_ERPparadigm->setExperimentMode(map.value("experimentMode").toInt());
     m_ERPparadigm->setControlMode(map.value("ERP_controlMode").toInt());
     m_ERPparadigm->setType(map.value("ERP_paradigmType").toInt());
     m_ERPparadigm->setStimulationDuration(map.value("ERP_stimulationDuration").toInt());
@@ -88,7 +91,7 @@ void Hybrid::fromVariant(const QVariant &variant)
     m_ERPparadigm->setStimulationType(map.value("ERP_stimulationType").toInt());
     m_ERPparadigm->setFlashingMode(map.value("ERP_flashingMode").toInt());
     // SSVEP config
-    m_SSVEPparadigm->setExperimentMode(map.value("SSVEP_experimentMode").toInt());
+    m_SSVEPparadigm->setExperimentMode(map.value("experimentMode").toInt());
     m_SSVEPparadigm->setControlMode(map.value("SSVEP_controlMode").toInt());
     m_SSVEPparadigm->setType(map.value("paradigmType").toInt());
     m_SSVEPparadigm->setStimulationDuration(map.value("SSVEP_stimulationDuration").toInt());

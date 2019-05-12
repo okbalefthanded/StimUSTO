@@ -14,6 +14,7 @@ public:
     RandomFlashSequence(int length, int nr_sequences, int min_dist=2, bool repetition=false);
 
     inline QVector<int> range(int start, int end);
+    QString toString();
     QVector<int> sequence;
 
 };

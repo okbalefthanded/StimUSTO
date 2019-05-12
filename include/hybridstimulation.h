@@ -6,28 +6,38 @@
 #include "paradigm.h"
 #include "erp.h"
 #include "ssvep.h"
+#include "hybrid.h"
 //
-class HybridStimulation
+class HybridStimulation : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit HybridStimulation(ERP *erp, SSVEP *ssvep);
+    //explicit HybridStimulation(ERP *erp, SSVEP *ssvep);
+    explicit HybridStimulation(Hybrid *hybridStimulation);
+    explicit HybridStimulation(Hybrid *hybridStimulation, Speller *ERPspeller,
+                               SsvepGL *ssvepGL);
     ~HybridStimulation();
     void initERPspeller(ERP *erp);
     void initSSVEP(SSVEP *ssvep);
 
 private slots:
     void hybridPreTrial();
-    void hybridStartTrial();
-    void hybridFeedback();
-    void hybridPostTrial();
+    void startTrial();
 
+    //    void hybridFeedback();
+    void hybridPostTrial();
+    void switchState();
+    void swichStimWindows();
 
 private:
-    int m_hybridState;
-    Speller *ERPspeller;
-    SsvepGL *ssvepStimulation;
+    int m_hybridState = trial_state::PRE_TRIAL;
+    int m_trials;
+    int m_currentTrial = 0;
+    bool m_switchStimulation = true;
+    Hybrid *m_hybridStimulaiton;
+    Speller *m_ERPspeller;
+    SsvepGL *m_ssvepStimulation;
 };
 
 

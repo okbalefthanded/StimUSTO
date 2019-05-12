@@ -69,19 +69,16 @@ void Speller::startTrial()
 
     if (m_state == trial_state::PRE_TRIAL)
     {
-
         preTrial();
     }
 
     if (m_state == trial_state::STIMULUS)
     {
         startFlashing();
-
     }
     else if (m_state == trial_state::POST_STIMULUS)
     {
         pauseFlashing();
-
     }
 }
 
@@ -89,7 +86,7 @@ void Speller::startFlashing(){}
 
 void Speller::pauseFlashing()
 {
-    //      qDebug()<< Q_FUNC_INFO;
+    // qDebug()<< "[PAUSE FLASHING]" << Q_FUNC_INFO;
     // sendMarker(OVTK_StimulationId_VisualStimulationStop);
     this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
             widget()->setStyleSheet("QLabel { color : gray; font: 40pt }");
@@ -109,7 +106,8 @@ void Speller::pauseFlashing()
         sendMarker(OVTK_StimulationId_TrialStop);
         m_state = trial_state::FEEDBACK;
 
-        if(m_spellingMode == operation_mode::COPY_MODE || m_spellingMode == operation_mode::FREE_MODE){
+        if(m_spellingMode == operation_mode::COPY_MODE || m_spellingMode == operation_mode::FREE_MODE)
+        {
             feedback();
         }
         else if(m_spellingMode == operation_mode::CALIBRATION)
@@ -130,7 +128,6 @@ void Speller::preTrial()
 
         if (m_spellingMode == operation_mode::CALIBRATION)
         {
-            qDebug()<< "highlightTarget";
             highlightTarget();
             m_text += m_desiredPhrase[m_currentLetter];
             m_textRow->setText(m_text);
@@ -192,13 +189,22 @@ void Speller::postTrial()
     refreshTarget();
 
     if (m_currentLetter >= m_desiredPhrase.length() &&
+            m_desiredPhrase.length() != 1 &&
             (m_spellingMode == operation_mode::COPY_MODE ||
-             m_spellingMode == operation_mode::CALIBRATION))
+             m_spellingMode == operation_mode::CALIBRATION)
+            )
     {
         qDebug()<< "Experiment End";
         sendMarker(OVTK_StimulationId_ExperimentStop);
         wait(2000);
         this->close();
+    }
+    else if(m_desiredPhrase.length() == 1)
+    {
+        qDebug() << "[POST TRIAL 1]" << Q_FUNC_INFO;
+        m_currentLetter = 0;
+        emit(slotTerminated());
+        return;
     }
     else
     {
@@ -249,9 +255,9 @@ bool Speller::isTarget()
     if(m_desiredPhrase[m_currentLetter] == m_presentedLetters[index][0])
     {
         //                qDebug()<< "letter : " << letters[row][column];
-//        qDebug()<< "desired letter: " << m_desiredPhrase[m_currentLetter];
+        //        qDebug()<< "desired letter: " << m_desiredPhrase[m_currentLetter];
         //        qDebug()<< "flashing: "<< flashingSequence->sequence[m_currentStimulation];
-//        qDebug()<< "presented letter:" << m_presentedLetters[index];
+        //        qDebug()<< "presented letter:" << m_presentedLetters[index];
         //        qDebug()<< "row: " << row << " column: "<< column;
         return true;
     }
@@ -339,7 +345,7 @@ void Speller::switchStimulationTimers()
         m_isiTimer->stop();
         m_state = trial_state::POST_STIMULUS;
     }
-        else if(trial_state::POST_STIMULUS)
+    else if(trial_state::POST_STIMULUS)
     {
         m_stimTimer->stop();
         m_isiTimer->start();
