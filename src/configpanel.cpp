@@ -115,7 +115,7 @@ void ConfigPanel::on_initSpeller_clicked()
         launchTimer->setSingleShot(true);
 
         Speller *speller = createSpeller(spellerType);
-        speller->initSpeller(erpParadigm);
+        speller->setERP(erpParadigm);
         connectParadigm(speller, launchTimer);
 
 
@@ -211,32 +211,11 @@ void ConfigPanel::on_initHybrid_clicked()
         launchTimer->setInterval(10000);
         launchTimer->setSingleShot(true);
 
-        // HybridStimulation *hybrid = new HybridStimulation(hybridParadigm);
         Speller *speller = createSpeller(hybridParadigm->m_ERPparadigm->stimulationType());
-        speller->initSpeller(hybridParadigm->m_ERPparadigm);
+        speller->setERP(hybridParadigm->m_ERPparadigm);
         SsvepGL *ssvepStimulation = createSSVEP(hybridParadigm->m_SSVEPparadigm);
         HybridStimulation *hybrid = new HybridStimulation(hybridParadigm, speller, ssvepStimulation);
         connectParadigm(hybrid, launchTimer);
-
-        //        HybridStimulation *hybrid = new HybridStimulation();
-        //        HybridGridStimulation *hybrid = new HybridGridStimulation();
-        //        connect(ui->startSpeller, SIGNAL(clicked()), hybrid, SLOT(startTrial()));
-        //        connect(hybrid, SIGNAL(markerTag(uint64_t)), m_markerSender, SLOT(sendStimulation(uint64_t)));
-        //ERP configuration
-        //        hybrid->setERPStimulationDuration(ui->stimulusDuration->text().toInt());
-        //        hybrid->setIsi(ui->interStimulusDuration->text().toInt());
-        //        hybrid->setERPNrSequence(ui->numberOfRepetition->text().toInt());
-        //        hybrid->setOperationMode(ui->spellingModeChoices->currentIndex());
-        //        hybrid->setDesiredSequence(ui->desiredPhrase->text());
-        //        hybrid->setERPStimulationType(spellerType);
-        //SSVEP configuration
-        // hybrid->setFrequencies(ui->Frequencies->text());
-        // hybrid->setSSVEPStimulationDuration(ui->SSVEP_StimDuration->text().toInt());
-        //        hybrid->setBreakDuration(ui->SSVEP_BreakDuration->text().toInt());
-        //        hybrid->setSSVEPSequence(ui->SSVEP_Sequence->text().toInt());
-        //        hybrid->setFlickeringMode(ui->SSVEP_mode->currentIndex());
-        // general configuration
-        // hybrid->setFeedbackPort(ui->feedback_port->text().toUShort());
     }
 }
 
@@ -264,11 +243,7 @@ Speller *ConfigPanel::createSpeller(int t_spellerType)
     {
         FlashingSpeller *flashSpeller = new FlashingSpeller();
         connectStimulation(flashSpeller);
-        // qDebug()<< Q_FUNC_INFO << "returning a FlashSpeller";
-        /* flashSpeller->initSpeller(erpParadigm);
-        connectParadigm(flashSpeller, launchTimer);*/
         return flashSpeller;
-        // break;
     }
 
         // case speller_type::FACES_SPELLER ... speller_type::INVERTED_COLORED_FACE: //mingw/gcc only
@@ -279,14 +254,11 @@ Speller *ConfigPanel::createSpeller(int t_spellerType)
     {
         FaceSpeller *faceSpeller = new FaceSpeller();
         connectStimulation(faceSpeller);
-        // qDebug()<< Q_FUNC_INFO << "returning a FaceSpeller";
         return  faceSpeller;
-        //  faceSpeller->initSpeller(erpParadigm);
-        //  connectParadigm(faceSpeller, launchTimer);
-        //  break;
     }
+
     }
-    //return speller;
+
 }
 
 SSVEP *ConfigPanel::initParadigmSSVEPGui()
@@ -335,7 +307,7 @@ SsvepGL *ConfigPanel::createSSVEP(SSVEP *t_ssvep)
     // format.setVersion(3,3);
     format.setVersion(3,0); // ANGLE supports ES 3.0, higher versions raise exceptions
 
-    SsvepGL *ssvepStimulation = new SsvepGL(*t_ssvep);
+    SsvepGL *ssvepStimulation = new SsvepGL(t_ssvep);
     ssvepStimulation->setFormat(format);
 
     if(QGuiApplication::screens().size() == 2)

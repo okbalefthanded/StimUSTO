@@ -13,7 +13,6 @@ class HybridStimulation : public QObject
     Q_OBJECT
 
 public:
-    //explicit HybridStimulation(ERP *erp, SSVEP *ssvep);
     explicit HybridStimulation(Hybrid *hybridStimulation);
     explicit HybridStimulation(Hybrid *hybridStimulation, Speller *ERPspeller,
                                SsvepGL *ssvepGL);
@@ -24,7 +23,6 @@ public:
 private slots:
     void hybridPreTrial();
     void startTrial();
-
     //    void hybridFeedback();
     void hybridPostTrial();
     void switchState();

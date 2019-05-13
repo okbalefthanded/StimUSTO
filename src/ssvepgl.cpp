@@ -1,12 +1,7 @@
 //
 #include <QWindow>
 #include <QDebug>
-#include <QLabel>
-#include <QGridLayout>
-#include <QHBoxLayout>
 #include <QTime>
-#include <QElapsedTimer>
-#include <windows.h>
 #include <QtMath>
 #include <Qapplication>
 #include <QDateTime>
@@ -16,27 +11,13 @@
 #include "ovtk_stimulations.h"
 #include "utils.h"
 #include "glutils.h"
-
 //
-SsvepGL::SsvepGL(SSVEP paradigm)
+SsvepGL::SsvepGL(SSVEP *paradigm)
 {
-
-    if(qApp->screens().count() == 2)
-    {
-        this->setScreen(qApp->screens().last());
-      //  this->showFullScreen();
-    }
-
-    m_nrElements = paradigm.nrElements();
-
-    setControlMode(paradigm.controlMode());
-    setFrequencies(paradigm.frequencies());
-    setStimulationDuration(paradigm.stimulationDuration());
-    setBreakDuration(paradigm.breakDuration());
-    setSequence(paradigm.nrSequences());
-    setFlickeringMode(paradigm.experimentMode());
+    m_ssvep = paradigm;
+    setFrequencies(m_ssvep->frequencies());
     setFeedbackPort(12345);
-    setStimulationMode(paradigm.stimulationMode());
+    m_preTrialWait = m_ssvep->breakDuration();
 
     // set vertices, vertices indeices & colors
     initElements();
@@ -51,7 +32,6 @@ SsvepGL::SsvepGL(SSVEP paradigm)
     m_feedbackSocket = new QUdpSocket(this);
     m_feedbackSocket->bind(QHostAddress::LocalHost, m_feedbackPort);
     connect(m_feedbackSocket, SIGNAL(readyRead()), this, SLOT(receiveFeedback()));
-
     //
     initLogger();
     //
@@ -74,7 +54,6 @@ void SsvepGL::initializeGL()
         this->showFullScreen();
     }
 
-    //this->showFullScreen();
     // set vertices, vertices indeices & colors
     // initElements();
 
@@ -83,7 +62,7 @@ void SsvepGL::initializeGL()
     m_flicker.resize(m_frequencies.size());
     for (int i=0; i < m_frequencies.size(); ++i)
     {
-        m_flicker[i] = utils::gen_flick(m_frequencies[i], config::REFRESH_RATE, m_stimulationDuration, m_stimulationMode);
+        m_flicker[i] = utils::gen_flick(m_frequencies[i], config::REFRESH_RATE, m_ssvep->stimulationDuration(), m_ssvep->stimulationMode());
     }
 
     // Application-specific initialization
@@ -131,7 +110,7 @@ void SsvepGL::resizeGL(int w, int h)
     //TODO
     //    (void)w;
     //    (void)h;
-   // initElements();
+    // initElements();
 }
 
 void SsvepGL::paintGL()
@@ -139,7 +118,7 @@ void SsvepGL::paintGL()
 
     // clear
     glClear(GL_COLOR_BUFFER_BIT);
-    int nVertices = glUtils::VERTICES_PER_TRIANGLE * (m_nrElements) * glUtils::TRIANGLES_PER_SQUARE;
+    int nVertices = glUtils::VERTICES_PER_TRIANGLE * (m_ssvep->nrElements()) * glUtils::TRIANGLES_PER_SQUARE;
     // Render using our shader
     m_programShader->bind();
     {
@@ -175,7 +154,7 @@ void SsvepGL::preTrial()
 
     if(m_firstRun)
     {
-        m_flickeringSequence = new RandomFlashSequence(m_nrElements, m_stimulationSequence / m_nrElements);
+        m_flickeringSequence = new RandomFlashSequence(m_ssvep->nrElements(), m_ssvep->nrSequences() / m_ssvep->nrElements());
         qDebug()<< "sequence "<<m_flickeringSequence->sequence;
         m_firstRun = false;
     }
@@ -185,8 +164,8 @@ void SsvepGL::preTrial()
 
         sendMarker(OVTK_StimulationId_TrialStart);
 
-        if (m_flickeringMode == operation_mode::CALIBRATION ||
-                m_flickeringMode == operation_mode::COPY_MODE)
+        if (m_ssvep->experimentMode() == operation_mode::CALIBRATION ||
+                m_ssvep->experimentMode() == operation_mode::COPY_MODE)
         {
             highlightTarget();
         }
@@ -221,13 +200,13 @@ void SsvepGL::postTrial()
     m_state = trial_state::PRE_TRIAL;
 
     // feedback
-    if(m_flickeringMode == operation_mode::COPY_MODE || m_flickeringMode == operation_mode::FREE_MODE)
+    if(m_ssvep->experimentMode() == operation_mode::COPY_MODE || m_ssvep->experimentMode() == operation_mode::FREE_MODE)
     {
 
-        wait(500);
+        utils::wait(500);
         feedback();
         // feedback for 1 sec & refresh
-        wait(1000);
+        utils::wait(1000);
         refresh(m_sessionFeedback[m_currentFlicker].digitValue()-1);
     }
 
@@ -237,15 +216,15 @@ void SsvepGL::postTrial()
     }
 
     // wait
-    int waitMillisec = m_breakDuration - m_preTrialWait * 1000;
-    wait(waitMillisec);
+    int waitMillisec = m_ssvep->breakDuration() - m_preTrialWait * 1000;
+    utils::wait(waitMillisec);
 
     //    refreshTarget();
     ++m_currentFlicker;
 
     if (m_currentFlicker < m_flickeringSequence->sequence.size() &&
             m_flickeringSequence->sequence.length() != 1 &&
-            (m_flickeringMode == operation_mode::COPY_MODE || m_flickeringMode == operation_mode::CALIBRATION))
+            (m_ssvep->experimentMode() == operation_mode::COPY_MODE || m_ssvep->experimentMode() == operation_mode::CALIBRATION))
     {
         startTrial();
     }
@@ -259,7 +238,8 @@ void SsvepGL::postTrial()
     {
         qDebug()<< "Experiment End";
         sendMarker(OVTK_StimulationId_ExperimentStop);
-        wait(2000);
+        utils::wait(2000);
+        emit(slotTerminated());
         this->close();
     }
 }
@@ -298,7 +278,7 @@ void SsvepGL::feedback()
     // receiveFeedback();
     m_feedbackSocket->waitForReadyRead(500);
 
-    if(m_flickeringMode == operation_mode::COPY_MODE)
+    if(m_ssvep->experimentMode() == operation_mode::COPY_MODE)
     {
 
         if(m_sessionFeedback[m_currentFlicker].digitValue() == m_flickeringSequence->sequence[m_currentFlicker])
@@ -310,7 +290,7 @@ void SsvepGL::feedback()
             highlightFeedback(glColors::orange, m_sessionFeedback[m_currentFlicker].digitValue()-1);
         }
     }
-    else if(m_flickeringMode == operation_mode::FREE_MODE)
+    else if(m_ssvep->experimentMode() == operation_mode::FREE_MODE)
     {
         highlightFeedback(glColors::red, m_sessionFeedback[m_currentFlicker].digitValue()-1);
     }
@@ -337,23 +317,6 @@ void SsvepGL::receiveFeedback()
 
 }
 
-void SsvepGL::wait(int millisecondsToWait)
-{
-
-    qDebug()<< Q_FUNC_INFO << "wait duration:" << millisecondsToWait;
-
-    // from stackoverflow question:
-    // http://stackoverflow.com/questions/3752742/how-do-i-create-a-pause-wait-function-using-qt
-    QTime dieTime = QTime::currentTime().addMSecs( millisecondsToWait );
-    while( QTime::currentTime() < dieTime )
-    {
-        //        qDebug()<<"Flickering"<<QTime::currentTime();
-        QCoreApplication::processEvents( QEventLoop::AllEvents, 100);
-
-    }
-
-}
-
 void SsvepGL::initElements()
 {
 
@@ -361,7 +324,7 @@ void SsvepGL::initElements()
     double dy = 0.2;
     int isNullX = 0, isNullY = 0, sx=1;
 
-    if(m_nrElements == 1)
+    if(m_ssvep->nrElements() == 1)
     {
         m_vertices.resize(glUtils::POINTS_PER_SQUARE);
         m_vertices[0] = refPoints::topPoints[0];
@@ -384,7 +347,7 @@ void SsvepGL::initElements()
     else
     {
         // init vectors
-        int vectorsSize = m_nrElements * glUtils::POINTS_PER_SQUARE;
+        int vectorsSize = m_ssvep->nrElements() * glUtils::POINTS_PER_SQUARE;
         m_vertices.resize(vectorsSize);
         initRects();
         initColors();
@@ -407,7 +370,7 @@ void SsvepGL::initRects()
     int isNullX = 0, isNullY = 0, sx=1;
     int offset;
 
-    if(m_controlMode == control_mode::SYNC)
+    if( m_ssvep->controlMode() == control_mode::SYNC)
     {
 
         offset = glUtils::POINTS_PER_SQUARE;
@@ -438,10 +401,10 @@ void SsvepGL::initRects()
 void SsvepGL::initColors()
 {
 
-    int vectorsSize = m_nrElements * glUtils::POINTS_PER_SQUARE;
+    int vectorsSize = m_ssvep->nrElements() * glUtils::POINTS_PER_SQUARE;
     m_colors.resize(vectorsSize);
 
-    if(m_controlMode == control_mode::SYNC)
+    if( m_ssvep->controlMode() == control_mode::SYNC)
     {
         for (int i=0; i<m_colors.count(); i++)
         {
@@ -463,9 +426,9 @@ void SsvepGL::initColors()
 void SsvepGL::initIndices()
 {
     // init indices
-    m_vindices.resize(m_nrElements*glUtils::INDICES_PER_SQUARE);
+    m_vindices.resize(m_ssvep->nrElements()*glUtils::INDICES_PER_SQUARE);
     int k=0; int val = 0;
-    for(int i=0; i<(m_nrElements*glUtils::INDICES_PER_SQUARE); i+=glUtils::INDICES_PER_SQUARE)
+    for(int i=0; i<(m_ssvep->nrElements()*glUtils::INDICES_PER_SQUARE); i+=glUtils::INDICES_PER_SQUARE)
     {
         val = 2*k;
         m_vindices[i] =  val;
@@ -481,7 +444,7 @@ void SsvepGL::initIndices()
 void SsvepGL::highlightTarget()
 {
 
-    if(m_nrElements == 1)
+    if(m_ssvep->nrElements() == 1)
     {
         m_colors = {glColors::green, glColors::green, glColors::green, glColors::green};
     }
@@ -502,19 +465,19 @@ void SsvepGL::highlightTarget()
 void SsvepGL::refreshTarget()
 {
 
-    if(m_nrElements == 1)
+    if(m_ssvep->nrElements() == 1)
     {
         m_colors = {glColors::white, glColors::white, glColors::white, glColors::white};
     }
     else
     {
-        if(m_controlMode == control_mode::SYNC)
+        if( m_ssvep->controlMode() == control_mode::SYNC)
         {
 
             int tmp = m_flickeringSequence->sequence[m_currentFlicker] - 1;
             int squareIndex = tmp+(glUtils::VERTICES_PER_TRIANGLE*tmp);
             // qDebug()<< Q_FUNC_INFO << "squareIdx " << tmp;
-//            int squareIndex = tmp;
+            //            int squareIndex = tmp;
             m_colors[squareIndex] = glColors::white;
             m_colors[squareIndex + 1] = glColors::white;
             m_colors[squareIndex + 2] = glColors::white;
@@ -557,7 +520,7 @@ void SsvepGL::highlightFeedback(QVector3D feedbackColor, int feebdackIndex)
     m_colors[squareIndex + 2] = feedbackColor;
     m_colors[squareIndex + 3] = feedbackColor;
 
-   scheduleRedraw();
+    scheduleRedraw();
 
 
 }
@@ -584,7 +547,7 @@ void SsvepGL::initLogger()
         logsDir.mkdir(logsDir.path());
     }
     QString fileName;
-    if(m_flickeringMode == operation_mode::CALIBRATION)
+    if(m_ssvep->experimentMode() == operation_mode::CALIBRATION)
     {
 
         fileName = logsDir.filePath("ssvep_calib_" +QDateTime::currentDateTime().toString("dd_MM_yyyy_hh_mm_ss")+".txt");
@@ -608,6 +571,16 @@ void SsvepGL::scheduleRedraw()
     QOpenGLWindow::update();
 }
 
+SSVEP *SsvepGL::ssvep() const
+{
+    return m_ssvep;
+}
+
+void SsvepGL::setSsvep(SSVEP *ssvep)
+{
+    m_ssvep = ssvep;
+}
+
 void SsvepGL::update()
 {
 
@@ -622,13 +595,13 @@ void SsvepGL::update()
 
     int k;
 
-    if(m_nrElements == 1)
+    if(m_ssvep->nrElements() == 1)
     {
         k = 0;
     }
     else
     {
-        if (m_controlMode == control_mode::SYNC)
+        if (m_ssvep->controlMode() == control_mode::SYNC)
         {
             k = 0;
         }
@@ -651,22 +624,13 @@ void SsvepGL::update()
 }
 
 // Setters
-void SsvepGL::setControlMode(quint8 t_controlMode)
-{
-    m_controlMode = t_controlMode;
-}
-
-void SsvepGL::setStimulationMode(quint8 t_stimulationMode)
-{
-    m_stimulationMode = t_stimulationMode;
-}
 
 void SsvepGL::setFrequencies(QString freqs)
 {
 
     QStringList freqsList = freqs.split(',');
 
-    if (m_nrElements == 1)
+    if (m_ssvep->nrElements() == 1)
     {
 
         //        frequencies[0] = freqsList[0].toDouble();
@@ -680,27 +644,6 @@ void SsvepGL::setFrequencies(QString freqs)
             m_frequencies.append(str.toDouble());
         }
     }
-}
-
-void SsvepGL::setFlickeringMode(int t_mode)
-{
-    m_flickeringMode = t_mode;
-}
-
-void SsvepGL::setStimulationDuration(float t_stimDuration)
-{
-    m_stimulationDuration = t_stimDuration;
-}
-
-void SsvepGL::setBreakDuration(int t_brkDuration)
-{
-    m_breakDuration = t_brkDuration;
-    m_preTrialWait = t_brkDuration;
-}
-
-void SsvepGL::setSequence(int t_sequence)
-{
-    m_stimulationSequence = t_sequence;
 }
 
 void SsvepGL::setFeedbackPort(int t_port)

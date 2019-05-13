@@ -24,18 +24,15 @@ class Speller : public QWidget
 public:
     explicit Speller(QWidget *parent = 0);
     ~Speller();
-    virtual void initSpeller(ERP *prdg);
-    void setStimulationDuration(int t_stimDuration);
-    void setIsi(int t_isi);
-    void setNrSequence(int t_nrSequence);
-    void setNrTrials(int t_nrTrials);
-    void setSpellingMode(int t_spellingMode);
-    void setDesiredPhrase(const QString &t_desiredPhrase);
-    void setSpellerType(int t_spellerType);
-    void setFeedbackPort(quint16 t_feedbackPort);
 
-friend class Hybrid;
-friend class HybridStimulation;
+    ERP *erp() const;
+    void setERP(ERP *erp);
+    QString *desiredPhrase() const;
+    void setDesiredPhrase(const QString &t_desiredPhrase);
+    void setTimers(int t_stimulation, int t_isi);
+
+    friend class Hybrid;
+    friend class HybridStimulation;
 
 signals:
     void markerTag(uint64_t t_ovStimulation);
@@ -44,7 +41,7 @@ signals:
 protected slots:
 
     void preTrial();
-    void startTrial();    
+    void startTrial();
     void feedback();
     void postTrial();
     virtual void startFlashing();
@@ -55,8 +52,6 @@ protected slots:
 
 public slots:
 
-    void wait(int t_millisecondsToWait);
-    //
     void sendMarker(uint64_t t_ovStimulation){
         emit markerTag(t_ovStimulation);
     }
@@ -85,13 +80,9 @@ protected:
     bool m_stateFinished = false;
     bool m_running = true;
     int  m_state;
-
-    int m_stimulationDuration = 100;
-    int m_isi = 100;
-    int m_nrSequence = 5;
-    int m_nrTrials;
-    int m_spellingMode = operation_mode::CALIBRATION;
-    int m_spellerType = speller_type::FLASHING_SPELLER;
+    //
+    ERP *m_ERP;
+    //
     int m_preTrialWait = 2; // 2 seconds
     int m_preTrialCount = 0;
     quint16 m_feedbackPort = 12345;

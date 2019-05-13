@@ -3,10 +3,8 @@
 //
 #include <QOpenGLWindow>
 #include <QOpenGLFunctions>
-#include <QWidget>
 #include <QTimer>
 #include <QUdpSocket>
-#include <QLabel>
 #include <QTimer>
 #include <QOpenGLBuffer>
 #include <QOpenGLVertexArrayObject>
@@ -22,20 +20,17 @@ class SsvepGL : public QOpenGLWindow, protected QOpenGLFunctions
     Q_OBJECT
 
 public:
-    SsvepGL(SSVEP paradigm);
+    SsvepGL(SSVEP *paradigm);
     ~SsvepGL();
 
-    void setControlMode(quint8 t_controlMode);
     void setFrequencies(QString t_freqs);
-    void setFlickeringMode(int t_mode);
-    void setStimulationDuration(float t_stimDuration);
-    void setBreakDuration(int t_brkDuration);
-    void setSequence(int t_sequence);
     void setFeedbackPort(int t_port);
-    void setStimulationMode(quint8 t_stimulationMode);
 
-friend class Hybrid;
-friend class HybridStimulation;
+    SSVEP *ssvep() const;
+    void setSsvep(SSVEP *ssvep);
+
+    friend class Hybrid;
+    friend class HybridStimulation;
 
     // QOpenGLWindow interface
 protected:
@@ -65,10 +60,9 @@ private slots:
 
 public slots:
 
-    void wait(int millisecondsToWait);
     //    void create_layout();
     //    void refresh_layout();
-    //
+
     void sendMarker(uint64_t ovStimulation){
         emit markerTag(ovStimulation);
     }
@@ -88,15 +82,9 @@ private:
     int m_preTrialWait;
     int m_currentFlicker=0;
     int m_state;
-    int m_flickeringMode;
-    int m_nrElements; // = MAX_ELEMENT
-
+    //
+    SSVEP *m_ssvep;
     QList<double> m_frequencies;
-    float m_stimulationDuration;
-    int m_stimulationSequence;
-    int m_breakDuration;
-    quint8 m_stimulationMode;
-    quint8 m_controlMode;
 
     quint16 m_feedbackPort = 12345;
     QString m_sessionFeedback;

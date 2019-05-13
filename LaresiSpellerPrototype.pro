@@ -26,7 +26,6 @@ SOURCES += src\main.cpp\
     src\ssvepgl.cpp \
     src\utils.cpp \
     src\speller.cpp \
-    src\test.cpp \
     src/flashingspeller.cpp \
     src/facespeller.cpp \
     src/paradigm.cpp \
@@ -47,7 +46,6 @@ HEADERS  += include\configpanel.h \
     include\ssvepgl.h \
     include\utils.h \
     include\speller.h \
-    include\test.h \
     include\glutils.h \
     include/flashingspeller.h \
     include/facespeller.h \

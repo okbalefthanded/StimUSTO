@@ -102,15 +102,15 @@ void Speller::pauseFlashing()
         m_isiTimer->stop();
         m_stimTimer->stop();
 
-        wait(1000);
+        utils::wait(1000);
         sendMarker(OVTK_StimulationId_TrialStop);
         m_state = trial_state::FEEDBACK;
 
-        if(m_spellingMode == operation_mode::COPY_MODE || m_spellingMode == operation_mode::FREE_MODE)
+        if(m_ERP->experimentMode() == operation_mode::COPY_MODE || m_ERP->experimentMode() == operation_mode::FREE_MODE)
         {
             feedback();
         }
-        else if(m_spellingMode == operation_mode::CALIBRATION)
+        else if(m_ERP->experimentMode() == operation_mode::CALIBRATION)
         {
             postTrial();
         }
@@ -123,16 +123,16 @@ void Speller::preTrial()
 
     if (m_preTrialCount == 0)
     {
-        m_flashingSequence = new RandomFlashSequence(m_nrElements, m_nrSequence);
+        m_flashingSequence = new RandomFlashSequence(m_nrElements, m_ERP->nrSequences());
         sendMarker(OVTK_StimulationId_TrialStart);
 
-        if (m_spellingMode == operation_mode::CALIBRATION)
+        if (m_ERP->experimentMode() == operation_mode::CALIBRATION)
         {
             highlightTarget();
             m_text += m_desiredPhrase[m_currentLetter];
             m_textRow->setText(m_text);
         }
-        else if(m_spellingMode == operation_mode::COPY_MODE)
+        else if(m_ERP->experimentMode() == operation_mode::COPY_MODE)
         {
             highlightTarget();
         }
@@ -159,7 +159,7 @@ void Speller::feedback()
     m_textRow->setText(m_text);
 
 
-    if (m_spellingMode == operation_mode::COPY_MODE)
+    if (m_ERP->experimentMode() == operation_mode::COPY_MODE)
     {
 
         if(m_text[m_currentLetter - 1] == m_desiredPhrase[m_currentLetter - 1])
@@ -184,19 +184,19 @@ void Speller::postTrial()
     m_currentStimulation = 0;
     m_state = trial_state::PRE_TRIAL;
     // wait
-    wait(1000);
-
+    utils::wait(1000);
     refreshTarget();
 
     if (m_currentLetter >= m_desiredPhrase.length() &&
             m_desiredPhrase.length() != 1 &&
-            (m_spellingMode == operation_mode::COPY_MODE ||
-             m_spellingMode == operation_mode::CALIBRATION)
+            (m_ERP->experimentMode() == operation_mode::COPY_MODE ||
+             m_ERP->experimentMode() == operation_mode::CALIBRATION)
             )
     {
         qDebug()<< "Experiment End";
         sendMarker(OVTK_StimulationId_ExperimentStop);
-        wait(2000);
+        utils::wait(2000);
+        emit(slotTerminated());
         this->close();
     }
     else if(m_desiredPhrase.length() == 1)
@@ -216,7 +216,7 @@ void Speller::postTrial()
 void Speller::receiveFeedback()
 {
     // wait for OV python script to write in UDP feedback socket
-    wait(200);
+    utils::wait(200);
     QHostAddress sender;
     quint16 senderPort;
     QByteArray *buffer = new QByteArray();
@@ -224,7 +224,12 @@ void Speller::receiveFeedback()
     buffer->resize(m_feedbackSocket->pendingDatagramSize());
     // qDebug() << "buffer size" << buffer->size();
 
-    m_feedbackSocket->readDatagram(buffer->data(), buffer->size(), &sender, &senderPort);
+    //m_feedbackSocket->readDatagram(buffer->data(), buffer->size(), &sender, &senderPort);
+    while(m_feedbackSocket->hasPendingDatagrams())
+    {
+        m_feedbackSocket->readDatagram(buffer->data(), buffer->size(), &sender, &senderPort);
+    }
+
     //    feedback_socket->waitForBytesWritten();
     m_text += buffer->data();
     // qDebug()<< "Feedback Data" << buffer->data();
@@ -232,40 +237,16 @@ void Speller::receiveFeedback()
 
 bool Speller::isTarget()
 {
-    //    int row, column;
     int index = m_flashingSequence->sequence[m_currentStimulation] - 1;
-    //    row = index / nr_elements;
-    //    column = index % nr_elements;
-
-
-    //    if(desired_phrase[m_currentLetter]==presented_letters[index])
-    //    {
-    //        //        qDebug()<< "letter : " << letters[row][column];
-    //        //        qDebug()<< "desired letter: " << desired_phrase[m_currentLetter];
-    //        //        qDebug()<< "flashing: "<< flashingSequence->sequence[m_currentStimulation];
-    //        //        qDebug()<< "presented letter:" << presented_letters[index];
-    //        //        qDebug()<< "row: " << row << " column: "<< column;
-    //        return true;
-    //    }
-    //    else
-    //    {
-    //        return false;
-    //    }
 
     if(m_desiredPhrase[m_currentLetter] == m_presentedLetters[index][0])
     {
-        //                qDebug()<< "letter : " << letters[row][column];
-        //        qDebug()<< "desired letter: " << m_desiredPhrase[m_currentLetter];
-        //        qDebug()<< "flashing: "<< flashingSequence->sequence[m_currentStimulation];
-        //        qDebug()<< "presented letter:" << m_presentedLetters[index];
-        //        qDebug()<< "row: " << row << " column: "<< column;
         return true;
     }
     else
     {
         return false;
     }
-
 }
 
 void Speller::highlightTarget()
@@ -300,30 +281,14 @@ void Speller::refreshTarget()
             widget()->setStyleSheet("QLabel { color : gray; font: 40pt }");
 }
 
-void Speller::wait(int t_millisecondsToWait)
-{
-
-    qDebug()<< Q_FUNC_INFO;
-
-    // from stackoverflow question:
-    // http://stackoverflow.com/questions/3752742/how-do-i-create-a-pause-wait-function-using-qt
-    QTime dieTime = QTime::currentTime().addMSecs( t_millisecondsToWait );
-    while( QTime::currentTime() < dieTime )
-    {
-        //        qDebug()<<"waiting..."<<QTime::currentTime();
-        QCoreApplication::processEvents( QEventLoop::AllEvents, 100);
-
-    }
-}
-
 void Speller::sendStimulationInfo()
 {
     sendMarker(OVTK_StimulationId_VisualStimulationStart);
     sendMarker(config::OVTK_StimulationLabel_Base + m_flashingSequence->sequence[m_currentStimulation]);
 
     // send target marker
-    if (m_spellingMode == operation_mode::CALIBRATION ||
-            m_spellingMode == operation_mode::COPY_MODE)
+    if (m_ERP->experimentMode() == operation_mode::CALIBRATION ||
+            m_ERP->experimentMode() == operation_mode::COPY_MODE)
     {
         if (isTarget())
         {
@@ -353,47 +318,27 @@ void Speller::switchStimulationTimers()
     }
 }
 
-/* Setters */
-void Speller::setSpellerType(int t_spellerType)
+ERP *Speller::erp() const
 {
-    m_spellerType = t_spellerType;
+    return m_ERP;
 }
 
-void Speller::setFeedbackPort(quint16 t_feedbackPort)
+void Speller::setERP(ERP *erp)
 {
-    m_feedbackPort = t_feedbackPort;
+    m_ERP = erp;
+    setTimers(m_ERP->stimulationDuration(), m_ERP->breakDuration());
+    setDesiredPhrase(m_ERP->desiredPhrase());
 }
 
-void Speller::setStimulationDuration(int t_stimDuration)
+void Speller::setTimers(int t_stimulation, int t_isi)
 {
-    m_stimulationDuration = t_stimDuration;
-    m_stimTimer->setInterval(m_stimulationDuration);
+    m_stimTimer->setInterval(t_stimulation);
+    m_isiTimer->setInterval(t_isi);
 }
 
 void Speller::setDesiredPhrase(const QString &t_desiredPhrase)
 {
     m_desiredPhrase = t_desiredPhrase;
-}
-
-void Speller::setSpellingMode(int t_spellingMode)
-{
-    m_spellingMode = t_spellingMode;
-}
-
-void Speller::setNrTrials(int t_nrTrials)
-{
-    m_nrTrials = t_nrTrials;
-}
-
-void Speller::setNrSequence(int t_nrSequence)
-{
-    m_nrSequence = t_nrSequence;
-}
-
-void Speller::setIsi(int t_isi)
-{
-    m_isi = t_isi;
-    m_isiTimer->setInterval(t_isi);
 }
 
 void Speller::createLayout()
@@ -447,4 +392,4 @@ Speller::~Speller()
     delete ui;
 }
 
-void Speller::initSpeller(ERP *prdg){}
+

@@ -7,7 +7,7 @@ class FlashingSpeller : public Speller
 {
     void startFlashing();
 public:
-    virtual void initSpeller(ERP *prdg);
+
 };
 
 

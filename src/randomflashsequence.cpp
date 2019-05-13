@@ -71,4 +71,16 @@ QString RandomFlashSequence::toString()
     return seqStr;
 }
 
+QVector<int> RandomFlashSequence::toSequence(QString seqStr)
+{
+    QVector<int> intSeq(seqStr.length());
+
+    for (int i=0;i<seqStr.length();i++)
+    {
+        intSeq[i] = seqStr.at(i).digitValue();
+    }
+
+    return intSeq;
+}
+
 

@@ -15,6 +15,7 @@ public:
 
     inline QVector<int> range(int start, int end);
     QString toString();
+    static QVector<int> toSequence(QString seqStr);
     QVector<int> sequence;
 
 };
