@@ -151,6 +151,11 @@ void SsvepGL::startTrial()
 
 void SsvepGL::preTrial()
 {
+    if(m_trials == 0)
+    {
+        sendMarker(OVTK_StimulationId_ExperimentStart);
+    }
+
 
     if(m_firstRun)
     {
@@ -221,7 +226,7 @@ void SsvepGL::postTrial()
 
     //    refreshTarget();
     ++m_currentFlicker;
-
+    ++m_trials;
     if (m_currentFlicker < m_flickeringSequence->sequence.size() &&
             m_flickeringSequence->sequence.length() != 1 &&
             (m_ssvep->experimentMode() == operation_mode::COPY_MODE || m_ssvep->experimentMode() == operation_mode::CALIBRATION))
@@ -236,7 +241,7 @@ void SsvepGL::postTrial()
     }
     else
     {
-        qDebug()<< "Experiment End";
+        qDebug()<< "Experiment End, closing SSVEP stimulation";
         sendMarker(OVTK_StimulationId_ExperimentStop);
         utils::wait(2000);
         emit(slotTerminated());

@@ -22,7 +22,6 @@ SOURCES += src\main.cpp\
     src\ovmarkersender.cpp \
     src\randomflashsequence.cpp \
     src\ellipselayout.cpp \
-    src\hybridgridstimulation.cpp \
     src\ssvepgl.cpp \
     src\utils.cpp \
     src\speller.cpp \
@@ -42,7 +41,6 @@ HEADERS  += include\configpanel.h \
     include\ovmarkersender.h \
     include\randomflashsequence.h \
     include\ellipselayout.h \
-    include\hybridgridstimulation.h \
     include\ssvepgl.h \
     include\utils.h \
     include\speller.h \
@@ -61,8 +59,6 @@ INCLUDEPATH += include\
 
 FORMS    += src\ui\configpanel.ui \
     src\ui\ssvep.ui \
-    src\ui\hybridstimulation.ui \
-    src\ui\hybridgridstimulation.ui \
     src\ui\ssvepsingle.ui \
     src\ui\speller.ui
 

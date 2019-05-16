@@ -92,7 +92,6 @@ void Speller::pauseFlashing()
             widget()->setStyleSheet("QLabel { color : gray; font: 40pt }");
 
     switchStimulationTimers();
-    //    qDebug("Isi Timer started");
     ++m_currentStimulation;
 
 
@@ -120,6 +119,11 @@ void Speller::pauseFlashing()
 void Speller::preTrial()
 {
     qDebug()<< Q_FUNC_INFO;
+
+    if(m_trials == 0)
+    {
+        sendMarker(OVTK_StimulationId_ExperimentStart);
+    }
 
     if (m_preTrialCount == 0)
     {
@@ -181,6 +185,7 @@ void Speller::postTrial()
 {
     qDebug()<< Q_FUNC_INFO;
 
+    ++m_trials;
     m_currentStimulation = 0;
     m_state = trial_state::PRE_TRIAL;
     // wait
@@ -193,7 +198,7 @@ void Speller::postTrial()
              m_ERP->experimentMode() == operation_mode::CALIBRATION)
             )
     {
-        qDebug()<< "Experiment End";
+        qDebug()<< "Experiment End, closing speller";
         sendMarker(OVTK_StimulationId_ExperimentStop);
         utils::wait(2000);
         emit(slotTerminated());

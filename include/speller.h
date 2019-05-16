@@ -74,6 +74,7 @@ protected:
     int m_currentStimulation = 0;
     int m_currentLetter = 0;
     int m_currentTarget = 0;
+    int m_trials = 0;
 
     bool m_stimulus = true;
 

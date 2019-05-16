@@ -1,5 +1,6 @@
 //
 #include <QtDebug>
+#include <QApplication>
 //
 #include "hybridstimulation.h"
 #include "facespeller.h"
@@ -72,18 +73,14 @@ void HybridStimulation::startTrial()
 
         if(m_switchStimulation)
         {
-            qDebug() << Q_FUNC_INFO << "ERP trial switch state:" << m_switchStimulation;
-            // m_ERPspeller->show();
-            // m_ssvepStimulation->hide();
+            qDebug() << Q_FUNC_INFO << "ERP trial";
             swichStimWindows();
             m_ERPspeller->startTrial();
         }
 
         else
         {
-            qDebug() << Q_FUNC_INFO << "SSVEP trial switch state:" << m_switchStimulation;
-            //  m_ERPspeller->hide();
-            //  m_ssvepStimulation->show();
+            qDebug() << Q_FUNC_INFO << "SSVEP trial";
             swichStimWindows();
             m_ssvepStimulation->startTrial();
         }
@@ -92,34 +89,19 @@ void HybridStimulation::startTrial()
     {
         hybridPostTrial();
     }
-
-
 }
 
 void HybridStimulation::switchState()
 {
-
     qDebug() << Q_FUNC_INFO;
 
-    /* else if(m_hybridState == trial_state::STIMULUS)
-        m_hybridState = trial_state::POST_TRIAL;
-
-    else if(m_hybridState == trial_state::POST_TRIAL)
-        m_hybridState = trial_state::PRE_TRIAL;
-    */
-
-    //   if(m_currentTrial >= m_trials)
-    //   {
-    //       m_hybridState = trial_state::POST_TRIAL;
-    //   }
-    // if(!m_switchStimulation)
-    //     m_hybridState = trial_state::PRE_TRIAL;
     if(!m_switchStimulation)
+    {
         m_hybridState = trial_state::POST_TRIAL;
+    }
     m_switchStimulation = !m_switchStimulation;
 
     startTrial();
-
 }
 
 void HybridStimulation::swichStimWindows()
@@ -140,21 +122,22 @@ void HybridStimulation::swichStimWindows()
 void HybridStimulation::hybridPostTrial()
 {
     qDebug() << "[HYBRID POST TRIAL]" << Q_FUNC_INFO;
-    // switchState();
+
     ++m_currentTrial;
     m_hybridState = trial_state::PRE_TRIAL;
 
-    if(m_currentTrial <= m_trials)
+    if(m_currentTrial < m_trials)
     {
         startTrial();
     }
     else
     {
-        qDebug() << "Experiment End";
+        qDebug() << "Hybrid Experiment End";
+        m_ERPspeller->close();
+        m_ssvepStimulation->close();
+        emit experimentEnd();
     }
 }
-
-
 
 void HybridStimulation::initERPspeller(ERP *erp)
 {

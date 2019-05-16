@@ -20,6 +20,8 @@ public:
     void initERPspeller(ERP *erp);
     void initSSVEP(SSVEP *ssvep);
 
+signals:
+    void experimentEnd();
 private slots:
     void hybridPreTrial();
     void startTrial();
@@ -27,6 +29,7 @@ private slots:
     void hybridPostTrial();
     void switchState();
     void swichStimWindows();
+
 
 private:
     int m_hybridState = trial_state::PRE_TRIAL;

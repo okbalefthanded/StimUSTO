@@ -82,6 +82,7 @@ private:
     int m_preTrialWait;
     int m_currentFlicker=0;
     int m_state;
+    int m_trials=0;
     //
     SSVEP *m_ssvep;
     QList<double> m_frequencies;

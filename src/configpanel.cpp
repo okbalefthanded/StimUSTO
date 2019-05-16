@@ -1,14 +1,13 @@
 //
 #include <QMessageBox>
 #include <QTimer>
+#include <QGuiApplication>
 #include <serializable.h>
 //
 #include "configpanel.h"
 #include "ui_configpanel.h"
 #include "ovmarkersender.h"
 #include "speller.h"
-// #include "hybridelipsestimulation.h"
-// #include "hybridgridstimulation.h"
 #include "ssvepgl.h"
 #include "hybridstimulation.h"
 #include "utils.h"
@@ -178,11 +177,18 @@ void ConfigPanel::on_stopSpeller_clicked()
 
 }
 
-//TODO
+
 //Quit speller
 void ConfigPanel::on_quitSpeller_clicked()
 {
-
+    if(noGui)
+    {
+        QGuiApplication::quit();
+    }
+    else
+    {
+        this->close();
+    }
 }
 
 void ConfigPanel::on_initHybrid_clicked()
@@ -216,6 +222,7 @@ void ConfigPanel::on_initHybrid_clicked()
         SsvepGL *ssvepStimulation = createSSVEP(hybridParadigm->m_SSVEPparadigm);
         HybridStimulation *hybrid = new HybridStimulation(hybridParadigm, speller, ssvepStimulation);
         connectParadigm(hybrid, launchTimer);
+        connect(hybrid, SIGNAL(experimentEnd()), this, SLOT(on_quitSpeller_clicked()));
     }
 }
 
@@ -355,6 +362,7 @@ void ConfigPanel::connectParadigm(QObject *pr, QTimer *timer)
     else
     {
         connect(ui->startSpeller, SIGNAL(clicked()), pr, SLOT(startTrial()));
+
     }
 }
 
