@@ -12,11 +12,11 @@
 #include "utils.h"
 #include "glutils.h"
 //
-SsvepGL::SsvepGL(SSVEP *paradigm)
+SsvepGL::SsvepGL(SSVEP *paradigm, int t_port)
 {
     m_ssvep = paradigm;
     setFrequencies(m_ssvep->frequencies());
-    setFeedbackPort(12345);
+    setFeedbackPort(t_port);
     m_preTrialWait = m_ssvep->breakDuration();
 
     // set vertices, vertices indeices & colors
@@ -31,6 +31,7 @@ SsvepGL::SsvepGL(SSVEP *paradigm)
 
     m_feedbackSocket = new QUdpSocket(this);
     m_feedbackSocket->bind(QHostAddress::LocalHost, m_feedbackPort);
+
     connect(m_feedbackSocket, SIGNAL(readyRead()), this, SLOT(receiveFeedback()));
     //
     initLogger();
@@ -133,7 +134,7 @@ void SsvepGL::paintGL()
 
 void SsvepGL::startTrial()
 {
-    qDebug()<< "[TRIAL START]" << Q_FUNC_INFO;
+    //    qDebug()<< "[TRIAL START]" << Q_FUNC_INFO;
 
     if (m_state == trial_state::PRE_TRIAL)
     {
@@ -209,6 +210,7 @@ void SsvepGL::postTrial()
     {
 
         utils::wait(500);
+        //        qDebug() << "**Feedbacking**";
         feedback();
         // feedback for 1 sec & refresh
         utils::wait(1000);
@@ -251,7 +253,7 @@ void SsvepGL::postTrial()
 
 void SsvepGL::Flickering()
 {
-    qDebug()<< Q_FUNC_INFO;
+    //    qDebug()<< Q_FUNC_INFO;
 
     if(m_index == 0)
     {
@@ -283,6 +285,7 @@ void SsvepGL::feedback()
     // receiveFeedback();
     m_feedbackSocket->waitForReadyRead(500);
 
+
     if(m_ssvep->experimentMode() == operation_mode::COPY_MODE)
     {
 
@@ -303,8 +306,6 @@ void SsvepGL::feedback()
 
 void SsvepGL::receiveFeedback()
 {
-    qDebug()<< Q_FUNC_INFO;
-
     // wait for OV python script to write in UDP feedback socket
     // wait(500);
     QHostAddress sender;
@@ -319,6 +320,7 @@ void SsvepGL::receiveFeedback()
     }
     log->write(buffer->data());
     m_sessionFeedback += buffer->data();
+    qDebug() << Q_FUNC_INFO << "SSVEP FEEDBACK "<< m_sessionFeedback;
 
 }
 

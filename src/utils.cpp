@@ -61,7 +61,7 @@ QVector<double> gen_flick_sin(double freq, int refreshRate, float length)
 //
 void wait(int millisecondsToWait)
 {
-    qDebug()<< Q_FUNC_INFO;
+//    qDebug()<< Q_FUNC_INFO;
 
     // from stackoverflow question:
     // http://stackoverflow.com/questions/3752742/how-do-i-create-a-pause-wait-function-using-qt

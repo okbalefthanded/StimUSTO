@@ -20,7 +20,7 @@ class SsvepGL : public QOpenGLWindow, protected QOpenGLFunctions
     Q_OBJECT
 
 public:
-    SsvepGL(SSVEP *paradigm);
+    SsvepGL(SSVEP *paradigm, int t_port);
     ~SsvepGL();
 
     void setFrequencies(QString t_freqs);

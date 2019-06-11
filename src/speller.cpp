@@ -9,6 +9,7 @@
 #include <QThread>
 #include <QTime>
 #include <QPropertyAnimation>
+#include <QDateTime>
 //
 #include "speller.h"
 #include "ui_speller.h"
@@ -60,12 +61,13 @@ Speller::Speller(QWidget *parent) :
     m_feedbackSocket = new QUdpSocket(this);
     m_feedbackSocket->bind(QHostAddress::LocalHost, m_feedbackPort);
 
+
     m_state = trial_state::PRE_TRIAL;
 }
 
 void Speller::startTrial()
 {
-    qDebug()<< "[TRIAL START]" << Q_FUNC_INFO;
+//     qDebug()<< "[TRIAL START]" << Q_FUNC_INFO;
 
     if (m_state == trial_state::PRE_TRIAL)
     {
@@ -118,7 +120,7 @@ void Speller::pauseFlashing()
 
 void Speller::preTrial()
 {
-    qDebug()<< Q_FUNC_INFO;
+//    qDebug()<< Q_FUNC_INFO;
 
     if(m_trials == 0)
     {
@@ -160,8 +162,8 @@ void Speller::feedback()
     qDebug() << Q_FUNC_INFO;
 
     receiveFeedback();
-    m_textRow->setText(m_text);
 
+    m_textRow->setText(m_text);
 
     if (m_ERP->experimentMode() == operation_mode::COPY_MODE)
     {
@@ -178,12 +180,13 @@ void Speller::feedback()
 
         }
     }
+
     postTrial();
 }
 
 void Speller::postTrial()
 {
-    qDebug()<< Q_FUNC_INFO;
+//    qDebug()<< Q_FUNC_INFO;
 
     ++m_trials;
     m_currentStimulation = 0;
@@ -220,8 +223,10 @@ void Speller::postTrial()
 
 void Speller::receiveFeedback()
 {
+    //qDebug() << Q_FUNC_INFO;
+    //qDebug() << "FEEDBACK SOCKET PORT" << m_feedbackPort;
     // wait for OV python script to write in UDP feedback socket
-    utils::wait(200);
+    utils::wait(500);
     QHostAddress sender;
     quint16 senderPort;
     QByteArray *buffer = new QByteArray();
@@ -235,9 +240,9 @@ void Speller::receiveFeedback()
         m_feedbackSocket->readDatagram(buffer->data(), buffer->size(), &sender, &senderPort);
     }
 
-    //    feedback_socket->waitForBytesWritten();
+    //  feedback_socket->waitForBytesWritten();
     m_text += buffer->data();
-    // qDebug()<< "Feedback Data" << buffer->data();
+    qDebug()<< Q_FUNC_INFO <<"Feedback Data" << buffer->data();
 }
 
 bool Speller::isTarget()

@@ -42,7 +42,7 @@ HybridStimulation::HybridStimulation(Hybrid *hybridStimulation, Speller *ERPspel
 
 void HybridStimulation::hybridPreTrial()
 {
-    qDebug() << "[HYBRID PRETRIAL START]" << Q_FUNC_INFO;
+    // qDebug() << "[HYBRID PRETRIAL START]" << Q_FUNC_INFO;
 
     if(m_hybridStimulaiton->experimentMode() == operation_mode::CALIBRATION)
     {
@@ -61,7 +61,7 @@ void HybridStimulation::hybridPreTrial()
 
 void HybridStimulation::startTrial()
 {
-    qDebug() << "[HYBRID TRIAL START]" << Q_FUNC_INFO;
+//    qDebug() << "[HYBRID TRIAL START]" << Q_FUNC_INFO;
 
     if(m_hybridState == trial_state::PRE_TRIAL)
     {
@@ -93,7 +93,7 @@ void HybridStimulation::startTrial()
 
 void HybridStimulation::switchState()
 {
-    qDebug() << Q_FUNC_INFO;
+//    qDebug() << Q_FUNC_INFO;
 
     if(!m_switchStimulation)
     {
@@ -121,7 +121,7 @@ void HybridStimulation::swichStimWindows()
 
 void HybridStimulation::hybridPostTrial()
 {
-    qDebug() << "[HYBRID POST TRIAL]" << Q_FUNC_INFO;
+//    qDebug() << "[HYBRID POST TRIAL]" << Q_FUNC_INFO;
 
     ++m_currentTrial;
     m_hybridState = trial_state::PRE_TRIAL;
@@ -172,7 +172,7 @@ void HybridStimulation::initSSVEP(SSVEP *ssvep)
     // format.setVersion(3,3);
     format.setVersion(3,0); // ANGLE supports ES 3.0, higher versions raise exceptions
 
-    m_ssvepStimulation = new SsvepGL(ssvep);
+    m_ssvepStimulation = new SsvepGL(ssvep, 12346);
     m_ssvepStimulation->setFormat(format);
 
     if(QGuiApplication::screens().size() == 2)

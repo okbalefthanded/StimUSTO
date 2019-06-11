@@ -149,7 +149,7 @@ void ConfigPanel::on_initSSVEP_clicked()
         launchTimer->setInterval(10000);
         launchTimer->setSingleShot(true);
 
-        SsvepGL *ssvepStimulation = createSSVEP(ssvepParadigm);
+        SsvepGL *ssvepStimulation = createSSVEP(ssvepParadigm, 12345);
         connectParadigm(ssvepStimulation, launchTimer);
         ssvepStimulation->show();
 
@@ -219,7 +219,8 @@ void ConfigPanel::on_initHybrid_clicked()
 
         Speller *speller = createSpeller(hybridParadigm->m_ERPparadigm->stimulationType());
         speller->setERP(hybridParadigm->m_ERPparadigm);
-        SsvepGL *ssvepStimulation = createSSVEP(hybridParadigm->m_SSVEPparadigm);
+        SsvepGL *ssvepStimulation = createSSVEP(hybridParadigm->m_SSVEPparadigm, 12346);
+
         HybridStimulation *hybrid = new HybridStimulation(hybridParadigm, speller, ssvepStimulation);
         connectParadigm(hybrid, launchTimer);
         connect(hybrid, SIGNAL(experimentEnd()), this, SLOT(on_quitSpeller_clicked()));
@@ -305,7 +306,7 @@ SSVEP *ConfigPanel::initParadigmSSVEPGui()
     return ssvepParadigm;
 }
 
-SsvepGL *ConfigPanel::createSSVEP(SSVEP *t_ssvep)
+SsvepGL *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
 {
 
     QSurfaceFormat format;
@@ -314,7 +315,7 @@ SsvepGL *ConfigPanel::createSSVEP(SSVEP *t_ssvep)
     // format.setVersion(3,3);
     format.setVersion(3,0); // ANGLE supports ES 3.0, higher versions raise exceptions
 
-    SsvepGL *ssvepStimulation = new SsvepGL(t_ssvep);
+    SsvepGL *ssvepStimulation = new SsvepGL(t_ssvep, t_port);
     ssvepStimulation->setFormat(format);
 
     if(QGuiApplication::screens().size() == 2)
