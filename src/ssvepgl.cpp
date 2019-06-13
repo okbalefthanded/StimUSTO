@@ -210,7 +210,6 @@ void SsvepGL::postTrial()
     {
 
         utils::wait(500);
-        //        qDebug() << "**Feedbacking**";
         feedback();
         // feedback for 1 sec & refresh
         utils::wait(1000);
@@ -319,7 +318,17 @@ void SsvepGL::receiveFeedback()
         m_feedbackSocket->readDatagram(buffer->data(), buffer->size(), &sender, &senderPort);
     }
     log->write(buffer->data());
-    m_sessionFeedback += buffer->data();
+
+    if (m_flickeringSequence->sequence.length() == 1) // Hybrid stimulation mode
+    {
+
+        m_sessionFeedback = buffer->data();
+    }
+    else
+    {
+        m_sessionFeedback += buffer->data();
+    }
+
     qDebug() << Q_FUNC_INFO << "SSVEP FEEDBACK "<< m_sessionFeedback;
 
 }

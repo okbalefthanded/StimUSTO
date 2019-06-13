@@ -19,6 +19,7 @@
 #include "ssvep.h"
 #include "hybrid.h"
 #include "jsonserializer.h"
+#include "ovtk_stimulations.h"
 //
 ConfigPanel::ConfigPanel(QWidget *parent) :
     QMainWindow(parent),
@@ -181,6 +182,8 @@ void ConfigPanel::on_stopSpeller_clicked()
 //Quit speller
 void ConfigPanel::on_quitSpeller_clicked()
 {
+    m_markerSender->sendStimulation(OVTK_StimulationId_ExperimentStop);
+
     if(noGui)
     {
         QGuiApplication::quit();
