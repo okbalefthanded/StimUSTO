@@ -172,6 +172,7 @@ void Speller::feedback()
         {
             this->layout()->itemAt(m_currentTarget)->
                     widget()->setStyleSheet("QLabel { color : green; font: 40pt }");
+           ++m_correct;
         }
         else
         {
@@ -180,6 +181,8 @@ void Speller::feedback()
 
         }
     }
+
+
 
     postTrial();
 }
@@ -201,6 +204,8 @@ void Speller::postTrial()
              m_ERP->experimentMode() == operation_mode::CALIBRATION)
             )
     {
+        m_correct = (m_correct / m_desiredPhrase.length()) * 100;
+        qDebug()<< "Accuracy on ERP session: " << m_correct;
         qDebug()<< "Experiment End, closing speller";
         sendMarker(OVTK_StimulationId_ExperimentStop);
         utils::wait(2000);

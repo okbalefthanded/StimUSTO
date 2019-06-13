@@ -35,7 +35,11 @@ private:
     int m_hybridState = trial_state::PRE_TRIAL;
     int m_trials;
     int m_currentTrial = 0;
+    float m_ERPCorrect = 0;
+    float m_SSVEPCorrect = 0;
     bool m_switchStimulation = true;
+    QString m_ERPFeedback = "";
+    QString m_SSVEPFeedback = "";
     Hybrid *m_hybridStimulaiton;
     Speller *m_ERPspeller;
     SsvepGL *m_ssvepStimulation;

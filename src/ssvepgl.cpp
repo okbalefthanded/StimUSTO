@@ -242,6 +242,8 @@ void SsvepGL::postTrial()
     }
     else
     {
+        m_correct = (m_correct / m_flickeringSequence->sequence.size()) * 100;
+        qDebug()<< "Accuracy in SSVEP session: " << m_correct;
         qDebug()<< "Experiment End, closing SSVEP stimulation";
         sendMarker(OVTK_StimulationId_ExperimentStop);
         utils::wait(2000);
@@ -268,7 +270,7 @@ void SsvepGL::Flickering()
 
     qDebug()<<"Stimulation "<<m_flickeringSequence->sequence[m_currentFlicker];
 
-    while(m_index < m_flicker[0].size())
+    while(m_index <= m_flicker[0].size())
     {
         QCoreApplication::processEvents(QEventLoop::AllEvents);
     }
@@ -291,6 +293,7 @@ void SsvepGL::feedback()
         if(m_sessionFeedback[m_currentFlicker].digitValue() == m_flickeringSequence->sequence[m_currentFlicker])
         {
             highlightFeedback(glColors::red, m_flickeringSequence->sequence[m_currentFlicker]-1);
+            ++m_correct;
         }
         else
         {

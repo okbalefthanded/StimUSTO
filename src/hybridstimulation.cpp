@@ -61,7 +61,7 @@ void HybridStimulation::hybridPreTrial()
 
 void HybridStimulation::startTrial()
 {
-//    qDebug() << "[HYBRID TRIAL START]" << Q_FUNC_INFO;
+    //    qDebug() << "[HYBRID TRIAL START]" << Q_FUNC_INFO;
 
     if(m_hybridState == trial_state::PRE_TRIAL)
     {
@@ -93,7 +93,7 @@ void HybridStimulation::startTrial()
 
 void HybridStimulation::switchState()
 {
-//    qDebug() << Q_FUNC_INFO;
+    //    qDebug() << Q_FUNC_INFO;
 
     if(!m_switchStimulation)
     {
@@ -121,7 +121,16 @@ void HybridStimulation::swichStimWindows()
 
 void HybridStimulation::hybridPostTrial()
 {
-//    qDebug() << "[HYBRID POST TRIAL]" << Q_FUNC_INFO;
+    qDebug() << "[HYBRID POST TRIAL]" << Q_FUNC_INFO;
+
+    if(m_hybridStimulaiton->experimentMode() == operation_mode::COPY_MODE || m_hybridStimulaiton->experimentMode() == operation_mode::FREE_MODE)
+    {
+        m_ERPFeedback = m_ERPspeller->m_text;
+        m_SSVEPFeedback += m_ssvepStimulation->m_sessionFeedback;
+        qDebug() << Q_FUNC_INFO << "ERP feedback: " << m_ERPFeedback;
+        qDebug() << Q_FUNC_INFO << "SSVEP feedback: " << m_SSVEPFeedback;
+    }
+
 
     ++m_currentTrial;
     m_hybridState = trial_state::PRE_TRIAL;
@@ -132,10 +141,18 @@ void HybridStimulation::hybridPostTrial()
     }
     else
     {
+        if(m_hybridStimulaiton->experimentMode() == operation_mode::COPY_MODE)
+        {
+            m_ERPCorrect = (m_ERPspeller->m_correct / m_trials) * 100;
+            m_SSVEPCorrect = (m_ssvepStimulation->m_correct / m_trials) * 100;
+            qDebug()<< "Accuracy in ERP: " << m_ERPCorrect;
+            qDebug()<< "Accuracy in SSVEP: "<< m_SSVEPCorrect;
+        }
+
         qDebug() << "Hybrid Experiment End";
-        m_ERPspeller->close();
-        m_ssvepStimulation->close();
-        emit experimentEnd();
+        //        m_ERPspeller->close();
+        //        m_ssvepStimulation->close();
+        //        emit experimentEnd();
     }
 }
 
