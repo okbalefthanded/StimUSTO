@@ -152,11 +152,11 @@ void SsvepGL::startTrial()
 
 void SsvepGL::preTrial()
 {
+
     if(m_trials == 0)
     {
         sendMarker(OVTK_StimulationId_ExperimentStart);
     }
-
 
     if(m_firstRun)
     {
@@ -167,7 +167,6 @@ void SsvepGL::preTrial()
 
     if (m_preTrialCount == 1)
     {
-
         sendMarker(OVTK_StimulationId_TrialStart);
 
         if (m_ssvep->experimentMode() == operation_mode::CALIBRATION ||
@@ -179,7 +178,11 @@ void SsvepGL::preTrial()
     }
     else if(m_preTrialCount == 2)
     {
-        refreshTarget();
+        if (m_ssvep->experimentMode() == operation_mode::CALIBRATION ||
+                m_ssvep->experimentMode() == operation_mode::COPY_MODE)
+        {
+            refreshTarget();
+        }
     }
 
     m_preTrialTimer->start();
@@ -187,7 +190,8 @@ void SsvepGL::preTrial()
 
     if (m_preTrialCount > m_preTrialWait)
     {
-        refreshTarget();
+        // refreshTarget();
+        scheduleRedraw();
         m_preTrialTimer->stop();
         m_preTrialCount = 0;
         m_state = trial_state::STIMULUS;
@@ -198,7 +202,6 @@ void SsvepGL::postTrial()
 {
 
     //    sendMarker(OVTK_StimulationId_TrialStop);
-    //    qDebug()<< Q_FUNC_INFO << "disconnecting frameswapped to update "<<"index"<< index;
     disconnect(this, SIGNAL(frameSwapped()), this, SLOT(update()));
     initElements();
 
@@ -234,7 +237,7 @@ void SsvepGL::postTrial()
     {
         startTrial();
     }
-    else if (m_flickeringSequence->sequence.length() == 1)
+    else if (m_flickeringSequence->sequence.length() <= 1)
     {
         m_currentFlicker = 0;
         emit(slotTerminated());
@@ -254,7 +257,6 @@ void SsvepGL::postTrial()
 
 void SsvepGL::Flickering()
 {
-    //    qDebug()<< Q_FUNC_INFO;
 
     if(m_index == 0)
     {
@@ -267,11 +269,11 @@ void SsvepGL::Flickering()
     //    sendMarker(OVTK_StimulationId_VisualSteadyStateStimulationStart);
     //    qDebug()<< Q_FUNC_INFO << "markers sent" << "current time: " << QTime::currentTime().msec();
 
-
     qDebug()<<"Stimulation "<<m_flickeringSequence->sequence[m_currentFlicker];
 
     while(m_index <= m_flicker[0].size())
     {
+
         QCoreApplication::processEvents(QEventLoop::AllEvents);
     }
 
@@ -285,7 +287,6 @@ void SsvepGL::feedback()
 {
     // receiveFeedback();
     m_feedbackSocket->waitForReadyRead(500);
-
 
     if(m_ssvep->experimentMode() == operation_mode::COPY_MODE)
     {
@@ -526,8 +527,6 @@ void SsvepGL::refreshTarget()
         }
     }
     scheduleRedraw();
-
-
 }
 
 void SsvepGL::highlightFeedback(QVector3D feedbackColor, int feebdackIndex)
@@ -603,8 +602,7 @@ void SsvepGL::setSsvep(SSVEP *ssvep)
 void SsvepGL::update()
 {
 
-    //    qDebug()<< "[update ]Index : "<< m_index << "current time: " << QTime::currentTime().msec();
-
+    //        qDebug()<< "[update ]Index : "<< m_index << "current time: " << QTime::currentTime().msec();
 
     if(m_index == 0)
     {

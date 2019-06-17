@@ -35,6 +35,12 @@ HybridStimulation::HybridStimulation(Hybrid *hybridStimulation, Speller *ERPspel
     {
         m_trials = m_hybridStimulaiton->m_ERPparadigm->desiredPhrase().count();
     }
+    /*
+    else if(m_hybridStimulation->experimentMode() == operation_mode::FREE_MODE)
+    {
+
+    }
+    */
 
     connect(m_ERPspeller, SIGNAL(slotTerminated()), this, SLOT(switchState()) );
     connect(m_ssvepStimulation, SIGNAL(slotTerminated()), this, SLOT(switchState()));
@@ -55,6 +61,13 @@ void HybridStimulation::hybridPreTrial()
         m_ERPspeller->setDesiredPhrase(m_hybridStimulaiton->m_ERPparadigm->desiredPhrase()[m_currentTrial].toLower());
         m_ssvepStimulation->m_flickeringSequence->sequence[0] = m_hybridStimulaiton->m_SSVEPparadigm->desiredPhrase()[m_currentTrial].digitValue();
     }
+
+    else if(m_hybridStimulaiton->experimentMode() == operation_mode::FREE_MODE)
+    {
+         m_ERPspeller->setDesiredPhrase("");
+         m_ssvepStimulation->m_flickeringSequence->sequence[0] = 0;
+    }
+
 
     m_hybridState = trial_state::STIMULUS;
 }
@@ -135,7 +148,7 @@ void HybridStimulation::hybridPostTrial()
     ++m_currentTrial;
     m_hybridState = trial_state::PRE_TRIAL;
 
-    if(m_currentTrial < m_trials)
+    if(m_currentTrial < m_trials || m_hybridStimulaiton->experimentMode() == operation_mode::FREE_MODE)
     {
         startTrial();
     }

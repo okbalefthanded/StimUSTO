@@ -58,6 +58,14 @@ Speller::Speller(QWidget *parent) :
     connect( m_isiTimer, SIGNAL(timeout()), this, SLOT(startFlashing()) );
     connect( m_preTrialTimer, SIGNAL(timeout()), this, SLOT(startTrial()) );
 
+    /*
+    if(m_ERP->experimentMode() == operation_mode::FREE_MODE)
+    {
+        qDebug() << "m_pretrailwait set to 0";
+        m_preTrialWait = 0;
+    }
+    */
+
     m_feedbackSocket = new QUdpSocket(this);
     m_feedbackSocket->bind(QHostAddress::LocalHost, m_feedbackPort);
 
@@ -88,7 +96,7 @@ void Speller::startFlashing(){}
 
 void Speller::pauseFlashing()
 {
-    // qDebug()<< "[PAUSE FLASHING]" << Q_FUNC_INFO;
+
     // sendMarker(OVTK_StimulationId_VisualStimulationStop);
     this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
             widget()->setStyleSheet("QLabel { color : gray; font: 40pt }");
@@ -129,8 +137,8 @@ void Speller::preTrial()
 
     if (m_preTrialCount == 0)
     {
-        m_flashingSequence = new RandomFlashSequence(m_nrElements, m_ERP->nrSequences());
         sendMarker(OVTK_StimulationId_TrialStart);
+        m_flashingSequence = new RandomFlashSequence(m_nrElements, m_ERP->nrSequences());
 
         if (m_ERP->experimentMode() == operation_mode::CALIBRATION)
         {
@@ -147,7 +155,7 @@ void Speller::preTrial()
     m_preTrialTimer->start();
     ++m_preTrialCount;
 
-    if (m_preTrialCount > m_preTrialWait)
+    if (m_preTrialCount > m_preTrialWait || m_ERP->experimentMode() == operation_mode::FREE_MODE)
     {
         refreshTarget();
         m_preTrialTimer->stop();
@@ -198,6 +206,7 @@ void Speller::postTrial()
     utils::wait(1000);
     refreshTarget();
 
+
     if (m_currentLetter >= m_desiredPhrase.length() &&
             m_desiredPhrase.length() != 1 &&
             (m_ERP->experimentMode() == operation_mode::COPY_MODE ||
@@ -212,7 +221,7 @@ void Speller::postTrial()
         emit(slotTerminated());
         this->close();
     }
-    else if(m_desiredPhrase.length() == 1)
+    else if(m_desiredPhrase.length() <= 1)
     {
         qDebug() << "[POST TRIAL 1]" << Q_FUNC_INFO;
         m_currentLetter = 0;

@@ -10,6 +10,7 @@
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLShaderProgram>
 #include <QVector3D>
+#include <QDebug>
 //
 #include "randomflashsequence.h"
 #include "ssvep.h"
