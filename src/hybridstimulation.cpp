@@ -21,6 +21,10 @@ HybridStimulation::HybridStimulation(Hybrid *hybridStimulation, Speller *ERPspel
     m_ERPspeller = ERPspeller;
     m_ssvepStimulation = ssvepGL;
 
+    m_robotSocket = new QUdpSocket();
+//    m_robotSocket->bind(QHostAddress::LocalHost, m_robotPort); // provide Robot Address
+    m_robotSocket->bind(QHostAddress("10.3.66.5"), m_robotPort);
+
     m_ssvepStimulation->m_firstRun = false;
     m_ssvepStimulation->m_flickeringSequence = new RandomFlashSequence(1, 1);
     RandomFlashSequence *rfseq = new RandomFlashSequence(m_hybridStimulaiton->m_SSVEPparadigm->nrElements(),
@@ -144,7 +148,16 @@ void HybridStimulation::hybridPostTrial()
         qDebug() << Q_FUNC_INFO << "SSVEP feedback: " << m_SSVEPFeedback;
     }
 
-
+    // Send feedback to Robot
+    m_hybridCommand = m_ERPFeedback[m_currentTrial] + m_SSVEPFeedback.at(m_currentTrial);
+//    qDebug() << Q_FUNC_INFO << "Hybrid Command: "<< m_hybridCommand;
+    QByteArray Data;
+    m_hybridCommand = "15";
+    qDebug() << Q_FUNC_INFO << "Hybrid Command: "<< m_hybridCommand;
+    Data = m_hybridCommand.toUtf8();
+    qDebug() << Q_FUNC_INFO << "Data"<< Data;
+    m_robotSocket->writeDatagram(Data, QHostAddress("10.3.66.5"), m_robotPort);
+    //
     ++m_currentTrial;
     m_hybridState = trial_state::PRE_TRIAL;
 

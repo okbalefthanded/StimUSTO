@@ -118,7 +118,6 @@ void ConfigPanel::on_initSpeller_clicked()
         speller->setERP(erpParadigm);
         connectParadigm(speller, launchTimer);
 
-
     }
 }
 

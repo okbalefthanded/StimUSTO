@@ -10,6 +10,7 @@
 #include <QTime>
 #include <QPropertyAnimation>
 #include <QDateTime>
+#include <QPixmap>
 //
 #include "speller.h"
 #include "ui_speller.h"
@@ -75,7 +76,7 @@ Speller::Speller(QWidget *parent) :
 
 void Speller::startTrial()
 {
-//     qDebug()<< "[TRIAL START]" << Q_FUNC_INFO;
+    //     qDebug()<< "[TRIAL START]" << Q_FUNC_INFO;
 
     if (m_state == trial_state::PRE_TRIAL)
     {
@@ -98,9 +99,36 @@ void Speller::pauseFlashing()
 {
 
     // sendMarker(OVTK_StimulationId_VisualStimulationStop);
+
     this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
             widget()->setStyleSheet("QLabel { color : gray; font: 40pt }");
+    /*
 
+    QString stimName = ":/images/"
+                       +
+                       QString::number(m_flashingSequence->sequence[m_currentStimulation])
+                       +
+                       ".png)";
+
+    QPalette pl = this->layout()
+            ->itemAt(m_flashingSequence->sequence[m_currentStimulation])
+            ->widget()->palette();
+
+    QPixmap picMap(stimName);
+
+    pl.setBrush(QPalette::Window, QBrush(picMap));
+
+
+    this->layout()
+            ->itemAt(m_flashingSequence->sequence[m_currentStimulation])
+            ->widget()
+            ->setPalette(pl);
+
+    this->layout()
+            ->itemAt(m_flashingSequence->sequence[m_currentStimulation])
+            ->widget()
+            ->setAutoFillBackground(true);
+    */
     switchStimulationTimers();
     ++m_currentStimulation;
 
@@ -128,7 +156,7 @@ void Speller::pauseFlashing()
 
 void Speller::preTrial()
 {
-//    qDebug()<< Q_FUNC_INFO;
+    //    qDebug()<< Q_FUNC_INFO;
 
     if(m_trials == 0)
     {
@@ -149,6 +177,10 @@ void Speller::preTrial()
         else if(m_ERP->experimentMode() == operation_mode::COPY_MODE)
         {
             highlightTarget();
+        }
+        else if(m_ERP->experimentMode() == operation_mode::FREE_MODE)
+        {
+            utils::wait(500);
         }
     }
 
@@ -180,7 +212,7 @@ void Speller::feedback()
         {
             this->layout()->itemAt(m_currentTarget)->
                     widget()->setStyleSheet("QLabel { color : green; font: 40pt }");
-           ++m_correct;
+            ++m_correct;
         }
         else
         {
@@ -197,7 +229,7 @@ void Speller::feedback()
 
 void Speller::postTrial()
 {
-//    qDebug()<< Q_FUNC_INFO;
+    //    qDebug()<< Q_FUNC_INFO;
 
     ++m_trials;
     m_currentStimulation = 0;
@@ -374,7 +406,7 @@ void Speller::createLayout()
     //    this->matrix_height = 640;
     //    this->matrix_width = 480;
     //    this->setGeometry(0, 0, matrix_width, matrix_height);
-    //        this->Mlayout = new MatrixLayout(qMakePair(6,6), 6, 6);
+    //    this->Mlayout = new MatrixLayout(qMakePair(6,6), 6, 6);
     //    QHBoxLayout *genLayout = new QHBoxLayout();
     QGridLayout *layout = new QGridLayout();
 
@@ -386,20 +418,32 @@ void Speller::createLayout()
     layout->addWidget(m_textRow, 0, 0, 1, 0);
 
     int k = 1;
+    QString stimName;
+    QPixmap pic;
+    int label_h, label_w;
     // add speller ellements
     for(int i=1; i<m_rows+1; i++)
     {
         for(int j=0; j<m_cols; j++)
         {
             QLabel *element = new QLabel(this);
-            //            element->setText(letters[i-1][j]);
-            element->setText(QString::number(k));
-            element->setStyleSheet("font: 40pt; color:gray");
+            label_h = element->height() + 40;
+            label_w = element->width() + 40;
+
+            // element->setText(letters[i-1][j]);
+            // element->setText(QString::number(k));
+            // element->setStyleSheet("font: 40pt; color:gray");
+
+            stimName = ":/images/" + QString::number(k) + ".png"; // directions images
+            // stimName ="image: url(:/images/" + QString::number(k) + ".png)";
+            pic = QPixmap(stimName);
+            element->setPixmap(pic.scaled(label_w, label_h, Qt::KeepAspectRatio));
+            // element->setStyleSheet(stimName);
             element->setAlignment(Qt::AlignCenter);
             layout->addWidget(element, i, j);
             m_presentedLetters.append(QString::number(k));
             k++;
-            //            presented_letters.append(letters[i-1][j]);
+            // presented_letters.append(letters[i-1][j]);
         }
     }
 
@@ -408,7 +452,7 @@ void Speller::createLayout()
 
 void Speller::refreshLayout()
 {
-
+    // TODO
 }
 
 Speller::~Speller()

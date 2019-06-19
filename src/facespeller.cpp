@@ -45,6 +45,8 @@ void FaceSpeller::stimulationFace()
             ->itemAt(m_flashingSequence->sequence[m_currentStimulation])
             ->widget()
             ->setStyleSheet("image: url(:/images/bennabi_face.png)");
+
+
 }
 
 void FaceSpeller::stimulationColoredFace()
@@ -112,10 +114,29 @@ void FaceSpeller::stimulationColoredFace()
 
 void FaceSpeller::stimulationInvertedFace()
 {
+
     this->layout()
             ->itemAt(m_flashingSequence->sequence[m_currentStimulation])
             ->widget()
             ->setStyleSheet("image: url(:/images/bennabi_face_inverted.png)");
+
+    /*
+    qDebug()<< Q_FUNC_INFO;
+
+    QPalette pl = this->layout()
+            ->itemAt(m_flashingSequence->sequence[m_currentStimulation])
+            ->widget()->palette();
+
+    QPixmap picMap(":/images/bennabi_face_inverted.png");
+
+    pl.setBrush(QPalette::Base, QBrush(picMap));
+
+    this->layout()
+            ->itemAt(m_flashingSequence->sequence[m_currentStimulation])
+            ->widget()
+            ->palette();
+    */
+
 }
 
 void FaceSpeller::stimulationInvertedColoredFace()
