@@ -208,6 +208,9 @@ void Speller::feedback()
     if (m_ERP->experimentMode() == operation_mode::COPY_MODE)
     {
 
+        qDebug() << "Desired letter: "<<  m_desiredPhrase[m_currentLetter - 1];
+        qDebug() << "Desired letter: "<<  m_text[m_currentLetter - 1];
+
         if(m_text[m_currentLetter - 1] == m_desiredPhrase[m_currentLetter - 1])
         {
             this->layout()->itemAt(m_currentTarget)->
@@ -221,8 +224,6 @@ void Speller::feedback()
 
         }
     }
-
-
 
     postTrial();
 }
@@ -255,7 +256,7 @@ void Speller::postTrial()
     }
     else if(m_desiredPhrase.length() <= 1)
     {
-        qDebug() << "[POST TRIAL 1]" << Q_FUNC_INFO;
+        // qDebug() << "[POST TRIAL 1]" << Q_FUNC_INFO;
         m_currentLetter = 0;
         emit(slotTerminated());
         return;
@@ -431,14 +432,18 @@ void Speller::createLayout()
             label_w = element->width() + 40;
 
             // element->setText(letters[i-1][j]);
-            // element->setText(QString::number(k));
-            // element->setStyleSheet("font: 40pt; color:gray");
 
+             element->setText(QString::number(k));
+             element->setStyleSheet("font: 40pt; color:gray");
+
+            /*
             stimName = ":/images/" + QString::number(k) + ".png"; // directions images
             // stimName ="image: url(:/images/" + QString::number(k) + ".png)";
             pic = QPixmap(stimName);
             element->setPixmap(pic.scaled(label_w, label_h, Qt::KeepAspectRatio));
             // element->setStyleSheet(stimName);
+            */
+
             element->setAlignment(Qt::AlignCenter);
             layout->addWidget(element, i, j);
             m_presentedLetters.append(QString::number(k));

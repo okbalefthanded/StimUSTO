@@ -97,4 +97,9 @@ const uint64_t OVTK_StimulationLabel_Base = 0x00008100;
 const int REFRESH_RATE = 60;
 }
 
+namespace robot_state {
+const quint8 MOVING = 0;
+const quint8 READY = 1;
+}
+
 #endif // UTILS_H

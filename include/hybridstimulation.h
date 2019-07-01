@@ -2,6 +2,7 @@
 #define HYBRIDSTIMULATION_H
 //
 #include <QUdpSocket>
+#include <QTcpSocket>
 //
 #include "ssvepgl.h"
 #include "speller.h"
@@ -48,7 +49,8 @@ private:
     Hybrid *m_hybridStimulaiton;
     Speller *m_ERPspeller;
     SsvepGL *m_ssvepStimulation;
-    QUdpSocket *m_robotSocket;
+//    QUdpSocket *m_robotSocket;
+    QTcpSocket *m_robotSocket;
 };
 
 
