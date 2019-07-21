@@ -139,7 +139,9 @@ void Speller::pauseFlashing()
         m_isiTimer->stop();
         m_stimTimer->stop();
 
-        utils::wait(1000);
+        // utils::wait(1000); // time window after last epoch/stim
+        // utils::wait(500);
+        utils::wait(700); // 700 ms == epoch time windows
         sendMarker(OVTK_StimulationId_TrialStop);
         m_state = trial_state::FEEDBACK;
 
@@ -190,6 +192,7 @@ void Speller::preTrial()
     if (m_preTrialCount > m_preTrialWait || m_ERP->experimentMode() == operation_mode::FREE_MODE)
     {
         refreshTarget();
+        qDebug() << "pre trial count ERP: " << m_preTrialCount;
         m_preTrialTimer->stop();
         m_preTrialCount = 0;
         m_state = trial_state::STIMULUS;
@@ -208,10 +211,7 @@ void Speller::feedback()
     if (m_ERP->experimentMode() == operation_mode::COPY_MODE)
     {
 
-        qDebug() << "Desired letter: "<<  m_desiredPhrase[m_currentLetter - 1];
-        qDebug() << "Desired letter: "<<  m_text[m_currentLetter - 1];
-
-        if(m_text[m_currentLetter - 1] == m_desiredPhrase[m_currentLetter - 1])
+        if( m_text[m_text.length()-1] == m_desiredPhrase[m_currentLetter - 1])
         {
             this->layout()->itemAt(m_currentTarget)->
                     widget()->setStyleSheet("QLabel { color : green; font: 40pt }");
@@ -236,7 +236,9 @@ void Speller::postTrial()
     m_currentStimulation = 0;
     m_state = trial_state::PRE_TRIAL;
     // wait
-    utils::wait(1000);
+    // utils::wait(1000);
+    //  utils::wait(500);
+    utils::wait(250);
     refreshTarget();
 
 
@@ -273,7 +275,8 @@ void Speller::receiveFeedback()
     //qDebug() << Q_FUNC_INFO;
     //qDebug() << "FEEDBACK SOCKET PORT" << m_feedbackPort;
     // wait for OV python script to write in UDP feedback socket
-    utils::wait(500);
+    // utils::wait(500);
+    utils::wait(250);
     QHostAddress sender;
     quint16 senderPort;
     QByteArray *buffer = new QByteArray();
@@ -288,8 +291,9 @@ void Speller::receiveFeedback()
     }
 
     //  feedback_socket->waitForBytesWritten();
-    m_text += buffer->data();
-    qDebug()<< Q_FUNC_INFO <<"Feedback Data" << buffer->data();
+
+    m_text += QString(buffer->data());
+
 }
 
 bool Speller::isTarget()
@@ -433,8 +437,8 @@ void Speller::createLayout()
 
             // element->setText(letters[i-1][j]);
 
-             element->setText(QString::number(k));
-             element->setStyleSheet("font: 40pt; color:gray");
+            element->setText(QString::number(k));
+            element->setStyleSheet("font: 40pt; color:gray");
 
             /*
             stimName = ":/images/" + QString::number(k) + ".png"; // directions images

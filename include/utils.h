@@ -50,6 +50,7 @@ const quint8 RC = 1;
 }
 namespace speller_type {
 // speller types
+// stimulation type
 const quint8 FLASHING_SPELLER = 0;
 const quint8 FACES_SPELLER = 1;
 const quint8 INVERTED_FACE = 2;

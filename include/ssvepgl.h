@@ -79,7 +79,7 @@ private:
 
     bool m_firstRun = true;
     bool m_stateFinished = true;
-    int m_preTrialCount=0;
+    int m_preTrialCount=1;
     int m_preTrialWait;
     int m_currentFlicker=0;
     int m_state;

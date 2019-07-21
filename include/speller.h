@@ -85,12 +85,12 @@ protected:
     //
     ERP *m_ERP;
     //
-    int m_preTrialWait = 2; // 2 seconds
+    int m_preTrialWait = 1; // 2 seconds
     int m_preTrialCount = 0;
     quint16 m_feedbackPort = 12345;
 
     QString m_desiredPhrase= "";
-    QString m_text;
+    QString m_text = "";
     QImage *m_faceStimuli;
     QList<QString> m_presentedLetters;
     MatrixLayout *m_mLayout;

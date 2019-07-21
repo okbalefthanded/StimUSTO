@@ -17,14 +17,18 @@ SsvepGL::SsvepGL(SSVEP *paradigm, int t_port)
     m_ssvep = paradigm;
     setFrequencies(m_ssvep->frequencies());
     setFeedbackPort(t_port);
-    m_preTrialWait = m_ssvep->breakDuration();
+    // m_preTrialWait = m_ssvep->breakDuration();
 
+    m_preTrialWait = 3;
+    qDebug() << "SSVEP stim duration : " << m_ssvep->stimulationDuration();
     // set vertices, vertices indeices & colors
     initElements();
 
     m_preTrialTimer = new QTimer(this);
     m_preTrialTimer->setTimerType(Qt::PreciseTimer);
-    m_preTrialTimer->setInterval(1000);
+    // m_preTrialTimer->setInterval(1000);
+    // m_preTrialTimer->setInterval((m_ssvep->breakDuration()*1000) / 2);
+    m_preTrialTimer->setInterval(m_ssvep->breakDuration() / 2);
     m_preTrialTimer->setSingleShot(true);
 
     connect(m_preTrialTimer, SIGNAL(timeout()), this, SLOT(startTrial()) );
@@ -172,6 +176,7 @@ void SsvepGL::preTrial()
         if (m_ssvep->experimentMode() == operation_mode::CALIBRATION ||
                 m_ssvep->experimentMode() == operation_mode::COPY_MODE)
         {
+            qDebug() << "Higlight target SSVEP ";
             highlightTarget();
         }
 
@@ -181,12 +186,15 @@ void SsvepGL::preTrial()
         if (m_ssvep->experimentMode() == operation_mode::CALIBRATION ||
                 m_ssvep->experimentMode() == operation_mode::COPY_MODE)
         {
+            qDebug() << "Refresh target SSVEP ";
             refreshTarget();
         }
     }
 
     m_preTrialTimer->start();
     m_preTrialCount++;
+
+    qDebug()<< "SSVEP GL "<<  m_preTrialWait;
 
     if (m_preTrialCount > m_preTrialWait)
     {
@@ -212,10 +220,11 @@ void SsvepGL::postTrial()
     if(m_ssvep->experimentMode() == operation_mode::COPY_MODE || m_ssvep->experimentMode() == operation_mode::FREE_MODE)
     {
 
-        utils::wait(500);
+        utils::wait(100);
         feedback();
+        utils::wait(500);
         // feedback for 1 sec & refresh
-        utils::wait(1000);
+        // utils::wait(1000);
         refresh(m_sessionFeedback[m_currentFlicker].digitValue()-1);
     }
 
@@ -225,8 +234,8 @@ void SsvepGL::postTrial()
     }
 
     // wait
-    int waitMillisec = m_ssvep->breakDuration() - m_preTrialWait * 1000;
-    utils::wait(waitMillisec);
+    // int waitMillisec = (m_ssvep->breakDuration() - m_preTrialWait) * 1000;
+    // utils::wait(waitMillisec);
 
     //    refreshTarget();
     ++m_currentFlicker;
@@ -267,8 +276,8 @@ void SsvepGL::Flickering()
 
     //    sendMarker(config::OVTK_StimulationLabel_Base + m_flickeringSequence->sequence[m_currentFlicker]);
     //    sendMarker(OVTK_StimulationId_VisualSteadyStateStimulationStart);
-    //    qDebug()<< Q_FUNC_INFO << "markers sent" << "current time: " << QTime::currentTime().msec();
-
+    //        qDebug()<< Q_FUNC_INFO << "markers sent" << "current time: " << QTime::currentTime().msec();
+    // qDebug()<< Q_FUNC_INFO << "Stim : " << "current time: " << QTime::currentTime().msec();
     qDebug()<<"Stimulation "<<m_flickeringSequence->sequence[m_currentFlicker];
 
     while(m_index <= m_flicker[0].size())

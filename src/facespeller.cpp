@@ -141,6 +141,26 @@ void FaceSpeller::stimulationInvertedFace()
 
 void FaceSpeller::stimulationInvertedColoredFace()
 {
+
+    int currentStim = m_flashingSequence->sequence[m_currentStimulation];
+
+    if(currentStim <= 3)
+    {
+        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
+                widget()->setStyleSheet("image: url(:/images/bennabi_face_red_inverted.png)");
+    }
+
+    else if (currentStim <= 6)
+    {
+        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
+                widget()->setStyleSheet("image: url(:/images/bennabi_face_green_inverted.png)");
+    }
+    else if (currentStim <= 9)
+    {
+        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
+                widget()->setStyleSheet("image: url(:/images/bennabi_face_blue_inverted.png)");
+    }
+    /*
     switch (m_flashingSequence->sequence[m_currentStimulation])
     {
     case 1:
@@ -198,5 +218,7 @@ void FaceSpeller::stimulationInvertedColoredFace()
         break;
     }
 
+
     }
+    */
 }
