@@ -99,23 +99,10 @@ void Speller::pauseFlashing()
 {
 
     // sendMarker(OVTK_StimulationId_VisualStimulationStop);
-    qDebug() << Q_FUNC_INFO << QTime::currentTime().msec();
+    //    qDebug() << Q_FUNC_INFO << QTime::currentTime().msec();
 
     //   this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
     //                widget()->setStyleSheet("QLabel { color : gray; font: 40pt }");
-
-    //    int label_h, label_w;
-    // int k=1;
-
-    //    QPixmap pic;
-    //    QLabel *element = new QLabel();
-    //    label_h = element->height();
-    //    label_w = element->width();
-    //    QString stimName = ":/images/" + QString::number(m_flashingSequence->sequence[m_currentStimulation]) + ".png"; // directions images
-    //    pic = QPixmap(stimName);
-    //    element->setPixmap(pic.scaled(label_w, label_h, Qt::KeepAspectRatio));
-    //        element->setPixmap(m_icons.at(m_flashingSequence->sequence[m_currentStimulation]));
-
 
     m_element = new QLabel();
     m_element->setPixmap(m_icons[m_flashingSequence->sequence[m_currentStimulation] - 1]);
@@ -127,9 +114,6 @@ void Speller::pauseFlashing()
                                   widget(),
                                   m_element,
                                   Qt::FindDirectChildrenOnly);
-
-
-
     /*
     this->layout()
             ->replaceWidget(this->
@@ -138,8 +122,7 @@ void Speller::pauseFlashing()
                             widget(),
                             m_icons[ m_flashingSequence->sequence[m_currentStimulation] - 1]
             );
-
-*/
+    */
     /*
     QString stimName = "qproperty-pixmap: url(:/images/"
     +
@@ -153,35 +136,6 @@ void Speller::pauseFlashing()
 
 
 
-
-
-    /*
-    QString stimName = ":/images/"
-                       +
-                       QString::number(m_flashingSequence->sequence[m_currentStimulation])
-                       +
-                       ".png)";
-
-
-    QPalette pl = this->layout()
-            ->itemAt(m_flashingSequence->sequence[m_currentStimulation])
-            ->widget()->palette();
-
-    QPixmap picMap(stimName);
-
-    pl.setBrush(QPalette::Window, QBrush(picMap));
-
-
-    this->layout()
-            ->itemAt(m_flashingSequence->sequence[m_currentStimulation])
-            ->widget()
-            ->setPalette(pl);
-
-    this->layout()
-            ->itemAt(m_flashingSequence->sequence[m_currentStimulation])
-            ->widget()
-            ->setAutoFillBackground(true);
-    */
     switchStimulationTimers();
     ++m_currentStimulation;
 
@@ -223,7 +177,7 @@ void Speller::preTrial()
         // Refresh previous feedback
         if(m_text.length() > 0)
         {
-            int id = m_text[m_text.length()-1].digitValue() ;
+            int id = m_text[m_text.length()-1].digitValue();
             QPixmap map =   m_icons[id-1];
             m_element = new QLabel();
             m_element->setPixmap(map);
@@ -275,7 +229,7 @@ void Speller::preTrial()
 
 void Speller::feedback()
 {
-    qDebug() << Q_FUNC_INFO;
+    qDebug() << Q_FUNC_INFO << m_desiredPhrase;
 
     receiveFeedback();
 
@@ -288,7 +242,7 @@ void Speller::feedback()
         {
             //            this->layout()->itemAt(m_currentTarget)->
             //                    widget()->setStyleSheet("QLabel { color : green; font: 40pt }");
-            qDebug() << "CORRECT//////";
+
             QPixmap map =  m_icons[m_currentLetter - 1];
             map.fill(Qt::green);
 
@@ -606,7 +560,7 @@ void Speller::createLayout()
             // presented_letters.append(letters[i-1][j]);
         }
     }
-    //    qDebug()<< Q_FUNC_INFO << m_flashingSequence->sequence;
+
     this->setLayout(layout);
 }
 

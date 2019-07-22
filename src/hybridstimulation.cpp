@@ -27,12 +27,11 @@ HybridStimulation::HybridStimulation(Hybrid *hybridStimulation, Speller *ERPspel
 
     // connect to Robot
     m_robotSocket = new QTcpSocket();
-//    m_robotSocket->connectToHost(QHostAddress("10.3.66.5"), m_robotPort);
+    //    m_robotSocket->connectToHost(QHostAddress("10.3.66.5"), m_robotPort);
     m_robotSocket->connectToHost(QHostAddress("10.3.65.128"), m_robotPort);
     if(m_robotSocket->waitForConnected())
     {
         qDebug() << "Robot Connection : State Connected";
-
     }
     else
     {

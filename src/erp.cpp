@@ -1,5 +1,7 @@
+#include <QDebug>
 #include "erp.h"
 #include "utils.h"
+#include "randomflashsequence.h"
 
 ERP::ERP() : Paradigm (),
              m_stimulationType(speller_type::INVERTED_FACE), m_flashingMode(flashing_mode::SC)
@@ -42,7 +44,14 @@ void ERP::fromVariant(const QVariant &variant)
     m_stimulationDuration = map.value("stimulationDuration").toInt();
     m_breakDuration = map.value("breakDuration").toInt();
     m_nrSequences = map.value("nrSequences").toInt();
+
     m_desiredPhrase = map.value("desiredPhrase").toString();
+    if(m_desiredPhrase.isEmpty())
+    {
+        RandomFlashSequence *randomPhrase = new RandomFlashSequence(9, 2);
+        m_desiredPhrase = randomPhrase->toString();
+    }
+
     m_stimulationType = map.value("stimulationType").toInt();
     m_flashingMode = map.value("flashingMode").toInt();
 }

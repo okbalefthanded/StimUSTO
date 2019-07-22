@@ -87,7 +87,18 @@ void Hybrid::fromVariant(const QVariant &variant)
     m_ERPparadigm->setStimulationDuration(map.value("ERP_stimulationDuration").toInt());
     m_ERPparadigm->setBreakDuration(map.value("ERP_breakDuration").toInt());
     m_ERPparadigm->setNrSequences(map.value("ERP_nrSequences").toInt());
-    m_ERPparadigm->setDesiredPhrase(map.value("ERP_desiredPhrase").toString());
+    QString str = map.value("ERP_desiredPhrase").toString();
+
+    if(str.isEmpty())
+    {
+        RandomFlashSequence *randomPhrase = new RandomFlashSequence(9, 2);
+        m_ERPparadigm->setDesiredPhrase(randomPhrase->toString());
+    }
+    else
+    {
+        m_ERPparadigm->setDesiredPhrase(str);
+    }
+
     m_ERPparadigm->setStimulationType(map.value("ERP_stimulationType").toInt());
     m_ERPparadigm->setFlashingMode(map.value("ERP_flashingMode").toInt());
     // SSVEP config
