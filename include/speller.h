@@ -34,6 +34,7 @@ public:
     friend class Hybrid;
     friend class HybridStimulation;
 
+
 signals:
     void markerTag(uint64_t t_ovStimulation);
     void slotTerminated();
@@ -91,9 +92,14 @@ protected:
 
     QString m_desiredPhrase= "";
     QString m_text = "";
-    QImage *m_faceStimuli;
+    //    QImage *m_faceStimuli;
     QList<QString> m_presentedLetters;
+    //    QList<QImage> m_icons;
+    //    QList<QWidget> m_icons;
+    //     QList<QLabel*> m_icons;
+    QList<QPixmap> m_icons;
     MatrixLayout *m_mLayout;
+    QLabel *m_element;
     // Timers
     QTimer *m_preTrialTimer;
     QTimer *m_stimTimer;

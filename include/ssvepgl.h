@@ -116,6 +116,7 @@ private:
     QVector<QVector3D> m_colors;
     QVector<int> m_vindices;
 
+
 };
 
 #endif // SSVEPGL_H

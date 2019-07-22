@@ -1,5 +1,6 @@
 #include <QLayout>
 #include <QTimer>
+#include <QTime>
 //
 #include "facespeller.h"
 #include "erp.h"
@@ -114,6 +115,7 @@ void FaceSpeller::stimulationColoredFace()
 
 void FaceSpeller::stimulationInvertedFace()
 {
+        qDebug() << Q_FUNC_INFO << QTime::currentTime().msec();
 
     this->layout()
             ->itemAt(m_flashingSequence->sequence[m_currentStimulation])
@@ -144,21 +146,36 @@ void FaceSpeller::stimulationInvertedColoredFace()
 
     int currentStim = m_flashingSequence->sequence[m_currentStimulation];
 
+    qDebug() << Q_FUNC_INFO << QTime::currentTime().msec();
+
     if(currentStim <= 3)
     {
+        //        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
+        //                widget()->setStyleSheet("image: url(:/images/bennabi_face_red_inverted.png)");
+
         this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
-                widget()->setStyleSheet("image: url(:/images/bennabi_face_red_inverted.png)");
+                widget()->setStyleSheet("qproperty-pixmap: url(:/images/bennabi_face_red_inverted.png)");
+
+
+
+
     }
 
     else if (currentStim <= 6)
     {
+        //        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
+        //                widget()->setStyleSheet("image: url(:/images/bennabi_face_green_inverted.png)");
         this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
-                widget()->setStyleSheet("image: url(:/images/bennabi_face_green_inverted.png)");
+                widget()->setStyleSheet("qproperty-pixmap: url(:/images/bennabi_face_green_inverted.png)");
+
     }
     else if (currentStim <= 9)
     {
+        //      this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
+        //              widget()->setStyleSheet("image: url(:/images/bennabi_face_blue_inverted.png)");
         this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
-                widget()->setStyleSheet("image: url(:/images/bennabi_face_blue_inverted.png)");
+                widget()->setStyleSheet("qproperty-pixmap: url(:/images/bennabi_face_blue_inverted.png)");
+
     }
     /*
     switch (m_flashingSequence->sequence[m_currentStimulation])

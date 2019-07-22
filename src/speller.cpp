@@ -99,16 +99,69 @@ void Speller::pauseFlashing()
 {
 
     // sendMarker(OVTK_StimulationId_VisualStimulationStop);
+    qDebug() << Q_FUNC_INFO << QTime::currentTime().msec();
 
-    this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
-            widget()->setStyleSheet("QLabel { color : gray; font: 40pt }");
+    //   this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
+    //                widget()->setStyleSheet("QLabel { color : gray; font: 40pt }");
+
+    //    int label_h, label_w;
+    // int k=1;
+
+    //    QPixmap pic;
+    //    QLabel *element = new QLabel();
+    //    label_h = element->height();
+    //    label_w = element->width();
+    //    QString stimName = ":/images/" + QString::number(m_flashingSequence->sequence[m_currentStimulation]) + ".png"; // directions images
+    //    pic = QPixmap(stimName);
+    //    element->setPixmap(pic.scaled(label_w, label_h, Qt::KeepAspectRatio));
+    //        element->setPixmap(m_icons.at(m_flashingSequence->sequence[m_currentStimulation]));
+
+
+    m_element = new QLabel();
+    m_element->setPixmap(m_icons[m_flashingSequence->sequence[m_currentStimulation] - 1]);
+    m_element->setAlignment(Qt::AlignCenter);
+
+    this->layout()->replaceWidget(this->
+                                  layout()->
+                                  itemAt(m_flashingSequence->sequence[m_currentStimulation])->
+                                  widget(),
+                                  m_element,
+                                  Qt::FindDirectChildrenOnly);
+
+
+
     /*
+    this->layout()
+            ->replaceWidget(this->
+                            layout()->
+                            itemAt(m_flashingSequence->sequence[m_currentStimulation])->
+                            widget(),
+                            m_icons[ m_flashingSequence->sequence[m_currentStimulation] - 1]
+            );
 
+*/
+    /*
+    QString stimName = "qproperty-pixmap: url(:/images/"
+    +
+    QString::number(m_flashingSequence->sequence[m_currentStimulation])
+    +
+    ".png)";
+    */
+
+    // this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
+    //                 widget()->setStyleSheet(stimName);
+
+
+
+
+
+    /*
     QString stimName = ":/images/"
                        +
                        QString::number(m_flashingSequence->sequence[m_currentStimulation])
                        +
                        ".png)";
+
 
     QPalette pl = this->layout()
             ->itemAt(m_flashingSequence->sequence[m_currentStimulation])
@@ -167,8 +220,28 @@ void Speller::preTrial()
 
     if (m_preTrialCount == 0)
     {
+        // Refresh previous feedback
+        if(m_text.length() > 0)
+        {
+            int id = m_text[m_text.length()-1].digitValue() ;
+            QPixmap map =   m_icons[id-1];
+            m_element = new QLabel();
+            m_element->setPixmap(map);
+            m_element->setAlignment(Qt::AlignCenter);
+
+            this->layout()->replaceWidget(this->
+                                          layout()->
+                                          itemAt(id)->
+                                          widget(),
+                                          m_element,
+                                          Qt::FindDirectChildrenOnly);
+        }
+        //
+
         sendMarker(OVTK_StimulationId_TrialStart);
         m_flashingSequence = new RandomFlashSequence(m_nrElements, m_ERP->nrSequences());
+
+        //        qDebug() << Q_FUNC_INFO << m_flashingSequence->sequence;
 
         if (m_ERP->experimentMode() == operation_mode::CALIBRATION)
         {
@@ -213,14 +286,42 @@ void Speller::feedback()
 
         if( m_text[m_text.length()-1] == m_desiredPhrase[m_currentLetter - 1])
         {
-            this->layout()->itemAt(m_currentTarget)->
-                    widget()->setStyleSheet("QLabel { color : green; font: 40pt }");
+            //            this->layout()->itemAt(m_currentTarget)->
+            //                    widget()->setStyleSheet("QLabel { color : green; font: 40pt }");
+            qDebug() << "CORRECT//////";
+            QPixmap map =  m_icons[m_currentLetter - 1];
+            map.fill(Qt::green);
+
+            m_element = new QLabel();
+            m_element->setPixmap(map);
+            m_element->setAlignment(Qt::AlignCenter);
+
+            this->layout()->replaceWidget(this->
+                                          layout()->
+                                          itemAt(m_currentTarget)->
+                                          widget(),
+                                          m_element,
+                                          Qt::FindDirectChildrenOnly);
+
             ++m_correct;
         }
         else
         {
-            this->layout()->itemAt(m_currentTarget)->
-                    widget()->setStyleSheet("QLabel { color : blue; font: 40pt }");
+            //            this->layout()->itemAt(m_currentTarget)->
+            //                    widget()->setStyleSheet("QLabel { color : blue; font: 40pt }");
+            int id = m_text[m_text.length()-1].digitValue();
+            QPixmap map = m_icons[id-1];
+            map.fill(Qt::blue);
+            m_element = new QLabel();
+            m_element->setPixmap(map);
+            m_element->setAlignment(Qt::AlignCenter);
+
+            this->layout()->replaceWidget(this->
+                                          layout()->
+                                          itemAt(id)->
+                                          widget(),
+                                          m_element,
+                                          Qt::FindDirectChildrenOnly);
 
         }
     }
@@ -331,15 +432,42 @@ void Speller::highlightTarget()
         }
     }
 
+    /*
     this->layout()->itemAt(m_currentTarget)->
             widget()->setStyleSheet("QLabel { color : red; font: 60pt }");
+    */
+    QPixmap map = m_icons[m_currentTarget - 1];
+    map.fill(Qt::red);
+
+    m_element = new QLabel();
+    m_element->setPixmap(map);
+    m_element->setAlignment(Qt::AlignCenter);
+
+    this->layout()->replaceWidget(this->
+                                  layout()->
+                                  itemAt(m_currentTarget)->
+                                  widget(),
+                                  m_element,
+                                  Qt::FindDirectChildrenOnly);
 
 }
 
 void Speller::refreshTarget()
 {
-    this->layout()->itemAt(m_currentTarget)->
-            widget()->setStyleSheet("QLabel { color : gray; font: 40pt }");
+    qDebug()<< Q_FUNC_INFO;
+    //   this->layout()->itemAt(m_currentTarget)->
+    //           widget()->setStyleSheet("QLabel { color : gray; font: 40pt }");
+    m_element = new QLabel();
+    m_element->setPixmap(m_icons[m_currentTarget - 1]);
+    m_element->setAlignment(Qt::AlignCenter);
+
+    this->layout()->replaceWidget(this->
+                                  layout()->
+                                  itemAt(m_currentTarget)->
+                                  widget(),
+                                  m_element,
+                                  Qt::FindDirectChildrenOnly);
+
 }
 
 void Speller::sendStimulationInfo()
@@ -408,6 +536,12 @@ void Speller::createLayout()
     m_rows = 3;
     m_cols = 3;
     m_nrElements = m_rows * m_cols;
+    //    m_icons = QList<QImage>();
+    //    m_icons = QList<QLabel>();
+    //    m_icons = QList<QLabel*>();
+    m_icons = QList<QPixmap>();
+    m_element = new QLabel();
+    m_element->setAlignment(Qt::AlignCenter);
     //    this->matrix_height = 640;
     //    this->matrix_width = 480;
     //    this->setGeometry(0, 0, matrix_width, matrix_height);
@@ -425,6 +559,7 @@ void Speller::createLayout()
     int k = 1;
     QString stimName;
     QPixmap pic;
+    QImage iconImage;
     int label_h, label_w;
     // add speller ellements
     for(int i=1; i<m_rows+1; i++)
@@ -435,27 +570,43 @@ void Speller::createLayout()
             label_h = element->height() + 40;
             label_w = element->width() + 40;
 
+            //            QLabel element;
+            //            label_h = element.height() + 40;
+            //            label_w = element.width() + 40;
+
+            stimName = ":/images/" + QString::number(k) + ".png"; // directions images
+            pic = QPixmap(stimName);
+
+            //            element.setPixmap(pic.scaled(label_w, label_h, Qt::KeepAspectRatio));
+            //            element.setAlignment(Qt::AlignCenter);
+
             // element->setText(letters[i-1][j]);
 
-            element->setText(QString::number(k));
-            element->setStyleSheet("font: 40pt; color:gray");
+            // element->setText(QString::number(k));
+            // element->setStyleSheet("font: 40pt; color:gray");
 
-            /*
-            stimName = ":/images/" + QString::number(k) + ".png"; // directions images
             // stimName ="image: url(:/images/" + QString::number(k) + ".png)";
-            pic = QPixmap(stimName);
-            element->setPixmap(pic.scaled(label_w, label_h, Qt::KeepAspectRatio));
-            // element->setStyleSheet(stimName);
-            */
 
+            element->setPixmap(pic.scaled(label_w, label_h, Qt::KeepAspectRatio));
             element->setAlignment(Qt::AlignCenter);
+
+            // element->setStyleSheet(stimName);
+
+            //            iconImage = QImage(stimName);
+            //            iconImage.scaled(label_w, label_h, Qt::KeepAspectRatio);
+            m_icons.append(pic.scaled(label_w, label_h, Qt::KeepAspectRatio));
+
+            //            m_icons->append(element);
+
+            //            m_icons.append(element);
             layout->addWidget(element, i, j);
+
             m_presentedLetters.append(QString::number(k));
             k++;
             // presented_letters.append(letters[i-1][j]);
         }
     }
-
+    //    qDebug()<< Q_FUNC_INFO << m_flashingSequence->sequence;
     this->setLayout(layout);
 }
 
