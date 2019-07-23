@@ -34,6 +34,10 @@ Speller::Speller(QWidget *parent) :
         this->windowHandle()->setScreen(qApp->screens().last());
         this->showFullScreen();
     }
+    else
+    {
+        this->showMaximized();
+    }
 
     this->setStyleSheet("background-color : black");
 
@@ -175,6 +179,7 @@ void Speller::preTrial()
     if (m_preTrialCount == 0)
     {
         // Refresh previous feedback
+        /*
         if(m_text.length() > 0)
         {
             int id = m_text[m_text.length()-1].digitValue();
@@ -190,6 +195,7 @@ void Speller::preTrial()
                                           m_element,
                                           Qt::FindDirectChildrenOnly);
         }
+        */
         //
 
         sendMarker(OVTK_StimulationId_TrialStart);
@@ -219,7 +225,6 @@ void Speller::preTrial()
     if (m_preTrialCount > m_preTrialWait || m_ERP->experimentMode() == operation_mode::FREE_MODE)
     {
         refreshTarget();
-        qDebug() << "pre trial count ERP: " << m_preTrialCount;
         m_preTrialTimer->stop();
         m_preTrialCount = 0;
         m_state = trial_state::STIMULUS;
@@ -229,8 +234,6 @@ void Speller::preTrial()
 
 void Speller::feedback()
 {
-    qDebug() << Q_FUNC_INFO << m_desiredPhrase;
-
     receiveFeedback();
 
     m_textRow->setText(m_text);
@@ -243,7 +246,8 @@ void Speller::feedback()
             //            this->layout()->itemAt(m_currentTarget)->
             //                    widget()->setStyleSheet("QLabel { color : green; font: 40pt }");
 
-            QPixmap map =  m_icons[m_currentLetter - 1];
+//            QPixmap map =  m_icons[m_currentLetter - 1];
+             QPixmap map =  m_icons[m_text.length() - 1];
             map.fill(Qt::green);
 
             m_element = new QLabel();
@@ -252,11 +256,12 @@ void Speller::feedback()
 
             this->layout()->replaceWidget(this->
                                           layout()->
-                                          itemAt(m_currentTarget)->
+                                          itemAt(m_text.length())->
                                           widget(),
                                           m_element,
                                           Qt::FindDirectChildrenOnly);
 
+            isCorrect = true;
             ++m_correct;
         }
         else
@@ -276,6 +281,7 @@ void Speller::feedback()
                                           widget(),
                                           m_element,
                                           Qt::FindDirectChildrenOnly);
+            isCorrect = false;
 
         }
     }
@@ -294,9 +300,28 @@ void Speller::postTrial()
     // utils::wait(1000);
     //  utils::wait(500);
     utils::wait(250);
-    refreshTarget();
+    //    refreshTarget();
+    if (m_ERP->experimentMode() == operation_mode::COPY_MODE)
+    {
 
+       int id = m_text[m_text.length()-1].digitValue();
+        QPixmap map = m_icons[id-1];
+        m_element = new QLabel();
+        m_element->setPixmap(map);
+        m_element->setAlignment(Qt::AlignCenter);
 
+        this->layout()->replaceWidget(this->
+                                      layout()->
+                                      itemAt(id)->
+                                      widget(),
+                                      m_element,
+                                      Qt::FindDirectChildrenOnly);
+    }
+    else if(m_ERP->experimentMode() == operation_mode::CALIBRATION)
+    {
+        refreshTarget();
+    }
+    //
     if (m_currentLetter >= m_desiredPhrase.length() &&
             m_desiredPhrase.length() != 1 &&
             (m_ERP->experimentMode() == operation_mode::COPY_MODE ||
@@ -391,7 +416,7 @@ void Speller::highlightTarget()
             widget()->setStyleSheet("QLabel { color : red; font: 60pt }");
     */
     QPixmap map = m_icons[m_currentTarget - 1];
-    map.fill(Qt::red);
+    map.fill(Qt::yellow);
 
     m_element = new QLabel();
     m_element->setPixmap(map);
@@ -408,9 +433,10 @@ void Speller::highlightTarget()
 
 void Speller::refreshTarget()
 {
-    qDebug()<< Q_FUNC_INFO;
+
     //   this->layout()->itemAt(m_currentTarget)->
     //           widget()->setStyleSheet("QLabel { color : gray; font: 40pt }");
+
     m_element = new QLabel();
     m_element->setPixmap(m_icons[m_currentTarget - 1]);
     m_element->setAlignment(Qt::AlignCenter);
@@ -506,7 +532,7 @@ void Speller::createLayout()
     m_textRow = new QLabel(this);
     m_textRow->setText(m_desiredPhrase);
     m_textRow->setStyleSheet("font:30pt; color:gray; border-color:white;");
-    m_textRow->setAlignment(Qt::AlignCenter);
+    m_textRow->setAlignment(Qt::AlignLeft);
     //    textRow->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(m_textRow, 0, 0, 1, 0);
 

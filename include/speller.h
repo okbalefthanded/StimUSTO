@@ -82,6 +82,7 @@ protected:
 
     bool m_stateFinished = false;
     bool m_running = true;
+    bool isCorrect = false;
     int  m_state;
     //
     ERP *m_ERP;

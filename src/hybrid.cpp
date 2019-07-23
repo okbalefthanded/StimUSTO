@@ -91,7 +91,7 @@ void Hybrid::fromVariant(const QVariant &variant)
 
     if(str.isEmpty())
     {
-        RandomFlashSequence *randomPhrase = new RandomFlashSequence(9, 2);
+        RandomFlashSequence *randomPhrase = new RandomFlashSequence(9, 6);
         m_ERPparadigm->setDesiredPhrase(randomPhrase->toString());
     }
     else

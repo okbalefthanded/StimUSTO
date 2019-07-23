@@ -48,10 +48,8 @@ QVector<double> gen_flick_on_off(double freq, int refreshRate, float length)
 // Taylor Fr. Brain Comput. InterfacesBrain-Computer Interfaces, vol. 1, no. 3–4, pp. 181–191, 2014.
 QVector<double> gen_flick_sin(double freq, int refreshRate, float length)
 {
-//    int samples = refreshRate * int(length);
-    qDebug() << "round: " << refreshRate * (length / 1000);
+//    int samples = refreshRate * int(length);    
     int samples = refreshRate * (length / 1000);
-    qDebug() << Q_FUNC_INFO << "Samples: " << samples;
     QVector<double> stim(samples, 0);
 
     for(int index = 0; index < samples; index++)

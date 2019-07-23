@@ -157,8 +157,6 @@ void FaceSpeller::stimulationInvertedColoredFace()
                 widget()->setStyleSheet("qproperty-pixmap: url(:/images/bennabi_face_red_inverted.png)");
 
 
-
-
     }
 
     else if (currentStim <= 6)

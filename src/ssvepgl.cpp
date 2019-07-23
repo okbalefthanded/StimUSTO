@@ -20,7 +20,7 @@ SsvepGL::SsvepGL(SSVEP *paradigm, int t_port)
     // m_preTrialWait = m_ssvep->breakDuration();
 
     m_preTrialWait = 3;
-    qDebug() << "SSVEP stim duration : " << m_ssvep->stimulationDuration();
+//    qDebug() << "SSVEP stim duration : " << m_ssvep->stimulationDuration();
     // set vertices, vertices indeices & colors
     initElements();
 
@@ -165,7 +165,7 @@ void SsvepGL::preTrial()
     if(m_firstRun)
     {
         m_flickeringSequence = new RandomFlashSequence(m_ssvep->nrElements(), m_ssvep->nrSequences() / m_ssvep->nrElements());
-        qDebug()<< "sequence "<<m_flickeringSequence->sequence;
+//        qDebug()<< "sequence "<<m_flickeringSequence->sequence;
         m_firstRun = false;
     }
 
@@ -176,7 +176,7 @@ void SsvepGL::preTrial()
         if (m_ssvep->experimentMode() == operation_mode::CALIBRATION ||
                 m_ssvep->experimentMode() == operation_mode::COPY_MODE)
         {
-            qDebug() << "Higlight target SSVEP ";
+//            qDebug() << "Higlight target SSVEP ";
             highlightTarget();
         }
 
@@ -186,7 +186,7 @@ void SsvepGL::preTrial()
         if (m_ssvep->experimentMode() == operation_mode::CALIBRATION ||
                 m_ssvep->experimentMode() == operation_mode::COPY_MODE)
         {
-            qDebug() << "Refresh target SSVEP ";
+//            qDebug() << "Refresh target SSVEP ";
             refreshTarget();
         }
     }
@@ -194,7 +194,6 @@ void SsvepGL::preTrial()
     m_preTrialTimer->start();
     m_preTrialCount++;
 
-    qDebug()<< "SSVEP GL "<<  m_preTrialWait;
 
     if (m_preTrialCount > m_preTrialWait)
     {
@@ -278,7 +277,7 @@ void SsvepGL::Flickering()
     //    sendMarker(OVTK_StimulationId_VisualSteadyStateStimulationStart);
     //        qDebug()<< Q_FUNC_INFO << "markers sent" << "current time: " << QTime::currentTime().msec();
     // qDebug()<< Q_FUNC_INFO << "Stim : " << "current time: " << QTime::currentTime().msec();
-    qDebug()<<"Stimulation "<<m_flickeringSequence->sequence[m_currentFlicker];
+
 
     while(m_index <= m_flicker[0].size())
     {
@@ -302,12 +301,12 @@ void SsvepGL::feedback()
 
         if(m_sessionFeedback[m_currentFlicker].digitValue() == m_flickeringSequence->sequence[m_currentFlicker])
         {
-            highlightFeedback(glColors::red, m_flickeringSequence->sequence[m_currentFlicker]-1);
+            highlightFeedback(glColors::green, m_flickeringSequence->sequence[m_currentFlicker]-1);
             ++m_correct;
         }
         else
         {
-            highlightFeedback(glColors::orange, m_sessionFeedback[m_currentFlicker].digitValue()-1);
+            highlightFeedback(glColors::blue, m_sessionFeedback[m_currentFlicker].digitValue()-1);
         }
     }
     else if(m_ssvep->experimentMode() == operation_mode::FREE_MODE)
@@ -475,16 +474,26 @@ void SsvepGL::highlightTarget()
 
     if(m_ssvep->nrElements() == 1)
     {
-        m_colors = {glColors::green, glColors::green, glColors::green, glColors::green};
+        //        m_colors = {glColors::green, glColors::green, glColors::green, glColors::green};
+        //        m_colors = {glColors::red, glColors::red, glColors::red, glColors::red};
+        m_colors = {glColors::yellow, glColors::yellow, glColors::yellow, glColors::yellow};
     }
     else
     {
         int tmp = m_flickeringSequence->sequence[m_currentFlicker]-1;
         int squareIndex = tmp + (glUtils::VERTICES_PER_TRIANGLE*tmp);
-        m_colors[squareIndex] = glColors::green;
-        m_colors[squareIndex + 1] = glColors::green;
-        m_colors[squareIndex + 2] = glColors::green;
-        m_colors[squareIndex + 3] = glColors::green;
+        //        m_colors[squareIndex] = glColors::green;
+        //        m_colors[squareIndex + 1] = glColors::green;
+        //        m_colors[squareIndex + 2] = glColors::green;
+        //        m_colors[squareIndex + 3] = glColors::green;
+        //        m_colors[squareIndex] = glColors::red;
+        //        m_colors[squareIndex + 1] = glColors::red;
+        //        m_colors[squareIndex + 2] = glColors::red;
+        //        m_colors[squareIndex + 3] = glColors::red;
+        m_colors[squareIndex] = glColors::yellow;
+        m_colors[squareIndex + 1] = glColors::yellow;
+        m_colors[squareIndex + 2] = glColors::yellow;
+        m_colors[squareIndex + 3] = glColors::yellow;
     }
 
     scheduleRedraw();
