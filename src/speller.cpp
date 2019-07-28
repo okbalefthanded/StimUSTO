@@ -11,6 +11,7 @@
 #include <QPropertyAnimation>
 #include <QDateTime>
 #include <QPixmap>
+#include <QDir>
 //
 #include "speller.h"
 #include "ui_speller.h"
@@ -73,7 +74,6 @@ Speller::Speller(QWidget *parent) :
 
     m_feedbackSocket = new QUdpSocket(this);
     m_feedbackSocket->bind(QHostAddress::LocalHost, m_feedbackPort);
-
 
     m_state = trial_state::PRE_TRIAL;
 }
@@ -174,6 +174,7 @@ void Speller::preTrial()
     if(m_trials == 0)
     {
         sendMarker(OVTK_StimulationId_ExperimentStart);
+        //        initLogger();
     }
 
     if (m_preTrialCount == 0)
@@ -241,26 +242,15 @@ void Speller::feedback()
     if (m_ERP->experimentMode() == operation_mode::COPY_MODE)
     {
 
+        int id = m_text[m_text.length()-1].digitValue();
+        QPixmap map = m_icons[id-1];
+
         if( m_text[m_text.length()-1] == m_desiredPhrase[m_currentLetter - 1])
         {
             //            this->layout()->itemAt(m_currentTarget)->
             //                    widget()->setStyleSheet("QLabel { color : green; font: 40pt }");
 
-//            QPixmap map =  m_icons[m_currentLetter - 1];
-             QPixmap map =  m_icons[m_text.length() - 1];
             map.fill(Qt::green);
-
-            m_element = new QLabel();
-            m_element->setPixmap(map);
-            m_element->setAlignment(Qt::AlignCenter);
-
-            this->layout()->replaceWidget(this->
-                                          layout()->
-                                          itemAt(m_text.length())->
-                                          widget(),
-                                          m_element,
-                                          Qt::FindDirectChildrenOnly);
-
             isCorrect = true;
             ++m_correct;
         }
@@ -268,22 +258,21 @@ void Speller::feedback()
         {
             //            this->layout()->itemAt(m_currentTarget)->
             //                    widget()->setStyleSheet("QLabel { color : blue; font: 40pt }");
-            int id = m_text[m_text.length()-1].digitValue();
-            QPixmap map = m_icons[id-1];
             map.fill(Qt::blue);
-            m_element = new QLabel();
-            m_element->setPixmap(map);
-            m_element->setAlignment(Qt::AlignCenter);
-
-            this->layout()->replaceWidget(this->
-                                          layout()->
-                                          itemAt(id)->
-                                          widget(),
-                                          m_element,
-                                          Qt::FindDirectChildrenOnly);
             isCorrect = false;
 
         }
+
+        m_element = new QLabel();
+        m_element->setPixmap(map);
+        m_element->setAlignment(Qt::AlignCenter);
+
+        this->layout()->replaceWidget(this->
+                                      layout()->
+                                      itemAt(id)->
+                                      widget(),
+                                      m_element,
+                                      Qt::FindDirectChildrenOnly);
     }
 
     postTrial();
@@ -304,7 +293,7 @@ void Speller::postTrial()
     if (m_ERP->experimentMode() == operation_mode::COPY_MODE)
     {
 
-       int id = m_text[m_text.length()-1].digitValue();
+        int id = m_text[m_text.length()-1].digitValue();
         QPixmap map = m_icons[id-1];
         m_element = new QLabel();
         m_element->setPixmap(map);
@@ -485,6 +474,30 @@ void Speller::switchStimulationTimers()
         m_isiTimer->start();
         m_state = trial_state::STIMULUS;
     }
+}
+
+void Speller::initLogger()
+{
+
+    qDebug() << Q_FUNC_INFO;
+
+    QDir logsDir(QCoreApplication::applicationDirPath() + "/logs");
+    if(!logsDir.exists())
+    {
+        logsDir.mkdir(logsDir.path());
+    }
+    QString fileName;
+    if(m_ERP->experimentMode() == operation_mode::CALIBRATION)
+    {
+
+        fileName = logsDir.filePath("erp_calib_" +QDateTime::currentDateTime().toString("dd_MM_yyyy_hh_mm_ss")+".txt");
+    }
+    else
+    {
+        fileName =  logsDir.filePath("erp_online_" +QDateTime::currentDateTime().toString("dd_MM_yyyy_hh_mm_ss")+".txt");
+    }
+
+    log = new Logger(this, fileName);
 }
 
 ERP *Speller::erp() const

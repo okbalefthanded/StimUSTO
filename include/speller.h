@@ -11,6 +11,7 @@
 #include "matrixlayout.h"
 #include "erp.h"
 #include "utils.h"
+#include "logger.h"
 //
 
 namespace Ui {
@@ -64,6 +65,7 @@ protected:
     void refreshTarget();
     void sendStimulationInfo();
     void switchStimulationTimers();
+    void initLogger();
 
     Ui::Speller *ui;
 
@@ -109,6 +111,8 @@ protected:
     QLabel *m_textRow;
     QUdpSocket *m_feedbackSocket;
     RandomFlashSequence *m_flashingSequence;
+    // logger
+    Logger *log;
 };
 
 #endif // SPELLER_H
