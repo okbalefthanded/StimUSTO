@@ -25,19 +25,21 @@ HybridStimulation::HybridStimulation(Hybrid *hybridStimulation, Speller *ERPspel
     //    m_robotSocket->bind(QHostAddress::LocalHost, m_robotPort); // provide Robot Address
     //    m_robotSocket->bind(QHostAddress("10.3.66.5"), m_robotPort);
 
-    // connect to Robot
-    m_robotSocket = new QTcpSocket();
-    //    m_robotSocket->connectToHost(QHostAddress("10.3.66.5"), m_robotPort);
-    m_robotSocket->connectToHost(QHostAddress("10.3.65.128"), m_robotPort);
-    if(m_robotSocket->waitForConnected())
+    // connect to Robot if external communication is enabled
+    if(m_hybridStimulaiton->externalComm() == external_comm::ENABLED)
     {
-        qDebug() << "Robot Connection : State Connected";
+        m_robotSocket = new QTcpSocket();
+        //    m_robotSocket->connectToHost(QHostAddress("10.3.66.5"), m_robotPort);
+        m_robotSocket->connectToHost(QHostAddress("10.3.65.128"), m_robotPort);
+        if(m_robotSocket->waitForConnected())
+        {
+            qDebug() << "Robot Connection : State Connected";
+        }
+        else
+        {
+            qDebug() << "Robot Connection : State Not Connected";
+        }
     }
-    else
-    {
-        qDebug() << "Robot Connection : State Not Connected";
-    }
-
     //
     m_ssvepStimulation->m_firstRun = false;
     m_ssvepStimulation->m_flickeringSequence = new RandomFlashSequence(1, 1);
@@ -70,7 +72,7 @@ HybridStimulation::HybridStimulation(Hybrid *hybridStimulation, Speller *ERPspel
 
 void HybridStimulation::hybridPreTrial()
 {
-    // qDebug() << "[HYBRID PRETRIAL START]" << Q_FUNC_INFO;
+    qDebug() << "[HYBRID PRETRIAL START]" << Q_FUNC_INFO;
 
     if(m_hybridStimulaiton->experimentMode() == operation_mode::CALIBRATION)
     {
@@ -96,7 +98,7 @@ void HybridStimulation::hybridPreTrial()
 
 void HybridStimulation::startTrial()
 {
-    //    qDebug() << "[HYBRID TRIAL START]" << Q_FUNC_INFO;
+        qDebug() << "[HYBRID TRIAL START]" << Q_FUNC_INFO;
 
     if(m_hybridState == trial_state::PRE_TRIAL)
     {
@@ -166,54 +168,51 @@ void HybridStimulation::hybridPostTrial()
         qDebug() << Q_FUNC_INFO << "SSVEP feedback: " << m_SSVEPFeedback;
     }
 
-    // Send and Recieve feedback to/from Robot
-    qDebug() << "Sending Feedback to Robot";
+    // Send and Recieve feedback to/from Robot if external communication is enabled
     m_hybridCommand = m_ERPFeedback[m_currentTrial] + m_SSVEPFeedback.at(m_currentTrial);
-
-    // m_hybridCommand = "12";
-    if (!m_robotSocket->isOpen())
+    if(m_hybridStimulaiton->externalComm() == external_comm::ENABLED)
     {
-        qDebug()<< "Not sending Feedback to Robot : Cannot send feedback socket is not open";
+        qDebug() << "Sending Feedback to Robot";
+        // m_hybridCommand = "12";
+        if (!m_robotSocket->isOpen())
+        {
+            qDebug()<< "Not sending Feedback to Robot : Cannot send feedback socket is not open";
+        }
+
+        try
+        {
+            m_hybridCommand = "12";
+            std::string str = m_hybridCommand.toStdString();
+            const char* p = str.c_str();
+
+            QByteArray byteovStimulation;
+            QDataStream streamovs(&byteovStimulation, QIODevice::WriteOnly);
+            streamovs.setByteOrder(QDataStream::LittleEndian);
+            //  streamovs << m_hybridCommand;
+            streamovs.writeRawData(p, m_hybridCommand.length());
+            m_robotSocket->write(byteovStimulation);
+            m_robotSocket->waitForBytesWritten();
+
+        }
+        catch(...)
+        {
+            qDebug() <<"Send Feedback to Robot, Issue With writting Data";
+        }
+
+        qDebug() << "Recieve State from Robot";
+        m_robotSocket->waitForReadyRead();
+
+        QByteArray robotState = m_robotSocket->readAll();
+
+        quint8 rState = robotState.toUInt();
+        qDebug()<< Q_FUNC_INFO << "Robot State recieved " << rState;
+        if(rState == robot_state::READY)
+        {
+            qDebug()<< "Correct State";
+            m_hybridState = trial_state::PRE_TRIAL;
+        }
+
     }
-
-    try
-
-    {
-
-        m_hybridCommand = "12";
-        std::string str = m_hybridCommand.toStdString();
-        const char* p = str.c_str();
-
-        QByteArray byteovStimulation;
-        QDataStream streamovs(&byteovStimulation, QIODevice::WriteOnly);
-        streamovs.setByteOrder(QDataStream::LittleEndian);
-        //  streamovs << m_hybridCommand;
-        streamovs.writeRawData(p, m_hybridCommand.length());
-        m_robotSocket->write(byteovStimulation);
-        m_robotSocket->waitForBytesWritten();
-
-    }
-
-    catch(...)
-    {
-
-        qDebug() <<"Send Feedback to Robot, Issue With writting Data";
-    }
-
-    qDebug() << "Recieve State from Robot";
-    m_robotSocket->waitForReadyRead();
-
-    QByteArray robotState = m_robotSocket->readAll();
-
-    quint8 rState = robotState.toUInt();
-    qDebug()<< Q_FUNC_INFO << "Robot State recieved " << rState;
-    if(rState == robot_state::READY)
-    {
-        qDebug()<< "Correct State";
-        m_hybridState = trial_state::PRE_TRIAL;
-    }
-
-
     //    qDebug() << Q_FUNC_INFO << "Hybrid Command: "<< m_hybridCommand;
     /*
     QByteArray Data;
@@ -224,7 +223,6 @@ void HybridStimulation::hybridPostTrial()
     m_robotSocket->writeDatagram(Data, QHostAddress("10.3.66.5"), m_robotPort);
     */
     //
-
 
     //
     ++m_currentTrial;

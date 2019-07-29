@@ -20,6 +20,7 @@ Hybrid::Hybrid(ERP *erp, SSVEP *ssvep)
     m_ERPparadigm = new ERP(erp->experimentMode(),
                             erp->controlMode(),
                             erp->type(),
+                            external_comm::DISABLED,
                             erp->stimulationDuration(),
                             erp->breakDuration(),
                             erp->nrSequences(),
@@ -31,6 +32,7 @@ Hybrid::Hybrid(ERP *erp, SSVEP *ssvep)
     m_SSVEPparadigm = new SSVEP(ssvep->experimentMode(),
                                 ssvep->controlMode(),
                                 ssvep->type(),
+                                external_comm::DISABLED,
                                 ssvep->stimulationDuration(),
                                 ssvep->breakDuration(),
                                 ssvep->nrSequences(),
@@ -49,6 +51,7 @@ QVariant Hybrid::toVariant() const
 
     map.insert("paradigmType", m_type);
     map.insert("experimentMode", m_experimentMode);
+    map.insert("externalComm", m_externalComm);
     // ERP config
     map.insert("ERP_breakDuration", m_ERPparadigm->breakDuration());
     map.insert("ERP_desiredPhrase", m_ERPparadigm->desiredPhrase());
@@ -80,6 +83,14 @@ void Hybrid::fromVariant(const QVariant &variant)
 
     m_type = map.value("paradigymType").toUInt();
     m_experimentMode = map.value("experimentMode").toUInt();
+    if(map.value("externalComm").isNull())
+    {
+        m_externalComm = external_comm::DISABLED;
+    }
+    else
+    {
+        m_externalComm = map.value("externalComm").toInt();
+    }
     // ERP config
     m_ERPparadigm->setExperimentMode(map.value("experimentMode").toInt());
     m_ERPparadigm->setControlMode(map.value("ERP_controlMode").toInt());

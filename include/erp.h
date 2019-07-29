@@ -11,7 +11,7 @@ class ERP : public Paradigm
 
 public:
     explicit ERP();
-    explicit ERP(quint8 mode, quint8 control, quint8 type, int dur, quint8 bDur, quint8 nrSeq, QString phrase, quint8 sType,
+    explicit ERP(quint8 mode, quint8 control, quint8 type, quint8 comm, int dur, quint8 bDur, quint8 nrSeq, QString phrase, quint8 sType,
                  quint8 fMode);
 
     QVariant toVariant() const override;

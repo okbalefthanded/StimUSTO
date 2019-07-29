@@ -9,9 +9,9 @@ ERP::ERP() : Paradigm (),
 
 }
 
-ERP::ERP(quint8 mode, quint8 control, quint8 type, int dur, quint8 bDur,
+ERP::ERP(quint8 mode, quint8 control, quint8 type, quint8 comm, int dur, quint8 bDur,
          quint8 nrSeq, QString phrase, quint8 sType, quint8 fMode):
-        Paradigm(mode, control, type, dur, bDur, nrSeq, phrase),
+        Paradigm(mode, control, type, comm, dur, bDur, nrSeq, phrase),
         m_stimulationType(sType), m_flashingMode(fMode)
 {
 
@@ -24,6 +24,7 @@ QVariant ERP::toVariant() const
     map.insert("experimentMode", m_experimentMode);
     map.insert("controlMode", m_controlMode);
     map.insert("paradigmType", m_type);
+    map.insert("externalComm", m_externalComm);
     map.insert("stimulationDuration", m_stimulationDuration);
     map.insert("breakDuration", m_breakDuration);
     map.insert("nrSequences", m_nrSequences);
@@ -40,6 +41,14 @@ void ERP::fromVariant(const QVariant &variant)
     QVariantMap map = variant.toMap();
     m_experimentMode = map.value("experimentMode").toInt();
     m_controlMode = map.value("controlMode").toInt();
+    if(map.value("externalComm").isNull())
+    {
+        m_externalComm = external_comm::DISABLED;
+    }
+    else
+    {
+        m_externalComm = map.value("externalComm").toInt();
+    }
     m_type = map.value("paradigmType").toInt();
     m_stimulationDuration = map.value("stimulationDuration").toInt();
     m_breakDuration = map.value("breakDuration").toInt();

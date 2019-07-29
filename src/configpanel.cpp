@@ -236,6 +236,7 @@ ERP *ConfigPanel::initParadigmERPGui()
     erpParadigm = new ERP(ui->spellingModeChoices->currentIndex(),
                           control_mode::SYNC, // TODO : implement async ERP control mode
                           paradigm_type::ERP,
+                          external_comm::DISABLED,
                           ui->stimulusDuration->text().toInt(),
                           ui->interStimulusDuration->text().toInt(),
                           ui->numberOfRepetition->text().toInt(),
@@ -298,6 +299,7 @@ SSVEP *ConfigPanel::initParadigmSSVEPGui()
     ssvepParadigm = new SSVEP(operationMode,
                               ui->SSVEP_Control->currentIndex(),
                               paradigm_type::SSVEP,
+                              external_comm::DISABLED,
                               ui->SSVEP_StimDuration->text().toFloat(),
                               ui->SSVEP_BreakDuration->text().toFloat(),
                               ui->SSVEP_Sequence->text().toInt(),

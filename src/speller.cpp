@@ -80,7 +80,7 @@ Speller::Speller(QWidget *parent) :
 
 void Speller::startTrial()
 {
-    //     qDebug()<< "[TRIAL START]" << Q_FUNC_INFO;
+//    qDebug()<< "[TRIAL START]" << Q_FUNC_INFO;
 
     if (m_state == trial_state::PRE_TRIAL)
     {
@@ -169,7 +169,7 @@ void Speller::pauseFlashing()
 
 void Speller::preTrial()
 {
-    //    qDebug()<< Q_FUNC_INFO;
+//    qDebug()<< Q_FUNC_INFO;
 
     if(m_trials == 0)
     {
@@ -225,7 +225,11 @@ void Speller::preTrial()
 
     if (m_preTrialCount > m_preTrialWait || m_ERP->experimentMode() == operation_mode::FREE_MODE)
     {
-        refreshTarget();
+        if( m_ERP->experimentMode() == operation_mode::COPY_MODE)
+        {
+
+            refreshTarget();
+        }
         m_preTrialTimer->stop();
         m_preTrialCount = 0;
         m_state = trial_state::STIMULUS;
@@ -280,7 +284,7 @@ void Speller::feedback()
 
 void Speller::postTrial()
 {
-    //    qDebug()<< Q_FUNC_INFO;
+    qDebug()<< Q_FUNC_INFO;
 
     ++m_trials;
     m_currentStimulation = 0;
