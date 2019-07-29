@@ -80,7 +80,7 @@ Speller::Speller(QWidget *parent) :
 
 void Speller::startTrial()
 {
-//    qDebug()<< "[TRIAL START]" << Q_FUNC_INFO;
+    //    qDebug()<< "[TRIAL START]" << Q_FUNC_INFO;
 
     if (m_state == trial_state::PRE_TRIAL)
     {
@@ -169,7 +169,7 @@ void Speller::pauseFlashing()
 
 void Speller::preTrial()
 {
-//    qDebug()<< Q_FUNC_INFO;
+    //    qDebug()<< Q_FUNC_INFO;
 
     if(m_trials == 0)
     {
@@ -253,7 +253,6 @@ void Speller::feedback()
         {
             //            this->layout()->itemAt(m_currentTarget)->
             //                    widget()->setStyleSheet("QLabel { color : green; font: 40pt }");
-
             map.fill(Qt::green);
             isCorrect = true;
             ++m_correct;
@@ -264,9 +263,25 @@ void Speller::feedback()
             //                    widget()->setStyleSheet("QLabel { color : blue; font: 40pt }");
             map.fill(Qt::blue);
             isCorrect = false;
-
         }
 
+        m_element = new QLabel();
+        m_element->setPixmap(map);
+        m_element->setAlignment(Qt::AlignCenter);
+
+        this->layout()->replaceWidget(this->
+                                      layout()->
+                                      itemAt(id)->
+                                      widget(),
+                                      m_element,
+                                      Qt::FindDirectChildrenOnly);
+    }
+
+    else if (m_ERP->experimentMode() == operation_mode::FREE_MODE)
+    {
+        int id = m_text[m_text.length()-1].digitValue();
+        QPixmap map = m_icons[id-1];
+        map.fill(Qt::blue);
         m_element = new QLabel();
         m_element->setPixmap(map);
         m_element->setAlignment(Qt::AlignCenter);
@@ -294,7 +309,7 @@ void Speller::postTrial()
     //  utils::wait(500);
     utils::wait(250);
     //    refreshTarget();
-    if (m_ERP->experimentMode() == operation_mode::COPY_MODE)
+    if (m_ERP->experimentMode() == operation_mode::COPY_MODE || m_ERP->experimentMode() == operation_mode::FREE_MODE)
     {
 
         int id = m_text[m_text.length()-1].digitValue();
