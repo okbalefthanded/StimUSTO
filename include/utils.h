@@ -17,6 +17,8 @@ static QChar letters[6][6] = {
     {'4','5','6','7','8','9'},
 };
 
+static QString ArabicLetters = "<>_9876543210أبتثجحخدذرزسشصضطظغفقكلمنهوي";
+
 // rectangle flickering
 QVector<double> gen_flick(double freq, int refreshRate, float length, quint8 stimMode);
 

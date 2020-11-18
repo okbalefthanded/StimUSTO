@@ -22,8 +22,9 @@ QVector<double> gen_flick(double freq, int refreshRate, float length, quint8 sti
 //
 QVector<double> gen_flick_on_off(double freq, int refreshRate, float length)
 {
-    //    int samples = refreshRate * (length / 1000);
-    int samples = refreshRate * length;
+    int samples = refreshRate * (length / 1000);
+    //int samples = refreshRate * length;
+
     int period = refreshRate / freq;QVector<double> temp(period, 1);
     QVector<double> v;
 
