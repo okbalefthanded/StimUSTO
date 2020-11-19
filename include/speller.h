@@ -6,6 +6,7 @@
 #include <QImage>
 #include <QElapsedTimer>
 #include <QUdpSocket>
+#include <QTcpSocket>
 //
 #include "ui_spellerform.h"
 #include "randomflashsequence.h"
@@ -112,6 +113,12 @@ protected:
     QLabel *m_textRow;
     QUdpSocket *m_feedbackSocket;
     RandomFlashSequence *m_flashingSequence;
+
+    // external communication
+    QString m_hybridCommand = "";
+    quint16 m_robotPort = 12347;
+    QTcpSocket *m_robotSocket;
+
     // logger
     Logger *log;
 };

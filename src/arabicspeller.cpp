@@ -49,7 +49,6 @@ void ArabicSpeller::pauseFlashing()
 }
 
 
-
 void ArabicSpeller::startFlashing()
 {
     qDebug()<< Q_FUNC_INFO;

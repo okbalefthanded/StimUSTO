@@ -21,7 +21,7 @@
 #include "utils.h"
 //
 Speller::Speller(QWidget *parent) : QWidget(parent)
-    //ui(new Ui::Speller)
+  //ui(new Ui::Speller)
 {
 
     qDebug()<< Q_FUNC_INFO;
@@ -103,7 +103,7 @@ void Speller::pauseFlashing()
 {
 
     // sendMarker(OVTK_StimulationId_VisualStimulationStop);
-    qDebug() << Q_FUNC_INFO << QTime::currentTime().msec();
+    // qDebug() << Q_FUNC_INFO << QTime::currentTime().msec();
 
     //   this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
     //                widget()->setStyleSheet("QLabel { color : gray; font: 40pt }");
@@ -261,8 +261,8 @@ void Speller::feedback()
             }
             else
             {
-                //            this->layout()->itemAt(m_currentTarget)->
-                //                    widget()->setStyleSheet("QLabel { color : blue; font: 40pt }");
+                this->layout()->itemAt(m_currentTarget)->
+                        widget()->setStyleSheet("QLabel { color : blue; font: 40pt }");
                 map.fill(Qt::blue);
                 isCorrect = false;
             }
@@ -281,6 +281,10 @@ void Speller::feedback()
 
         else if (m_ERP->experimentMode() == operation_mode::FREE_MODE)
         {
+
+            //        this->layout()->itemAt(0)->
+            //             widget()->setStyleSheet("QLabel { color : blue; font: 40pt }");
+
             int id = m_text[m_text.length()-1].digitValue();
             QPixmap map = m_icons[id-1];
             map.fill(Qt::blue);
@@ -294,6 +298,7 @@ void Speller::feedback()
                                           widget(),
                                           m_element,
                                           Qt::FindDirectChildrenOnly);
+
         }
     }
     postTrial();
@@ -312,7 +317,8 @@ void Speller::postTrial()
     utils::wait(250);
     //    refreshTarget();
 
-    if (m_text[m_text.length()-1] != "#") {
+    if (m_text[m_text.length()-1] != "#")
+    {
         if (m_ERP->experimentMode() == operation_mode::COPY_MODE || m_ERP->experimentMode() == operation_mode::FREE_MODE)
         {
 
@@ -334,6 +340,53 @@ void Speller::postTrial()
             refreshTarget();
         }
     }
+    //
+    // Send and Recieve feedback to/from Robot if external communication is enabled
+    // m_hybridCommand = m_ERPFeedback[m_currentTrial] + m_SSVEPFeedback.at(m_currentTrial);
+    if(m_ERP->externalComm() == external_comm::ENABLED)
+    {
+        qDebug() << "Sending Feedback to Robot";
+        // m_hybridCommand = "12";
+        if (!m_robotSocket->isOpen())
+        {
+            qDebug()<< "Not sending Feedback to Robot : Cannot send feedback socket is not open";
+        }
+
+        try
+        {
+            m_hybridCommand = "12";
+            std::string str = m_hybridCommand.toStdString();
+            const char* p = str.c_str();
+
+            QByteArray byteovStimulation;
+            QDataStream streamovs(&byteovStimulation, QIODevice::WriteOnly);
+            streamovs.setByteOrder(QDataStream::LittleEndian);
+            //  streamovs << m_hybridCommand;
+            streamovs.writeRawData(p, m_hybridCommand.length());
+            m_robotSocket->write(byteovStimulation);
+            m_robotSocket->waitForBytesWritten();
+
+        }
+        catch(...)
+        {
+            qDebug() <<"Send Feedback to Robot, Issue With writting Data";
+        }
+
+        qDebug() << "Recieve State from Robot";
+        m_robotSocket->waitForReadyRead();
+
+        QByteArray robotState = m_robotSocket->readAll();
+
+        quint8 rState = robotState.toUInt();
+        qDebug()<< Q_FUNC_INFO << "Robot State recieved " << rState;
+        if(rState == robot_state::READY)
+        {
+            qDebug()<< "Correct State";
+            m_state = trial_state::PRE_TRIAL;
+        }
+
+    }
+
     //
     if (m_currentLetter >= m_desiredPhrase.length() &&
             m_desiredPhrase.length() != 1 &&
@@ -425,10 +478,10 @@ void Speller::highlightTarget()
         }
     }
 
-    /*
-    this->layout()->itemAt(m_currentTarget)->
-            widget()->setStyleSheet("QLabel { color : red; font: 60pt }");
-    */
+
+    // this->layout()->itemAt(m_currentTarget)->
+    //         widget()->setStyleSheet("QLabel { color : red; font: 60pt }");
+
     QPixmap map = m_icons[m_currentTarget - 1];
     map.fill(Qt::yellow);
 
@@ -442,6 +495,7 @@ void Speller::highlightTarget()
                                   widget(),
                                   m_element,
                                   Qt::FindDirectChildrenOnly);
+
 
 }
 
@@ -535,6 +589,25 @@ void Speller::setERP(ERP *erp)
     m_ERP = erp;
     setTimers(m_ERP->stimulationDuration(), m_ERP->breakDuration());
     setDesiredPhrase(m_ERP->desiredPhrase());
+    // external comm
+    // a temporary hack
+    qDebug()<< "Lets see external comm" <<m_ERP->externalComm();
+    if(m_ERP->externalComm() == external_comm::ENABLED)
+    {
+        qDebug()<< "External Comm is enabled;";
+        m_robotSocket = new QTcpSocket();
+        //    m_robotSocket->connectToHost(QHostAddress("10.3.66.5"), m_robotPort);
+        // 10.3.66.5 / 10.6.65.128 /10.3.64.92
+        m_robotSocket->connectToHost(QHostAddress("10.3.64.92"), m_robotPort);
+        if(m_robotSocket->waitForConnected())
+        {
+            qDebug() << "Robot Connection : State Connected";
+        }
+        else
+        {
+            qDebug() << "Robot Connection : State Not Connected";
+        }
+    }
 }
 
 void Speller::setTimers(int t_stimulation, int t_isi)
@@ -547,77 +620,6 @@ void Speller::setDesiredPhrase(const QString &t_desiredPhrase)
 {
     m_desiredPhrase = t_desiredPhrase;
 }
-
-void Speller::createLayout()
-{
-    qDebug()<< Q_FUNC_INFO;
-    // speller settings
-    // Arabic speller
-    m_rows = 5;
-    m_cols = 8;
-    m_nrElements = m_rows * m_cols;
-
-    m_icons = QList<QPixmap>();
-    m_element = new QLabel();
-    m_element->setAlignment(Qt::AlignCenter);
-    QGridLayout *layout = new QGridLayout();
-
-    m_textRow = new QLabel(this);
-    m_textRow->setText(m_desiredPhrase);
-    m_textRow->setStyleSheet("font:30pt; color:gray; border-color:white;");
-    m_textRow->setAlignment(Qt::AlignLeft);
-    //    textRow->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    layout->addWidget(m_textRow, 0, 0, 1, 0);
-
-    int k = 0, nbr=0;
-    QString stimName;
-    QPixmap pic;
-    QImage iconImage;
-    int label_h, label_w;
-    // add speller ellements
-    for(int i=1; i<m_rows+1; i++)
-    {
-        for(int j=0; j<m_cols; j++)
-        {
-            QLabel *element = new QLabel(this);
-            label_h = element->height();
-            label_w = element->width();
-
-            if(k < utils::ArabicLetters.length())
-            {
-                element->setText(utils::ArabicLetters.at(k));
-                m_presentedLetters.append(utils::ArabicLetters.at(k));
-            }
-            else
-            {
-                element->setText(utils::numbers.at(nbr));
-                m_presentedLetters.append(utils::numbers.at(nbr));
-                nbr++;
-            }
-
-            element->setStyleSheet("font: 40pt; color:gray");
-            element->setAlignment(Qt::AlignCenter);
-            layout->addWidget(element, i, j);
-
-            k++;
-
-        }
-    }
-
-    this->setLayout(layout);
-}
-
-void Speller::refreshLayout()
-{
-    // TODO
-}
-
-Speller::~Speller()
-{
-    // delete ui;
-}
-
-/*
 
 void Speller::createLayout()
 {
@@ -699,5 +701,73 @@ void Speller::createLayout()
 
     this->setLayout(layout);
 }
+void Speller::refreshLayout()
+{
+    // TODO
+}
 
-*/
+Speller::~Speller()
+{
+    // delete ui;
+}
+
+
+/*
+void Speller::createLayout()
+{
+    qDebug()<< Q_FUNC_INFO;
+    // speller settings
+    // Arabic speller
+    m_rows = 5;
+    m_cols = 8;
+    m_nrElements = m_rows * m_cols;
+
+    m_icons = QList<QPixmap>();
+    m_element = new QLabel();
+    m_element->setAlignment(Qt::AlignCenter);
+    QGridLayout *layout = new QGridLayout();
+
+    m_textRow = new QLabel(this);
+    m_textRow->setText(m_desiredPhrase);
+    m_textRow->setStyleSheet("font:30pt; color:gray; border-color:white;");
+    m_textRow->setAlignment(Qt::AlignLeft);
+    //    textRow->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    layout->addWidget(m_textRow, 0, 0, 1, 0);
+
+    int k = 0, nbr=0;
+    QString stimName;
+    QPixmap pic;
+    QImage iconImage;
+    int label_h, label_w;
+    // add speller ellements
+    for(int i=1; i<m_rows+1; i++)
+    {
+        for(int j=0; j<m_cols; j++)
+        {
+            QLabel *element = new QLabel(this);
+            label_h = element->height();
+            label_w = element->width();
+
+            if(k < utils::ArabicLetters.length())
+            {
+                element->setText(utils::ArabicLetters.at(k));
+                m_presentedLetters.append(utils::ArabicLetters.at(k));
+            }
+            else
+            {
+                element->setText(utils::numbers.at(nbr));
+                m_presentedLetters.append(utils::numbers.at(nbr));
+                nbr++;
+            }
+
+            element->setStyleSheet("font: 40pt; color:gray");
+            element->setAlignment(Qt::AlignCenter);
+            layout->addWidget(element, i, j);
+
+            k++;
+
+        }
+    }
+
+    this->setLayout(layout);
+}*/

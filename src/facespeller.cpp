@@ -115,7 +115,7 @@ void FaceSpeller::stimulationColoredFace()
 
 void FaceSpeller::stimulationInvertedFace()
 {
-        qDebug() << Q_FUNC_INFO << QTime::currentTime().msec();
+       // qDebug() << Q_FUNC_INFO << QTime::currentTime().msec();
 
     this->layout()
             ->itemAt(m_flashingSequence->sequence[m_currentStimulation])
@@ -146,7 +146,7 @@ void FaceSpeller::stimulationInvertedColoredFace()
 
     int currentStim = m_flashingSequence->sequence[m_currentStimulation];
 
-//    qDebug() << Q_FUNC_INFO << QTime::currentTime().msec();
+    //qDebug() << Q_FUNC_INFO << QTime::currentTime().msec();
 
     if(currentStim <= 3)
     {
