@@ -242,6 +242,7 @@ ERP *ConfigPanel::initParadigmERPGui()
                           ui->interStimulusDuration->text().toInt(),
                           ui->numberOfRepetition->text().toInt(),
                           ui->desiredPhrase->text(),
+                          "127.0.0.1",
                           spellerType,
                           flashing_mode::SC);
     return erpParadigm;
@@ -313,6 +314,7 @@ SSVEP *ConfigPanel::initParadigmSSVEPGui()
                               ui->SSVEP_BreakDuration->text().toFloat(),
                               ui->SSVEP_Sequence->text().toInt(),
                               "",
+                              "127.0.0.1",
                               SSVEPNrElements,
                               ui->Frequencies->text(),
                               ui->SSVEP_Stimulation->currentIndex());

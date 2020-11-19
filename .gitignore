@@ -3,3 +3,5 @@ build
 
 # Ignore any executables
 bin/*
+
+*.pro.*

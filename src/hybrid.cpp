@@ -25,6 +25,7 @@ Hybrid::Hybrid(ERP *erp, SSVEP *ssvep)
                             erp->breakDuration(),
                             erp->nrSequences(),
                             erp->desiredPhrase(),
+                            m_externalAddress,
                             erp->stimulationType(),
                             erp->flashingMode()
                             );
@@ -37,12 +38,12 @@ Hybrid::Hybrid(ERP *erp, SSVEP *ssvep)
                                 ssvep->breakDuration(),
                                 ssvep->nrSequences(),
                                 ssvep->desiredPhrase(),
+                                m_externalAddress,
                                 ssvep->nrElements(),
                                 ssvep->frequencies(),
                                 ssvep->stimulationMode()
                                 );
 }
-
 
 
 QVariant Hybrid::toVariant() const
@@ -52,6 +53,7 @@ QVariant Hybrid::toVariant() const
     map.insert("paradigmType", m_type);
     map.insert("experimentMode", m_experimentMode);
     map.insert("externalComm", m_externalComm);
+    map.insert("ip", m_externalAddress);
     // ERP config
     map.insert("ERP_breakDuration", m_ERPparadigm->breakDuration());
     map.insert("ERP_desiredPhrase", m_ERPparadigm->desiredPhrase());
@@ -83,13 +85,16 @@ void Hybrid::fromVariant(const QVariant &variant)
 
     m_type = map.value("paradigymType").toUInt();
     m_experimentMode = map.value("experimentMode").toUInt();
+
     if(map.value("externalComm").isNull())
     {
         m_externalComm = external_comm::DISABLED;
+        m_externalAddress = "127.0.0.1"; // home sweet home
     }
     else
     {
         m_externalComm = map.value("externalComm").toInt();
+        m_externalAddress = map.value("ip").toString();
     }
     // ERP config
     m_ERPparadigm->setExperimentMode(map.value("experimentMode").toInt());

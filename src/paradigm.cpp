@@ -3,16 +3,18 @@
 #include "paradigm.h"
 #include "utils.h"
 //
-Paradigm::Paradigm(quint8 mode, quint8 control, quint8 type, quint8 comm, int dur, quint8 bDur, quint8 nrSeq, QString phrase):
-    m_experimentMode(mode), m_controlMode(control), m_type(type), m_externalComm(comm), m_stimulationDuration(dur), m_breakDuration(bDur), m_nrSequences(nrSeq),
-    m_desiredPhrase(phrase)
+Paradigm::Paradigm(quint8 mode, quint8 control, quint8 type, quint8 comm, int dur, quint8 bDur,
+                   quint8 nrSeq, QString phrase, QString ip):
+    m_experimentMode(mode), m_controlMode(control), m_type(type), m_externalComm(comm),
+    m_stimulationDuration(dur), m_breakDuration(bDur), m_nrSequences(nrSeq),
+    m_desiredPhrase(phrase), m_externalAddress(ip)
 {
 
 }
 
 Paradigm::Paradigm():
     m_experimentMode(operation_mode::CALIBRATION), m_controlMode(control_mode::SYNC), m_type(paradigm_type::ERP), m_externalComm(external_comm::DISABLED),
-    m_stimulationDuration(100), m_breakDuration(100), m_nrSequences(10), m_desiredPhrase("12345")
+    m_stimulationDuration(100), m_breakDuration(100), m_nrSequences(10), m_desiredPhrase("12345"), m_externalAddress("127.0.0.1")
 {
 
 }
@@ -29,6 +31,7 @@ QVariant Paradigm::toVariant() const
     map.insert("breakDuration", m_breakDuration);
     map.insert("nrSequences", m_nrSequences);
     map.insert("desiredPhrase", m_desiredPhrase);
+    map.insert("ip", m_externalAddress);
     return map;
 }
 
@@ -130,6 +133,16 @@ quint8 Paradigm::externalComm() const
 void Paradigm::setExternalComm(const quint8 &externalComm)
 {
     m_externalComm = externalComm;
+}
+
+QString Paradigm::externalAddress() const
+{
+    return m_externalAddress;
+}
+
+void Paradigm::setExternalAddress(const QString &externalAddress)
+{
+    m_externalAddress = externalAddress;
 }
 
 Paradigm::~Paradigm()

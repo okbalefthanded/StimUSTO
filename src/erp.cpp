@@ -10,8 +10,8 @@ ERP::ERP() : Paradigm (),
 }
 
 ERP::ERP(quint8 mode, quint8 control, quint8 type, quint8 comm, int dur, quint8 bDur,
-         quint8 nrSeq, QString phrase, quint8 sType, quint8 fMode):
-        Paradigm(mode, control, type, comm, dur, bDur, nrSeq, phrase),
+         quint8 nrSeq, QString phrase,  QString ip, quint8 sType, quint8 fMode):
+        Paradigm(mode, control, type, comm, dur, bDur, nrSeq, phrase, ip),
         m_stimulationType(sType), m_flashingMode(fMode)
 {
 
@@ -25,6 +25,7 @@ QVariant ERP::toVariant() const
     map.insert("controlMode", m_controlMode);
     map.insert("paradigmType", m_type);
     map.insert("externalComm", m_externalComm);
+    map.insert("ip", m_externalAddress);
     map.insert("stimulationDuration", m_stimulationDuration);
     map.insert("breakDuration", m_breakDuration);
     map.insert("nrSequences", m_nrSequences);
@@ -44,10 +45,12 @@ void ERP::fromVariant(const QVariant &variant)
     if(map.value("externalComm").isNull())
     {
         m_externalComm = external_comm::DISABLED;
+        m_externalAddress = "127.0.0.1"; // home sweet home
     }
     else
     {
         m_externalComm = map.value("externalComm").toInt();
+        m_externalAddress = map.value("ip").toString();
     }
     m_type = map.value("paradigmType").toInt();
     m_stimulationDuration = map.value("stimulationDuration").toInt();

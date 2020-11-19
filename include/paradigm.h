@@ -9,7 +9,8 @@ class Paradigm : public Serializable
 
 
 public:
-    explicit Paradigm(quint8 mode, quint8 control, quint8 comm, quint8 type, int dur, quint8 bDur, quint8 nrSeq, QString phrase);
+    explicit Paradigm(quint8 mode, quint8 control, quint8 comm, quint8 type, int dur,
+                      quint8 bDur, quint8 nrSeq, QString phrase, QString ip);
     explicit Paradigm();
     ~Paradigm();
 
@@ -40,6 +41,9 @@ public:
     quint8 externalComm() const;
     void setExternalComm(const quint8 &externalComm);
 
+    QString externalAddress() const;
+    void setExternalAddress(const QString &externalAddress);
+
 protected:
     quint8 m_experimentMode;
     quint8 m_controlMode;
@@ -49,6 +53,7 @@ protected:
     int m_breakDuration; // isi for ERP, break for SSVEP
     quint8 m_nrSequences;
     QString m_desiredPhrase;
+    QString m_externalAddress;
 
 };
 

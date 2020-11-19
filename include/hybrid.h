@@ -28,6 +28,7 @@ private:
   //   int m_hybridState;
     ERP *m_ERPparadigm;
     SSVEP *m_SSVEPparadigm;
+    QString m_externalAddress;
 
 
 };
