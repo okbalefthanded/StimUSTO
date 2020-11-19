@@ -7,6 +7,7 @@
 #include <QElapsedTimer>
 #include <QUdpSocket>
 //
+#include "ui_spellerform.h"
 #include "randomflashsequence.h"
 #include "matrixlayout.h"
 #include "erp.h"
@@ -14,11 +15,12 @@
 #include "logger.h"
 //
 
+/*
 namespace Ui {
 class Speller;
 }
-
-class Speller : public QWidget
+*/
+class Speller : public QWidget, protected Ui::SpellerForm
 {
     Q_OBJECT
 
@@ -34,7 +36,6 @@ public:
 
     friend class Hybrid;
     friend class HybridStimulation;
-
 
 signals:
     void markerTag(uint64_t t_ovStimulation);
@@ -67,7 +68,7 @@ protected:
     void switchStimulationTimers();
     void initLogger();
 
-    Ui::Speller *ui;
+    // Ui::Speller *ui;
 
     int m_rows;
     int m_cols;

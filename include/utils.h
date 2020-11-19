@@ -17,7 +17,9 @@ static QChar letters[6][6] = {
     {'4','5','6','7','8','9'},
 };
 
-static QString ArabicLetters = "<>_9876543210أبتثجحخدذرزسشصضطظغفقكلمنهوي";
+// static QString ArabicLetters = "أبتثجحخدذرزسشصضطظغفقكلمنهوي";
+static QString ArabicLetters = "دخحجثتبأطضصشسزرذنملكقفغظيوه";
+static QString numbers = "0123456789<_>";
 
 // rectangle flickering
 QVector<double> gen_flick(double freq, int refreshRate, float length, quint8 stimMode);
@@ -59,6 +61,7 @@ const quint8 INVERTED_FACE = 2;
 const quint8 COLORED_FACE = 3;
 const quint8 INVERTED_COLORED_FACE = 4;
 const quint8 SSVEP = 5;
+const quint8 ARABIC_SPELLER = 6;
 //const quint8 MOTION_BAR = 2;
 //const quint8 MOTION_FACE = 3;
 //const quint8 MOVING_FACE = 4;

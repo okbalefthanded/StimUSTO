@@ -15,6 +15,7 @@ TEMPLATE = app
 
 
 SOURCES += src\main.cpp\
+    src/arabicspeller.cpp \
     src/hybrid.cpp \
     src/hybridstimulation.cpp \
     src\configpanel.cpp \
@@ -34,6 +35,7 @@ SOURCES += src\main.cpp\
     src/logger.cpp
 
 HEADERS  += include\configpanel.h \
+    include/arabicspeller.h \
     include/hybrid.h \
     include/hybridstimulation.h \
     include\ovtk_stimulations.h \
@@ -58,9 +60,9 @@ HEADERS  += include\configpanel.h \
 INCLUDEPATH += include\
 
 FORMS    += src\ui\configpanel.ui \
-    src\ui\ssvep.ui \
-    src\ui\ssvepsingle.ui \
-    src\ui\speller.ui
+            src\ui\ssvep.ui \
+            src\ui\ssvepsingle.ui \
+            src\ui\spellerform.ui
 
 RESOURCES +=  assets\asset.qrc
 

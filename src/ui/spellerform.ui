@@ -1,9 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <author/>
- <comment/>
- <exportmacro/>
- <class>Speller</class>
- <widget name="Speller" class="QWidget">
+ <class>SpellerForm</class>
+ <widget class="QWidget" name="SpellerForm">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -16,6 +14,6 @@
    <string>Form</string>
   </property>
  </widget>
- <pixmapfunction/>
+ <resources/>
  <connections/>
 </ui>

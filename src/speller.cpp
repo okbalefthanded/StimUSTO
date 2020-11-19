@@ -14,21 +14,21 @@
 #include <QDir>
 //
 #include "speller.h"
-#include "ui_speller.h"
+//#include "ui_speller.h"
 #include "configpanel.h"
 #include "ovtk_stimulations.h"
 #include "randomflashsequence.h"
 #include "utils.h"
 //
-Speller::Speller(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::Speller)
+Speller::Speller(QWidget *parent) : QWidget(parent)
+    //ui(new Ui::Speller)
 {
 
-    ui->setupUi(this);
+    qDebug()<< Q_FUNC_INFO;
+    // ui->setupUi(this);
+    setupUi(this);
     this->setProperty("windowTitle", "ERP Speller");
     this->show();
-
 
     if(qApp->screens().count() == 2)
     {
@@ -42,7 +42,7 @@ Speller::Speller(QWidget *parent) :
 
     this->setStyleSheet("background-color : black");
 
-    createLayout();
+    this->createLayout();
 
     m_stimTimer = new QTimer(this);
     m_isiTimer = new QTimer(this);
@@ -80,7 +80,7 @@ Speller::Speller(QWidget *parent) :
 
 void Speller::startTrial()
 {
-    //    qDebug()<< "[TRIAL START]" << Q_FUNC_INFO;
+    qDebug()<< "[TRIAL START]" << Q_FUNC_INFO;
 
     if (m_state == trial_state::PRE_TRIAL)
     {
@@ -103,7 +103,7 @@ void Speller::pauseFlashing()
 {
 
     // sendMarker(OVTK_StimulationId_VisualStimulationStop);
-    //    qDebug() << Q_FUNC_INFO << QTime::currentTime().msec();
+    qDebug() << Q_FUNC_INFO << QTime::currentTime().msec();
 
     //   this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
     //                widget()->setStyleSheet("QLabel { color : gray; font: 40pt }");
@@ -169,7 +169,7 @@ void Speller::pauseFlashing()
 
 void Speller::preTrial()
 {
-    //    qDebug()<< Q_FUNC_INFO;
+    qDebug()<< Q_FUNC_INFO;
 
     if(m_trials == 0)
     {
@@ -188,7 +188,6 @@ void Speller::preTrial()
             m_element = new QLabel();
             m_element->setPixmap(map);
             m_element->setAlignment(Qt::AlignCenter);
-
             this->layout()->replaceWidget(this->
                                           layout()->
                                           itemAt(id)->
@@ -551,6 +550,78 @@ void Speller::setDesiredPhrase(const QString &t_desiredPhrase)
 
 void Speller::createLayout()
 {
+    qDebug()<< Q_FUNC_INFO;
+    // speller settings
+    // Arabic speller
+    m_rows = 5;
+    m_cols = 8;
+    m_nrElements = m_rows * m_cols;
+
+    m_icons = QList<QPixmap>();
+    m_element = new QLabel();
+    m_element->setAlignment(Qt::AlignCenter);
+    QGridLayout *layout = new QGridLayout();
+
+    m_textRow = new QLabel(this);
+    m_textRow->setText(m_desiredPhrase);
+    m_textRow->setStyleSheet("font:30pt; color:gray; border-color:white;");
+    m_textRow->setAlignment(Qt::AlignLeft);
+    //    textRow->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    layout->addWidget(m_textRow, 0, 0, 1, 0);
+
+    int k = 0, nbr=0;
+    QString stimName;
+    QPixmap pic;
+    QImage iconImage;
+    int label_h, label_w;
+    // add speller ellements
+    for(int i=1; i<m_rows+1; i++)
+    {
+        for(int j=0; j<m_cols; j++)
+        {
+            QLabel *element = new QLabel(this);
+            label_h = element->height();
+            label_w = element->width();
+
+            if(k < utils::ArabicLetters.length())
+            {
+                element->setText(utils::ArabicLetters.at(k));
+                m_presentedLetters.append(utils::ArabicLetters.at(k));
+            }
+            else
+            {
+                element->setText(utils::numbers.at(nbr));
+                m_presentedLetters.append(utils::numbers.at(nbr));
+                nbr++;
+            }
+
+            element->setStyleSheet("font: 40pt; color:gray");
+            element->setAlignment(Qt::AlignCenter);
+            layout->addWidget(element, i, j);
+
+            k++;
+
+        }
+    }
+
+    this->setLayout(layout);
+}
+
+void Speller::refreshLayout()
+{
+    // TODO
+}
+
+Speller::~Speller()
+{
+    // delete ui;
+}
+
+/*
+
+void Speller::createLayout()
+{
+    qDebug()<< Q_FUNC_INFO;
     // speller settings
     m_rows = 3;
     m_cols = 3;
@@ -629,14 +700,4 @@ void Speller::createLayout()
     this->setLayout(layout);
 }
 
-void Speller::refreshLayout()
-{
-    // TODO
-}
-
-Speller::~Speller()
-{
-    delete ui;
-}
-
-
+*/
