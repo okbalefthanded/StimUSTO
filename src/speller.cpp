@@ -309,8 +309,8 @@ void Speller::postTrial()
     qDebug()<< Q_FUNC_INFO;
 
     ++m_trials;
-    m_currentStimulation = 0;
-    m_state = trial_state::PRE_TRIAL;
+    // m_currentStimulation = 0;
+    // m_state = trial_state::PRE_TRIAL;
     // wait
     // utils::wait(1000);
     //  utils::wait(500);
@@ -319,7 +319,8 @@ void Speller::postTrial()
 
     if (m_text[m_text.length()-1] != "#")
     {
-        if (m_ERP->experimentMode() == operation_mode::COPY_MODE || m_ERP->experimentMode() == operation_mode::FREE_MODE)
+        if (m_ERP->experimentMode() == operation_mode::COPY_MODE ||
+                m_ERP->experimentMode() == operation_mode::FREE_MODE)
         {
 
             int id = m_text[m_text.length()-1].digitValue();
@@ -342,7 +343,7 @@ void Speller::postTrial()
     }
     //
     // Send and Recieve feedback to/from Robot if external communication is enabled
-    // m_hybridCommand = m_ERPFeedback[m_currentTrial] + m_SSVEPFeedback.at(m_currentTrial);
+    m_hybridCommand = m_text[m_text.length()-1] + "2";
     if(m_ERP->externalComm() == external_comm::ENABLED)
     {
         qDebug() << "Sending Feedback to Robot";
@@ -354,10 +355,10 @@ void Speller::postTrial()
 
         try
         {
-            m_hybridCommand = "12";
+            // m_hybridCommand = "12";
             std::string str = m_hybridCommand.toStdString();
             const char* p = str.c_str();
-
+            qDebug()<< "command to send to Robot: " << m_hybridCommand;
             QByteArray byteovStimulation;
             QDataStream streamovs(&byteovStimulation, QIODevice::WriteOnly);
             streamovs.setByteOrder(QDataStream::LittleEndian);
@@ -387,6 +388,8 @@ void Speller::postTrial()
 
     }
 
+    m_currentStimulation = 0;
+    m_state = trial_state::PRE_TRIAL;
     //
     if (m_currentLetter >= m_desiredPhrase.length() &&
             m_desiredPhrase.length() != 1 &&
