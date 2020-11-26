@@ -16,49 +16,30 @@ ArabicSpeller::ArabicSpeller(QWidget *parent) : Speller(0)
     qDebug()<< Q_FUNC_INFO;
 
     setupUi(this);
+
     this->setProperty("windowTitle", "ERP Arabic Speller");
-    this->show();
 
-    if(qApp->screens().count() == 2)
-    {
-        this->windowHandle()->setScreen(qApp->screens().last());
-        this->showFullScreen();
-    }
-    else
-    {
-        this->showMaximized();
-    }
-
-    this->setStyleSheet("background-color : black");
+    showWindow();
 
     createLayout();
-
-    m_stimTimer = new QTimer(this);
-    m_isiTimer = new QTimer(this);
-    m_preTrialTimer = new QTimer(this);
-
-    m_stimTimer->setTimerType(Qt::PreciseTimer);
-    m_stimTimer->setSingleShot(true);
-    m_stimTimer->setInterval(100); //default value
-
-    m_isiTimer->setTimerType(Qt::PreciseTimer);
-    m_isiTimer->setSingleShot(true);
-    m_isiTimer->setInterval(100); //default value
-
-    m_preTrialTimer->setTimerType(Qt::PreciseTimer);
-    m_preTrialTimer->setInterval(1000);
-    m_preTrialTimer->setSingleShot(true);
-
-    connect( m_stimTimer, SIGNAL(timeout()), this, SLOT(pauseFlashing()) );
-    connect( m_isiTimer, SIGNAL(timeout()), this, SLOT(startFlashing()) );
-    connect( m_preTrialTimer, SIGNAL(timeout()), this, SLOT(startTrial()) );
-
-    m_feedbackSocket = new QUdpSocket(this);
-    m_feedbackSocket->bind(QHostAddress::LocalHost, m_feedbackPort);
+    initTimers();
+    initFeedbackSocket();
 
     m_state = trial_state::PRE_TRIAL;
 }
 
+void ArabicSpeller::startFlashing()
+{
+    // qDebug()<< Q_FUNC_INFO;
+    sendStimulationInfo();
+
+    this->layout()
+            ->itemAt(m_flashingSequence->sequence[m_currentStimulation])
+            ->widget()
+            ->setStyleSheet("image: url(:/images/bennabi_face_inverted.png)");
+
+    switchStimulationTimers();
+}
 
 void ArabicSpeller::pauseFlashing()
 {
@@ -71,41 +52,9 @@ void ArabicSpeller::pauseFlashing()
     switchStimulationTimers();
     ++m_currentStimulation;
 
+    trialEnd();
 
-    if (m_currentStimulation >= m_flashingSequence->sequence.count())
-    {
-        ++m_currentLetter;
-        m_isiTimer->stop();
-        m_stimTimer->stop();
-
-        // utils::wait(1000); // time window after last epoch/stim
-        // utils::wait(500);
-        utils::wait(700); // 700 ms == epoch time windows
-        sendMarker(OVTK_StimulationId_TrialStop);
-        m_state = trial_state::FEEDBACK;
-
-        if(m_ERP->experimentMode() == operation_mode::COPY_MODE || m_ERP->experimentMode() == operation_mode::FREE_MODE)
-        {
-            feedback();
-        }
-        else if(m_ERP->experimentMode() == operation_mode::CALIBRATION)
-        {
-            postTrial();
-        }
-    }
 }
-
-void ArabicSpeller::startFlashing()
-{
-    // qDebug()<< Q_FUNC_INFO;
-    this->layout()
-            ->itemAt(m_flashingSequence->sequence[m_currentStimulation])
-            ->widget()
-            ->setStyleSheet("image: url(:/images/bennabi_face_inverted.png)");
-
-    switchStimulationTimers();
-}
-
 
 void ArabicSpeller::createLayout()
 {
@@ -172,35 +121,19 @@ void ArabicSpeller::highlightTarget()
 {
     qDebug() << Q_FUNC_INFO;
 
-    int idx = 0;
+    int currentTarget = getCurrentTarget();
 
-    for (int i=0; i<m_rows; i++)
-    {
-        for (int j=0; j<m_cols; j++)
-        {
-            if(m_desiredPhrase[m_currentLetter] == m_presentedLetters[idx][0])
-            {
-                m_currentTarget = idx + 1;
-                break;
-            }
-            idx++;
-        }
-    }
-
-    this->layout()->itemAt(m_currentTarget)->
+    this->layout()->itemAt(currentTarget)->
             widget()->setStyleSheet("QLabel { color : red; font: 60pt }");
+
+   // this->layout()->itemAt(m_currentTarget)->
+   //         widget()->setStyleSheet("QLabel { color : red; font: 60pt }");
 }
 
 void ArabicSpeller::refreshTarget()
 {
     this->layout()->itemAt(m_currentTarget)->
             widget()->setStyleSheet("QLabel { color : gray; font: 40pt }");
-}
-
-
-ArabicSpeller::~ArabicSpeller()
-{
-
 }
 
 void ArabicSpeller::preTrial()
@@ -214,7 +147,6 @@ void ArabicSpeller::preTrial()
 
     if (m_preTrialCount == 0)
     {
-
         sendMarker(OVTK_StimulationId_TrialStart);
         m_flashingSequence = new RandomFlashSequence(m_nrElements, m_ERP->nrSequences());
 
@@ -234,20 +166,12 @@ void ArabicSpeller::preTrial()
         }
     }
 
+    // startPreTrial();
+
     m_preTrialTimer->start();
     ++m_preTrialCount;
 
-    if (m_preTrialCount > m_preTrialWait || m_ERP->experimentMode() == operation_mode::FREE_MODE)
-    {
-        if( m_ERP->experimentMode() == operation_mode::COPY_MODE)
-        {
-
-            refreshTarget();
-        }
-        m_preTrialTimer->stop();
-        m_preTrialCount = 0;
-        m_state = trial_state::STIMULUS;
-    }
+    endPreTrial();
 
 }
 
@@ -264,8 +188,6 @@ void ArabicSpeller::feedback()
 
         if (m_ERP->experimentMode() == operation_mode::COPY_MODE)
         {
-
-            int id = m_text[m_text.length()-1].digitValue();
 
             if( m_text[m_text.length()-1] == m_desiredPhrase[m_currentLetter - 1])
             {
@@ -290,6 +212,7 @@ void ArabicSpeller::feedback()
                     widget()->setStyleSheet("QLabel { color : blue; font: 40pt }");
         }
     }
+
     postTrial();
 }
 
@@ -306,7 +229,7 @@ void ArabicSpeller::postTrial()
         if (m_ERP->experimentMode() == operation_mode::COPY_MODE ||
                 m_ERP->experimentMode() == operation_mode::FREE_MODE)
         {
-            refreshTarget();
+            // refreshTarget();
 
         }
         else if(m_ERP->experimentMode() == operation_mode::CALIBRATION)
@@ -316,47 +239,7 @@ void ArabicSpeller::postTrial()
     }
     //
     // Send and Recieve feedback to/from Robot if external communication is enabled
-    m_hybridCommand = m_text[m_text.length()-1] + "2";
-    if(m_ERP->externalComm() == external_comm::ENABLED)
-    {
-        qDebug() << "Sending Feedback to Robot";
-        if (!m_robotSocket->isOpen())
-        {
-            qDebug()<< "Not sending Feedback to Robot : Cannot send feedback socket is not open";
-        }
-
-        try
-        {
-            // m_hybridCommand = "12";
-            std::string str = m_hybridCommand.toStdString();
-            const char* p = str.c_str();
-            qDebug()<< "command to send to Robot: " << m_hybridCommand;
-            QByteArray byteovStimulation;
-            QDataStream streamovs(&byteovStimulation, QIODevice::WriteOnly);
-            streamovs.setByteOrder(QDataStream::LittleEndian);
-            streamovs.writeRawData(p, m_hybridCommand.length());
-            m_robotSocket->write(byteovStimulation);
-            m_robotSocket->waitForBytesWritten();
-        }
-        catch(...)
-        {
-            qDebug() <<"Send Feedback to Robot, Issue With writting Data";
-        }
-
-        qDebug() << "Recieve State from Robot";
-        m_robotSocket->waitForReadyRead();
-
-        QByteArray robotState = m_robotSocket->readAll();
-
-        quint8 rState = robotState.toUInt();
-        qDebug()<< Q_FUNC_INFO << "Robot State recieved " << rState;
-        if(rState == robot_state::READY)
-        {
-            qDebug()<< "Correct State";
-            m_state = trial_state::PRE_TRIAL;
-        }
-
-    }
+    externalCommunication();
 
     m_currentStimulation = 0;
     m_state = trial_state::PRE_TRIAL;
@@ -386,5 +269,10 @@ void ArabicSpeller::postTrial()
     {
         startTrial();
     }
+
+}
+
+ArabicSpeller::~ArabicSpeller()
+{
 
 }

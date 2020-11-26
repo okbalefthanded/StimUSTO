@@ -183,7 +183,7 @@ void Speller::preTrial()
     if (m_preTrialCount == 0)
     {
         // Refresh previous feedback
-        /*
+
         if(m_text.length() > 0)
         {
             int id = m_text[m_text.length()-1].digitValue();
@@ -198,7 +198,7 @@ void Speller::preTrial()
                                           m_element,
                                           Qt::FindDirectChildrenOnly);
         }
-        */
+
         //
 
         sendMarker(OVTK_StimulationId_TrialStart);
@@ -558,6 +558,124 @@ void Speller::switchStimulationTimers()
     }
 }
 
+void Speller::startPreTrial()
+{
+    qDebug() << Q_FUNC_INFO;
+
+    if (m_preTrialCount == 0)
+    {
+        sendMarker(OVTK_StimulationId_TrialStart);
+        m_flashingSequence = new RandomFlashSequence(m_nrElements, m_ERP->nrSequences());
+        qDebug() << "about to test mode";
+        if (m_ERP->experimentMode() == operation_mode::CALIBRATION)
+        {
+            highlightTarget();
+            m_text += m_desiredPhrase[m_currentLetter];
+            m_textRow->setText(m_text);
+        }
+        else if(m_ERP->experimentMode() == operation_mode::COPY_MODE)
+        {
+            highlightTarget();
+        }
+        else if(m_ERP->experimentMode() == operation_mode::FREE_MODE)
+        {
+            utils::wait(500);
+        }
+    }
+    else return;
+}
+
+void Speller::endPreTrial()
+{
+
+     qDebug() << Q_FUNC_INFO;
+    if (m_preTrialCount > m_preTrialWait || m_ERP->experimentMode() == operation_mode::FREE_MODE)
+    {
+        if(m_ERP->experimentMode() == operation_mode::COPY_MODE ||
+                m_ERP->experimentMode() == operation_mode::CALIBRATION)
+        {
+
+            refreshTarget();
+        }
+        m_preTrialTimer->stop();
+        m_preTrialCount = 0;
+        m_state = trial_state::STIMULUS;
+    }
+    else return;
+}
+
+void Speller::trialEnd()
+{
+
+    if (m_currentStimulation >= m_flashingSequence->sequence.count())
+    {
+        ++m_currentLetter;
+        m_isiTimer->stop();
+        m_stimTimer->stop();
+
+        // utils::wait(1000); // time window after last epoch/stim
+        // utils::wait(500);
+        utils::wait(700); // 700 ms == epoch time windows
+        sendMarker(OVTK_StimulationId_TrialStop);
+        m_state = trial_state::FEEDBACK;
+
+        if(m_ERP->experimentMode() == operation_mode::COPY_MODE || m_ERP->experimentMode() == operation_mode::FREE_MODE)
+        {
+            feedback();
+        }
+        else if(m_ERP->experimentMode() == operation_mode::CALIBRATION)
+        {
+            postTrial();
+        }
+    }
+}
+
+void Speller::externalCommunication()
+{
+    // Send and Recieve feedback to/from Robot if external communication is enabled
+    m_hybridCommand = m_text[m_text.length()-1] + "2";
+    if(m_ERP->externalComm() == external_comm::ENABLED)
+    {
+        qDebug() << "Sending Feedback to Robot";
+        if (!m_robotSocket->isOpen())
+        {
+            qDebug()<< "Not sending Feedback to Robot : Cannot send feedback socket is not open";
+        }
+
+        try
+        {
+            // m_hybridCommand = "12";
+            std::string str = m_hybridCommand.toStdString();
+            const char* p = str.c_str();
+            qDebug()<< "command to send to Robot: " << m_hybridCommand;
+            QByteArray byteovStimulation;
+            QDataStream streamovs(&byteovStimulation, QIODevice::WriteOnly);
+            streamovs.setByteOrder(QDataStream::LittleEndian);
+            streamovs.writeRawData(p, m_hybridCommand.length());
+            m_robotSocket->write(byteovStimulation);
+            m_robotSocket->waitForBytesWritten();
+        }
+        catch(...)
+        {
+            qDebug() <<"Send Feedback to Robot, Issue With writting Data";
+        }
+
+        qDebug() << "Recieve State from Robot";
+        m_robotSocket->waitForReadyRead();
+
+        QByteArray robotState = m_robotSocket->readAll();
+
+        quint8 rState = robotState.toUInt();
+        qDebug()<< Q_FUNC_INFO << "Robot State recieved " << rState;
+        if(rState == robot_state::READY)
+        {
+            qDebug()<< "Correct State";
+            m_state = trial_state::PRE_TRIAL;
+        }
+
+    }
+}
+
 void Speller::initLogger()
 {
 
@@ -580,6 +698,52 @@ void Speller::initLogger()
     }
 
     log = new Logger(this, fileName);
+}
+
+void Speller::showWindow()
+{
+    this->show();
+
+    if(qApp->screens().count() == 2)
+    {
+        this->windowHandle()->setScreen(qApp->screens().last());
+        this->showFullScreen();
+    }
+    else
+    {
+        this->showMaximized();
+    }
+
+    this->setStyleSheet("background-color : black");
+}
+
+void Speller::initTimers()
+{
+    m_stimTimer = new QTimer(this);
+    m_isiTimer = new QTimer(this);
+    m_preTrialTimer = new QTimer(this);
+
+    m_stimTimer->setTimerType(Qt::PreciseTimer);
+    m_stimTimer->setSingleShot(true);
+    m_stimTimer->setInterval(100); //default value
+
+    m_isiTimer->setTimerType(Qt::PreciseTimer);
+    m_isiTimer->setSingleShot(true);
+    m_isiTimer->setInterval(100); //default value
+
+    m_preTrialTimer->setTimerType(Qt::PreciseTimer);
+    m_preTrialTimer->setInterval(1000);
+    m_preTrialTimer->setSingleShot(true);
+
+    connect( m_stimTimer, SIGNAL(timeout()), this, SLOT(pauseFlashing()) );
+    connect( m_isiTimer, SIGNAL(timeout()), this, SLOT(startFlashing()) );
+    connect( m_preTrialTimer, SIGNAL(timeout()), this, SLOT(startTrial()) );
+}
+
+void Speller::initFeedbackSocket()
+{
+    m_feedbackSocket = new QUdpSocket(this);
+    m_feedbackSocket->bind(QHostAddress::LocalHost, m_feedbackPort);
 }
 
 ERP *Speller::erp() const
@@ -619,6 +783,26 @@ void Speller::setTimers(int t_stimulation, int t_isi)
 {
     m_stimTimer->setInterval(t_stimulation);
     m_isiTimer->setInterval(t_isi);
+}
+
+int Speller::getCurrentTarget()
+{
+    int idx = 0;
+
+    for (int i=0; i<m_rows; i++)
+    {
+        for (int j=0; j<m_cols; j++)
+        {
+            if(m_desiredPhrase[m_currentLetter] == m_presentedLetters[idx][0])
+            {
+                m_currentTarget = idx + 1;
+                break;
+            }
+            idx++;
+        }
+    }
+
+    return m_currentTarget;
 }
 
 void Speller::setDesiredPhrase(const QString &t_desiredPhrase)
@@ -706,6 +890,7 @@ void Speller::createLayout()
 
     this->setLayout(layout);
 }
+
 void Speller::refreshLayout()
 {
     // TODO
@@ -715,64 +900,3 @@ Speller::~Speller()
 {
     // delete ui;
 }
-
-
-/*
-void Speller::createLayout()
-{
-    qDebug()<< Q_FUNC_INFO;
-    // speller settings
-    // Arabic speller
-    m_rows = 5;
-    m_cols = 8;
-    m_nrElements = m_rows * m_cols;
-
-    m_icons = QList<QPixmap>();
-    m_element = new QLabel();
-    m_element->setAlignment(Qt::AlignCenter);
-    QGridLayout *layout = new QGridLayout();
-
-    m_textRow = new QLabel(this);
-    m_textRow->setText(m_desiredPhrase);
-    m_textRow->setStyleSheet("font:30pt; color:gray; border-color:white;");
-    m_textRow->setAlignment(Qt::AlignLeft);
-    //    textRow->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    layout->addWidget(m_textRow, 0, 0, 1, 0);
-
-    int k = 0, nbr=0;
-    QString stimName;
-    QPixmap pic;
-    QImage iconImage;
-    int label_h, label_w;
-    // add speller ellements
-    for(int i=1; i<m_rows+1; i++)
-    {
-        for(int j=0; j<m_cols; j++)
-        {
-            QLabel *element = new QLabel(this);
-            label_h = element->height();
-            label_w = element->width();
-
-            if(k < utils::ArabicLetters.length())
-            {
-                element->setText(utils::ArabicLetters.at(k));
-                m_presentedLetters.append(utils::ArabicLetters.at(k));
-            }
-            else
-            {
-                element->setText(utils::numbers.at(nbr));
-                m_presentedLetters.append(utils::numbers.at(nbr));
-                nbr++;
-            }
-
-            element->setStyleSheet("font: 40pt; color:gray");
-            element->setAlignment(Qt::AlignCenter);
-            layout->addWidget(element, i, j);
-
-            k++;
-
-        }
-    }
-
-    this->setLayout(layout);
-}*/

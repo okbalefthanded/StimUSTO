@@ -37,6 +37,8 @@ public:
     void setDesiredPhrase(const QString &t_desiredPhrase);
     void setTimers(int t_stimulation, int t_isi);
 
+    int getCurrentTarget();
+
     friend class Hybrid;
     friend class HybridStimulation;
 
@@ -64,12 +66,25 @@ public slots:
 
 protected:
 
+    void initLogger();
+    void showWindow();
+    void initTimers();
+    void initFeedbackSocket();
+
     bool isTarget();
     void highlightTarget();
     virtual void refreshTarget();
+
     void sendStimulationInfo();
     void switchStimulationTimers();
-    void initLogger();
+
+    void startPreTrial();
+    void endPreTrial();
+
+    void trialEnd();
+
+    void externalCommunication();
+
 
     // Ui::Speller *ui;
 
