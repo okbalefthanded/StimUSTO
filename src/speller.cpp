@@ -42,7 +42,8 @@ Speller::Speller(QWidget *parent) : QWidget(parent)
 
     this->setStyleSheet("background-color : black");
 
-    this->createLayout();
+    // this->createLayout();
+    createLayout();
 
     m_stimTimer = new QTimer(this);
     m_isiTimer = new QTimer(this);
@@ -76,6 +77,11 @@ Speller::Speller(QWidget *parent) : QWidget(parent)
     m_feedbackSocket->bind(QHostAddress::LocalHost, m_feedbackPort);
 
     m_state = trial_state::PRE_TRIAL;
+}
+
+Speller::Speller(int i)
+{
+    qDebug()<< Q_FUNC_INFO;
 }
 
 void Speller::startTrial()
@@ -138,11 +144,8 @@ void Speller::pauseFlashing()
     // this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
     //                 widget()->setStyleSheet(stimName);
 
-
-
     switchStimulationTimers();
     ++m_currentStimulation;
-
 
     if (m_currentStimulation >= m_flashingSequence->sequence.count())
     {
@@ -366,7 +369,6 @@ void Speller::postTrial()
             streamovs.writeRawData(p, m_hybridCommand.length());
             m_robotSocket->write(byteovStimulation);
             m_robotSocket->waitForBytesWritten();
-
         }
         catch(...)
         {
@@ -442,8 +444,6 @@ void Speller::receiveFeedback()
     //  feedback_socket->waitForBytesWritten();
 
     m_text += QString(buffer->data());
-
-
 }
 
 bool Speller::isTarget()

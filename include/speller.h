@@ -9,6 +9,7 @@
 #include <QTcpSocket>
 //
 #include "ui_spellerform.h"
+//
 #include "randomflashsequence.h"
 #include "matrixlayout.h"
 #include "erp.h"
@@ -27,6 +28,7 @@ class Speller : public QWidget, protected Ui::SpellerForm
 
 public:
     explicit Speller(QWidget *parent = 0);
+    Speller(int i);
     ~Speller();
 
     ERP *erp() const;
@@ -44,15 +46,15 @@ signals:
 
 protected slots:
 
-    void preTrial();
-    void startTrial();
-    void feedback();
-    void postTrial();
+    virtual void preTrial();
+    virtual void startTrial();
+    virtual void feedback();
+    virtual void postTrial();
     virtual void startFlashing();
-    void pauseFlashing();
-    void receiveFeedback();
-    void createLayout();
-    void refreshLayout();
+    virtual void pauseFlashing();
+    virtual void receiveFeedback();
+    virtual void createLayout();
+    virtual void refreshLayout();
 
 public slots:
 
@@ -64,7 +66,7 @@ protected:
 
     bool isTarget();
     void highlightTarget();
-    void refreshTarget();
+    virtual void refreshTarget();
     void sendStimulationInfo();
     void switchStimulationTimers();
     void initLogger();
