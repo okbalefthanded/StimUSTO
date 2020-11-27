@@ -42,11 +42,19 @@ void FaceSpeller::startFlashing()
 
 void FaceSpeller::stimulationFace()
 {
+   // qDebug()<< Q_FUNC_INFO;
+
     this->layout()
             ->itemAt(m_flashingSequence->sequence[m_currentStimulation])
             ->widget()
             ->setStyleSheet("image: url(:/images/bennabi_face.png)");
 
+    /*
+    this->layout()
+            ->itemAt(m_flashingSequence->sequence[m_currentStimulation])
+            ->widget()
+            ->setStyleSheet("image: url(:/images/yin_yang_small_croped.png)");
+            */
 
 }
 
@@ -115,7 +123,7 @@ void FaceSpeller::stimulationColoredFace()
 
 void FaceSpeller::stimulationInvertedFace()
 {
-       // qDebug() << Q_FUNC_INFO << QTime::currentTime().msec();
+    // qDebug() << Q_FUNC_INFO << QTime::currentTime().msec();
 
     this->layout()
             ->itemAt(m_flashingSequence->sequence[m_currentStimulation])

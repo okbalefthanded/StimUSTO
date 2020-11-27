@@ -186,19 +186,23 @@ void Speller::preTrial()
 
         if(m_text.length() > 0)
         {
-            int id = m_text[m_text.length()-1].digitValue();
-            QPixmap map =   m_icons[id-1];
-            m_element = new QLabel();
-            m_element->setPixmap(map);
-            m_element->setAlignment(Qt::AlignCenter);
-            this->layout()->replaceWidget(this->
-                                          layout()->
-                                          itemAt(id)->
-                                          widget(),
-                                          m_element,
-                                          Qt::FindDirectChildrenOnly);
-        }
 
+            if(m_ERP->experimentMode() == operation_mode::COPY_MODE ||
+                    m_ERP->experimentMode() == operation_mode::FREE_MODE)
+            {
+                int id = m_text[m_text.length()-1].digitValue();
+                QPixmap map = m_icons[id-1];
+                m_element = new QLabel();
+                m_element->setPixmap(map);
+                m_element->setAlignment(Qt::AlignCenter);
+                this->layout()->replaceWidget(this->
+                                              layout()->
+                                              itemAt(id)->
+                                              widget(),
+                                              m_element,
+                                              Qt::FindDirectChildrenOnly);
+            }
+        }
         //
 
         sendMarker(OVTK_StimulationId_TrialStart);
@@ -509,7 +513,8 @@ void Speller::refreshTarget()
     //           widget()->setStyleSheet("QLabel { color : gray; font: 40pt }");
 
     m_element = new QLabel();
-    m_element->setPixmap(m_icons[m_currentTarget - 1]);
+    // m_element->setPixmap(m_icons[m_currentTarget - 1]);
+    m_element->setPixmap(m_icons[m_currentTarget-1]);
     m_element->setAlignment(Qt::AlignCenter);
 
     this->layout()->replaceWidget(this->
@@ -588,7 +593,7 @@ void Speller::startPreTrial()
 void Speller::endPreTrial()
 {
 
-     qDebug() << Q_FUNC_INFO;
+    qDebug() << Q_FUNC_INFO;
     if (m_preTrialCount > m_preTrialWait || m_ERP->experimentMode() == operation_mode::FREE_MODE)
     {
         if(m_ERP->experimentMode() == operation_mode::COPY_MODE ||
@@ -766,7 +771,7 @@ void Speller::setERP(ERP *erp)
         //    m_robotSocket->connectToHost(QHostAddress("10.3.66.5"), m_robotPort);
         // 10.3.66.5 / 10.6.65.128 /10.3.64.92
         // m_robotSocket->connectToHost(QHostAddress("10.3.64.92"), m_robotPort);
-         m_robotSocket->connectToHost(QHostAddress(m_ERP->externalAddress()), m_robotPort);
+        m_robotSocket->connectToHost(QHostAddress(m_ERP->externalAddress()), m_robotPort);
 
         if(m_robotSocket->waitForConnected())
         {
