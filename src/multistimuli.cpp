@@ -26,7 +26,7 @@ void MultiStimuli::startFlashing()
                  widget()->setStyleSheet("qproperty-pixmap: url(:/images/yin_yang_small_croped.png)");
 
         this->layout()->itemAt(3)->
-                 widget()->setStyleSheet("qproperty-pixmap: url(:/images/whitehouse.png)");
+                 widget()->setStyleSheet("qproperty-pixmap: url(:/images/whitehouse_small.png)");
     }
 
     else if (currentStim <= 6)
@@ -39,7 +39,7 @@ void MultiStimuli::startFlashing()
                   widget()->setStyleSheet("qproperty-pixmap: url(:/images/yin_yang_small_croped.png)");
 
          this->layout()->itemAt(6)->
-                  widget()->setStyleSheet("qproperty-pixmap: url(:/images/whitehouse.png)");
+                  widget()->setStyleSheet("qproperty-pixmap: url(:/images/whitehouse_small.png)");
 
     }
     else if (currentStim <= 9)
@@ -52,7 +52,7 @@ void MultiStimuli::startFlashing()
                   widget()->setStyleSheet("qproperty-pixmap: url(:/images/yin_yang_small_croped.png)");
 
          this->layout()->itemAt(9)->
-                  widget()->setStyleSheet("qproperty-pixmap: url(:/images/whitehouse.png)");
+                  widget()->setStyleSheet("qproperty-pixmap: url(:/images/whitehouse_small.png)");
     }
 
     switchStimulationTimers();
