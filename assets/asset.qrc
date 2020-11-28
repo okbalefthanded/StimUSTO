@@ -29,6 +29,7 @@
         <file>bennabi_face_yellow.png</file>
         <file>bennabi_face_yellow_inverted.png</file>
         <file>yin_yang_small_croped.png</file>
+        <file>whitehouse.png</file>
     </qresource>
     <qresource prefix="/shaders">
         <file>../src/shaders/sh_f.frag</file>

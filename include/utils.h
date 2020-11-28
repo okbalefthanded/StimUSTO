@@ -62,6 +62,7 @@ const quint8 COLORED_FACE = 3;
 const quint8 INVERTED_COLORED_FACE = 4;
 const quint8 SSVEP = 5;
 const quint8 ARABIC_SPELLER = 6;
+const quint8 MULTI_STIM = 7;
 //const quint8 MOTION_BAR = 2;
 //const quint8 MOTION_FACE = 3;
 //const quint8 MOVING_FACE = 4;

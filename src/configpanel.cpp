@@ -16,6 +16,7 @@
 #include "flashingspeller.h"
 #include "facespeller.h"
 #include "arabicspeller.h"
+#include "multistimuli.h"
 #include "erp.h"
 #include "ssvep.h"
 #include "hybrid.h"
@@ -276,6 +277,13 @@ Speller *ConfigPanel::createSpeller(int t_spellerType)
         connectStimulation(arabicSpeller);
         return arabicSpeller;
 
+    }
+
+    case speller_type::MULTI_STIM:
+    {
+        MultiStimuli *multiStimuli = new MultiStimuli();
+        connectStimulation(multiStimuli);
+        return multiStimuli;
     }
 
     }

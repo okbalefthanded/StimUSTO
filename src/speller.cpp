@@ -513,7 +513,6 @@ void Speller::refreshTarget()
     //           widget()->setStyleSheet("QLabel { color : gray; font: 40pt }");
 
     m_element = new QLabel();
-    // m_element->setPixmap(m_icons[m_currentTarget - 1]);
     m_element->setPixmap(m_icons[m_currentTarget-1]);
     m_element->setAlignment(Qt::AlignCenter);
 

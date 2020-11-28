@@ -18,6 +18,7 @@ SOURCES += src\main.cpp\
     src/arabicspeller.cpp \
     src/hybrid.cpp \
     src/hybridstimulation.cpp \
+    src/multistimuli.cpp \
     src\configpanel.cpp \
     src\matrixlayout.cpp \
     src\ovmarkersender.cpp \
@@ -38,6 +39,7 @@ HEADERS  += include\configpanel.h \
     include/arabicspeller.h \
     include/hybrid.h \
     include/hybridstimulation.h \
+    include/multistimuli.h \
     include\ovtk_stimulations.h \
     include\matrixlayout.h \
     include\ovmarkersender.h \

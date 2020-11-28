@@ -42,18 +42,23 @@ void FaceSpeller::startFlashing()
 
 void FaceSpeller::stimulationFace()
 {
-   // qDebug()<< Q_FUNC_INFO;
+    // qDebug()<< Q_FUNC_INFO;
 
-    this->layout()
-            ->itemAt(m_flashingSequence->sequence[m_currentStimulation])
-            ->widget()
-            ->setStyleSheet("image: url(:/images/bennabi_face.png)");
+    this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
+            widget()->setStyleSheet("qproperty-pixmap: url(:/images/bennabi_face.png)");
+
 
     /*
     this->layout()
             ->itemAt(m_flashingSequence->sequence[m_currentStimulation])
             ->widget()
             ->setStyleSheet("image: url(:/images/yin_yang_small_croped.png)");
+            */
+
+    /*this->layout()
+            ->itemAt(m_flashingSequence->sequence[m_currentStimulation])
+            ->widget()
+            ->setStyleSheet("image: url(:/images/whitehouse.png)");
             */
 
 }
