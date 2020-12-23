@@ -183,7 +183,6 @@ void Speller::preTrial()
     if (m_preTrialCount == 0)
     {
         // Refresh previous feedback
-
         if(m_text.length() > 0)
         {
 
@@ -195,12 +194,13 @@ void Speller::preTrial()
                 m_element = new QLabel();
                 m_element->setPixmap(map);
                 m_element->setAlignment(Qt::AlignCenter);
+                /*
                 this->layout()->replaceWidget(this->
                                               layout()->
                                               itemAt(id)->
                                               widget(),
                                               m_element,
-                                              Qt::FindDirectChildrenOnly);
+                                              Qt::FindDirectChildrenOnly);*/
             }
         }
         //
@@ -257,7 +257,8 @@ void Speller::feedback()
 
             int id = m_text[m_text.length()-1].digitValue();
             QPixmap map = m_icons[id-1];
-
+            // feedback: green correct selection, highlight the target icon
+            //           blue incorrect selection, highlight the selected icon
             if( m_text[m_text.length()-1] == m_desiredPhrase[m_currentLetter - 1])
             {
                 //            this->layout()->itemAt(m_currentTarget)->
@@ -268,8 +269,8 @@ void Speller::feedback()
             }
             else
             {
-                this->layout()->itemAt(m_currentTarget)->
-                        widget()->setStyleSheet("QLabel { color : blue; font: 40pt }");
+               // this->layout()->itemAt(m_currentTarget)->
+               //         widget()->setStyleSheet("QLabel { color : blue; font: 40pt }");
                 map.fill(Qt::blue);
                 isCorrect = false;
             }
@@ -331,6 +332,7 @@ void Speller::postTrial()
         {
 
             int id = m_text[m_text.length()-1].digitValue();
+
             QPixmap map = m_icons[id-1];
             m_element = new QLabel();
             m_element->setPixmap(map);
@@ -342,6 +344,7 @@ void Speller::postTrial()
                                           widget(),
                                           m_element,
                                           Qt::FindDirectChildrenOnly);
+
         }
         else if(m_ERP->experimentMode() == operation_mode::CALIBRATION)
         {
@@ -408,8 +411,8 @@ void Speller::postTrial()
         qDebug()<< "Experiment End, closing speller";
         sendMarker(OVTK_StimulationId_ExperimentStop);
         utils::wait(2000);
-        emit(slotTerminated());
-        this->close();
+        //emit(slotTerminated());
+        //this->close();
     }
     else if(m_desiredPhrase.length() <= 1)
     {
@@ -446,7 +449,7 @@ void Speller::receiveFeedback()
     }
 
     //  feedback_socket->waitForBytesWritten();
-
+    qDebug()<< "Received: "<< QString(buffer->data());
     m_text += QString(buffer->data());
 }
 
@@ -472,7 +475,7 @@ void Speller::highlightTarget()
     {
         for (int j=0; j<m_cols; j++)
         {
-            //                        idx++;
+            //            idx++;
             //            if (desired_phrase[m_currentLetter] == letters[i][j]){
             //                currentTarget = idx;
             //                break;
@@ -488,7 +491,7 @@ void Speller::highlightTarget()
 
     // this->layout()->itemAt(m_currentTarget)->
     //         widget()->setStyleSheet("QLabel { color : red; font: 60pt }");
-
+    qDebug()<< Q_FUNC_INFO << "current tg "<< m_currentTarget << "current letter " << m_currentLetter;
     QPixmap map = m_icons[m_currentTarget - 1];
     map.fill(Qt::yellow);
 
@@ -522,6 +525,8 @@ void Speller::refreshTarget()
                                   widget(),
                                   m_element,
                                   Qt::FindDirectChildrenOnly);
+
+    qDebug()<< Q_FUNC_INFO << "[current target] "<< m_currentTarget <<"[map] "<< m_currentTarget-1;
 
 }
 

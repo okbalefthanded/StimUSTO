@@ -1,5 +1,6 @@
 #include "randomflashsequence.h"
 #include <QVector>
+#include <QList>
 #include <algorithm>
 #include <time.h>
 //using namespace std;
@@ -19,7 +20,8 @@ RandomFlashSequence::RandomFlashSequence(int length, int nr_sequences, int min_d
     std::random_shuffle(list.begin(), list.end());
     l = list;
 
-    for (int i=1; i<nr_sequences; i++){
+    for (int i=1; i<nr_sequences; i++)
+    {
         if (length == 1)
         {
             list.append( l );
@@ -52,10 +54,40 @@ RandomFlashSequence::RandomFlashSequence(int length, int nr_sequences, int min_d
 
 }
 
+RandomFlashSequence::RandomFlashSequence(int elements, int nr_sequences, int setCount, int setLength)
+{
+    srand(time(0));
+    QList<QList<int>> list;
+    QVector<int> l(elements);
+
+    for(int i=0; i<setCount; i++)
+    {
+        for(int j=0; j<setLength; j++)
+        {
+
+        }
+    }
+
+    std::iota(list.begin(), list.end(), 1);
+
+    for (int i=0; i<nr_sequences; i++)
+    {
+
+    }
+}
+
 QVector<int> RandomFlashSequence::range(int start, int end)
 {
     QVector<int> list(end-start+1);
     std::iota(list.begin(), list.end(), start);
+    return list;
+}
+
+QList<int> RandomFlashSequence::range(int start, int end, int step)
+{
+    QList<int> list;
+    for (int i = start; i <= end; i += step)
+        list.push_back(i);
     return list;
 }
 
