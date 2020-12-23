@@ -57,18 +57,16 @@ RandomFlashSequence::RandomFlashSequence(int length, int nr_sequences, int min_d
 RandomFlashSequence::RandomFlashSequence(int elements, int nr_sequences, int setCount, int setLength)
 {
     srand(time(0));
-    QList<QList<int>> list;
+    QList<QList<int>> sequenceSets;
+
     QVector<int> l(elements);
 
-    for(int i=0; i<setCount; i++)
+    for(int i=1; i<=setCount; i++)
     {
-        for(int j=0; j<setLength; j++)
-        {
-
-        }
+        sequenceSets.append(range(i, i+(elements-setLength), setLength));
     }
 
-    std::iota(list.begin(), list.end(), 1);
+    //std::iota(list.begin(), list.end(), 1);
 
     for (int i=0; i<nr_sequences; i++)
     {
