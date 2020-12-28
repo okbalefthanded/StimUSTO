@@ -3,6 +3,7 @@
 #include <QList>
 #include <algorithm>
 #include <time.h>
+#include <QtDebug>
 //using namespace std;
 
 RandomFlashSequence::RandomFlashSequence(QObject *parent) : QObject(parent)
@@ -56,22 +57,69 @@ RandomFlashSequence::RandomFlashSequence(int length, int nr_sequences, int min_d
 
 RandomFlashSequence::RandomFlashSequence(int elements, int nr_sequences, int setCount, int setLength)
 {
+    qDebug() << Q_FUNC_INFO;
+
     srand(time(0));
     QList<QList<int>> sequenceSets;
-
-    QVector<int> l(elements);
+    QVector<int> l(elements / setLength);
+    QVector<int> x(elements / setLength);
+    // QVector<int> l(elements);
+    // QVector<int> x(elements);
+    QList<int> tmp;
+    QList<int> tmp2;
+    QVector<int> buff;
+    QList<int> flash;
 
     for(int i=1; i<=setCount; i++)
     {
         sequenceSets.append(range(i, i+(elements-setLength), setLength));
     }
 
-    //std::iota(list.begin(), list.end(), 1);
+    qDebug()<< Q_FUNC_INFO << sequenceSets;
 
+    std::iota(l.begin(), l.end(), 1);
+    std::random_shuffle(l.begin(), l.end());
+    x = l;
+    buff = x;
     for (int i=0; i<nr_sequences; i++)
     {
-
+        for(int k=0; k<setLength; k++)
+        {
+            for(int j=0; j<setCount; j++)
+            {
+                if (tmp.size() == 0)
+                {
+                    tmp.append( sequenceSets[j].at(l[k]-1) );
+                    x.removeAll(l[k]);
+                }
+                else
+                {
+                    tmp.append( sequenceSets[j].at(x.takeFirst()-1) );
+                }
+            }
+            // append list of one sequence
+            tmp2.append(tmp);
+            x.resize(l.size());
+            x[0] = l[k+1];
+            tmp = buff.toList();
+            tmp.removeAll(x[0]);
+            std::swap(tmp.first(), tmp.last());
+            for(int m=1; m<=x.size(); m++)
+            {
+                x[m] = tmp[m-1];
+            }
+            tmp.clear();
+            buff = x;
+        }
+        std::random_shuffle(l.begin(), l.end());
+        flash.append(tmp2);
+        tmp2.clear();
+        x = l;
+        buff = x;
     }
+
+    sequence = flash.toVector();
+    qDebug()<< Q_FUNC_INFO << sequence;
 }
 
 QVector<int> RandomFlashSequence::range(int start, int end)

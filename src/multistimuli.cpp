@@ -1,6 +1,7 @@
 #include <QLayout>
 #include <QTimer>
 #include <QTime>
+#include <QMap>
 //
 #include "multistimuli.h"
 #include "erp.h"
@@ -12,22 +13,36 @@
 void MultiStimuli::startFlashing()
 {
     sendStimulationInfo();
-
     // stimulation
-    int currentStim = m_flashingSequence->sequence[m_currentStimulation];
+    int currentStim1 = m_flashingSequence->sequence[m_currentStimulation];
+    int currentStim2 = m_flashingSequence->sequence[m_currentStimulation+1];
+    int currentStim3 = m_flashingSequence->sequence[m_currentStimulation+2];
+
+    qDebug()<< Q_FUNC_INFO << currentStim1 << currentStim2 << currentStim3;
+
+    this->layout()->itemAt(currentStim1)->
+            widget()->setStyleSheet("qproperty-pixmap: url(:/images/"+stimuli[currentStim1]+")");
+
+    this->layout()->itemAt(currentStim2)->
+            widget()->setStyleSheet("qproperty-pixmap: url(:/images/"+stimuli[currentStim2]+")");
+
+    this->layout()->itemAt(currentStim3)->
+            widget()->setStyleSheet("qproperty-pixmap: url(:/images/"+stimuli[currentStim3]+")");
+
+    /*
     // qDebug() << Q_FUNC_INFO << QTime::currentTime().msec();
 
     //if(currentStim <= 3)
     if(currentStim == 1)
     {
-       this->layout()->itemAt(1)->
+        this->layout()->itemAt(1)->
                 widget()->setStyleSheet("qproperty-pixmap: url(:/images/bennabi_face_red_inverted.png)");
 
         this->layout()->itemAt(2)->
-                 widget()->setStyleSheet("qproperty-pixmap: url(:/images/yin_yang_small_croped.png)");
+                widget()->setStyleSheet("qproperty-pixmap: url(:/images/yin_yang_small_croped.png)");
 
         this->layout()->itemAt(3)->
-                 widget()->setStyleSheet("qproperty-pixmap: url(:/images/whitehouse_small.png)");
+                widget()->setStyleSheet("qproperty-pixmap: url(:/images/whitehouse_small.png)");
     }
 
     //else if (currentStim <= 6)
@@ -35,13 +50,13 @@ void MultiStimuli::startFlashing()
     {
 
         this->layout()->itemAt(4)->
-                 widget()->setStyleSheet("qproperty-pixmap: url(:/images/bennabi_face_blue_inverted.png)");
+                widget()->setStyleSheet("qproperty-pixmap: url(:/images/bennabi_face_blue_inverted.png)");
 
-         this->layout()->itemAt(5)->
-                  widget()->setStyleSheet("qproperty-pixmap: url(:/images/yin_yang_small_croped.png)");
+        this->layout()->itemAt(5)->
+                widget()->setStyleSheet("qproperty-pixmap: url(:/images/yin_yang_small_croped.png)");
 
-         this->layout()->itemAt(6)->
-                  widget()->setStyleSheet("qproperty-pixmap: url(:/images/whitehouse_small.png)");
+        this->layout()->itemAt(6)->
+                widget()->setStyleSheet("qproperty-pixmap: url(:/images/whitehouse_small.png)");
 
     }
     // else if (currentStim <= 9)
@@ -49,15 +64,15 @@ void MultiStimuli::startFlashing()
     {
 
         this->layout()->itemAt(7)->
-                 widget()->setStyleSheet("qproperty-pixmap: url(:/images/bennabi_face_magenta_inverted.png)");
+                widget()->setStyleSheet("qproperty-pixmap: url(:/images/bennabi_face_magenta_inverted.png)");
 
-         this->layout()->itemAt(8)->
-                  widget()->setStyleSheet("qproperty-pixmap: url(:/images/yin_yang_small_croped.png)");
+        this->layout()->itemAt(8)->
+                widget()->setStyleSheet("qproperty-pixmap: url(:/images/yin_yang_small_croped.png)");
 
-         this->layout()->itemAt(9)->
-                  widget()->setStyleSheet("qproperty-pixmap: url(:/images/whitehouse_small.png)");
+        this->layout()->itemAt(9)->
+                widget()->setStyleSheet("qproperty-pixmap: url(:/images/whitehouse_small.png)");
     }
-
+    */
     switchStimulationTimers();
 }
 
@@ -66,8 +81,43 @@ void MultiStimuli::pauseFlashing()
     // sendMarker(OVTK_StimulationId_VisualStimulationStop);
     // qDebug() << Q_FUNC_INFO << QTime::currentTime().msec();
 
-   int currentStim = m_flashingSequence->sequence[m_currentStimulation];
+    int currentStim1 = m_flashingSequence->sequence[m_currentStimulation];
+    int currentStim2 = m_flashingSequence->sequence[m_currentStimulation+1];
+    int currentStim3 = m_flashingSequence->sequence[m_currentStimulation+2];
 
+    qDebug()<< Q_FUNC_INFO << currentStim1 << currentStim2 << currentStim3;
+
+    m_element = new QLabel();
+    m_element->setPixmap(m_icons[currentStim1-1]);
+    m_element->setAlignment(Qt::AlignCenter);
+    this->layout()->replaceWidget(this->
+                                  layout()->
+                                  itemAt(currentStim1)->
+                                  widget(),
+                                  m_element,
+                                  Qt::FindDirectChildrenOnly);
+    m_element = new QLabel();
+    m_element->setPixmap(m_icons[currentStim2-1]);
+    m_element->setAlignment(Qt::AlignCenter);
+    this->layout()->replaceWidget(this->
+                                  layout()->
+                                  itemAt(currentStim2)->
+                                  widget(),
+                                  m_element,
+                                  Qt::FindDirectChildrenOnly);
+
+    m_element = new QLabel();
+    m_element->setPixmap(m_icons[currentStim3-1]);
+    m_element->setAlignment(Qt::AlignCenter);
+    this->layout()->replaceWidget(this->
+                                  layout()->
+                                  itemAt(currentStim3)->
+                                  widget(),
+                                  m_element,
+                                  Qt::FindDirectChildrenOnly);
+
+
+    /*
    // if(currentStim <= 3)
    if(currentStim == 1)
    {
@@ -125,10 +175,11 @@ void MultiStimuli::pauseFlashing()
        }
 
    }
-
-
+   */
     switchStimulationTimers();
-    ++m_currentStimulation;
+    // ++m_currentStimulation;
+    m_currentStimulation = m_currentStimulation + (m_nrElements / 3);
+    qDebug()<< m_currentStimulation;
 
     if (m_currentStimulation >= m_flashingSequence->sequence.count())
     {
@@ -188,9 +239,9 @@ void MultiStimuli::preTrial()
             }
         }
         //
-
         sendMarker(OVTK_StimulationId_TrialStart);
-        m_flashingSequence = new RandomFlashSequence(m_nrElements / 3, m_ERP->nrSequences());
+        //m_flashingSequence = new RandomFlashSequence(m_nrElements / 3, m_ERP->nrSequences());
+        m_flashingSequence = new RandomFlashSequence(m_nrElements, m_ERP->nrSequences(), 3, 3);
 
         qDebug() << Q_FUNC_INFO << m_flashingSequence->sequence;
 

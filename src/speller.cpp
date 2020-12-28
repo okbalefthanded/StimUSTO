@@ -449,7 +449,7 @@ void Speller::receiveFeedback()
     }
 
     //  feedback_socket->waitForBytesWritten();
-    qDebug()<< "Received: "<< QString(buffer->data());
+    // qDebug()<< "Received: "<< QString(buffer->data());
     m_text += QString(buffer->data());
 }
 
@@ -491,7 +491,7 @@ void Speller::highlightTarget()
 
     // this->layout()->itemAt(m_currentTarget)->
     //         widget()->setStyleSheet("QLabel { color : red; font: 60pt }");
-    qDebug()<< Q_FUNC_INFO << "current tg "<< m_currentTarget << "current letter " << m_currentLetter;
+    // qDebug()<< Q_FUNC_INFO << "current tg "<< m_currentTarget << "current letter " << m_currentLetter;
     QPixmap map = m_icons[m_currentTarget - 1];
     map.fill(Qt::yellow);
 
@@ -526,7 +526,7 @@ void Speller::refreshTarget()
                                   m_element,
                                   Qt::FindDirectChildrenOnly);
 
-    qDebug()<< Q_FUNC_INFO << "[current target] "<< m_currentTarget <<"[map] "<< m_currentTarget-1;
+    // qDebug()<< Q_FUNC_INFO << "[current target] "<< m_currentTarget <<"[map] "<< m_currentTarget-1;
 
 }
 
