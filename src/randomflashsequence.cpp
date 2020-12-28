@@ -57,7 +57,7 @@ RandomFlashSequence::RandomFlashSequence(int length, int nr_sequences, int min_d
 
 RandomFlashSequence::RandomFlashSequence(int elements, int nr_sequences, int setCount, int setLength)
 {
-    qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
 
     srand(time(0));
     QList<QList<int>> sequenceSets;
@@ -75,7 +75,7 @@ RandomFlashSequence::RandomFlashSequence(int elements, int nr_sequences, int set
         sequenceSets.append(range(i, i+(elements-setLength), setLength));
     }
 
-    qDebug()<< Q_FUNC_INFO << sequenceSets;
+    // qDebug()<< Q_FUNC_INFO << sequenceSets;
 
     std::iota(l.begin(), l.end(), 1);
     std::random_shuffle(l.begin(), l.end());
@@ -119,7 +119,7 @@ RandomFlashSequence::RandomFlashSequence(int elements, int nr_sequences, int set
     }
 
     sequence = flash.toVector();
-    qDebug()<< Q_FUNC_INFO << sequence;
+    // qDebug()<< Q_FUNC_INFO << sequence;
 }
 
 QVector<int> RandomFlashSequence::range(int start, int end)

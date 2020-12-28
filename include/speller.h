@@ -75,7 +75,7 @@ protected:
     void highlightTarget();
     virtual void refreshTarget();
 
-    void sendStimulationInfo();
+    virtual void sendStimulationInfo();
     void switchStimulationTimers();
 
     void startPreTrial();

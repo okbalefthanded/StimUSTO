@@ -8,178 +8,25 @@
 #include "ovtk_stimulations.h"
 #include "utils.h"
 //
-
-
 void MultiStimuli::startFlashing()
 {
     sendStimulationInfo();
     // stimulation
-    int currentStim1 = m_flashingSequence->sequence[m_currentStimulation];
-    int currentStim2 = m_flashingSequence->sequence[m_currentStimulation+1];
-    int currentStim3 = m_flashingSequence->sequence[m_currentStimulation+2];
+    updateWidgets(m_stimuli);
 
-    qDebug()<< Q_FUNC_INFO << currentStim1 << currentStim2 << currentStim3;
-
-    this->layout()->itemAt(currentStim1)->
-            widget()->setStyleSheet("qproperty-pixmap: url(:/images/"+stimuli[currentStim1]+")");
-
-    this->layout()->itemAt(currentStim2)->
-            widget()->setStyleSheet("qproperty-pixmap: url(:/images/"+stimuli[currentStim2]+")");
-
-    this->layout()->itemAt(currentStim3)->
-            widget()->setStyleSheet("qproperty-pixmap: url(:/images/"+stimuli[currentStim3]+")");
-
-    /*
-    // qDebug() << Q_FUNC_INFO << QTime::currentTime().msec();
-
-    //if(currentStim <= 3)
-    if(currentStim == 1)
-    {
-        this->layout()->itemAt(1)->
-                widget()->setStyleSheet("qproperty-pixmap: url(:/images/bennabi_face_red_inverted.png)");
-
-        this->layout()->itemAt(2)->
-                widget()->setStyleSheet("qproperty-pixmap: url(:/images/yin_yang_small_croped.png)");
-
-        this->layout()->itemAt(3)->
-                widget()->setStyleSheet("qproperty-pixmap: url(:/images/whitehouse_small.png)");
-    }
-
-    //else if (currentStim <= 6)
-    else if (currentStim == 2)
-    {
-
-        this->layout()->itemAt(4)->
-                widget()->setStyleSheet("qproperty-pixmap: url(:/images/bennabi_face_blue_inverted.png)");
-
-        this->layout()->itemAt(5)->
-                widget()->setStyleSheet("qproperty-pixmap: url(:/images/yin_yang_small_croped.png)");
-
-        this->layout()->itemAt(6)->
-                widget()->setStyleSheet("qproperty-pixmap: url(:/images/whitehouse_small.png)");
-
-    }
-    // else if (currentStim <= 9)
-    else if (currentStim == 3)
-    {
-
-        this->layout()->itemAt(7)->
-                widget()->setStyleSheet("qproperty-pixmap: url(:/images/bennabi_face_magenta_inverted.png)");
-
-        this->layout()->itemAt(8)->
-                widget()->setStyleSheet("qproperty-pixmap: url(:/images/yin_yang_small_croped.png)");
-
-        this->layout()->itemAt(9)->
-                widget()->setStyleSheet("qproperty-pixmap: url(:/images/whitehouse_small.png)");
-    }
-    */
     switchStimulationTimers();
 }
 
 void MultiStimuli::pauseFlashing()
 {
-    // sendMarker(OVTK_StimulationId_VisualStimulationStop);
+    sendMarker(OVTK_StimulationId_VisualStimulationStop);
     // qDebug() << Q_FUNC_INFO << QTime::currentTime().msec();
 
-    int currentStim1 = m_flashingSequence->sequence[m_currentStimulation];
-    int currentStim2 = m_flashingSequence->sequence[m_currentStimulation+1];
-    int currentStim3 = m_flashingSequence->sequence[m_currentStimulation+2];
+    updateWidgets(m_icons);
 
-    qDebug()<< Q_FUNC_INFO << currentStim1 << currentStim2 << currentStim3;
-
-    m_element = new QLabel();
-    m_element->setPixmap(m_icons[currentStim1-1]);
-    m_element->setAlignment(Qt::AlignCenter);
-    this->layout()->replaceWidget(this->
-                                  layout()->
-                                  itemAt(currentStim1)->
-                                  widget(),
-                                  m_element,
-                                  Qt::FindDirectChildrenOnly);
-    m_element = new QLabel();
-    m_element->setPixmap(m_icons[currentStim2-1]);
-    m_element->setAlignment(Qt::AlignCenter);
-    this->layout()->replaceWidget(this->
-                                  layout()->
-                                  itemAt(currentStim2)->
-                                  widget(),
-                                  m_element,
-                                  Qt::FindDirectChildrenOnly);
-
-    m_element = new QLabel();
-    m_element->setPixmap(m_icons[currentStim3-1]);
-    m_element->setAlignment(Qt::AlignCenter);
-    this->layout()->replaceWidget(this->
-                                  layout()->
-                                  itemAt(currentStim3)->
-                                  widget(),
-                                  m_element,
-                                  Qt::FindDirectChildrenOnly);
-
-
-    /*
-   // if(currentStim <= 3)
-   if(currentStim == 1)
-   {
-
-       for (int i=1; i<=3; i++) {
-           m_element = new QLabel();
-           m_element->setPixmap(m_icons[i-1]);
-           m_element->setAlignment(Qt::AlignCenter);
-
-           this->layout()->replaceWidget(this->
-                                         layout()->
-                                         itemAt(i)->
-                                         widget(),
-                                         m_element,
-                                         Qt::FindDirectChildrenOnly);
-       }
-
-
-   }
-
-   // else if (currentStim <= 6)
-   else if (currentStim == 2)
-   {
-
-       for (int i=4; i<=6; i++) {
-           m_element = new QLabel();
-           m_element->setPixmap(m_icons[i-1]);
-           m_element->setAlignment(Qt::AlignCenter);
-
-           this->layout()->replaceWidget(this->
-                                         layout()->
-                                         itemAt(i)->
-                                         widget(),
-                                         m_element,
-                                         Qt::FindDirectChildrenOnly);
-       }
-
-
-   }
-   // else if (currentStim <= 9)
-   else if (currentStim == 3)
-   {
-
-       for (int i=7; i<=9; i++) {
-           m_element = new QLabel();
-           m_element->setPixmap(m_icons[i-1]);
-           m_element->setAlignment(Qt::AlignCenter);
-
-           this->layout()->replaceWidget(this->
-                                         layout()->
-                                         itemAt(i)->
-                                         widget(),
-                                         m_element,
-                                         Qt::FindDirectChildrenOnly);
-       }
-
-   }
-   */
     switchStimulationTimers();
     // ++m_currentStimulation;
     m_currentStimulation = m_currentStimulation + (m_nrElements / 3);
-    qDebug()<< m_currentStimulation;
 
     if (m_currentStimulation >= m_flashingSequence->sequence.count())
     {
@@ -212,7 +59,12 @@ void MultiStimuli::preTrial()
     if(m_trials == 0)
     {
         sendMarker(OVTK_StimulationId_ExperimentStart);
-        //        initLogger();
+
+        foreach(QString value, m_stimuliMap)
+        {
+            QPixmap pic(":/images/"+value);
+            m_stimuli.append(pic);
+        }
     }
 
     if (m_preTrialCount == 0)
@@ -243,7 +95,7 @@ void MultiStimuli::preTrial()
         //m_flashingSequence = new RandomFlashSequence(m_nrElements / 3, m_ERP->nrSequences());
         m_flashingSequence = new RandomFlashSequence(m_nrElements, m_ERP->nrSequences(), 3, 3);
 
-        qDebug() << Q_FUNC_INFO << m_flashingSequence->sequence;
+        // qDebug() << Q_FUNC_INFO << m_flashingSequence->sequence;
 
         if (m_ERP->experimentMode() == operation_mode::CALIBRATION)
         {
@@ -276,4 +128,48 @@ void MultiStimuli::preTrial()
         m_state = trial_state::STIMULUS;
     }
 
+}
+
+void MultiStimuli::sendStimulationInfo()
+{
+    sendMarker(OVTK_StimulationId_VisualStimulationStart);
+
+    for(int i=0; i<3; i++)
+        sendMarker(config::OVTK_StimulationLabel_Base + m_flashingSequence->sequence[m_currentStimulation+i]);
+
+      // send target marker
+    if (m_ERP->experimentMode() == operation_mode::CALIBRATION ||
+            m_ERP->experimentMode() == operation_mode::COPY_MODE)
+    {
+        if (isTarget())
+        {
+            // qDebug()<< desired_phrase[currentLetter];
+            sendMarker(OVTK_StimulationId_Target);
+        }
+        else
+        {
+            sendMarker(OVTK_StimulationId_NonTarget);
+        }
+    }
+}
+
+void MultiStimuli::updateWidgets(QList<QPixmap> &pics)
+{
+    int id = 0;
+
+    for(int i=0; i<3; i++)
+    {
+        id = m_flashingSequence->sequence[m_currentStimulation+i];
+        QPixmap pixmap = pics[id-1];
+        m_element = new QLabel();
+        m_element->setPixmap(pixmap);
+        m_element->setAlignment(Qt::AlignCenter);
+
+        this->layout()->replaceWidget(this->
+                                      layout()->
+                                      itemAt(id)->
+                                      widget(),
+                                      m_element,
+                                      Qt::FindDirectChildrenOnly);
+    }
 }
