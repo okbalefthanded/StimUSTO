@@ -24,7 +24,7 @@ Speller::Speller(QWidget *parent) : QWidget(parent)
   //ui(new Ui::Speller)
 {
 
-    qDebug()<< Q_FUNC_INFO;
+    // qDebug()<< Q_FUNC_INFO;
     // ui->setupUi(this);
     setupUi(this);
     this->setProperty("windowTitle", "ERP Speller");

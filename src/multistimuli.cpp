@@ -19,7 +19,7 @@ void MultiStimuli::startFlashing()
 
 void MultiStimuli::pauseFlashing()
 {
-    sendMarker(OVTK_StimulationId_VisualStimulationStop);
+    // sendMarker(OVTK_StimulationId_VisualStimulationStop);
     // qDebug() << Q_FUNC_INFO << QTime::currentTime().msec();
 
     updateWidgets(m_icons);
@@ -27,30 +27,9 @@ void MultiStimuli::pauseFlashing()
     switchStimulationTimers();
     // ++m_currentStimulation;
     m_currentStimulation = m_currentStimulation + (m_nrElements / 3);
+    trialEnd();
 
-    if (m_currentStimulation >= m_flashingSequence->sequence.count())
-    {
-        ++m_currentLetter;
-        m_isiTimer->stop();
-        m_stimTimer->stop();
-
-        // utils::wait(1000); // time window after last epoch/stim
-        // utils::wait(500);
-        utils::wait(700); // 700 ms == epoch time windows
-        sendMarker(OVTK_StimulationId_TrialStop);
-        m_state = trial_state::FEEDBACK;
-
-        if(m_ERP->experimentMode() == operation_mode::COPY_MODE || m_ERP->experimentMode() == operation_mode::FREE_MODE)
-        {
-            feedback();
-        }
-        else if(m_ERP->experimentMode() == operation_mode::CALIBRATION)
-        {
-            postTrial();
-        }
-    }
 }
-
 
 void MultiStimuli::preTrial()
 {
@@ -137,7 +116,7 @@ void MultiStimuli::sendStimulationInfo()
     for(int i=0; i<3; i++)
         sendMarker(config::OVTK_StimulationLabel_Base + m_flashingSequence->sequence[m_currentStimulation+i]);
 
-      // send target marker
+    // send target marker
     if (m_ERP->experimentMode() == operation_mode::CALIBRATION ||
             m_ERP->experimentMode() == operation_mode::COPY_MODE)
     {
@@ -173,3 +152,4 @@ void MultiStimuli::updateWidgets(QList<QPixmap> &pics)
                                       Qt::FindDirectChildrenOnly);
     }
 }
+

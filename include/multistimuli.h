@@ -16,6 +16,7 @@ protected slots:
     void sendStimulationInfo();
     void updateWidgets(QList<QPixmap> &pics);
 
+
 private:
     QList<QPixmap> m_stimuli;
     QMap<int, QString> m_stimuliMap{{1, "bennabi_face_red_inverted.png"},
