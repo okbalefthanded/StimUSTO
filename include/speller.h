@@ -72,6 +72,7 @@ protected:
     void initFeedbackSocket();
 
     bool isTarget();
+    bool isTarget(int t_stim);
     void highlightTarget();
     virtual void refreshTarget();
 

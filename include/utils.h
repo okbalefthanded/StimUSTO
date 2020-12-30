@@ -27,8 +27,8 @@ QVector<double> gen_flick(double freq, int refreshRate, float length, quint8 sti
 // rectangle flickering : ON/OFF
 QVector<double> gen_flick_on_off(double freq, int refreshRate, float length);
 
-// sampled sinusoidal flickering
-QVector<double> gen_flick_sin(double freq, int refreshRate, float length);
+// sampled sinusoidal flickering // joint frequency-phase modulation (JFPM)
+QVector<double> gen_flick_sin(double freq, int refreshRate, float length, float phase);
 
 void wait(int millisecondsToWait);
 
@@ -93,7 +93,8 @@ const quint8 POST_TRIAL = 4;
 //
 namespace frequency_stimulation {
 const quint8 ON_OFF = 0;
-const quint8 SIN = 1;
+const quint8 SIN = 1; // only frequency
+const quint8 SIN_FP = 2; // joint frequency-phase modulation
 }
 
 namespace config {

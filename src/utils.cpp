@@ -15,7 +15,11 @@ QVector<double> gen_flick(double freq, int refreshRate, float length, quint8 sti
     }
     else if( stimMode == frequency_stimulation::SIN)
     {
-        return gen_flick_sin(freq, refreshRate, length);
+        return gen_flick_sin(freq, refreshRate, length, 0.0);
+    }
+    else if( stimMode == frequency_stimulation::SIN_FP)
+    {
+        //
     }
 }
 
@@ -47,7 +51,7 @@ QVector<double> gen_flick_on_off(double freq, int refreshRate, float length)
 // implement the Sampled sinusoidal frequency modulation method
 // X. Chen, Z. Chen, S. Gao, and X. Gao, “A high-ITR SSVEP-based BCI speller,”
 // Taylor Fr. Brain Comput. InterfacesBrain-Computer Interfaces, vol. 1, no. 3–4, pp. 181–191, 2014.
-QVector<double> gen_flick_sin(double freq, int refreshRate, float length)
+QVector<double> gen_flick_sin(double freq, int refreshRate, float length, float phase)
 {
 //    int samples = refreshRate * int(length);    
     int samples = refreshRate * (length / 1000);
@@ -55,7 +59,7 @@ QVector<double> gen_flick_sin(double freq, int refreshRate, float length)
 
     for(int index = 0; index < samples; index++)
     {
-        stim[index] = 0.5 * (1 + qSin(2*M_PI*freq*(index/float(refreshRate))));
+        stim[index] = 0.5 * (1 + qSin(2*M_PI*freq*(index/float(refreshRate)) + 0.5*M_PI));
     }
 
     return stim;

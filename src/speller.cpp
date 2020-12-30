@@ -467,6 +467,14 @@ bool Speller::isTarget()
     }
 }
 
+bool Speller::isTarget(int t_stim)
+{
+    if (m_desiredPhrase[m_currentLetter] == m_presentedLetters[t_stim-1][0])
+        return true;
+    else
+        return false;
+}
+
 void Speller::highlightTarget()
 {
     int idx = 0;
