@@ -113,7 +113,7 @@ protected:
     int m_preTrialCount = 0;
     quint16 m_feedbackPort = 12345;
 
-    QString m_desiredPhrase= "";
+    QString m_desiredPhrase = "";
     QString m_text = "";
     //    QImage *m_faceStimuli;
     QList<QString> m_presentedLetters;

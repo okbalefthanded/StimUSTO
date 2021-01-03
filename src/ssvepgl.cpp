@@ -346,7 +346,7 @@ void SsvepGL::receiveFeedback()
         m_sessionFeedback += buffer->data();
     }
 
-    qDebug() << Q_FUNC_INFO << "SSVEP FEEDBACK "<< m_sessionFeedback;
+    // qDebug() << Q_FUNC_INFO << "SSVEP FEEDBACK "<< m_sessionFeedback;
 
 }
 

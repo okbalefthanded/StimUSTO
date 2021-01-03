@@ -30,53 +30,13 @@ Speller::Speller(QWidget *parent) : QWidget(parent)
     this->setProperty("windowTitle", "ERP Speller");
     this->show();
 
-    if(qApp->screens().count() == 2)
-    {
-        this->windowHandle()->setScreen(qApp->screens().last());
-        this->showFullScreen();
-    }
-    else
-    {
-        this->showMaximized();
-    }
-
-    this->setStyleSheet("background-color : black");
-
-    // this->createLayout();
+    showWindow();
     createLayout();
-
-    m_stimTimer = new QTimer(this);
-    m_isiTimer = new QTimer(this);
-    m_preTrialTimer = new QTimer(this);
-
-    m_stimTimer->setTimerType(Qt::PreciseTimer);
-    m_stimTimer->setSingleShot(true);
-    m_stimTimer->setInterval(100); //default value
-
-    m_isiTimer->setTimerType(Qt::PreciseTimer);
-    m_isiTimer->setSingleShot(true);
-    m_isiTimer->setInterval(100); //default value
-
-    m_preTrialTimer->setTimerType(Qt::PreciseTimer);
-    m_preTrialTimer->setInterval(1000);
-    m_preTrialTimer->setSingleShot(true);
-
-    connect( m_stimTimer, SIGNAL(timeout()), this, SLOT(pauseFlashing()) );
-    connect( m_isiTimer, SIGNAL(timeout()), this, SLOT(startFlashing()) );
-    connect( m_preTrialTimer, SIGNAL(timeout()), this, SLOT(startTrial()) );
-
-    /*
-    if(m_ERP->experimentMode() == operation_mode::FREE_MODE)
-    {
-        qDebug() << "m_pretrailwait set to 0";
-        m_preTrialWait = 0;
-    }
-    */
-
-    m_feedbackSocket = new QUdpSocket(this);
-    m_feedbackSocket->bind(QHostAddress::LocalHost, m_feedbackPort);
+    initTimers();
+    initFeedbackSocket();
 
     m_state = trial_state::PRE_TRIAL;
+
 }
 
 Speller::Speller(int i)
@@ -86,7 +46,7 @@ Speller::Speller(int i)
 
 void Speller::startTrial()
 {
-    qDebug()<< "[TRIAL START]" << Q_FUNC_INFO;
+    // qDebug()<< "[TRIAL START]" << Q_FUNC_INFO;
 
     if (m_state == trial_state::PRE_TRIAL)
     {
@@ -124,55 +84,16 @@ void Speller::pauseFlashing()
                                   widget(),
                                   m_element,
                                   Qt::FindDirectChildrenOnly);
-    /*
-    this->layout()
-            ->replaceWidget(this->
-                            layout()->
-                            itemAt(m_flashingSequence->sequence[m_currentStimulation])->
-                            widget(),
-                            m_icons[ m_flashingSequence->sequence[m_currentStimulation] - 1]
-            );
-    */
-    /*
-    QString stimName = "qproperty-pixmap: url(:/images/"
-    +
-    QString::number(m_flashingSequence->sequence[m_currentStimulation])
-    +
-    ".png)";
-    */
-
-    // this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
-    //                 widget()->setStyleSheet(stimName);
 
     switchStimulationTimers();
     ++m_currentStimulation;
 
-    if (m_currentStimulation >= m_flashingSequence->sequence.count())
-    {
-        ++m_currentLetter;
-        m_isiTimer->stop();
-        m_stimTimer->stop();
-
-        // utils::wait(1000); // time window after last epoch/stim
-        // utils::wait(500);
-        utils::wait(700); // 700 ms == epoch time windows
-        sendMarker(OVTK_StimulationId_TrialStop);
-        m_state = trial_state::FEEDBACK;
-
-        if(m_ERP->experimentMode() == operation_mode::COPY_MODE || m_ERP->experimentMode() == operation_mode::FREE_MODE)
-        {
-            feedback();
-        }
-        else if(m_ERP->experimentMode() == operation_mode::CALIBRATION)
-        {
-            postTrial();
-        }
-    }
+    trialEnd();
 }
 
 void Speller::preTrial()
 {
-    qDebug()<< Q_FUNC_INFO;
+    // qDebug()<< Q_FUNC_INFO;
 
     if(m_trials == 0)
     {
@@ -182,43 +103,22 @@ void Speller::preTrial()
 
     if (m_preTrialCount == 0)
     {
-        // Refresh previous feedback
-        if(m_text.length() > 0)
-        {
-
-            if(m_ERP->experimentMode() == operation_mode::COPY_MODE ||
-                    m_ERP->experimentMode() == operation_mode::FREE_MODE)
-            {
-                int id = m_text[m_text.length()-1].digitValue();
-                QPixmap map = m_icons[id-1];
-                m_element = new QLabel();
-                m_element->setPixmap(map);
-                m_element->setAlignment(Qt::AlignCenter);
-                /*
-                this->layout()->replaceWidget(this->
-                                              layout()->
-                                              itemAt(id)->
-                                              widget(),
-                                              m_element,
-                                              Qt::FindDirectChildrenOnly);*/
-            }
-        }
-        //
-
         sendMarker(OVTK_StimulationId_TrialStart);
         m_flashingSequence = new RandomFlashSequence(m_nrElements, m_ERP->nrSequences());
 
-        //        qDebug() << Q_FUNC_INFO << m_flashingSequence->sequence;
+        // qDebug() << Q_FUNC_INFO << m_flashingSequence->sequence;
 
         if (m_ERP->experimentMode() == operation_mode::CALIBRATION)
         {
             highlightTarget();
             m_text += m_desiredPhrase[m_currentLetter];
             m_textRow->setText(m_text);
+
         }
         else if(m_ERP->experimentMode() == operation_mode::COPY_MODE)
         {
             highlightTarget();
+            // m_textRow->setText(m_text);
         }
         else if(m_ERP->experimentMode() == operation_mode::FREE_MODE)
         {
@@ -229,18 +129,7 @@ void Speller::preTrial()
     m_preTrialTimer->start();
     ++m_preTrialCount;
 
-    if (m_preTrialCount > m_preTrialWait || m_ERP->experimentMode() == operation_mode::FREE_MODE)
-    {
-        if( m_ERP->experimentMode() == operation_mode::COPY_MODE)
-        {
-
-            refreshTarget();
-        }
-        m_preTrialTimer->stop();
-        m_preTrialCount = 0;
-        m_state = trial_state::STIMULUS;
-    }
-
+    endPreTrial();
 }
 
 void Speller::feedback()
@@ -248,6 +137,8 @@ void Speller::feedback()
     receiveFeedback();
 
     m_textRow->setText(m_text);
+    qDebug()<< Q_FUNC_INFO << "setting TEXT ROW with "<< m_text;
+    qDebug()<< "m text row "<< m_textRow->text();
 
     if (m_text[m_text.length()-1] != "#")
     {
@@ -269,11 +160,12 @@ void Speller::feedback()
             }
             else
             {
-               // this->layout()->itemAt(m_currentTarget)->
-               //         widget()->setStyleSheet("QLabel { color : blue; font: 40pt }");
+                // this->layout()->itemAt(m_currentTarget)->
+                //         widget()->setStyleSheet("QLabel { color : blue; font: 40pt }");
                 map.fill(Qt::blue);
                 isCorrect = false;
             }
+            qDebug()<< Q_FUNC_INFO << "element id: "<< id;
 
             m_element = new QLabel();
             m_element->setPixmap(map);
@@ -289,16 +181,13 @@ void Speller::feedback()
 
         else if (m_ERP->experimentMode() == operation_mode::FREE_MODE)
         {
-
-            //        this->layout()->itemAt(0)->
-            //             widget()->setStyleSheet("QLabel { color : blue; font: 40pt }");
-
             int id = m_text[m_text.length()-1].digitValue();
             QPixmap map = m_icons[id-1];
             map.fill(Qt::blue);
             m_element = new QLabel();
             m_element->setPixmap(map);
             m_element->setAlignment(Qt::AlignCenter);
+
 
             this->layout()->replaceWidget(this->
                                           layout()->
@@ -309,12 +198,13 @@ void Speller::feedback()
 
         }
     }
+
     postTrial();
 }
 
 void Speller::postTrial()
 {
-    qDebug()<< Q_FUNC_INFO;
+    // qDebug()<< Q_FUNC_INFO;
 
     ++m_trials;
     // m_currentStimulation = 0;
@@ -322,7 +212,7 @@ void Speller::postTrial()
     // wait
     // utils::wait(1000);
     //  utils::wait(500);
-    utils::wait(250);
+    utils::wait(250); // showing feedback for 0.25 sec
     //    refreshTarget();
 
     if (m_text[m_text.length()-1] != "#")
@@ -331,8 +221,9 @@ void Speller::postTrial()
                 m_ERP->experimentMode() == operation_mode::FREE_MODE)
         {
 
-            int id = m_text[m_text.length()-1].digitValue();
 
+            int id = m_text[m_text.length()-1].digitValue();
+            qDebug()<< Q_FUNC_INFO << "element ID" << id;
             QPixmap map = m_icons[id-1];
             m_element = new QLabel();
             m_element->setPixmap(map);
@@ -345,57 +236,19 @@ void Speller::postTrial()
                                           m_element,
                                           Qt::FindDirectChildrenOnly);
 
+
         }
         else if(m_ERP->experimentMode() == operation_mode::CALIBRATION)
         {
             refreshTarget();
         }
     }
-    //
+
+    // m_textRow->setText(m_text);
+    // m_textRow->show();
+
     // Send and Recieve feedback to/from Robot if external communication is enabled
-    m_hybridCommand = m_text[m_text.length()-1] + "2";
-    if(m_ERP->externalComm() == external_comm::ENABLED)
-    {
-        qDebug() << "Sending Feedback to Robot";
-        // m_hybridCommand = "12";
-        if (!m_robotSocket->isOpen())
-        {
-            qDebug()<< "Not sending Feedback to Robot : Cannot send feedback socket is not open";
-        }
-
-        try
-        {
-            // m_hybridCommand = "12";
-            std::string str = m_hybridCommand.toStdString();
-            const char* p = str.c_str();
-            qDebug()<< "command to send to Robot: " << m_hybridCommand;
-            QByteArray byteovStimulation;
-            QDataStream streamovs(&byteovStimulation, QIODevice::WriteOnly);
-            streamovs.setByteOrder(QDataStream::LittleEndian);
-            //  streamovs << m_hybridCommand;
-            streamovs.writeRawData(p, m_hybridCommand.length());
-            m_robotSocket->write(byteovStimulation);
-            m_robotSocket->waitForBytesWritten();
-        }
-        catch(...)
-        {
-            qDebug() <<"Send Feedback to Robot, Issue With writting Data";
-        }
-
-        qDebug() << "Recieve State from Robot";
-        m_robotSocket->waitForReadyRead();
-
-        QByteArray robotState = m_robotSocket->readAll();
-
-        quint8 rState = robotState.toUInt();
-        qDebug()<< Q_FUNC_INFO << "Robot State recieved " << rState;
-        if(rState == robot_state::READY)
-        {
-            qDebug()<< "Correct State";
-            m_state = trial_state::PRE_TRIAL;
-        }
-
-    }
+    externalCommunication();
 
     m_currentStimulation = 0;
     m_state = trial_state::PRE_TRIAL;
@@ -423,6 +276,7 @@ void Speller::postTrial()
     }
     else
     {
+        this->layout()->update();
         startTrial();
     }
 
@@ -496,10 +350,9 @@ void Speller::highlightTarget()
         }
     }
 
+    qDebug()<< Q_FUNC_INFO << "current tg "<< m_currentTarget << "current letter " << m_desiredPhrase[m_currentLetter];
 
-    // this->layout()->itemAt(m_currentTarget)->
-    //         widget()->setStyleSheet("QLabel { color : red; font: 60pt }");
-    // qDebug()<< Q_FUNC_INFO << "current tg "<< m_currentTarget << "current letter " << m_currentLetter;
+
     QPixmap map = m_icons[m_currentTarget - 1];
     map.fill(Qt::yellow);
 
@@ -514,7 +367,6 @@ void Speller::highlightTarget()
                                   m_element,
                                   Qt::FindDirectChildrenOnly);
 
-
 }
 
 void Speller::refreshTarget()
@@ -522,21 +374,25 @@ void Speller::refreshTarget()
 
     //   this->layout()->itemAt(m_currentTarget)->
     //           widget()->setStyleSheet("QLabel { color : gray; font: 40pt }");
+    qDebug()<< Q_FUNC_INFO << m_currentTarget;
 
     m_element = new QLabel();
-    m_element->setPixmap(m_icons[m_currentTarget-1]);
+    QPixmap map = m_icons[m_currentTarget - 1];
+    m_element->setPixmap(map);
     m_element->setAlignment(Qt::AlignCenter);
-
+    /*
     this->layout()->replaceWidget(this->
                                   layout()->
                                   itemAt(m_currentTarget)->
                                   widget(),
                                   m_element,
                                   Qt::FindDirectChildrenOnly);
+                                  */
 
     // qDebug()<< Q_FUNC_INFO << "[current target] "<< m_currentTarget <<"[map] "<< m_currentTarget-1;
 
 }
+
 
 void Speller::sendStimulationInfo()
 {
@@ -773,6 +629,7 @@ void Speller::setERP(ERP *erp)
     m_ERP = erp;
     setTimers(m_ERP->stimulationDuration(), m_ERP->breakDuration());
     setDesiredPhrase(m_ERP->desiredPhrase());
+    m_textRow->setText(m_desiredPhrase);
     // external comm
     // a temporary hack
     qDebug()<< "Lets see external comm" <<m_ERP->externalComm();
@@ -848,11 +705,14 @@ void Speller::createLayout()
     QGridLayout *layout = new QGridLayout();
 
     m_textRow = new QLabel(this);
-    m_textRow->setText(m_desiredPhrase);
     m_textRow->setStyleSheet("font:30pt; color:gray; border-color:white;");
     m_textRow->setAlignment(Qt::AlignLeft);
+    m_textRow->setObjectName("Desired Phrase Row");
     //    textRow->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(m_textRow, 0, 0, 1, 0);
+
+    m_textRow->setText(m_desiredPhrase);
+    qDebug()<< Q_FUNC_INFO<< m_desiredPhrase;
 
     int k = 1;
     QString stimName;

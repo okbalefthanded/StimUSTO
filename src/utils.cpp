@@ -101,6 +101,7 @@ QSize getScreenSize()
         return pluggedScreens.first()->size();
     }
 }
+
 }
 
 

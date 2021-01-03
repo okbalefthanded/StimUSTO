@@ -44,23 +44,19 @@ void FaceSpeller::stimulationFace()
 {
     // qDebug()<< Q_FUNC_INFO;
 
-    this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
-            widget()->setStyleSheet("qproperty-pixmap: url(:/images/bennabi_face.png)");
 
+    int id = m_flashingSequence->sequence[m_currentStimulation];
+    QPixmap pixmap(":/images/bennabi_face.png");
+    m_element = new QLabel();
+    m_element->setPixmap(pixmap);
+    m_element->setAlignment(Qt::AlignCenter);
 
-    /*
-    this->layout()
-            ->itemAt(m_flashingSequence->sequence[m_currentStimulation])
-            ->widget()
-            ->setStyleSheet("image: url(:/images/yin_yang_small_croped.png)");
-            */
-
-    /*this->layout()
-            ->itemAt(m_flashingSequence->sequence[m_currentStimulation])
-            ->widget()
-            ->setStyleSheet("image: url(:/images/whitehouse.png)");
-            */
-
+    this->layout()->replaceWidget(this->
+                                  layout()->
+                                  itemAt(id)->
+                                  widget(),
+                                  m_element,
+                                  Qt::FindDirectChildrenOnly);
 }
 
 void FaceSpeller::stimulationColoredFace()
@@ -130,27 +126,18 @@ void FaceSpeller::stimulationInvertedFace()
 {
     // qDebug() << Q_FUNC_INFO << QTime::currentTime().msec();
 
-    this->layout()
-            ->itemAt(m_flashingSequence->sequence[m_currentStimulation])
-            ->widget()
-            ->setStyleSheet("image: url(:/images/bennabi_face_inverted.png)");
+    int id = m_flashingSequence->sequence[m_currentStimulation];
+    QPixmap pixmap(":/images/bennabi_face_inverted.png");
+    m_element = new QLabel();
+    m_element->setPixmap(pixmap);
+    m_element->setAlignment(Qt::AlignCenter);
 
-    /*
-    qDebug()<< Q_FUNC_INFO;
-
-    QPalette pl = this->layout()
-            ->itemAt(m_flashingSequence->sequence[m_currentStimulation])
-            ->widget()->palette();
-
-    QPixmap picMap(":/images/bennabi_face_inverted.png");
-
-    pl.setBrush(QPalette::Base, QBrush(picMap));
-
-    this->layout()
-            ->itemAt(m_flashingSequence->sequence[m_currentStimulation])
-            ->widget()
-            ->palette();
-    */
+    this->layout()->replaceWidget(this->
+                                  layout()->
+                                  itemAt(id)->
+                                  widget(),
+                                  m_element,
+                                  Qt::FindDirectChildrenOnly);
 
 }
 
@@ -158,95 +145,31 @@ void FaceSpeller::stimulationInvertedColoredFace()
 {
 
     int currentStim = m_flashingSequence->sequence[m_currentStimulation];
+    QPixmap pixmap;
+    m_element = new QLabel();
+    m_element->setAlignment(Qt::AlignCenter);
 
     //qDebug() << Q_FUNC_INFO << QTime::currentTime().msec();
 
     if(currentStim <= 3)
     {
-        //        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
-        //                widget()->setStyleSheet("image: url(:/images/bennabi_face_red_inverted.png)");
-
-        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
-                widget()->setStyleSheet("qproperty-pixmap: url(:/images/bennabi_face_red_inverted.png)");
-
-
+        pixmap = QPixmap(":/images/bennabi_face_red_inverted.png");
     }
 
     else if (currentStim <= 6)
     {
-        //        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
-        //                widget()->setStyleSheet("image: url(:/images/bennabi_face_green_inverted.png)");
-        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
-                widget()->setStyleSheet("qproperty-pixmap: url(:/images/bennabi_face_green_inverted.png)");
-
+        pixmap = QPixmap(":/images/bennabi_face_green_inverted.png");
     }
     else if (currentStim <= 9)
-    {
-        //      this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
-        //              widget()->setStyleSheet("image: url(:/images/bennabi_face_blue_inverted.png)");
-        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
-                widget()->setStyleSheet("qproperty-pixmap: url(:/images/bennabi_face_blue_inverted.png)");
-
-    }
-    /*
-    switch (m_flashingSequence->sequence[m_currentStimulation])
-    {
-    case 1:
-    {
-        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
-                widget()->setStyleSheet("image: url(:/images/bennabi_face_blue_inverted.png)");
-        break;
-    }
-    case 2:
-    {
-        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
-                widget()->setStyleSheet("image: url(:/images/bennabi_face_green_inverted.png)");
-        break;
-    }
-    case 3:
-    {
-        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
-                widget()->setStyleSheet("image: url(:/images/bennabi_face_red_inverted.png)");
-        break;
-    }
-    case 4:
-    {
-        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
-                widget()->setStyleSheet("image: url(:/images/bennabi_face_brown_inverted.png)");
-        break;
-    }
-    case 5:
-    {
-        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
-                widget()->setStyleSheet("image: url(:/images/bennabi_face_cyan_inverted.png)");
-        break;
-    }
-    case 6:
-    {
-        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
-                widget()->setStyleSheet("image: url(:/images/bennabi_face_inverted.png)");
-        break;
-    }
-    case 7:
-    {
-        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
-                widget()->setStyleSheet("image: url(:/images/bennabi_face_yellow_inverted.png)");
-        break;
-    }
-    case 8:
-    {
-        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
-                widget()->setStyleSheet("image: url(:/images/bennabi_face_orange_inverted.png)");
-        break;
-    }
-    case 9:
-    {
-        this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
-                widget()->setStyleSheet("image: url(:/images/bennabi_face_magenta_inverted.png)");
-        break;
+    {      
+        pixmap = QPixmap(":/images/bennabi_face_blue_inverted.png");
     }
 
-
-    }
-    */
+    m_element->setPixmap(pixmap);
+    this->layout()->replaceWidget(this->
+                                  layout()->
+                                  itemAt(currentStim)->
+                                  widget(),
+                                  m_element,
+                                  Qt::FindDirectChildrenOnly);
 }
