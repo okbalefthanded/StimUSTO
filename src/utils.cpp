@@ -47,6 +47,7 @@ QVector<double> gen_flick_on_off(double freq, int refreshRate, float length)
     return v;
 }
 
+
 // sampled sinusoidal flickering
 // implement the Sampled sinusoidal frequency modulation method
 // X. Chen, Z. Chen, S. Gao, and X. Gao, “A high-ITR SSVEP-based BCI speller,”
@@ -59,7 +60,7 @@ QVector<double> gen_flick_sin(double freq, int refreshRate, float length, float 
 
     for(int index = 0; index < samples; index++)
     {
-        stim[index] = 0.5 * (1 + qSin(2*M_PI*freq*(index/float(refreshRate)) + 0.5*M_PI));
+        stim[index] = 0.5 * (1 + qSin(2*M_PI*freq*(index/float(refreshRate)) + phase));
     }
 
     return stim;
