@@ -1,6 +1,7 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#include <QtMath>
 #include <QVector>
 #include <QSize>
 #include <QGuiApplication>
@@ -22,13 +23,13 @@ static QString ArabicLetters = "دخحجثتبأطضصشسزرذنملكقفغظ
 static QString numbers = "0123456789<_>";
 
 // rectangle flickering
-QVector<double> gen_flick(double freq, int refreshRate, float length, quint8 stimMode);
+QVector<double> gen_flick(double freq, int refreshRate, float length, quint8 stimMode, double phase=0.0);
 
 // rectangle flickering : ON/OFF
 QVector<double> gen_flick_on_off(double freq, int refreshRate, float length);
 
 // sampled sinusoidal flickering // joint frequency-phase modulation (JFPM)
-QVector<double> gen_flick_sin(double freq, int refreshRate, float length, float phase);
+QVector<double> gen_flick_sin(double freq, int refreshRate, float length, double phase);
 
 void wait(int millisecondsToWait);
 
@@ -103,6 +104,7 @@ const int start_port = 54321;
 //
 const uint64_t OVTK_StimulationLabel_Base = 0x00008100;
 const int REFRESH_RATE = 60;
+const double PHASE = 0.35*M_PI;
 }
 
 namespace external_comm {

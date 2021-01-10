@@ -70,7 +70,7 @@ void SsvepGL::initializeGL()
 
     for (int i=0; i < m_frequencies.size(); ++i)
     {
-        m_flicker[i] = utils::gen_flick(m_frequencies[i], config::REFRESH_RATE, m_ssvep->stimulationDuration(), m_ssvep->stimulationMode());
+        m_flicker[i] = utils::gen_flick(m_frequencies[i], config::REFRESH_RATE, m_ssvep->stimulationDuration(), m_ssvep->stimulationMode(), config::PHASE*i);
     }
     //qDebug() << "flicker size: "<< m_flicker[0].size();
     // Application-specific initialization
