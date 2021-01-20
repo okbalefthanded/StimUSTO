@@ -49,6 +49,7 @@ void MultiStimuli::preTrial()
     if (m_preTrialCount == 0)
     {
         // Refresh previous feedback
+        /*
         if(m_text.length() > 0)
         {
 
@@ -60,15 +61,16 @@ void MultiStimuli::preTrial()
                 m_element = new QLabel();
                 m_element->setPixmap(map);
                 m_element->setAlignment(Qt::AlignCenter);
-                /*
+
                 this->layout()->replaceWidget(this->
                                               layout()->
                                               itemAt(id)->
                                               widget(),
                                               m_element,
-                                              Qt::FindDirectChildrenOnly);*/
+                                              Qt::FindDirectChildrenOnly);
             }
         }
+        */
         //
         sendMarker(OVTK_StimulationId_TrialStart);
         //m_flashingSequence = new RandomFlashSequence(m_nrElements / 3, m_ERP->nrSequences());

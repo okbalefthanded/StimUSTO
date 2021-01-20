@@ -264,8 +264,8 @@ void Speller::postTrial()
         qDebug()<< "Experiment End, closing speller";
         sendMarker(OVTK_StimulationId_ExperimentStop);
         utils::wait(2000);
-        //emit(slotTerminated());
-        //this->close();
+        emit(slotTerminated());
+        this->close();
     }
     else if(m_desiredPhrase.length() <= 1)
     {
