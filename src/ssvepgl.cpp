@@ -141,7 +141,7 @@ void SsvepGL::paintGL()
 
 void SsvepGL::startTrial()
 {
-   // qDebug()<< "[TRIAL START]" << Q_FUNC_INFO;
+    // qDebug()<< "[TRIAL START]" << Q_FUNC_INFO;
 
     if (m_state == trial_state::PRE_TRIAL)
     {
@@ -160,7 +160,7 @@ void SsvepGL::startTrial()
 void SsvepGL::preTrial()
 {
 
-    if(m_trials == 0)
+    if(m_trials == 0 && m_preTrialCount == 0)
     {
         sendMarker(OVTK_StimulationId_ExperimentStart);
     }
@@ -212,9 +212,9 @@ void SsvepGL::preTrial()
 void SsvepGL::postTrial()
 {
 
-
-    // sendMarker(OVTK_StimulationId_TrialStop);
+    qDebug()<< "POST TRIAL [update ] Index : "<< m_index << "current time: " << QTime::currentTime().msec();
     disconnect(this, SIGNAL(frameSwapped()), this, SLOT(update()));
+    qDebug()<< "AFTER DISCONNECT POST TRIAL [update ] Index : "<< m_index << "current time: " << QTime::currentTime().msec();
     initElements();
 
     m_index = 0;
@@ -263,21 +263,24 @@ void SsvepGL::postTrial()
         qDebug()<< "Experiment End, closing SSVEP stimulation";
         sendMarker(OVTK_StimulationId_ExperimentStop);
         utils::wait(2000);
-        emit(slotTerminated());
-        this->close();
+        // emit(slotTerminated());
+        // this->close();
     }
 }
 
 void SsvepGL::Flickering()
 {
 
+    QOpenGLWindow::update();
+
     if(m_index == 0)
     {
         // qDebug()<< Q_FUNC_INFO << "connecting frameswapped to update" << "index " << index;
         connect(this, SIGNAL(frameSwapped()), this, SLOT(update()));
-        //        qDebug()<< Q_FUNC_INFO << "[update ]Index (first): "<< m_index << "current time: " << QTime::currentTime().msec();
+        // qDebug()<< Q_FUNC_INFO << "[update ]Index (first): "<< m_index << "current time: " << QTime::currentTime().msec();
     }
 
+    QOpenGLWindow::update();
     //    sendMarker(config::OVTK_StimulationLabel_Base + m_flickeringSequence->sequence[m_currentFlicker]);
     //    sendMarker(OVTK_StimulationId_VisualSteadyStateStimulationStart);
     //        qDebug()<< Q_FUNC_INFO << "markers sent" << "current time: " << QTime::currentTime().msec();
@@ -286,12 +289,13 @@ void SsvepGL::Flickering()
 
     while(m_index <= m_flicker[0].size())
     {
-
         QCoreApplication::processEvents(QEventLoop::AllEvents);
     }
 
+    utils::wait(17);
     sendMarker(OVTK_StimulationId_TrialStop);
-    //    qDebug()<< Q_FUNC_INFO << "[update ]Index (last) : "<< m_index << "current time: " << QTime::currentTime().msec();
+    qDebug()<< Q_FUNC_INFO << "[update ]Index (last) : "<< m_index << "current time: " << QTime::currentTime().msec();
+
     //++m_currentFlicker;
     m_state = trial_state::POST_TRIAL;
 }
@@ -601,6 +605,10 @@ void SsvepGL::initLogger()
 
 void SsvepGL::scheduleRedraw()
 {
+
+    // qDebug()<< "ScheduleRedraw [update ] Index : "<< m_index << "current time: " << QTime::currentTime().msec();
+    QOpenGLWindow::update();
+
     m_vaObject.bind();
     m_colorBuffer.bind();
     m_colorBuffer.write(0, m_colors.data(), m_colors.count() * sizeof(QVector3D)); // number of vertices to avoid * sizeof QVector3D
@@ -622,8 +630,8 @@ void SsvepGL::setSsvep(SSVEP *ssvep)
 
 void SsvepGL::update()
 {
+    qDebug()<< "Update         [update ] Index : "<< m_index << "current time: " << QTime::currentTime().msec();
 
-    //        qDebug()<< "[update ]Index : "<< m_index << "current time: " << QTime::currentTime().msec();
 
     if(m_index == 0)
     {
