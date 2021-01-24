@@ -55,11 +55,13 @@ void SsvepGL::initializeGL()
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glEnable(GL_FRAMEBUFFER_SRGB);
 
+    /*
     if(QGuiApplication::screens().size() == 2)
     {
         this->setScreen(QGuiApplication::screens().last());
         this->showFullScreen();
     }
+    */
 
     // set vertices, vertices indeices & colors
     // initElements();
@@ -212,9 +214,7 @@ void SsvepGL::preTrial()
 void SsvepGL::postTrial()
 {
 
-    qDebug()<< "POST TRIAL [update ] Index : "<< m_index << "current time: " << QTime::currentTime().msec();
     disconnect(this, SIGNAL(frameSwapped()), this, SLOT(update()));
-    qDebug()<< "AFTER DISCONNECT POST TRIAL [update ] Index : "<< m_index << "current time: " << QTime::currentTime().msec();
     initElements();
 
     m_index = 0;
@@ -271,8 +271,6 @@ void SsvepGL::postTrial()
 void SsvepGL::Flickering()
 {
 
-    QOpenGLWindow::update();
-
     if(m_index == 0)
     {
         // qDebug()<< Q_FUNC_INFO << "connecting frameswapped to update" << "index " << index;
@@ -280,7 +278,6 @@ void SsvepGL::Flickering()
         // qDebug()<< Q_FUNC_INFO << "[update ]Index (first): "<< m_index << "current time: " << QTime::currentTime().msec();
     }
 
-    QOpenGLWindow::update();
     //    sendMarker(config::OVTK_StimulationLabel_Base + m_flickeringSequence->sequence[m_currentFlicker]);
     //    sendMarker(OVTK_StimulationId_VisualSteadyStateStimulationStart);
     //        qDebug()<< Q_FUNC_INFO << "markers sent" << "current time: " << QTime::currentTime().msec();
@@ -292,9 +289,9 @@ void SsvepGL::Flickering()
         QCoreApplication::processEvents(QEventLoop::AllEvents);
     }
 
-    utils::wait(17);
+    // utils::wait(17);
     sendMarker(OVTK_StimulationId_TrialStop);
-    qDebug()<< Q_FUNC_INFO << "[update ]Index (last) : "<< m_index << "current time: " << QTime::currentTime().msec();
+   //  qDebug()<< Q_FUNC_INFO << "[update ]Index (last) : "<< m_index << "current time: " << QTime::currentTime().msec();
 
     //++m_currentFlicker;
     m_state = trial_state::POST_TRIAL;
@@ -607,7 +604,7 @@ void SsvepGL::scheduleRedraw()
 {
 
     // qDebug()<< "ScheduleRedraw [update ] Index : "<< m_index << "current time: " << QTime::currentTime().msec();
-    QOpenGLWindow::update();
+    // QOpenGLWindow::update();
 
     m_vaObject.bind();
     m_colorBuffer.bind();
@@ -628,9 +625,11 @@ void SsvepGL::setSsvep(SSVEP *ssvep)
     m_ssvep = ssvep;
 }
 
+
+
 void SsvepGL::update()
 {
-    qDebug()<< "Update         [update ] Index : "<< m_index << "current time: " << QTime::currentTime().msec();
+    qDebug()<< "[update ] Index : "<< m_index << "current time: " << QTime::currentTime().msec();
 
 
     if(m_index == 0)

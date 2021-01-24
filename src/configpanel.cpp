@@ -153,7 +153,8 @@ void ConfigPanel::on_initSSVEP_clicked()
 
         SsvepGL *ssvepStimulation = createSSVEP(ssvepParadigm, 12345);
         connectParadigm(ssvepStimulation, launchTimer);
-        ssvepStimulation->show();
+        // ssvepStimulation->show();
+        ssvepStimulation->showFullScreen();
 
     }
 }
@@ -178,7 +179,6 @@ void ConfigPanel::on_stopSpeller_clicked()
 {
 
 }
-
 
 //Quit speller
 void ConfigPanel::on_quitSpeller_clicked()
@@ -337,6 +337,7 @@ SsvepGL *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
     format.setProfile(QSurfaceFormat::CoreProfile);
     // format.setVersion(3,3);
     format.setVersion(3,0); // ANGLE supports ES 3.0, higher versions raise exceptions
+    // format.setVersion(4, 5); // HP ProBook
 
     SsvepGL *ssvepStimulation = new SsvepGL(t_ssvep, t_port);
     ssvepStimulation->setFormat(format);
@@ -344,10 +345,11 @@ SsvepGL *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
     if(QGuiApplication::screens().size() == 2)
     {
         ssvepStimulation->resize(utils::getScreenSize());
+        ssvepStimulation->setScreen(QGuiApplication::screens().last());
     }
     else
     {
-        ssvepStimulation->resize(QSize(1366, 768)); //temporaty size;
+        ssvepStimulation->resize(QSize(1366, 768)); // temporaty size;
     }
 
     connectStimulation(ssvepStimulation);
