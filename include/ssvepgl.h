@@ -85,6 +85,9 @@ private:
     int m_state;
     int m_trials = 0;
     float m_correct = 0;
+
+    int m_lostFrames = 0;
+
     //
     SSVEP *m_ssvep;
     QList<double> m_frequencies;
