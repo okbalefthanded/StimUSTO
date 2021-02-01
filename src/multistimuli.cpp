@@ -111,6 +111,12 @@ void MultiStimuli::preTrial()
 
 }
 
+void MultiStimuli::createLayout()
+{
+    // create special laytout
+
+}
+
 void MultiStimuli::sendStimulationInfo()
 {
     int stim = 0;

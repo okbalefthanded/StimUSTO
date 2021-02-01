@@ -13,6 +13,7 @@ protected slots:
     void startFlashing();
     void pauseFlashing();
     void preTrial();
+    void createLayout();
     void sendStimulationInfo();
     void updateWidgets(QList<QPixmap> &pics);
 
