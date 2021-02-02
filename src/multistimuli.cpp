@@ -8,8 +8,27 @@
 #include "ovtk_stimulations.h"
 #include "utils.h"
 //
+MultiStimuli::MultiStimuli(QWidget *parent) : Speller(0)
+{
+    qDebug()<< Q_FUNC_INFO;
+
+    setupUi(this);
+
+    this->setProperty("windowTitle", "ERP MultiStim Speller");
+
+    showWindow();
+
+    createLayout();
+    initTimers();
+    initFeedbackSocket();
+
+    m_state = trial_state::PRE_TRIAL;
+}
+
+
 void MultiStimuli::startFlashing()
 {
+    // qDebug() << Q_FUNC_INFO;
     sendStimulationInfo();
     // stimulation
     updateWidgets(m_stimuli);
@@ -20,7 +39,8 @@ void MultiStimuli::startFlashing()
 void MultiStimuli::pauseFlashing()
 {
     // sendMarker(OVTK_StimulationId_VisualStimulationStop);
-    // qDebug() << Q_FUNC_INFO << QTime::currentTime().msec();
+    //qDebug() << Q_FUNC_INFO << QTime::currentTime().msec();
+    // qDebug() << Q_FUNC_INFO;
 
     updateWidgets(m_icons);
 
@@ -114,7 +134,80 @@ void MultiStimuli::preTrial()
 void MultiStimuli::createLayout()
 {
     // create special laytout
+    qDebug()<< Q_FUNC_INFO;
+    // speller settings
+    m_rows = 3;
+    m_cols = 3;
+    m_nrElements = m_rows * m_cols;
 
+    m_icons = QList<QPixmap>();
+    m_element = new QLabel();
+    m_element->setAlignment(Qt::AlignCenter);
+
+    QGridLayout *layout = new QGridLayout();
+
+    m_textRow = new QLabel(this);
+    m_textRow->setStyleSheet("font:25pt; color:gray; border-color:white;");
+    m_textRow->setGeometry(0, 0, 10, 10);
+    qDebug()<< " textrow geometry "<< m_textRow->geometry();
+    m_textRow->setAlignment(Qt::AlignLeft);
+    m_textRow->setObjectName("Desired Phrase Row");
+    // m_textRow->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+    layout->setHorizontalSpacing(400);
+    layout->setVerticalSpacing(100);
+    layout->addWidget(m_textRow, 0, 0, 1, 0);
+    // layout->addWidget(m_textRow, 0, 0);
+
+    m_textRow->setText(m_desiredPhrase);
+
+    int k = 1;
+    // bool splitter = false;
+    QString stimName;
+    QPixmap pic;
+    QImage iconImage;
+    int label_h, label_w;
+    // add speller ellements
+    for(int i=1; i<m_rows+1; i++)
+        //for(int i=0; i<m_rows; i++)
+    {
+        //  splitter = false;
+
+        for(int j=0; j<m_cols; j++)
+        {
+            QLabel *element = new QLabel(this);
+            // label_h = element->height() + 40;
+            //  label_w = element->width() + 40;
+            label_h = element->height() + 20;
+            label_w = element->width() + 20;
+
+            /* if (splitter)
+           {
+                element->setText("#");
+                element->setStyleSheet("font: 40pt; color:gray");
+                element->setAlignment(Qt::AlignCenter);
+                splitter = false;
+            }
+            else
+            {*/
+            stimName = ":/images/" + QString::number(k) + ".png"; // directions images
+            pic = QPixmap(stimName);
+
+            element->setPixmap(pic.scaled(label_w, label_h, Qt::KeepAspectRatio));
+            element->setAlignment(Qt::AlignCenter);
+            m_icons.append(pic.scaled(label_w, label_h, Qt::KeepAspectRatio));
+            // splitter = true;
+
+            //}
+
+            layout->addWidget(element, i, j);
+            m_presentedLetters.append(QString::number(k));
+            k++;
+
+        }
+    }
+
+    this->setLayout(layout);
 }
 
 void MultiStimuli::sendStimulationInfo()
@@ -148,8 +241,10 @@ void MultiStimuli::updateWidgets(QList<QPixmap> &pics)
     int id = 0;
 
     for(int i=0; i<3; i++)
+
     {
         id = m_flashingSequence->sequence[m_currentStimulation+i];
+        // qDebug()<< Q_FUNC_INFO << id;
         QPixmap pixmap = pics[id-1];
         m_element = new QLabel();
         m_element->setPixmap(pixmap);
@@ -162,5 +257,10 @@ void MultiStimuli::updateWidgets(QList<QPixmap> &pics)
                                       m_element,
                                       Qt::FindDirectChildrenOnly);
     }
+}
+
+MultiStimuli::~MultiStimuli()
+{
+
 }
 
