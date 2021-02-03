@@ -28,6 +28,17 @@ protected slots:
 private:
     QList<QPixmap> m_stimuli;
 
+    QMap<int, QString> m_stimuliMap{{1, "bennabi_face_red_inverted.png"},
+                                    {2, "yin_yang_small_croped.png"},
+                                    {3, "whitehouse_small.png"},
+                                    {4, "bennabi_face_blue_inverted.png"},
+                                    {5, "yin_yang_small_croped.png"},
+                                    {6, "whitehouse_small.png"},
+                                    {7, "bennabi_face_magenta_inverted.png"},
+                                    {8, "yin_yang_small_croped.png"},
+                                    {9, "whitehouse_small.png"}
+                                   };
+    /*
     QMap<int, QString> m_stimuliMap{{1, "rsz_bennabi_face_red_inverted.png"},
                                     {2, "rsz_yin_yang_small_croped.png"},
                                     {3, "rsz_whitehouse_small.png"},
@@ -37,7 +48,7 @@ private:
                                     {7, "rsz_bennabi_face_magenta_inverted.png"},
                                     {8, "rsz_yin_yang_small_croped.png"},
                                     {9, "rsz_whitehouse_small.png"}
-                                   };
+                                   };*/
     /*
     QMap<int, QString> m_stimuliMap{{1, "bennabi_face_red_inverted.png"},
                                     {2, "whitehouse_small.png"},

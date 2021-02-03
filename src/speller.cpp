@@ -362,7 +362,7 @@ void Speller::highlightTarget()
 
     this->layout()->replaceWidget(this->
                                   layout()->
-                                  itemAt(m_currentTarget)->
+                                  itemAt(m_currentTarget-1)->
                                   widget(),
                                   m_element,
                                   Qt::FindDirectChildrenOnly);

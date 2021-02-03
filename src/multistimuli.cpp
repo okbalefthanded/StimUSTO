@@ -62,6 +62,7 @@ void MultiStimuli::preTrial()
         foreach(QString value, m_stimuliMap)
         {
             QPixmap pic(":/images/"+value);
+
             m_stimuli.append(pic);
         }
     }
@@ -102,7 +103,7 @@ void MultiStimuli::preTrial()
         {
             highlightTarget();
             m_text += m_desiredPhrase[m_currentLetter];
-            m_textRow->setText(m_text);
+            // m_textRow->setText(m_text);
         }
         else if(m_ERP->experimentMode() == operation_mode::COPY_MODE)
         {
@@ -156,7 +157,7 @@ void MultiStimuli::createLayout()
 
     layout->setHorizontalSpacing(400);
     layout->setVerticalSpacing(100);
-    layout->addWidget(m_textRow, 0, 0, 1, 0);
+    // layout->addWidget(m_textRow, 0, 0, 1, 0);
     // layout->addWidget(m_textRow, 0, 0);
 
     m_textRow->setText(m_desiredPhrase);
@@ -208,6 +209,7 @@ void MultiStimuli::createLayout()
     }
 
     this->setLayout(layout);
+
 }
 
 void MultiStimuli::sendStimulationInfo()
@@ -238,14 +240,16 @@ void MultiStimuli::sendStimulationInfo()
 
 void MultiStimuli::updateWidgets(QList<QPixmap> &pics)
 {
+    // qDebug()<< Q_FUNC_INFO;
     int id = 0;
 
     for(int i=0; i<3; i++)
 
     {
-        id = m_flashingSequence->sequence[m_currentStimulation+i];
+        id = m_flashingSequence->sequence[m_currentStimulation+i]-1;
         // qDebug()<< Q_FUNC_INFO << id;
-        QPixmap pixmap = pics[id-1];
+        // QPixmap pixmap = pics[id-1];
+        QPixmap pixmap = pics[id];
         m_element = new QLabel();
         m_element->setPixmap(pixmap);
         m_element->setAlignment(Qt::AlignCenter);
