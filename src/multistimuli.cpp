@@ -95,8 +95,16 @@ void MultiStimuli::preTrial()
         //
         sendMarker(OVTK_StimulationId_TrialStart);
         //m_flashingSequence = new RandomFlashSequence(m_nrElements / 3, m_ERP->nrSequences());
-        m_flashingSequence = new RandomFlashSequence(m_nrElements, m_ERP->nrSequences(), 3, 3);
 
+        if (m_ERP->type()== speller_type::MULTI_STIM)
+        {
+            m_flashingSequence = new RandomFlashSequence(m_nrElements, m_ERP->nrSequences(), 3, 3);
+        }
+        else if (m_ERP->type()== speller_type::DUAL_STIM)
+        {
+            //
+            m_flashingSequence = new RandomFlashSequence(m_ERP->nrSequences());
+        }
         // qDebug() << Q_FUNC_INFO << m_flashingSequence->sequence;
 
         if (m_ERP->experimentMode() == operation_mode::CALIBRATION)
