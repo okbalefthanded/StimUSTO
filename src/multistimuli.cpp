@@ -61,7 +61,7 @@ void MultiStimuli::pauseFlashing()
 
 void MultiStimuli::preTrial()
 {
-   //  qDebug()<< Q_FUNC_INFO;
+    //  qDebug()<< Q_FUNC_INFO;
 
     if(m_trials == 0)
     {
@@ -260,23 +260,33 @@ void MultiStimuli::sendStimulationInfo()
     for(int i=0; i<setCount; i++)
     {
         stim = m_flashingSequence->sequence[m_currentStimulation+i];
+        /*
         if  (stim == 0)
         {
             break;
         }
+        */
         // sendMarker(config::OVTK_StimulationLabel_Base + m_flashingSequence->sequence[m_currentStimulation+i]);
         sendMarker(config::OVTK_StimulationLabel_Base + stim);
         // send target marker
-        if (m_ERP->experimentMode() == operation_mode::CALIBRATION ||
-                m_ERP->experimentMode() == operation_mode::COPY_MODE)
+        if  (stim == 0)
         {
-            if (isTarget(stim))
+            // break;
+            sendMarker(OVTK_StimulationId_NonTarget);
+        }
+        else
+        {
+            if (m_ERP->experimentMode() == operation_mode::CALIBRATION ||
+                    m_ERP->experimentMode() == operation_mode::COPY_MODE)
             {
-                sendMarker(OVTK_StimulationId_Target);
-            }
-            else
-            {
-                sendMarker(OVTK_StimulationId_NonTarget);
+                if (isTarget(stim))
+                {
+                    sendMarker(OVTK_StimulationId_Target);
+                }
+                else
+                {
+                    sendMarker(OVTK_StimulationId_NonTarget);
+                }
             }
         }
     }
