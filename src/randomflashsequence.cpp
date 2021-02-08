@@ -13,6 +13,7 @@ RandomFlashSequence::RandomFlashSequence(QObject *parent) : QObject(parent)
 RandomFlashSequence::RandomFlashSequence(int length, int nr_sequences, int min_dist, bool repetition)
 {
 
+
     srand(time(0));
     QVector<int> list(length);
     QVector<int> l(length);
@@ -58,7 +59,6 @@ RandomFlashSequence::RandomFlashSequence(int length, int nr_sequences, int min_d
 RandomFlashSequence::RandomFlashSequence(int elements, int nr_sequences, int setCount, int setLength)
 {
     // qDebug() << Q_FUNC_INFO;
-
     srand(time(0));
     QList<QList<int>> sequenceSets;
     QVector<int> l(elements / setLength);
@@ -124,11 +124,12 @@ RandomFlashSequence::RandomFlashSequence(int elements, int nr_sequences, int set
 
 RandomFlashSequence::RandomFlashSequence(int nr_sequences)
 {
+
     srand(time(0));
     QList<QList<int>> sequenceSets;
     QList<int> flash;
     int k = 0;
-    for(int i=1; i<=4; i++)
+    for(int i=1; i<4; i++)
     {
         sequenceSets.append(range(i+k, i+k+2, 2));
         k += 2;
@@ -146,7 +147,9 @@ RandomFlashSequence::RandomFlashSequence(int nr_sequences)
         }
 
     }
+
     sequence = flash.toVector();
+
 }
 
 QVector<int> RandomFlashSequence::range(int start, int end)

@@ -10,7 +10,7 @@
 //
 MultiStimuli::MultiStimuli(QWidget *parent) : Speller(0)
 {
-    qDebug()<< Q_FUNC_INFO;
+    // qDebug()<< Q_FUNC_INFO;
 
     setupUi(this);
 
@@ -39,27 +39,48 @@ void MultiStimuli::startFlashing()
 void MultiStimuli::pauseFlashing()
 {
     // sendMarker(OVTK_StimulationId_VisualStimulationStop);
-    //qDebug() << Q_FUNC_INFO << QTime::currentTime().msec();
+    // qDebug() << Q_FUNC_INFO << QTime::currentTime().msec();
     // qDebug() << Q_FUNC_INFO;
 
     updateWidgets(m_icons);
 
     switchStimulationTimers();
     // ++m_currentStimulation;
-    m_currentStimulation = m_currentStimulation + (m_nrElements / 3);
+    if(m_ERP->stimulationType() == speller_type::DUAL_STIM)
+    {
+        m_currentStimulation += 2;
+    }
+    else if(m_ERP->stimulationType() == speller_type::MULTI_STIM)
+    {
+        m_currentStimulation = m_currentStimulation + (m_nrElements / 3);
+    }
+    // m_currentStimulation = m_currentStimulation + (m_nrElements / 3);
     trialEnd();
 
 }
 
 void MultiStimuli::preTrial()
 {
-    qDebug()<< Q_FUNC_INFO;
+   //  qDebug()<< Q_FUNC_INFO;
 
     if(m_trials == 0)
     {
         sendMarker(OVTK_StimulationId_ExperimentStart);
 
-        foreach(QString value, m_stimuliMap)
+        QMap<int, QString> t_stimMap;
+
+        if(m_ERP->stimulationType() == speller_type::DUAL_STIM)
+        {
+
+            t_stimMap = m_stimuliMapDual;
+        }
+        else if(m_ERP->stimulationType() == speller_type::MULTI_STIM)
+        {
+            t_stimMap = m_stimuliMap;
+        }
+
+        // foreach(QString value, m_stimuliMap)
+        foreach(QString value, t_stimMap)
         {
             QPixmap pic(":/images/"+value);
 
@@ -96,15 +117,16 @@ void MultiStimuli::preTrial()
         sendMarker(OVTK_StimulationId_TrialStart);
         //m_flashingSequence = new RandomFlashSequence(m_nrElements / 3, m_ERP->nrSequences());
 
-        if (m_ERP->type()== speller_type::MULTI_STIM)
+
+        if (m_ERP->stimulationType() == speller_type::MULTI_STIM)
         {
             m_flashingSequence = new RandomFlashSequence(m_nrElements, m_ERP->nrSequences(), 3, 3);
         }
-        else if (m_ERP->type()== speller_type::DUAL_STIM)
+        else if (m_ERP->stimulationType() == speller_type::DUAL_STIM)
         {
-            //
             m_flashingSequence = new RandomFlashSequence(m_ERP->nrSequences());
         }
+
         // qDebug() << Q_FUNC_INFO << m_flashingSequence->sequence;
 
         if (m_ERP->experimentMode() == operation_mode::CALIBRATION)
@@ -130,7 +152,6 @@ void MultiStimuli::preTrial()
     {
         if( m_ERP->experimentMode() == operation_mode::COPY_MODE)
         {
-
             refreshTarget();
         }
         m_preTrialTimer->stop();
@@ -223,11 +244,26 @@ void MultiStimuli::createLayout()
 void MultiStimuli::sendStimulationInfo()
 {
     int stim = 0;
+    int setCount = 0;
+
+    if(m_ERP->stimulationType() == speller_type::DUAL_STIM)
+    {
+        setCount = 2;
+    }
+    else if(m_ERP->stimulationType() == speller_type::MULTI_STIM)
+    {
+        setCount = 3;
+    }
     sendMarker(OVTK_StimulationId_VisualStimulationStart);
 
-    for(int i=0; i<3; i++)
+    // for(int i=0; i<3; i++)
+    for(int i=0; i<setCount; i++)
     {
         stim = m_flashingSequence->sequence[m_currentStimulation+i];
+        if  (stim == 0)
+        {
+            break;
+        }
         // sendMarker(config::OVTK_StimulationLabel_Base + m_flashingSequence->sequence[m_currentStimulation+i]);
         sendMarker(config::OVTK_StimulationLabel_Base + stim);
         // send target marker
@@ -250,11 +286,25 @@ void MultiStimuli::updateWidgets(QList<QPixmap> &pics)
 {
     // qDebug()<< Q_FUNC_INFO;
     int id = 0;
+    int setCount = 0;
 
-    for(int i=0; i<3; i++)
+    if(m_ERP->stimulationType() == speller_type::DUAL_STIM)
+    {
+        setCount = 2;
+    }
+    else if(m_ERP->stimulationType() == speller_type::MULTI_STIM)
+    {
+        setCount = 3;
+    }
+
+    for(int i=0; i<setCount; i++)
 
     {
         id = m_flashingSequence->sequence[m_currentStimulation+i]-1;
+        if (id == -1)
+        {
+            break;
+        }
         // qDebug()<< Q_FUNC_INFO << id;
         // QPixmap pixmap = pics[id-1];
         QPixmap pixmap = pics[id];

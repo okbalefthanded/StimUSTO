@@ -127,7 +127,8 @@ void FaceSpeller::stimulationInvertedFace()
     // qDebug() << Q_FUNC_INFO << QTime::currentTime().msec();
 
     int id = m_flashingSequence->sequence[m_currentStimulation];
-    QPixmap pixmap(":/images/bennabi_face_inverted.png");
+    // QPixmap pixmap(":/images/bennabi_face_inverted.png");
+    QPixmap pixmap(":/images/rsz_whitehouse_small.png");
     m_element = new QLabel();
     m_element->setPixmap(pixmap);
     m_element->setAlignment(Qt::AlignCenter);

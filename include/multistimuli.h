@@ -38,6 +38,17 @@ private:
                                     {8, "yin_yang_small_croped.png"},
                                     {9, "whitehouse_small.png"}
                                    };
+
+    QMap<int, QString> m_stimuliMapDual{{1, "bennabi_face_red_inverted.png"},
+                                    {2, "bennabi_face_red_inverted.png"},
+                                    {3, "yin_yang_small_croped.png"},
+                                    {4, "bennabi_face_blue_inverted.png"},
+                                    {5, "bennabi_face_blue_inverted.png"},
+                                    {6, "yin_yang_small_croped.png"},
+                                    {7, "bennabi_face_magenta_inverted.png"},
+                                    {8, "yin_yang_small_croped.png"},
+                                    {9, "yin_yang_small_croped.png"}
+                                   };
     /*
     QMap<int, QString> m_stimuliMap{{1, "rsz_bennabi_face_red_inverted.png"},
                                     {2, "rsz_yin_yang_small_croped.png"},

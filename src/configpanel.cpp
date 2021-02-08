@@ -279,6 +279,7 @@ Speller *ConfigPanel::createSpeller(int t_spellerType)
 
     }
 
+    case speller_type::DUAL_STIM:
     case speller_type::MULTI_STIM:
     {
         MultiStimuli *multiStimuli = new MultiStimuli();
