@@ -173,7 +173,7 @@ void Speller::feedback()
 
             this->layout()->replaceWidget(this->
                                           layout()->
-                                          itemAt(id)->
+                                          itemAt(id-1)->
                                           widget(),
                                           m_element,
                                           Qt::FindDirectChildrenOnly);
@@ -191,7 +191,7 @@ void Speller::feedback()
 
             this->layout()->replaceWidget(this->
                                           layout()->
-                                          itemAt(id)->
+                                          itemAt(id-1)->
                                           widget(),
                                           m_element,
                                           Qt::FindDirectChildrenOnly);
@@ -231,7 +231,7 @@ void Speller::postTrial()
 
             this->layout()->replaceWidget(this->
                                           layout()->
-                                          itemAt(id)->
+                                          itemAt(id-1)->
                                           widget(),
                                           m_element,
                                           Qt::FindDirectChildrenOnly);
