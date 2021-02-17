@@ -80,7 +80,7 @@ void Speller::pauseFlashing()
 
     this->layout()->replaceWidget(this->
                                   layout()->
-                                  itemAt(m_flashingSequence->sequence[m_currentStimulation])->
+                                  itemAt(m_flashingSequence->sequence[m_currentStimulation]-1)->
                                   widget(),
                                   m_element,
                                   Qt::FindDirectChildrenOnly);
@@ -709,7 +709,10 @@ void Speller::createLayout()
     m_textRow->setAlignment(Qt::AlignLeft);
     m_textRow->setObjectName("Desired Phrase Row");
     //    textRow->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    layout->addWidget(m_textRow, 0, 0, 1, 0);
+    // layout->addWidget(m_textRow, 0, 0, 1, 0);
+
+    layout->setHorizontalSpacing(400);
+    layout->setVerticalSpacing(100);
 
     m_textRow->setText(m_desiredPhrase);
     qDebug()<< Q_FUNC_INFO<< m_desiredPhrase;

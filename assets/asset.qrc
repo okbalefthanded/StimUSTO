@@ -36,6 +36,7 @@
         <file>rsz_bennabi_face_red_inverted.png</file>
         <file>rsz_whitehouse_small.png</file>
         <file>rsz_yin_yang_small_croped.png</file>
+        <file>hammer_crt.png</file>
     </qresource>
     <qresource prefix="/shaders">
         <file>../src/shaders/sh_f.frag</file>

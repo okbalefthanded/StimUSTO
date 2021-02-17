@@ -128,14 +128,15 @@ void FaceSpeller::stimulationInvertedFace()
 
     int id = m_flashingSequence->sequence[m_currentStimulation];
     // QPixmap pixmap(":/images/bennabi_face_inverted.png");
-    QPixmap pixmap(":/images/rsz_whitehouse_small.png");
+    QPixmap pixmap(":/images/bennabi_face_red_inverted.png");
+    // QPixmap pixmap(":/images/rsz_whitehouse_small.png");
     m_element = new QLabel();
     m_element->setPixmap(pixmap);
     m_element->setAlignment(Qt::AlignCenter);
 
     this->layout()->replaceWidget(this->
                                   layout()->
-                                  itemAt(id)->
+                                  itemAt(id-1)->
                                   widget(),
                                   m_element,
                                   Qt::FindDirectChildrenOnly);
@@ -146,6 +147,8 @@ void FaceSpeller::stimulationInvertedColoredFace()
 {
 
     int currentStim = m_flashingSequence->sequence[m_currentStimulation];
+   // qDebug()<< Q_FUNC_INFO << currentStim;
+
     QPixmap pixmap;
     m_element = new QLabel();
     m_element->setAlignment(Qt::AlignCenter);
@@ -169,7 +172,7 @@ void FaceSpeller::stimulationInvertedColoredFace()
     m_element->setPixmap(pixmap);
     this->layout()->replaceWidget(this->
                                   layout()->
-                                  itemAt(currentStim)->
+                                  itemAt(currentStim-1)->
                                   widget(),
                                   m_element,
                                   Qt::FindDirectChildrenOnly);
