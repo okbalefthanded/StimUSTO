@@ -128,7 +128,7 @@ void Speller::preTrial()
 
     m_preTrialTimer->start();
     ++m_preTrialCount;
-
+    // qDebug() << Q_FUNC_INFO << m_preTrialCount;
     endPreTrial();
 }
 
@@ -137,8 +137,8 @@ void Speller::feedback()
     receiveFeedback();
 
     m_textRow->setText(m_text);
-    qDebug()<< Q_FUNC_INFO << "setting TEXT ROW with "<< m_text;
-    qDebug()<< "m text row "<< m_textRow->text();
+    // qDebug()<< Q_FUNC_INFO << "setting TEXT ROW with "<< m_text;
+    // qDebug()<< "m text row "<< m_textRow->text();
 
     if (m_text[m_text.length()-1] != "#")
     {
@@ -211,9 +211,10 @@ void Speller::postTrial()
     // m_state = trial_state::PRE_TRIAL;
     // wait
     // utils::wait(1000);
-    //  utils::wait(500);
-    utils::wait(250); // showing feedback for 0.25 sec
+    // utils::wait(500);
+    // utils::wait(250); // showing feedback for 0.25 sec
     //    refreshTarget();
+    utils::wait(100);
 
     if (m_text[m_text.length()-1] != "#")
     {
@@ -285,10 +286,12 @@ void Speller::postTrial()
 void Speller::receiveFeedback()
 {
     qDebug() << Q_FUNC_INFO;
-    //qDebug() << "FEEDBACK SOCKET PORT" << m_feedbackPort;
+    // qDebug() << "FEEDBACK SOCKET PORT" << m_feedbackPort;
     // wait for OV python script to write in UDP feedback socket
     // utils::wait(500);
-    utils::wait(250);
+    // utils::wait(250);
+    utils::wait(200);
+
     QHostAddress sender;
     quint16 senderPort;
     QByteArray *buffer = new QByteArray();
@@ -393,7 +396,6 @@ void Speller::refreshTarget()
 
 }
 
-
 void Speller::sendStimulationInfo()
 {
     sendMarker(OVTK_StimulationId_VisualStimulationStart);
@@ -439,7 +441,7 @@ void Speller::startPreTrial()
     {
         sendMarker(OVTK_StimulationId_TrialStart);
         m_flashingSequence = new RandomFlashSequence(m_nrElements, m_ERP->nrSequences());
-        qDebug() << "about to test mode";
+        // qDebug() << "about to test mode";
         if (m_ERP->experimentMode() == operation_mode::CALIBRATION)
         {
             highlightTarget();
@@ -460,7 +462,6 @@ void Speller::startPreTrial()
 
 void Speller::endPreTrial()
 {
-
     qDebug() << Q_FUNC_INFO;
     if (m_preTrialCount > m_preTrialWait || m_ERP->experimentMode() == operation_mode::FREE_MODE)
     {
@@ -479,7 +480,6 @@ void Speller::endPreTrial()
 
 void Speller::trialEnd()
 {
-
     if (m_currentStimulation >= m_flashingSequence->sequence.count())
     {
         ++m_currentLetter;
@@ -487,8 +487,8 @@ void Speller::trialEnd()
         m_stimTimer->stop();
 
         // utils::wait(1000); // time window after last epoch/stim
-        // utils::wait(500);
-        utils::wait(700); // 700 ms == epoch time windows
+        utils::wait(500);
+        // utils::wait(700); // 700 ms == epoch time windows
         sendMarker(OVTK_StimulationId_TrialStop);
         m_state = trial_state::FEEDBACK;
 
@@ -506,7 +506,10 @@ void Speller::trialEnd()
 void Speller::externalCommunication()
 {
     // Send and Recieve feedback to/from Robot if external communication is enabled
-    m_hybridCommand = m_text[m_text.length()-1] + "2";
+    // m_hybridCommand = m_text[m_text.length()-1] + "2";
+
+    m_hybridCommand = m_text[m_text.length()-1];
+
     if(m_ERP->externalComm() == external_comm::ENABLED)
     {
         qDebug() << "Sending Feedback to Robot";
@@ -605,7 +608,9 @@ void Speller::initTimers()
     m_isiTimer->setInterval(100); //default value
 
     m_preTrialTimer->setTimerType(Qt::PreciseTimer);
-    m_preTrialTimer->setInterval(1000);
+    // m_preTrialTimer->setInterval(1000);
+    // m_preTrialTimer->setInterval(500);
+    m_preTrialTimer->setInterval(200);
     m_preTrialTimer->setSingleShot(true);
 
     connect( m_stimTimer, SIGNAL(timeout()), this, SLOT(pauseFlashing()) );

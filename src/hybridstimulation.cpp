@@ -20,27 +20,8 @@ HybridStimulation::HybridStimulation(Hybrid *hybridStimulation, Speller *ERPspel
     m_hybridStimulaiton = hybridStimulation;
     m_ERPspeller = ERPspeller;
     m_ssvepStimulation = ssvepGL;
-
-    //    m_robotSocket = new QUdpSocket();
-    //    m_robotSocket->bind(QHostAddress::LocalHost, m_robotPort); // provide Robot Address
-    //    m_robotSocket->bind(QHostAddress("10.3.66.5"), m_robotPort);
-
-    // connect to Robot if external communication is enabled
-    if(m_hybridStimulaiton->externalComm() == external_comm::ENABLED)
-    {
-        m_robotSocket = new QTcpSocket();
-        //    m_robotSocket->connectToHost(QHostAddress("10.3.66.5"), m_robotPort);
-        // m_robotSocket->connectToHost(QHostAddress("10.3.65.128"), m_robotPort);
-        m_robotSocket->connectToHost(QHostAddress(m_hybridStimulaiton->externalAddress()), m_robotPort);
-        if(m_robotSocket->waitForConnected())
-        {
-            qDebug() << "Robot Connection : State Connected";
-        }
-        else
-        {
-            qDebug() << "Robot Connection : State Not Connected";
-        }
-    }
+    //
+    initExternalComm();
     //
     m_ssvepStimulation->m_firstRun = false;
     m_ssvepStimulation->m_flickeringSequence = new RandomFlashSequence(1, 1);
@@ -93,13 +74,12 @@ void HybridStimulation::hybridPreTrial()
         m_ssvepStimulation->m_flickeringSequence->sequence[0] = 0;
     }
 
-
     m_hybridState = trial_state::STIMULUS;
 }
 
 void HybridStimulation::startTrial()
 {
-        qDebug() << "[HYBRID TRIAL START]" << Q_FUNC_INFO;
+    qDebug() << "[HYBRID TRIAL START]" << Q_FUNC_INFO;
 
     if(m_hybridState == trial_state::PRE_TRIAL)
     {
@@ -144,6 +124,7 @@ void HybridStimulation::switchState()
 
 void HybridStimulation::swichStimWindows()
 {
+
     if(m_switchStimulation)
     {
         m_ssvepStimulation->hide();
@@ -157,20 +138,27 @@ void HybridStimulation::swichStimWindows()
     }
 }
 
-void HybridStimulation::hybridPostTrial()
+void HybridStimulation::initExternalComm()
 {
-    qDebug() << "[HYBRID POST TRIAL]" << Q_FUNC_INFO;
-
-    if(m_hybridStimulaiton->experimentMode() == operation_mode::COPY_MODE || m_hybridStimulaiton->experimentMode() == operation_mode::FREE_MODE)
+    if(m_hybridStimulaiton->externalComm() == external_comm::ENABLED)
     {
-        m_ERPFeedback = m_ERPspeller->m_text;
-        m_SSVEPFeedback += m_ssvepStimulation->m_sessionFeedback;
-        qDebug() << Q_FUNC_INFO << "ERP feedback: " << m_ERPFeedback;
-        qDebug() << Q_FUNC_INFO << "SSVEP feedback: " << m_SSVEPFeedback;
+        m_robotSocket = new QTcpSocket();
+        //    m_robotSocket->connectToHost(QHostAddress("10.3.66.5"), m_robotPort);
+        // m_robotSocket->connectToHost(QHostAddress("10.3.65.128"), m_robotPort);
+        m_robotSocket->connectToHost(QHostAddress(m_hybridStimulaiton->externalAddress()), m_robotPort);
+        if(m_robotSocket->waitForConnected())
+        {
+            qDebug() << "Robot Connection : State Connected";
+        }
+        else
+        {
+            qDebug() << "Robot Connection : State Not Connected";
+        }
     }
+}
 
-    // Send and Recieve feedback to/from Robot if external communication is enabled
-    m_hybridCommand = m_ERPFeedback[m_currentTrial] + m_SSVEPFeedback.at(m_currentTrial);
+void HybridStimulation::externalComm()
+{
     if(m_hybridStimulaiton->externalComm() == external_comm::ENABLED)
     {
         qDebug() << "Sending Feedback to Robot";
@@ -182,7 +170,7 @@ void HybridStimulation::hybridPostTrial()
 
         try
         {
-            m_hybridCommand = "12";
+            // m_hybridCommand = "12";
             std::string str = m_hybridCommand.toStdString();
             const char* p = str.c_str();
 
@@ -224,7 +212,23 @@ void HybridStimulation::hybridPostTrial()
     m_robotSocket->writeDatagram(Data, QHostAddress("10.3.66.5"), m_robotPort);
     */
     //
+}
 
+void HybridStimulation::hybridPostTrial()
+{
+    qDebug() << "[HYBRID POST TRIAL]" << Q_FUNC_INFO;
+
+    if(m_hybridStimulaiton->experimentMode() == operation_mode::COPY_MODE || m_hybridStimulaiton->experimentMode() == operation_mode::FREE_MODE)
+    {
+        m_ERPFeedback = m_ERPspeller->m_text;
+        m_SSVEPFeedback += m_ssvepStimulation->m_sessionFeedback;
+        qDebug() << Q_FUNC_INFO << "ERP feedback: " << m_ERPFeedback;
+        qDebug() << Q_FUNC_INFO << "SSVEP feedback: " << m_SSVEPFeedback;
+    }
+
+    // Send and Recieve feedback to/from Robot if external communication is enabled
+    m_hybridCommand = m_ERPFeedback[m_currentTrial] + m_SSVEPFeedback.at(m_currentTrial);
+    externalComm();
     //
     ++m_currentTrial;
     m_hybridState = trial_state::PRE_TRIAL;
@@ -244,9 +248,9 @@ void HybridStimulation::hybridPostTrial()
         }
 
         qDebug() << "Hybrid Experiment End";
-        //        m_ERPspeller->close();
-        //        m_ssvepStimulation->close();
-        //        emit experimentEnd();
+        m_ERPspeller->close();
+        m_ssvepStimulation->close();
+        emit experimentEnd();
     }
 }
 
@@ -280,8 +284,11 @@ void HybridStimulation::initSSVEP(SSVEP *ssvep)
     QSurfaceFormat format;
     format.setRenderableType(QSurfaceFormat::OpenGL);
     format.setProfile(QSurfaceFormat::CoreProfile);
+    format.setSwapInterval(1); // vsync on
+    format.setSwapBehavior(QSurfaceFormat::TripleBuffer); //
     // format.setVersion(3,3);
     format.setVersion(3,0); // ANGLE supports ES 3.0, higher versions raise exceptions
+
 
     m_ssvepStimulation = new SsvepGL(ssvep, 12346);
     m_ssvepStimulation->setFormat(format);

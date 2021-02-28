@@ -3,6 +3,7 @@
 //
 #include <QUdpSocket>
 #include <QTcpSocket>
+#include <QPropertyAnimation>
 //
 #include "ssvepgl.h"
 #include "speller.h"
@@ -32,6 +33,8 @@ private slots:
     void hybridPostTrial();
     void switchState();
     void swichStimWindows();
+    void initExternalComm();
+    void externalComm();
 
 
 private:
@@ -51,6 +54,8 @@ private:
     SsvepGL *m_ssvepStimulation;
 //    QUdpSocket *m_robotSocket;
     QTcpSocket *m_robotSocket;
+    //
+    QPropertyAnimation *m_animation;
 };
 
 

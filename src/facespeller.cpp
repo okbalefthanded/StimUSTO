@@ -39,7 +39,6 @@ void FaceSpeller::startFlashing()
     switchStimulationTimers();
 }
 
-
 void FaceSpeller::stimulationFace()
 {
     // qDebug()<< Q_FUNC_INFO;
