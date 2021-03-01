@@ -20,7 +20,7 @@ SsvepGL::SsvepGL(SSVEP *paradigm, int t_port)
     // m_preTrialWait = m_ssvep->breakDuration();
 
     m_preTrialWait = 3;
-    //    qDebug() << "SSVEP stim duration : " << m_ssvep->stimulationDuration();
+    // qDebug() << "SSVEP stim duration : " << m_ssvep->stimulationDuration();
     // set vertices, vertices indeices & colors
     initElements();
 
@@ -40,7 +40,6 @@ SsvepGL::SsvepGL(SSVEP *paradigm, int t_port)
     //
     initLogger();
     //
-
     //
     m_state = trial_state::PRE_TRIAL;
 
@@ -113,6 +112,8 @@ void SsvepGL::initializeGL()
         m_colorBuffer.release();
         m_programShader->release();
     }
+
+    initExternalSocket();
 }
 
 void SsvepGL::resizeGL(int w, int h)
@@ -225,12 +226,15 @@ void SsvepGL::postTrial()
     if(m_ssvep->experimentMode() == operation_mode::COPY_MODE || m_ssvep->experimentMode() == operation_mode::FREE_MODE)
     {
 
-        utils::wait(100);
-        feedback();
-        utils::wait(500);
-        // feedback for 1 sec & refresh
-        // utils::wait(1000);
-        refresh(m_sessionFeedback[m_currentFlicker].digitValue()-1);
+        // utils::wait(100); // wait for OV processing
+        feedback();  // wait for feedback
+        if (m_presentFeedback)
+        {
+            utils::wait(500);
+            // feedback for 1 sec & refresh
+            // utils::wait(1000);
+            refresh(m_sessionFeedback[m_currentFlicker].digitValue()-1);
+        }
     }
 
     else // calibration mode
@@ -238,6 +242,7 @@ void SsvepGL::postTrial()
         refreshTarget();
     }
 
+    externalCommunication();
     // wait
     // int waitMillisec = (m_ssvep->breakDuration() - m_preTrialWait) * 1000;
     // utils::wait(waitMillisec);
@@ -304,22 +309,25 @@ void SsvepGL::feedback()
     // receiveFeedback();
     m_feedbackSocket->waitForReadyRead(500);
 
-    if(m_ssvep->experimentMode() == operation_mode::COPY_MODE)
+    if(m_presentFeedback)
     {
+        if(m_ssvep->experimentMode() == operation_mode::COPY_MODE)
+        {
 
-        if(m_sessionFeedback[m_currentFlicker].digitValue() == m_flickeringSequence->sequence[m_currentFlicker])
-        {
-            highlightFeedback(glColors::green, m_flickeringSequence->sequence[m_currentFlicker]-1);
-            ++m_correct;
+            if(m_sessionFeedback[m_currentFlicker].digitValue() == m_flickeringSequence->sequence[m_currentFlicker])
+            {
+                highlightFeedback(glColors::green, m_flickeringSequence->sequence[m_currentFlicker]-1);
+                ++m_correct;
+            }
+            else
+            {
+                highlightFeedback(glColors::blue, m_sessionFeedback[m_currentFlicker].digitValue()-1);
+            }
         }
-        else
+        else if(m_ssvep->experimentMode() == operation_mode::FREE_MODE)
         {
-            highlightFeedback(glColors::blue, m_sessionFeedback[m_currentFlicker].digitValue()-1);
+            highlightFeedback(glColors::red, m_sessionFeedback[m_currentFlicker].digitValue()-1);
         }
-    }
-    else if(m_ssvep->experimentMode() == operation_mode::FREE_MODE)
-    {
-        highlightFeedback(glColors::red, m_sessionFeedback[m_currentFlicker].digitValue()-1);
     }
 }
 
@@ -397,7 +405,9 @@ void SsvepGL::initElements()
 
 void SsvepGL::initRects()
 {
-    double pixelSize = 250.0; // length of a stimulus vertex in pixels (150x150 square)
+    // double pixelSize = 250.0; // length of a stimulus vertex in pixels (150x150 square)
+    // double pixelSize = 150.0;
+    double pixelSize = 200.0;
     // double dx = 0.2;
     // double dy = 0.2;
     QSize screenSize = utils::getScreenSize();
@@ -472,6 +482,53 @@ void SsvepGL::initIndices()
         m_vindices[i+4] = m_vindices[i+2];
         m_vindices[i+5] = val + 3;
         k +=2;
+    }
+}
+
+void SsvepGL::externalCommunication()
+{
+    // Send and Recieve feedback to/from Robot if external communication is enabled
+    qDebug()<< Q_FUNC_INFO << m_sessionFeedback;
+    std::string cmd = QString(m_sessionFeedback[m_currentFlicker]).toStdString();
+
+    if(m_ssvep->externalComm() == external_comm::ENABLED)
+    {
+        qDebug() << "Sending Feedback to Robot";
+        if (!m_robotSocket->isOpen())
+        {
+            qDebug()<< "Not sending Feedback to Robot : Cannot send feedback socket is not open";
+        }
+
+        try
+        {
+            std::string str = cmd;
+            const char* p = str.c_str();
+            qDebug()<< "command to send to Robot: " << QString::fromStdString(cmd) << m_sessionFeedback[m_currentFlicker];
+            QByteArray byteovStimulation;
+            QDataStream streamovs(&byteovStimulation, QIODevice::WriteOnly);
+            streamovs.setByteOrder(QDataStream::LittleEndian);
+            streamovs.writeRawData(p, str.length());
+            m_robotSocket->write(byteovStimulation);
+            m_robotSocket->waitForBytesWritten();
+        }
+        catch(...)
+        {
+            qDebug() <<"Send Feedback to Robot, Issue With writting Data";
+        }
+
+        qDebug() << "Recieve State from Robot";
+        m_robotSocket->waitForReadyRead();
+
+        QByteArray robotState = m_robotSocket->readAll();
+
+        quint8 rState = robotState.toUInt();
+        qDebug()<< Q_FUNC_INFO << "Robot State recieved " << rState;
+        if(rState == robot_state::READY)
+        {
+            qDebug()<< "Correct State";
+            m_state = trial_state::PRE_TRIAL;
+        }
+
     }
 }
 
@@ -555,7 +612,6 @@ void SsvepGL::refreshTarget()
 
 void SsvepGL::highlightFeedback(QVector3D feedbackColor, int feebdackIndex)
 {
-
     int squareIndex = feebdackIndex + (glUtils::VERTICES_PER_TRIANGLE*feebdackIndex);
     m_colors[squareIndex] = feedbackColor;
     m_colors[squareIndex + 1] = feedbackColor;
@@ -563,8 +619,6 @@ void SsvepGL::highlightFeedback(QVector3D feedbackColor, int feebdackIndex)
     m_colors[squareIndex + 3] = feedbackColor;
 
     scheduleRedraw();
-
-
 }
 
 void SsvepGL::refresh(int feedbackIndex)
@@ -617,6 +671,16 @@ void SsvepGL::scheduleRedraw()
     QOpenGLWindow::update();
 }
 
+bool SsvepGL::presentFeedback() const
+{
+    return m_presentFeedback;
+}
+
+void SsvepGL::setPresentFeedback(bool presentFeedback)
+{
+    m_presentFeedback = presentFeedback;
+}
+
 SSVEP *SsvepGL::ssvep() const
 {
     return m_ssvep;
@@ -627,23 +691,22 @@ void SsvepGL::setSsvep(SSVEP *ssvep)
     m_ssvep = ssvep;
 }
 
-
 void SsvepGL::update()
 {
-    qDebug()<< "[update ] Index : "<< m_lostFrames << " " << m_index << "current time: " << QTime::currentTime().msec();
+    //   qDebug()<< "[update ] Index : "<< m_lostFrames << " " << m_index << "current time: " << QTime::currentTime().msec();
 
     // temporary hack
     if (m_lostFrames <= 7)
     {
-        if(m_lostFrames == 0)
-            qDebug()<< "[update ] first: incorrect" << QTime::currentTime();
+        //if(m_lostFrames == 0)
+        //  qDebug()<< "[update ] first: incorrect" << QTime::currentTime();
     }
     else
     {
 
         if(m_index == -1)
         {
-            qDebug()<< "[update ] first correct: " << QTime::currentTime();
+            //  qDebug()<< "[update ] first correct: " << QTime::currentTime();
             sendMarker(config::OVTK_StimulationLabel_Base + m_flickeringSequence->sequence[m_currentFlicker]);
             sendMarker(OVTK_StimulationId_VisualSteadyStateStimulationStart);
         }
@@ -682,7 +745,6 @@ void SsvepGL::update()
 }
 
 // Setters
-
 void SsvepGL::setFrequencies(QString freqs)
 {
 
@@ -707,6 +769,29 @@ void SsvepGL::setFrequencies(QString freqs)
 void SsvepGL::setFeedbackPort(int t_port)
 {
     m_feedbackPort = t_port;
+}
+
+void SsvepGL::initExternalSocket()
+{
+    qDebug()<< "Lets see external comm" <<m_ssvep->externalComm();
+    if(m_ssvep->externalComm() == external_comm::ENABLED)
+    {
+        qDebug()<< "External Comm is enabled;";
+        m_robotSocket = new QTcpSocket();
+        //    m_robotSocket->connectToHost(QHostAddress("10.3.66.5"), m_robotPort);
+        // 10.3.66.5 / 10.6.65.128 /10.3.64.92
+        // m_robotSocket->connectToHost(QHostAddress("10.3.64.92"), m_robotPort);
+        m_robotSocket->connectToHost(QHostAddress(m_ssvep->externalAddress()), m_robotPort);
+
+        if(m_robotSocket->waitForConnected())
+        {
+            qDebug() << "Robot Connection : State Connected";
+        }
+        else
+        {
+            qDebug() << "Robot Connection : State Not Connected";
+        }
+    }
 }
 
 SsvepGL::~SsvepGL()

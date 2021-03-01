@@ -124,7 +124,6 @@ void HybridStimulation::switchState()
 
 void HybridStimulation::swichStimWindows()
 {
-
     if(m_switchStimulation)
     {
         m_ssvepStimulation->hide();
@@ -218,7 +217,8 @@ void HybridStimulation::hybridPostTrial()
 {
     qDebug() << "[HYBRID POST TRIAL]" << Q_FUNC_INFO;
 
-    if(m_hybridStimulaiton->experimentMode() == operation_mode::COPY_MODE || m_hybridStimulaiton->experimentMode() == operation_mode::FREE_MODE)
+    if(m_hybridStimulaiton->experimentMode() == operation_mode::COPY_MODE ||
+            m_hybridStimulaiton->experimentMode() == operation_mode::FREE_MODE)
     {
         m_ERPFeedback = m_ERPspeller->m_text;
         m_SSVEPFeedback += m_ssvepStimulation->m_sessionFeedback;
@@ -228,7 +228,17 @@ void HybridStimulation::hybridPostTrial()
 
     // Send and Recieve feedback to/from Robot if external communication is enabled
     m_hybridCommand = m_ERPFeedback[m_currentTrial] + m_SSVEPFeedback.at(m_currentTrial);
-    externalComm();
+
+    // show feedback on ERP speller for 500 ms
+    m_ssvepStimulation->hide();
+    m_ERPspeller->show();
+    m_ERPspeller->presentFeedback(m_hybridCommand);
+
+    //
+    if (m_hybridCommand[0] != '#')
+    {
+        externalComm();
+    }
     //
     ++m_currentTrial;
     m_hybridState = trial_state::PRE_TRIAL;

@@ -34,9 +34,11 @@ public:
     ERP *erp() const;
     void setERP(ERP *erp);
     QString *desiredPhrase() const;
+    bool presentFeedback() const;
     void setDesiredPhrase(const QString &t_desiredPhrase);
     void setTimers(int t_stimulation, int t_isi);
-
+    void setPresentFeedback(bool t_do);
+    void presentFeedback (QString command); // used for HybridStimulation
     int getCurrentTarget();
 
     friend class Hybrid;
@@ -101,7 +103,7 @@ protected:
     float m_correct = 0;
 
     bool m_stimulus = true;
-
+    bool m_presentFeedback = true;
     bool m_stateFinished = false;
     bool m_running = true;
     bool isCorrect = false;
@@ -127,7 +129,7 @@ protected:
     QTimer *m_preTrialTimer;
     QTimer *m_stimTimer;
     QTimer *m_isiTimer;
-
+    //
     QLabel *m_textRow;
     QUdpSocket *m_feedbackSocket;
     RandomFlashSequence *m_flashingSequence;

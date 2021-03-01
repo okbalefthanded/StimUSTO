@@ -36,7 +36,6 @@ private slots:
     void initExternalComm();
     void externalComm();
 
-
 private:
     int m_hybridState = trial_state::PRE_TRIAL;
     int m_trials;
@@ -44,15 +43,17 @@ private:
     float m_ERPCorrect = 0;
     float m_SSVEPCorrect = 0;
     bool m_switchStimulation = true;
+    //
     quint16 m_robotPort = 12347;
     QString m_hybridCommand = "";
     QString m_robotFeedback = "";
     QString m_ERPFeedback = "";
     QString m_SSVEPFeedback = "";
+    //
     Hybrid *m_hybridStimulaiton;
     Speller *m_ERPspeller;
     SsvepGL *m_ssvepStimulation;
-//    QUdpSocket *m_robotSocket;
+    // QUdpSocket *m_robotSocket;
     QTcpSocket *m_robotSocket;
     //
     QPropertyAnimation *m_animation;
