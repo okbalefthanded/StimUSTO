@@ -31,6 +31,7 @@ private slots:
     void startTrial();
     //    void hybridFeedback();
     void hybridPostTrial();
+    void hybridPostTrialEnd();
     void switchState();
     void swichStimWindows();
     void initExternalComm();

@@ -36,6 +36,7 @@ public:
 
     bool presentFeedback() const;
     void setPresentFeedback(bool presentFeedback);
+
     // QOpenGLWindow interface
 protected:
     void initializeGL();
@@ -52,9 +53,10 @@ private slots:
     void preTrial();
     void feedback();
     void postTrial();
+    void postTrialEnd();
     void Flickering();
-    //    void pauseFlashing();
-    void receiveFeedback();
+    // void pauseFlashing();
+    // void receiveFeedback();
     void update();
 
     void initElements();
@@ -70,6 +72,9 @@ public slots:
     void sendMarker(uint64_t ovStimulation){
         emit markerTag(ovStimulation);
     }
+
+protected slots:
+    void receiveFeedback();
 
 protected:
     void externalCommunication();

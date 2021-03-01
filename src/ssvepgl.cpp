@@ -207,7 +207,8 @@ void SsvepGL::preTrial()
         // refreshTarget();
         scheduleRedraw();
         m_preTrialTimer->stop();
-        m_preTrialCount = 0;
+        // m_preTrialCount = 0;
+        m_preTrialCount = 1;
         m_state = trial_state::STIMULUS;
     }
 }
@@ -243,16 +244,20 @@ void SsvepGL::postTrial()
     }
 
     externalCommunication();
-    // wait
-    // int waitMillisec = (m_ssvep->breakDuration() - m_preTrialWait) * 1000;
-    // utils::wait(waitMillisec);
 
-    // refreshTarget();
+    postTrialEnd();
+
+}
+
+void SsvepGL::postTrialEnd()
+{
     ++m_currentFlicker;
     ++m_trials;
+
     if (m_currentFlicker < m_flickeringSequence->sequence.size() &&
             m_flickeringSequence->sequence.length() != 1 &&
-            (m_ssvep->experimentMode() == operation_mode::COPY_MODE || m_ssvep->experimentMode() == operation_mode::CALIBRATION))
+            (m_ssvep->experimentMode() == operation_mode::COPY_MODE ||
+             m_ssvep->experimentMode() == operation_mode::CALIBRATION))
     {
         startTrial();
     }
@@ -306,11 +311,14 @@ void SsvepGL::Flickering()
 
 void SsvepGL::feedback()
 {
-    // receiveFeedback();
-    m_feedbackSocket->waitForReadyRead(500);
+    // receiveFeedback
+    // m_feedbackSocket->waitForReadyRead(500);
+    m_feedbackSocket->waitForReadyRead(100);
 
     if(m_presentFeedback)
     {
+        // m_feedbackSocket->waitForReadyRead(100);
+
         if(m_ssvep->experimentMode() == operation_mode::COPY_MODE)
         {
 
@@ -335,6 +343,7 @@ void SsvepGL::receiveFeedback()
 {
     // wait for OV python script to write in UDP feedback socket
     // wait(500);
+    qDebug()<< Q_FUNC_INFO;
     QHostAddress sender;
     quint16 senderPort;
     QByteArray *buffer = new QByteArray();
@@ -346,6 +355,8 @@ void SsvepGL::receiveFeedback()
         m_feedbackSocket->readDatagram(buffer->data(), buffer->size(), &sender, &senderPort);
     }
     log->write(buffer->data());
+
+    qDebug()<< buffer->data();
 
     if (m_flickeringSequence->sequence.length() == 1) // Hybrid stimulation mode
     {
@@ -363,7 +374,6 @@ void SsvepGL::receiveFeedback()
 
 void SsvepGL::initElements()
 {
-
     double dx = 0.2;
     double dy = 0.2;
     int isNullX = 0, isNullY = 0, sx=1;
@@ -386,7 +396,6 @@ void SsvepGL::initElements()
             // init colors
             m_colors[i] = glColors::white;
         }
-
     }
     else
     {
@@ -395,7 +404,6 @@ void SsvepGL::initElements()
         m_vertices.resize(vectorsSize);
         initRects();
         initColors();
-
     }
     //
     initIndices();
@@ -439,12 +447,10 @@ void SsvepGL::initRects()
             sx--;
         }
     }
-
 }
 
 void SsvepGL::initColors()
 {
-
     int vectorsSize = m_ssvep->nrElements() * glUtils::POINTS_PER_SQUARE;
     m_colors.resize(vectorsSize);
 
@@ -488,7 +494,7 @@ void SsvepGL::initIndices()
 void SsvepGL::externalCommunication()
 {
     // Send and Recieve feedback to/from Robot if external communication is enabled
-    qDebug()<< Q_FUNC_INFO << m_sessionFeedback;
+    // qDebug()<< Q_FUNC_INFO << m_sessionFeedback;
     std::string cmd = QString(m_sessionFeedback[m_currentFlicker]).toStdString();
 
     if(m_ssvep->externalComm() == external_comm::ENABLED)
@@ -503,7 +509,7 @@ void SsvepGL::externalCommunication()
         {
             std::string str = cmd;
             const char* p = str.c_str();
-            qDebug()<< "command to send to Robot: " << QString::fromStdString(cmd) << m_sessionFeedback[m_currentFlicker];
+            // qDebug()<< "command to send to Robot: " << QString::fromStdString(cmd) << m_sessionFeedback[m_currentFlicker];
             QByteArray byteovStimulation;
             QDataStream streamovs(&byteovStimulation, QIODevice::WriteOnly);
             streamovs.setByteOrder(QDataStream::LittleEndian);
@@ -773,7 +779,7 @@ void SsvepGL::setFeedbackPort(int t_port)
 
 void SsvepGL::initExternalSocket()
 {
-    qDebug()<< "Lets see external comm" <<m_ssvep->externalComm();
+    // qDebug()<< "Lets see external comm" <<m_ssvep->externalComm();
     if(m_ssvep->externalComm() == external_comm::ENABLED)
     {
         qDebug()<< "External Comm is enabled;";

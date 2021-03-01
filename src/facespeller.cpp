@@ -42,8 +42,6 @@ void FaceSpeller::startFlashing()
 void FaceSpeller::stimulationFace()
 {
     // qDebug()<< Q_FUNC_INFO;
-
-
     int id = m_flashingSequence->sequence[m_currentStimulation];
     QPixmap pixmap(":/images/bennabi_face.png");
     m_element = new QLabel();

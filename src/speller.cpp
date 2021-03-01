@@ -42,7 +42,7 @@ Speller::Speller(QWidget *parent) : QWidget(parent)
 
 Speller::Speller(int i)
 {
-    qDebug()<< Q_FUNC_INFO;
+   // qDebug()<< Q_FUNC_INFO;
 }
 
 void Speller::startTrial()
@@ -136,14 +136,17 @@ void Speller::preTrial()
 void Speller::feedback()
 {
     receiveFeedback();
-
     m_textRow->setText(m_text);
+
     // qDebug()<< Q_FUNC_INFO << "setting TEXT ROW with "<< m_text;
     // qDebug()<< "m text row "<< m_textRow->text();
 
     // Presenting Feedback
     if (m_presentFeedback)
     {
+        //receiveFeedback();
+        //m_textRow->setText(m_text);
+
         if (m_text[m_text.length()-1] != "#")
         {
             if (m_ERP->experimentMode() == operation_mode::COPY_MODE)
@@ -213,7 +216,7 @@ void Speller::postTrial()
     // utils::wait(1000);
     // utils::wait(500);
     // utils::wait(250); // showing feedback for 0.25 sec
-    //    refreshTarget();
+    // refreshTarget();
 
     if (m_presentFeedback)
     {
@@ -288,7 +291,7 @@ void Speller::postTrial()
 
 void Speller::receiveFeedback()
 {
-    qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
     // qDebug() << "FEEDBACK SOCKET PORT" << m_feedbackPort;
     // wait for OV python script to write in UDP feedback socket
     // utils::wait(500);
@@ -307,7 +310,6 @@ void Speller::receiveFeedback()
     {
         m_feedbackSocket->readDatagram(buffer->data(), buffer->size(), &sender, &senderPort);
     }
-
     //  feedback_socket->waitForBytesWritten();
     // qDebug()<< "Received: "<< QString(buffer->data());
     m_text += QString(buffer->data());
@@ -356,7 +358,7 @@ void Speller::highlightTarget()
         }
     }
 
-    qDebug()<< Q_FUNC_INFO << "current tg "<< m_currentTarget << "current letter " << m_desiredPhrase[m_currentLetter];
+    // qDebug()<< Q_FUNC_INFO << "current tg "<< m_currentTarget << "current letter " << m_desiredPhrase[m_currentLetter];
 
 
     QPixmap map = m_icons[m_currentTarget - 1];
@@ -380,7 +382,7 @@ void Speller::refreshTarget()
 
     //   this->layout()->itemAt(m_currentTarget)->
     //           widget()->setStyleSheet("QLabel { color : gray; font: 40pt }");
-    qDebug()<< Q_FUNC_INFO << m_currentTarget;
+    // qDebug()<< Q_FUNC_INFO << m_currentTarget;
 
     m_element = new QLabel();
     QPixmap map = m_icons[m_currentTarget - 1];
@@ -438,7 +440,7 @@ void Speller::switchStimulationTimers()
 
 void Speller::startPreTrial()
 {
-    qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
 
     if (m_preTrialCount == 0)
     {
@@ -465,7 +467,7 @@ void Speller::startPreTrial()
 
 void Speller::endPreTrial()
 {
-    qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
     if (m_preTrialCount > m_preTrialWait || m_ERP->experimentMode() == operation_mode::FREE_MODE)
     {
         if(m_ERP->experimentMode() == operation_mode::COPY_MODE ||
@@ -526,7 +528,7 @@ void Speller::externalCommunication()
             // m_hybridCommand = "12";
             std::string str = m_hybridCommand.toStdString();
             const char* p = str.c_str();
-            qDebug()<< "command to send to Robot: " << m_hybridCommand;
+            // qDebug()<< "command to send to Robot: " << m_hybridCommand;
             QByteArray byteovStimulation;
             QDataStream streamovs(&byteovStimulation, QIODevice::WriteOnly);
             streamovs.setByteOrder(QDataStream::LittleEndian);
@@ -558,7 +560,7 @@ void Speller::externalCommunication()
 void Speller::initLogger()
 {
 
-    qDebug() << Q_FUNC_INFO;
+   // qDebug() << Q_FUNC_INFO;
 
     QDir logsDir(QCoreApplication::applicationDirPath() + "/logs");
     if(!logsDir.exists())
@@ -640,7 +642,7 @@ void Speller::setERP(ERP *erp)
     m_textRow->setText(m_desiredPhrase);
     // external comm
     // a temporary hack
-    qDebug()<< "Lets see external comm" <<m_ERP->externalComm();
+    // qDebug()<< "Lets see external comm" <<m_ERP->externalComm();
     if(m_ERP->externalComm() == external_comm::ENABLED)
     {
         qDebug()<< "External Comm is enabled;";
@@ -787,7 +789,7 @@ void Speller::setDesiredPhrase(const QString &t_desiredPhrase)
 
 void Speller::createLayout()
 {
-    qDebug()<< Q_FUNC_INFO;
+    // qDebug()<< Q_FUNC_INFO;
     // speller settings
     m_rows = 3;
     m_cols = 3;
@@ -816,7 +818,7 @@ void Speller::createLayout()
     layout->setVerticalSpacing(100);
 
     m_textRow->setText(m_desiredPhrase);
-    qDebug()<< Q_FUNC_INFO<< m_desiredPhrase;
+    // qDebug()<< Q_FUNC_INFO<< m_desiredPhrase;
 
     int k = 1;
     QString stimName;
