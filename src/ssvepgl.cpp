@@ -50,7 +50,8 @@ void SsvepGL::initializeGL()
 {
     // Initialize OpenGL Backend
     initializeOpenGLFunctions();
-    m_index = -1;
+    // m_index = -1;
+    m_index = 0;
     // Set global information
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glEnable(GL_FRAMEBUFFER_SRGB);
@@ -217,8 +218,8 @@ void SsvepGL::postTrial()
     disconnect(this, SIGNAL(frameSwapped()), this, SLOT(update()));
     initElements();
 
-    m_index = -1;
-    m_lostFrames = 0;
+    m_index = 0;
+    // m_lostFrames = 0;
     m_state = trial_state::PRE_TRIAL;
 
     // feedback
@@ -272,7 +273,7 @@ void SsvepGL::postTrial()
 void SsvepGL::Flickering()
 {
 
-    if(m_index == -1)
+    if(m_index == 0)
     {
         // qDebug()<< Q_FUNC_INFO << "connecting frameswapped to update" << "index " << index;
         connect(this, SIGNAL(frameSwapped()), this, SLOT(update()));
@@ -633,17 +634,17 @@ void SsvepGL::update()
     qDebug()<< "[update ] Index : "<< m_lostFrames << " " << m_index << "current time: " << QTime::currentTime().msec();
 
     // temporary hack
-    if (m_lostFrames <= 7)
-    {
-        if(m_lostFrames == 0)
-            qDebug()<< "[update ] first: incorrect" << QTime::currentTime();
-    }
-    else
-    {
+    // if (m_lostFrames <= 7)
+    // {
+    //    if(m_lostFrames == 0)
+    //        qDebug()<< "[update ] first: incorrect" << QTime::currentTime();
+    // }
+    // else
+    // {
 
-        if(m_index == -1)
+        if(m_index == 0)
         {
-            qDebug()<< "[update ] first correct: " << QTime::currentTime();
+            // qDebug()<< "[update ] first correct: " << QTime::currentTime();
             sendMarker(config::OVTK_StimulationLabel_Base + m_flickeringSequence->sequence[m_currentFlicker]);
             sendMarker(OVTK_StimulationId_VisualSteadyStateStimulationStart);
         }
@@ -675,9 +676,9 @@ void SsvepGL::update()
         }
 
         ++m_index;
-    }
+    //}
 
-    ++m_lostFrames;
+  //  ++m_lostFrames;
     scheduleRedraw();
 }
 
