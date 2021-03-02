@@ -343,7 +343,7 @@ void SsvepGL::receiveFeedback()
 {
     // wait for OV python script to write in UDP feedback socket
     // wait(500);
-    qDebug()<< Q_FUNC_INFO;
+    // qDebug()<< Q_FUNC_INFO;
     QHostAddress sender;
     quint16 senderPort;
     QByteArray *buffer = new QByteArray();
@@ -356,7 +356,7 @@ void SsvepGL::receiveFeedback()
     }
     log->write(buffer->data());
 
-    qDebug()<< buffer->data();
+    // qDebug()<< buffer->data();
 
     if (m_flickeringSequence->sequence.length() == 1) // Hybrid stimulation mode
     {

@@ -359,8 +359,6 @@ void Speller::highlightTarget()
     }
 
     // qDebug()<< Q_FUNC_INFO << "current tg "<< m_currentTarget << "current letter " << m_desiredPhrase[m_currentLetter];
-
-
     QPixmap map = m_icons[m_currentTarget - 1];
     map.fill(Qt::yellow);
 
@@ -614,8 +612,8 @@ void Speller::initTimers()
 
     m_preTrialTimer->setTimerType(Qt::PreciseTimer);
     // m_preTrialTimer->setInterval(1000);
-    // m_preTrialTimer->setInterval(500);
-    m_preTrialTimer->setInterval(200);
+    m_preTrialTimer->setInterval(500);
+    // m_preTrialTimer->setInterval(200);
     m_preTrialTimer->setSingleShot(true);
 
     connect( m_stimTimer, SIGNAL(timeout()), this, SLOT(pauseFlashing()) );
@@ -682,18 +680,19 @@ void Speller::setPresentFeedback(bool t_do)
 void Speller::presentFeedback(QString command)
 {
     int id = 0;
+    QPixmap map;
     if (command[0] != '#')
     {
         id = command[0].digitValue();
         QString speed = command.at(1);
-
+        // qDebug()<< "speed "<< speed << command;
         // present feedbck
         if (m_ERP->experimentMode() == operation_mode::COPY_MODE)
         {
-            QPixmap map = m_icons[id-1];
+            map = m_icons[id-1];
             // feedback: green correct selection, highlight the target icon
             //           blue incorrect selection, highlight the selected icon
-            if( m_text[m_text.length()-1] == m_desiredPhrase[m_currentLetter - 1])
+            if( m_text[m_text.length()-1] == m_desiredPhrase[m_desiredPhrase.length() - 1])
             {
                 map.fill(Qt::green);
                 isCorrect = true;
@@ -724,7 +723,7 @@ void Speller::presentFeedback(QString command)
 
         else if (m_ERP->experimentMode() == operation_mode::FREE_MODE)
         {
-            QPixmap map = m_icons[id-1];
+            map = m_icons[id-1];
             map.fill(Qt::blue);
             m_element = new QLabel();
             m_element->setPixmap(map);
@@ -745,7 +744,7 @@ void Speller::presentFeedback(QString command)
         if (m_ERP->experimentMode() == operation_mode::COPY_MODE ||
                 m_ERP->experimentMode() == operation_mode::FREE_MODE)
         {
-            QPixmap map = m_icons[id-1];
+            map = m_icons[id-1];
             m_element = new QLabel();
             m_element->setPixmap(map);
             m_element->setAlignment(Qt::AlignCenter);

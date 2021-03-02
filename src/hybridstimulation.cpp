@@ -187,8 +187,8 @@ void HybridStimulation::externalComm()
             qDebug() <<"Send Feedback to Robot, Issue With writting Data";
         }
 
-        qDebug() << "Recieve State from Robot";
-        m_robotSocket->waitForReadyRead();
+        qDebug() << "Recieve State from Robot...";
+        m_robotSocket->waitForReadyRead(40000);
 
         QByteArray robotState = m_robotSocket->readAll();
 
