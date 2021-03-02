@@ -677,7 +677,7 @@ void Speller::setPresentFeedback(bool t_do)
     m_presentFeedback = t_do;
 }
 
-void Speller::presentFeedback(QString command)
+void Speller::showFeedback(QString command, bool correct)
 {
     int id = 0;
     QPixmap map;
@@ -703,9 +703,14 @@ void Speller::presentFeedback(QString command)
                 map.fill(Qt::blue);
                 isCorrect = false;
             }
-
+            QColor color;
+            if (correct)
+                color = Qt::red;
+            else
+                color = Qt::black;
             QPainter painter(&map);
-            painter.setPen(Qt::white);
+            // painter.setPen(Qt::white);
+            painter.setPen(color);
             painter.setFont(QFont("Arial", 30));
             painter.drawText(QPoint(25, 50), speed);
 

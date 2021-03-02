@@ -697,6 +697,11 @@ void SsvepGL::setSsvep(SSVEP *ssvep)
     m_ssvep = ssvep;
 }
 
+bool SsvepGL::isCorrect() const
+{
+   return m_sessionFeedback[m_currentFlicker-1].digitValue() == m_flickeringSequence->sequence[m_currentFlicker-1];
+}
+
 void SsvepGL::update()
 {
     //   qDebug()<< "[update ] Index : "<< m_lostFrames << " " << m_index << "current time: " << QTime::currentTime().msec();

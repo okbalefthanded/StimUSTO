@@ -216,7 +216,7 @@ void HybridStimulation::externalComm()
 void HybridStimulation::hybridPostTrial()
 {
     qDebug() << "[HYBRID POST TRIAL]" << Q_FUNC_INFO;
-
+    bool correct = false;
     // recieve feedback from both paradigms:
     // m_ERPspeller->receiveFeedback();
     // m_ssvepStimulation->receiveFeedback();
@@ -237,10 +237,11 @@ void HybridStimulation::hybridPostTrial()
     }
     m_hybridCommand = m_ERPFeedback[m_currentTrial] + m_SSVEPFeedback.at(m_currentTrial);
 
+    correct = m_ssvepStimulation->isCorrect();
     // show feedback on ERP speller for 500 ms
     m_ssvepStimulation->hide();
     m_ERPspeller->show();
-    m_ERPspeller->presentFeedback(m_hybridCommand);
+    m_ERPspeller->showFeedback(m_hybridCommand, correct);
     //
     if (m_hybridCommand[0] != '#')
     {

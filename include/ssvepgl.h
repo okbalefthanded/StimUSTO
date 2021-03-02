@@ -33,7 +33,7 @@ public:
 
     friend class Hybrid;
     friend class HybridStimulation;
-
+    bool isCorrect() const;
     bool presentFeedback() const;
     void setPresentFeedback(bool presentFeedback);
 
