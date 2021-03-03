@@ -296,8 +296,12 @@ void Speller::receiveFeedback()
     // wait for OV python script to write in UDP feedback socket
     // utils::wait(500);
     // utils::wait(250);
-    utils::wait(200);
 
+    // utils::wait(200);
+    // utils::wait(80);
+    // m_feedbackSocket->waitForReadyRead(90);
+    // qDebug()<< QTime::currentTime();
+    m_feedbackSocket->waitForReadyRead();
     QHostAddress sender;
     quint16 senderPort;
     QByteArray *buffer = new QByteArray();

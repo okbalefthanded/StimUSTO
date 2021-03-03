@@ -1,6 +1,8 @@
 //
 #include <QtDebug>
 #include <QApplication>
+#include <QPropertyAnimation>
+#include <QGraphicsOpacityEffect>
 //
 #include "hybridstimulation.h"
 #include "facespeller.h"
@@ -124,16 +126,39 @@ void HybridStimulation::switchState()
 
 void HybridStimulation::swichStimWindows()
 {
+
     if(m_switchStimulation)
     {
+        qDebug()<< QTime::currentTime();
         m_ssvepStimulation->hide();
+
+        // m_ERPspeller->setProperty("opactity", 1);
+        // m_ERPspeller->setProperty("opacity", 0.7);
+        qDebug()<< QTime::currentTime();
         m_ERPspeller->show();
+        // m_ssvepStimulation->setOpacity(0.01);
     }
     else
     {
+        /*
+        QGraphicsOpacityEffect* fade_effect = new QGraphicsOpacityEffect();
+        m_ERPspeller->setGraphicsEffect(fade_effect);
+        QPropertyAnimation *animation = new QPropertyAnimation(fade_effect, "opacity");
+        animation->setEasingCurve(QEasingCurve::InOutQuad);
+        animation->setDuration(50);
+        animation->setStartValue(0.7);
+        animation->setEndValue(0.01);
+        animation->start(QPropertyAnimation::DeleteWhenStopped);
+        */
+        // m_ssvepStimulation->setOpacity(0.7);
+        qDebug()<< QTime::currentTime();
         m_ssvepStimulation->setScreen(QGuiApplication::screens().last());
         m_ssvepStimulation->showFullScreen();
+        qDebug()<< QTime::currentTime();
         m_ERPspeller->hide();
+        qDebug()<< QTime::currentTime();
+        // m_ERPspeller->setProperty("opacity", 0.01);
+
     }
 }
 
@@ -272,9 +297,9 @@ void HybridStimulation::hybridPostTrialEnd()
         }
 
         qDebug() << "Hybrid Experiment End";
-        m_ERPspeller->close();
-        m_ssvepStimulation->close();
-        emit experimentEnd();
+        // m_ERPspeller->close();
+        // m_ssvepStimulation->close();
+        // emit experimentEnd();
     }
 }
 

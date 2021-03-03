@@ -313,7 +313,10 @@ void SsvepGL::feedback()
 {
     // receiveFeedback
     // m_feedbackSocket->waitForReadyRead(500);
-    m_feedbackSocket->waitForReadyRead(100);
+    // qDebug()<< QTime::currentTime();
+    // m_feedbackSocket->waitForReadyRead(100);
+    // m_feedbackSocket->waitForReadyRead(90);
+    m_feedbackSocket->waitForReadyRead();
 
     if(m_presentFeedback)
     {
