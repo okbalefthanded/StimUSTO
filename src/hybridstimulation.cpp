@@ -129,13 +129,14 @@ void HybridStimulation::swichStimWindows()
 
     if(m_switchStimulation)
     {
-        qDebug()<< QTime::currentTime();
+        qDebug()<< "Hiding SSVEP" <<QTime::currentTime();
         m_ssvepStimulation->hide();
 
         // m_ERPspeller->setProperty("opactity", 1);
         // m_ERPspeller->setProperty("opacity", 0.7);
-        qDebug()<< QTime::currentTime();
+        qDebug()<< "showing ERP" << QTime::currentTime();
         m_ERPspeller->show();
+        qDebug()<< "showing done" << QTime::currentTime();
         // m_ssvepStimulation->setOpacity(0.01);
     }
     else
@@ -151,12 +152,13 @@ void HybridStimulation::swichStimWindows()
         animation->start(QPropertyAnimation::DeleteWhenStopped);
         */
         // m_ssvepStimulation->setOpacity(0.7);
-        qDebug()<< QTime::currentTime();
+        qDebug()<< "hiding ERP"<< QTime::currentTime();
+        m_ERPspeller->hide();
+        qDebug()<<"showing SSVEP " <<QTime::currentTime();
         m_ssvepStimulation->setScreen(QGuiApplication::screens().last());
         m_ssvepStimulation->showFullScreen();
-        qDebug()<< QTime::currentTime();
-        m_ERPspeller->hide();
-        qDebug()<< QTime::currentTime();
+        qDebug()<<"showing done" <<QTime::currentTime();
+        // qDebug()<<"hiding done" <<QTime::currentTime();
         // m_ERPspeller->setProperty("opacity", 0.01);
 
     }

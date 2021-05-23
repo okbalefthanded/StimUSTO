@@ -702,7 +702,7 @@ void SsvepGL::setSsvep(SSVEP *ssvep)
 
 bool SsvepGL::isCorrect() const
 {
-   return m_sessionFeedback[m_currentFlicker-1].digitValue() == m_flickeringSequence->sequence[m_currentFlicker-1];
+    return m_sessionFeedback[m_currentFlicker].digitValue() == m_flickeringSequence->sequence[m_currentFlicker];
 }
 
 void SsvepGL::update()
