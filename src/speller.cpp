@@ -12,6 +12,7 @@
 #include <QDateTime>
 #include <QPixmap>
 #include <QDir>
+#include <QPainter>
 //
 #include "speller.h"
 //#include "ui_speller.h"
@@ -41,7 +42,7 @@ Speller::Speller(QWidget *parent) : QWidget(parent)
 
 Speller::Speller(int i)
 {
-    qDebug()<< Q_FUNC_INFO;
+    // qDebug()<< Q_FUNC_INFO;
 }
 
 void Speller::startTrial()
@@ -135,70 +136,72 @@ void Speller::preTrial()
 void Speller::feedback()
 {
     receiveFeedback();
-
     m_textRow->setText(m_text);
+
     // qDebug()<< Q_FUNC_INFO << "setting TEXT ROW with "<< m_text;
     // qDebug()<< "m text row "<< m_textRow->text();
 
-    if (m_text[m_text.length()-1] != "#")
+    // Presenting Feedback
+    if (m_presentFeedback)
     {
+        //receiveFeedback();
+        //m_textRow->setText(m_text);
 
-        if (m_ERP->experimentMode() == operation_mode::COPY_MODE)
+        if (m_text[m_text.length()-1] != "#")
         {
+            if (m_ERP->experimentMode() == operation_mode::COPY_MODE)
+            {
+                int id = m_text[m_text.length()-1].digitValue();
+                QPixmap map = m_icons[id-1];
+                // feedback: green correct selection, highlight the target icon
+                //           blue incorrect selection, highlight the selected icon
+                if( m_text[m_text.length()-1] == m_desiredPhrase[m_currentLetter - 1])
+                {
+                    //            this->layout()->itemAt(m_currentTarget)->
+                    //                    widget()->setStyleSheet("QLabel { color : green; font: 40pt }");
+                    map.fill(Qt::green);
+                    isCorrect = true;
+                    ++m_correct;
+                }
+                else
+                {
+                    // this->layout()->itemAt(m_currentTarget)->
+                    //         widget()->setStyleSheet("QLabel { color : blue; font: 40pt }");
+                    map.fill(Qt::blue);
+                    isCorrect = false;
+                }
+                // qDebug()<< Q_FUNC_INFO << "element id: "<< id;
+                m_element = new QLabel();
+                m_element->setPixmap(map);
+                m_element->setAlignment(Qt::AlignCenter);
 
-            int id = m_text[m_text.length()-1].digitValue();
-            QPixmap map = m_icons[id-1];
-            // feedback: green correct selection, highlight the target icon
-            //           blue incorrect selection, highlight the selected icon
-            if( m_text[m_text.length()-1] == m_desiredPhrase[m_currentLetter - 1])
-            {
-                //            this->layout()->itemAt(m_currentTarget)->
-                //                    widget()->setStyleSheet("QLabel { color : green; font: 40pt }");
-                map.fill(Qt::green);
-                isCorrect = true;
-                ++m_correct;
+                this->layout()->replaceWidget(this->
+                                              layout()->
+                                              itemAt(id-1)->
+                                              widget(),
+                                              m_element,
+                                              Qt::FindDirectChildrenOnly);
             }
-            else
+
+            else if (m_ERP->experimentMode() == operation_mode::FREE_MODE)
             {
-                // this->layout()->itemAt(m_currentTarget)->
-                //         widget()->setStyleSheet("QLabel { color : blue; font: 40pt }");
+                int id = m_text[m_text.length()-1].digitValue();
+                QPixmap map = m_icons[id-1];
                 map.fill(Qt::blue);
-                isCorrect = false;
+                m_element = new QLabel();
+                m_element->setPixmap(map);
+                m_element->setAlignment(Qt::AlignCenter);
+
+                this->layout()->replaceWidget(this->
+                                              layout()->
+                                              itemAt(id-1)->
+                                              widget(),
+                                              m_element,
+                                              Qt::FindDirectChildrenOnly);
+
             }
-            qDebug()<< Q_FUNC_INFO << "element id: "<< id;
-
-            m_element = new QLabel();
-            m_element->setPixmap(map);
-            m_element->setAlignment(Qt::AlignCenter);
-
-            this->layout()->replaceWidget(this->
-                                          layout()->
-                                          itemAt(id-1)->
-                                          widget(),
-                                          m_element,
-                                          Qt::FindDirectChildrenOnly);
-        }
-
-        else if (m_ERP->experimentMode() == operation_mode::FREE_MODE)
-        {
-            int id = m_text[m_text.length()-1].digitValue();
-            QPixmap map = m_icons[id-1];
-            map.fill(Qt::blue);
-            m_element = new QLabel();
-            m_element->setPixmap(map);
-            m_element->setAlignment(Qt::AlignCenter);
-
-
-            this->layout()->replaceWidget(this->
-                                          layout()->
-                                          itemAt(id-1)->
-                                          widget(),
-                                          m_element,
-                                          Qt::FindDirectChildrenOnly);
-
         }
     }
-
     postTrial();
 }
 
@@ -213,38 +216,41 @@ void Speller::postTrial()
     // utils::wait(1000);
     // utils::wait(500);
     // utils::wait(250); // showing feedback for 0.25 sec
-    //    refreshTarget();
-    utils::wait(100);
+    // refreshTarget();
 
-    if (m_text[m_text.length()-1] != "#")
+    if (m_presentFeedback)
     {
-        if (m_ERP->experimentMode() == operation_mode::COPY_MODE ||
-                m_ERP->experimentMode() == operation_mode::FREE_MODE)
+        // utils::wait(1000);
+        // utils::wait(500);
+        // utils::wait(250); // showing feedback for 0.25 sec
+        utils::wait(100);
+        if (m_text[m_text.length()-1] != "#")
         {
+            if (m_ERP->experimentMode() == operation_mode::COPY_MODE ||
+                    m_ERP->experimentMode() == operation_mode::FREE_MODE)
+            {
+                int id = m_text[m_text.length()-1].digitValue();
+                // qDebug()<< Q_FUNC_INFO << "element ID" << id;
+                QPixmap map = m_icons[id-1];
+                m_element = new QLabel();
+                m_element->setPixmap(map);
+                m_element->setAlignment(Qt::AlignCenter);
+
+                this->layout()->replaceWidget(this->
+                                              layout()->
+                                              itemAt(id-1)->
+                                              widget(),
+                                              m_element,
+                                              Qt::FindDirectChildrenOnly);
 
 
-            int id = m_text[m_text.length()-1].digitValue();
-            qDebug()<< Q_FUNC_INFO << "element ID" << id;
-            QPixmap map = m_icons[id-1];
-            m_element = new QLabel();
-            m_element->setPixmap(map);
-            m_element->setAlignment(Qt::AlignCenter);
-
-            this->layout()->replaceWidget(this->
-                                          layout()->
-                                          itemAt(id-1)->
-                                          widget(),
-                                          m_element,
-                                          Qt::FindDirectChildrenOnly);
-
-
-        }
-        else if(m_ERP->experimentMode() == operation_mode::CALIBRATION)
-        {
-            refreshTarget();
+            }
+            else if(m_ERP->experimentMode() == operation_mode::CALIBRATION)
+            {
+                refreshTarget();
+            }
         }
     }
-
     // m_textRow->setText(m_text);
     // m_textRow->show();
 
@@ -285,13 +291,17 @@ void Speller::postTrial()
 
 void Speller::receiveFeedback()
 {
-    qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
     // qDebug() << "FEEDBACK SOCKET PORT" << m_feedbackPort;
     // wait for OV python script to write in UDP feedback socket
     // utils::wait(500);
     // utils::wait(250);
-    utils::wait(200);
 
+    // utils::wait(200);
+    // utils::wait(80);
+    // m_feedbackSocket->waitForReadyRead(90);
+    // qDebug()<< QTime::currentTime();
+    m_feedbackSocket->waitForReadyRead();
     QHostAddress sender;
     quint16 senderPort;
     QByteArray *buffer = new QByteArray();
@@ -304,7 +314,6 @@ void Speller::receiveFeedback()
     {
         m_feedbackSocket->readDatagram(buffer->data(), buffer->size(), &sender, &senderPort);
     }
-
     //  feedback_socket->waitForBytesWritten();
     // qDebug()<< "Received: "<< QString(buffer->data());
     m_text += QString(buffer->data());
@@ -353,9 +362,7 @@ void Speller::highlightTarget()
         }
     }
 
-    qDebug()<< Q_FUNC_INFO << "current tg "<< m_currentTarget << "current letter " << m_desiredPhrase[m_currentLetter];
-
-
+    // qDebug()<< Q_FUNC_INFO << "current tg "<< m_currentTarget << "current letter " << m_desiredPhrase[m_currentLetter];
     QPixmap map = m_icons[m_currentTarget - 1];
     map.fill(Qt::yellow);
 
@@ -377,7 +384,7 @@ void Speller::refreshTarget()
 
     //   this->layout()->itemAt(m_currentTarget)->
     //           widget()->setStyleSheet("QLabel { color : gray; font: 40pt }");
-    qDebug()<< Q_FUNC_INFO << m_currentTarget;
+    // qDebug()<< Q_FUNC_INFO << m_currentTarget;
 
     m_element = new QLabel();
     QPixmap map = m_icons[m_currentTarget - 1];
@@ -435,7 +442,7 @@ void Speller::switchStimulationTimers()
 
 void Speller::startPreTrial()
 {
-    qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
 
     if (m_preTrialCount == 0)
     {
@@ -462,7 +469,7 @@ void Speller::startPreTrial()
 
 void Speller::endPreTrial()
 {
-    qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
     if (m_preTrialCount > m_preTrialWait || m_ERP->experimentMode() == operation_mode::FREE_MODE)
     {
         if(m_ERP->experimentMode() == operation_mode::COPY_MODE ||
@@ -523,7 +530,7 @@ void Speller::externalCommunication()
             // m_hybridCommand = "12";
             std::string str = m_hybridCommand.toStdString();
             const char* p = str.c_str();
-            qDebug()<< "command to send to Robot: " << m_hybridCommand;
+            // qDebug()<< "command to send to Robot: " << m_hybridCommand;
             QByteArray byteovStimulation;
             QDataStream streamovs(&byteovStimulation, QIODevice::WriteOnly);
             streamovs.setByteOrder(QDataStream::LittleEndian);
@@ -555,7 +562,7 @@ void Speller::externalCommunication()
 void Speller::initLogger()
 {
 
-    qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
 
     QDir logsDir(QCoreApplication::applicationDirPath() + "/logs");
     if(!logsDir.exists())
@@ -609,8 +616,8 @@ void Speller::initTimers()
 
     m_preTrialTimer->setTimerType(Qt::PreciseTimer);
     // m_preTrialTimer->setInterval(1000);
-    // m_preTrialTimer->setInterval(500);
-    m_preTrialTimer->setInterval(200);
+    m_preTrialTimer->setInterval(500);
+    // m_preTrialTimer->setInterval(200);
     m_preTrialTimer->setSingleShot(true);
 
     connect( m_stimTimer, SIGNAL(timeout()), this, SLOT(pauseFlashing()) );
@@ -637,7 +644,7 @@ void Speller::setERP(ERP *erp)
     m_textRow->setText(m_desiredPhrase);
     // external comm
     // a temporary hack
-    qDebug()<< "Lets see external comm" <<m_ERP->externalComm();
+    // qDebug()<< "Lets see external comm" <<m_ERP->externalComm();
     if(m_ERP->externalComm() == external_comm::ENABLED)
     {
         qDebug()<< "External Comm is enabled;";
@@ -658,10 +665,113 @@ void Speller::setERP(ERP *erp)
     }
 }
 
+bool Speller::presentFeedback() const
+{
+    return m_presentFeedback;
+}
+
 void Speller::setTimers(int t_stimulation, int t_isi)
 {
     m_stimTimer->setInterval(t_stimulation);
     m_isiTimer->setInterval(t_isi);
+}
+
+void Speller::setPresentFeedback(bool t_do)
+{
+    m_presentFeedback = t_do;
+}
+
+void Speller::showFeedback(QString command, bool correct)
+{
+    int id = 0;
+    QPixmap map;
+    if (command[0] != '#')
+    {
+        id = command[0].digitValue();
+        QString speed = command.at(1);
+        // qDebug()<< "speed "<< speed << command;
+        // present feedbck
+        if (m_ERP->experimentMode() == operation_mode::COPY_MODE)
+        {
+            map = m_icons[id-1];
+            // feedback: green correct selection, highlight the target icon
+            //           blue incorrect selection, highlight the selected icon
+            if( m_text[m_text.length()-1] == m_desiredPhrase[m_desiredPhrase.length() - 1])
+            {
+                map.fill(Qt::green);
+                isCorrect = true;
+                ++m_correct;
+            }
+            else
+            {
+                map.fill(Qt::blue);
+                isCorrect = false;
+            }
+            QColor color;
+            if (correct)
+            {
+                color = Qt::red;
+            }
+            else
+            {
+                color = Qt::black;
+            }
+            QPainter painter(&map);
+            // painter.setPen(Qt::white);
+            painter.setPen(color);
+            painter.setFont(QFont("Arial", 30));
+            painter.drawText(QPoint(25, 50), speed);
+
+            m_element = new QLabel();
+            m_element->setPixmap(map);
+            m_element->setAlignment(Qt::AlignCenter);
+
+            this->layout()->replaceWidget(this->
+                                          layout()->
+                                          itemAt(id-1)->
+                                          widget(),
+                                          m_element,
+                                          Qt::FindDirectChildrenOnly);
+        }
+
+        else if (m_ERP->experimentMode() == operation_mode::FREE_MODE)
+        {
+            map = m_icons[id-1];
+            map.fill(Qt::blue);
+            m_element = new QLabel();
+            m_element->setPixmap(map);
+            m_element->setAlignment(Qt::AlignCenter);
+
+            this->layout()->replaceWidget(this->
+                                          layout()->
+                                          itemAt(id-1)->
+                                          widget(),
+                                          m_element,
+                                          Qt::FindDirectChildrenOnly);
+
+        }
+        //
+        utils::wait(500);
+
+        // refreshtarget
+        if (m_ERP->experimentMode() == operation_mode::COPY_MODE ||
+                m_ERP->experimentMode() == operation_mode::FREE_MODE)
+        {
+            map = m_icons[id-1];
+            m_element = new QLabel();
+            m_element->setPixmap(map);
+            m_element->setAlignment(Qt::AlignCenter);
+
+            this->layout()->replaceWidget(this->
+                                          layout()->
+                                          itemAt(id-1)->
+                                          widget(),
+                                          m_element,
+                                          Qt::FindDirectChildrenOnly);
+
+
+        }
+    }
 }
 
 int Speller::getCurrentTarget()
@@ -691,7 +801,7 @@ void Speller::setDesiredPhrase(const QString &t_desiredPhrase)
 
 void Speller::createLayout()
 {
-    qDebug()<< Q_FUNC_INFO;
+    // qDebug()<< Q_FUNC_INFO;
     // speller settings
     m_rows = 3;
     m_cols = 3;
@@ -720,7 +830,7 @@ void Speller::createLayout()
     layout->setVerticalSpacing(100);
 
     m_textRow->setText(m_desiredPhrase);
-    qDebug()<< Q_FUNC_INFO<< m_desiredPhrase;
+    // qDebug()<< Q_FUNC_INFO<< m_desiredPhrase;
 
     int k = 1;
     QString stimName;

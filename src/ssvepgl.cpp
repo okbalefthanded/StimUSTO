@@ -50,7 +50,7 @@ void SsvepGL::initializeGL()
 {
     // Initialize OpenGL Backend
     initializeOpenGLFunctions();
-    // m_index = -1;
+
     m_index = 0;
     // Set global information
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -70,10 +70,11 @@ void SsvepGL::initializeGL()
     // static const int samplesLength = REFRESH_RATE * (stimulationDuration);
 
     m_flicker.resize(m_frequencies.size());
-
+    double phase = 0.0;
     for (int i=0; i < m_frequencies.size(); ++i)
     {
-        m_flicker[i] = utils::gen_flick(m_frequencies[i], config::REFRESH_RATE, m_ssvep->stimulationDuration(), m_ssvep->stimulationMode(), config::PHASE*i);
+        phase = config::PHASE * ((i+1)%2);
+        m_flicker[i] = utils::gen_flick(m_frequencies[i], config::REFRESH_RATE, m_ssvep->stimulationDuration(), m_ssvep->stimulationMode(), phase);
     }
     //qDebug() << "flicker size: "<< m_flicker[0].size();
     // Application-specific initialization
@@ -114,6 +115,7 @@ void SsvepGL::initializeGL()
         m_colorBuffer.release();
         m_programShader->release();
     }
+    initExternalSocket();
 }
 
 void SsvepGL::resizeGL(int w, int h)
@@ -163,7 +165,8 @@ void SsvepGL::startTrial()
 void SsvepGL::preTrial()
 {
 
-    if(m_trials == 0 && m_preTrialCount == 0)
+//    if(m_trials == 0 && m_preTrialCount == 0)
+    if(m_trials == 0)
     {
         sendMarker(OVTK_StimulationId_ExperimentStart);
     }
@@ -207,7 +210,8 @@ void SsvepGL::preTrial()
         // refreshTarget();
         scheduleRedraw();
         m_preTrialTimer->stop();
-        m_preTrialCount = 0;
+        // m_preTrialCount = 0;
+        m_preTrialCount = 1;
         m_state = trial_state::STIMULUS;
     }
 }
@@ -226,12 +230,15 @@ void SsvepGL::postTrial()
     if(m_ssvep->experimentMode() == operation_mode::COPY_MODE || m_ssvep->experimentMode() == operation_mode::FREE_MODE)
     {
 
-        utils::wait(100);
-        feedback();
-        utils::wait(500);
-        // feedback for 1 sec & refresh
-        // utils::wait(1000);
-        refresh(m_sessionFeedback[m_currentFlicker].digitValue()-1);
+        // utils::wait(100); // wait for OV processing
+        feedback();  // wait for feedback
+        if (m_presentFeedback)
+        {
+            utils::wait(500);
+            // feedback for 1 sec & refresh
+            // utils::wait(1000);
+            refresh(m_sessionFeedback[m_currentFlicker].digitValue()-1);
+        }
     }
 
     else // calibration mode
@@ -239,16 +246,21 @@ void SsvepGL::postTrial()
         refreshTarget();
     }
 
-    // wait
-    // int waitMillisec = (m_ssvep->breakDuration() - m_preTrialWait) * 1000;
-    // utils::wait(waitMillisec);
+    externalCommunication();
 
-    // refreshTarget();
+    postTrialEnd();
+
+}
+
+void SsvepGL::postTrialEnd()
+{
     ++m_currentFlicker;
     ++m_trials;
+
     if (m_currentFlicker < m_flickeringSequence->sequence.size() &&
             m_flickeringSequence->sequence.length() != 1 &&
-            (m_ssvep->experimentMode() == operation_mode::COPY_MODE || m_ssvep->experimentMode() == operation_mode::CALIBRATION))
+            (m_ssvep->experimentMode() == operation_mode::COPY_MODE ||
+             m_ssvep->experimentMode() == operation_mode::CALIBRATION))
     {
         startTrial();
     }
@@ -269,6 +281,7 @@ void SsvepGL::postTrial()
         // this->close();
     }
 }
+
 
 void SsvepGL::Flickering()
 {
@@ -302,25 +315,34 @@ void SsvepGL::Flickering()
 
 void SsvepGL::feedback()
 {
-    // receiveFeedback();
-    m_feedbackSocket->waitForReadyRead(500);
+    // receiveFeedback
+    // m_feedbackSocket->waitForReadyRead(500);
+    // qDebug()<< QTime::currentTime();
+    // m_feedbackSocket->waitForReadyRead(100);
+    // m_feedbackSocket->waitForReadyRead(90);
+    m_feedbackSocket->waitForReadyRead();
 
-    if(m_ssvep->experimentMode() == operation_mode::COPY_MODE)
+    if(m_presentFeedback)
     {
+        // m_feedbackSocket->waitForReadyRead(100);
 
-        if(m_sessionFeedback[m_currentFlicker].digitValue() == m_flickeringSequence->sequence[m_currentFlicker])
+        if(m_ssvep->experimentMode() == operation_mode::COPY_MODE)
         {
-            highlightFeedback(glColors::green, m_flickeringSequence->sequence[m_currentFlicker]-1);
-            ++m_correct;
+
+            if(m_sessionFeedback[m_currentFlicker].digitValue() == m_flickeringSequence->sequence[m_currentFlicker])
+            {
+                highlightFeedback(glColors::green, m_flickeringSequence->sequence[m_currentFlicker]-1);
+                ++m_correct;
+            }
+            else
+            {
+                highlightFeedback(glColors::blue, m_sessionFeedback[m_currentFlicker].digitValue()-1);
+            }
         }
-        else
+        else if(m_ssvep->experimentMode() == operation_mode::FREE_MODE)
         {
-            highlightFeedback(glColors::blue, m_sessionFeedback[m_currentFlicker].digitValue()-1);
+            highlightFeedback(glColors::red, m_sessionFeedback[m_currentFlicker].digitValue()-1);
         }
-    }
-    else if(m_ssvep->experimentMode() == operation_mode::FREE_MODE)
-    {
-        highlightFeedback(glColors::red, m_sessionFeedback[m_currentFlicker].digitValue()-1);
     }
 }
 
@@ -476,6 +498,53 @@ void SsvepGL::initIndices()
     }
 }
 
+void SsvepGL::externalCommunication()
+{
+    // Send and Recieve feedback to/from Robot if external communication is enabled
+    // qDebug()<< Q_FUNC_INFO << m_sessionFeedback;
+    std::string cmd = QString(m_sessionFeedback[m_currentFlicker]).toStdString();
+
+    if(m_ssvep->externalComm() == external_comm::ENABLED)
+    {
+        qDebug() << "Sending Feedback to Robot";
+        if (!m_robotSocket->isOpen())
+        {
+            qDebug()<< "Not sending Feedback to Robot : Cannot send feedback socket is not open";
+        }
+
+        try
+        {
+            std::string str = cmd;
+            const char* p = str.c_str();
+            // qDebug()<< "command to send to Robot: " << QString::fromStdString(cmd) << m_sessionFeedback[m_currentFlicker];
+            QByteArray byteovStimulation;
+            QDataStream streamovs(&byteovStimulation, QIODevice::WriteOnly);
+            streamovs.setByteOrder(QDataStream::LittleEndian);
+            streamovs.writeRawData(p, str.length());
+            m_robotSocket->write(byteovStimulation);
+            m_robotSocket->waitForBytesWritten();
+        }
+        catch(...)
+        {
+            qDebug() <<"Send Feedback to Robot, Issue With writting Data";
+        }
+
+        qDebug() << "Recieve State from Robot";
+        m_robotSocket->waitForReadyRead();
+
+        QByteArray robotState = m_robotSocket->readAll();
+
+        quint8 rState = robotState.toUInt();
+        qDebug()<< Q_FUNC_INFO << "Robot State recieved " << rState;
+        if(rState == robot_state::READY)
+        {
+            qDebug()<< "Correct State";
+            m_state = trial_state::PRE_TRIAL;
+        }
+
+    }
+}
+
 void SsvepGL::highlightTarget()
 {
 
@@ -618,6 +687,17 @@ void SsvepGL::scheduleRedraw()
     QOpenGLWindow::update();
 }
 
+bool SsvepGL::presentFeedback() const
+{
+    return m_presentFeedback;
+}
+
+void SsvepGL::setPresentFeedback(bool presentFeedback)
+{
+    m_presentFeedback = presentFeedback;
+}
+
+
 SSVEP *SsvepGL::ssvep() const
 {
     return m_ssvep;
@@ -629,18 +709,14 @@ void SsvepGL::setSsvep(SSVEP *ssvep)
 }
 
 
+bool SsvepGL::isCorrect() const
+{
+    return m_sessionFeedback[m_sessionFeedback.length()-1].digitValue() == m_flickeringSequence->sequence[m_currentFlicker];
+}
+
 void SsvepGL::update()
 {
     qDebug()<< "[update ] Index : "<< m_lostFrames << " " << m_index << "current time: " << QTime::currentTime().msec();
-
-    // temporary hack
-    // if (m_lostFrames <= 7)
-    // {
-    //    if(m_lostFrames == 0)
-    //        qDebug()<< "[update ] first: incorrect" << QTime::currentTime();
-    // }
-    // else
-    // {
 
         if(m_index == 0)
         {
@@ -676,9 +752,7 @@ void SsvepGL::update()
         }
 
         ++m_index;
-    //}
 
-  //  ++m_lostFrames;
     scheduleRedraw();
 }
 
@@ -709,6 +783,30 @@ void SsvepGL::setFeedbackPort(int t_port)
 {
     m_feedbackPort = t_port;
 }
+
+void SsvepGL::initExternalSocket()
+{
+    // qDebug()<< "Lets see external comm" <<m_ssvep->externalComm();
+    if(m_ssvep->externalComm() == external_comm::ENABLED)
+    {
+        qDebug()<< "External Comm is enabled;";
+        m_robotSocket = new QTcpSocket();
+        //    m_robotSocket->connectToHost(QHostAddress("10.3.66.5"), m_robotPort);
+        // 10.3.66.5 / 10.6.65.128 /10.3.64.92
+        // m_robotSocket->connectToHost(QHostAddress("10.3.64.92"), m_robotPort);
+        m_robotSocket->connectToHost(QHostAddress(m_ssvep->externalAddress()), m_robotPort);
+
+        if(m_robotSocket->waitForConnected())
+        {
+            qDebug() << "Robot Connection : State Connected";
+        }
+        else
+        {
+            qDebug() << "Robot Connection : State Not Connected";
+        }
+    }
+}
+
 
 SsvepGL::~SsvepGL()
 {

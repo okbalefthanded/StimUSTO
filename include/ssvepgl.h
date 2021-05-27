@@ -11,6 +11,7 @@
 #include <QOpenGLShaderProgram>
 #include <QVector3D>
 #include <QDebug>
+#include <QTcpSocket>
 //
 #include "randomflashsequence.h"
 #include "ssvep.h"
@@ -32,6 +33,9 @@ public:
 
     friend class Hybrid;
     friend class HybridStimulation;
+    bool isCorrect() const;
+    bool presentFeedback() const;
+    void setPresentFeedback(bool presentFeedback);
 
     // QOpenGLWindow interface
 protected:
@@ -49,9 +53,10 @@ private slots:
     void preTrial();
     void feedback();
     void postTrial();
+    void postTrialEnd();
     void Flickering();
-    //    void pauseFlashing();
-    void receiveFeedback();
+    // void pauseFlashing();
+    // void receiveFeedback();
     void update();
 
     void initElements();
@@ -68,6 +73,14 @@ public slots:
         emit markerTag(ovStimulation);
     }
 
+protected slots:
+    void receiveFeedback();
+
+protected:
+    void externalCommunication();
+    void initExternalSocket();
+
+
 private:
     //    bool isTarget();
     void highlightTarget();
@@ -79,6 +92,7 @@ private:
 
     bool m_firstRun = true;
     bool m_stateFinished = true;
+    bool m_presentFeedback = true;
     int m_preTrialCount=1;
     int m_preTrialWait;
     int m_currentFlicker=0;
@@ -118,6 +132,11 @@ private:
     QVector<QVector3D> m_vertices;
     QVector<QVector3D> m_colors;
     QVector<int> m_vindices;
+
+    // external communication
+    QString m_hybridCommand = "";
+    quint16 m_robotPort = 12347;
+    QTcpSocket *m_robotSocket;
 
 
 };

@@ -54,8 +54,8 @@ QVector<double> gen_flick_on_off(double freq, int refreshRate, float length)
 // Taylor Fr. Brain Comput. InterfacesBrain-Computer Interfaces, vol. 1, no. 3–4, pp. 181–191, 2014.
 QVector<double> gen_flick_sin(double freq, int refreshRate, float length, double phase)
 {
-//    int samples = refreshRate * int(length);    
-    qDebug()<< Q_FUNC_INFO << phase;
+    //    int samples = refreshRate * int(length);
+    // qDebug()<< Q_FUNC_INFO << phase;
     int samples = refreshRate * (length / 1000);
     QVector<double> stim(samples, 0);
 
@@ -69,7 +69,7 @@ QVector<double> gen_flick_sin(double freq, int refreshRate, float length, double
 //
 void wait(int millisecondsToWait)
 {
-//    qDebug()<< Q_FUNC_INFO;
+    //    qDebug()<< Q_FUNC_INFO;
 
     // from stackoverflow question:
     // http://stackoverflow.com/questions/3752742/how-do-i-create-a-pause-wait-function-using-qt

@@ -1,6 +1,8 @@
 //
 #include <QtDebug>
 #include <QApplication>
+#include <QPropertyAnimation>
+#include <QGraphicsOpacityEffect>
 //
 #include "hybridstimulation.h"
 #include "facespeller.h"
@@ -127,14 +129,36 @@ void HybridStimulation::swichStimWindows()
 
     if(m_switchStimulation)
     {
+        qDebug()<< QTime::currentTime();
         m_ssvepStimulation->hide();
+
+        // m_ERPspeller->setProperty("opactity", 1);
+        // m_ERPspeller->setProperty("opacity", 0.7);
+        qDebug()<< QTime::currentTime();
         m_ERPspeller->show();
+        // m_ssvepStimulation->setOpacity(0.01);
     }
     else
     {
+        /*
+        QGraphicsOpacityEffect* fade_effect = new QGraphicsOpacityEffect();
+        m_ERPspeller->setGraphicsEffect(fade_effect);
+        QPropertyAnimation *animation = new QPropertyAnimation(fade_effect, "opacity");
+        animation->setEasingCurve(QEasingCurve::InOutQuad);
+        animation->setDuration(50);
+        animation->setStartValue(0.7);
+        animation->setEndValue(0.01);
+        animation->start(QPropertyAnimation::DeleteWhenStopped);
+        */
+        // m_ssvepStimulation->setOpacity(0.7);
+        qDebug()<< QTime::currentTime();
         m_ssvepStimulation->setScreen(QGuiApplication::screens().last());
         m_ssvepStimulation->showFullScreen();
+        qDebug()<< QTime::currentTime();
         m_ERPspeller->hide();
+        qDebug()<< QTime::currentTime();
+        // m_ERPspeller->setProperty("opacity", 0.01);
+
     }
 }
 
@@ -188,8 +212,8 @@ void HybridStimulation::externalComm()
             qDebug() <<"Send Feedback to Robot, Issue With writting Data";
         }
 
-        qDebug() << "Recieve State from Robot";
-        m_robotSocket->waitForReadyRead();
+        qDebug() << "Recieve State from Robot...";
+        m_robotSocket->waitForReadyRead(40000);
 
         QByteArray robotState = m_robotSocket->readAll();
 
@@ -217,8 +241,13 @@ void HybridStimulation::externalComm()
 void HybridStimulation::hybridPostTrial()
 {
     qDebug() << "[HYBRID POST TRIAL]" << Q_FUNC_INFO;
-
-    if(m_hybridStimulaiton->experimentMode() == operation_mode::COPY_MODE || m_hybridStimulaiton->experimentMode() == operation_mode::FREE_MODE)
+    bool correct = false;
+    // recieve feedback from both paradigms:
+    // m_ERPspeller->receiveFeedback();
+    // m_ssvepStimulation->receiveFeedback();
+    //
+    if(m_hybridStimulaiton->experimentMode() == operation_mode::COPY_MODE ||
+            m_hybridStimulaiton->experimentMode() == operation_mode::FREE_MODE)
     {
         m_ERPFeedback = m_ERPspeller->m_text;
         m_SSVEPFeedback += m_ssvepStimulation->m_sessionFeedback;
@@ -227,9 +256,29 @@ void HybridStimulation::hybridPostTrial()
     }
 
     // Send and Recieve feedback to/from Robot if external communication is enabled
+    if (m_hybridStimulaiton->m_SSVEPparadigm->controlMode() == control_mode::ASYNC)
+    {
+        m_SSVEPFeedback[m_currentTrial] = m_SSVEPFeedback[m_currentTrial].digitValue() - 1;
+    }
     m_hybridCommand = m_ERPFeedback[m_currentTrial] + m_SSVEPFeedback.at(m_currentTrial);
-    externalComm();
+
+    correct = m_ssvepStimulation->isCorrect();
+    // show feedback on ERP speller for 500 ms
+    m_ssvepStimulation->hide();
+    m_ERPspeller->show();
+    m_ERPspeller->showFeedback(m_hybridCommand, correct);
     //
+    if (m_hybridCommand[0] != '#')
+    {
+        externalComm();
+    }
+    //
+    hybridPostTrialEnd();
+
+}
+
+void HybridStimulation::hybridPostTrialEnd()
+{
     ++m_currentTrial;
     m_hybridState = trial_state::PRE_TRIAL;
 
@@ -248,9 +297,11 @@ void HybridStimulation::hybridPostTrial()
         }
 
         qDebug() << "Hybrid Experiment End";
-        m_ERPspeller->close();
-        m_ssvepStimulation->close();
-        emit experimentEnd();
+        m_ERPspeller->sendMarker(OVTK_StimulationId_ExperimentStop);
+        utils::wait(2000);
+        // m_ERPspeller->close();
+        // m_ssvepStimulation->close();
+        //emit experimentEnd();
     }
 }
 

@@ -223,7 +223,9 @@ void ConfigPanel::on_initHybrid_clicked()
 
         Speller *speller = createSpeller(hybridParadigm->m_ERPparadigm->stimulationType());
         speller->setERP(hybridParadigm->m_ERPparadigm);
+        speller->setPresentFeedback(false);
         SsvepGL *ssvepStimulation = createSSVEP(hybridParadigm->m_SSVEPparadigm, 12346);
+        ssvepStimulation->setPresentFeedback(false);
 
         HybridStimulation *hybrid = new HybridStimulation(hybridParadigm, speller, ssvepStimulation);
         connectParadigm(hybrid, launchTimer);
@@ -420,6 +422,3 @@ ConfigPanel::~ConfigPanel()
     delete ui;
 
 }
-
-
-

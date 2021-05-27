@@ -42,8 +42,6 @@ void FaceSpeller::startFlashing()
 void FaceSpeller::stimulationFace()
 {
     // qDebug()<< Q_FUNC_INFO;
-
-
     int id = m_flashingSequence->sequence[m_currentStimulation];
     QPixmap pixmap(":/images/bennabi_face.png");
     m_element = new QLabel();
@@ -164,7 +162,7 @@ void FaceSpeller::stimulationInvertedColoredFace()
         pixmap = QPixmap(":/images/bennabi_face_green_inverted.png");
     }
     else if (currentStim <= 9)
-    {      
+    {
         pixmap = QPixmap(":/images/bennabi_face_blue_inverted.png");
     }
 
