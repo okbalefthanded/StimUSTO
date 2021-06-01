@@ -130,8 +130,10 @@ private:
     // QVector <QVector <int>> m_flicker;
     QVector <QVector <double>> m_flicker;
     QVector<QVector3D> m_vertices;
+    QVector<QVector3D> m_centers;
     QVector<QVector3D> m_colors;
     QVector<int> m_vindices;
+    QVector<int> m_centerindices;
 
     // external communication
     QString m_hybridCommand = "";

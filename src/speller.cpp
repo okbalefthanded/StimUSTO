@@ -594,7 +594,8 @@ void Speller::showWindow()
     }
     else
     {
-        this->showMaximized();
+        // this->showMaximized();
+        this->showFullScreen();
     }
 
     this->setStyleSheet("background-color : black");

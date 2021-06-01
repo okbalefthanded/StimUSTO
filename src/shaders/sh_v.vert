@@ -8,6 +8,7 @@ out vec3 vColor;
 
 void main()
 {
+    gl_PointSize = 8.0f;
     gl_Position = vec4(position, 1.0);
     vColor = color;
 }
