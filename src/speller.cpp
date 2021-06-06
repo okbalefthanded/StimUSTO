@@ -123,7 +123,8 @@ void Speller::preTrial()
         }
         else if(m_ERP->experimentMode() == operation_mode::FREE_MODE)
         {
-            utils::wait(500);
+            // utils::wait(500);
+            utils::wait(200);
         }
     }
 
@@ -739,6 +740,11 @@ void Speller::showFeedback(QString command, bool correct)
         {
             map = m_icons[id-1];
             map.fill(Qt::blue);
+            QPainter painter(&map);
+            painter.setPen(Qt::black);
+            painter.setFont(QFont("Arial", 30));
+            painter.drawText(QPoint(25, 50), speed);
+
             m_element = new QLabel();
             m_element->setPixmap(map);
             m_element->setAlignment(Qt::AlignCenter);

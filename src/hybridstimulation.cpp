@@ -39,7 +39,8 @@ HybridStimulation::HybridStimulation(Hybrid *hybridStimulation, Speller *ERPspel
     {
         m_trials = 1;
     }
-    else if(m_hybridStimulaiton->experimentMode() == operation_mode::COPY_MODE)
+    else if(m_hybridStimulaiton->experimentMode() == operation_mode::COPY_MODE ||
+            operation_mode::FREE_MODE)
     {
         m_trials = m_hybridStimulaiton->m_ERPparadigm->desiredPhrase().count();
     }
@@ -282,7 +283,8 @@ void HybridStimulation::hybridPostTrialEnd()
     ++m_currentTrial;
     m_hybridState = trial_state::PRE_TRIAL;
 
-    if(m_currentTrial < m_trials || m_hybridStimulaiton->experimentMode() == operation_mode::FREE_MODE)
+    // if(m_currentTrial < m_trials || m_hybridStimulaiton->experimentMode() == operation_mode::FREE_MODE)
+    if(m_currentTrial < m_trials)
     {
         startTrial();
     }

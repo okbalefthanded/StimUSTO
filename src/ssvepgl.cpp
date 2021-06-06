@@ -57,7 +57,6 @@ void SsvepGL::initializeGL()
     glEnable(GL_PROGRAM_POINT_SIZE); //
     glEnable(GL_FRAMEBUFFER_SRGB);
 
-
     /*
     if(QGuiApplication::screens().size() == 2)
     {
@@ -75,7 +74,8 @@ void SsvepGL::initializeGL()
     double phase = 0.0;
     for (int i=0; i < m_frequencies.size(); ++i)
     {
-        phase = config::PHASE * ((i+1)%2);
+        // phase = config::PHASE * ((i+1)%2);
+        phase = config::PHASE * (i%2);
         m_flicker[i] = utils::gen_flick(m_frequencies[i], config::REFRESH_RATE, m_ssvep->stimulationDuration(), m_ssvep->stimulationMode(), phase);
     }
     //qDebug() << "flicker size: "<< m_flicker[0].size();
@@ -239,7 +239,8 @@ void SsvepGL::postTrial()
         feedback();  // wait for feedback
         if (m_presentFeedback)
         {
-            utils::wait(500);
+            utils::wait(300);
+            // utils::wait(500);
             // feedback for 1 sec & refresh
             // utils::wait(1000);
             refresh(m_sessionFeedback[m_currentFlicker].digitValue()-1);
@@ -265,7 +266,8 @@ void SsvepGL::postTrialEnd()
     if (m_currentFlicker < m_flickeringSequence->sequence.size() &&
             m_flickeringSequence->sequence.length() != 1 &&
             (m_ssvep->experimentMode() == operation_mode::COPY_MODE ||
-             m_ssvep->experimentMode() == operation_mode::CALIBRATION))
+             m_ssvep->experimentMode() == operation_mode::CALIBRATION ||
+            m_ssvep->experimentMode() == operation_mode::FREE_MODE))
     {
         startTrial();
     }
@@ -768,6 +770,7 @@ void SsvepGL::update()
     if(m_index == 0)
     {
         // qDebug()<< "[update ] first correct: " << QTime::currentTime();
+
         sendMarker(config::OVTK_StimulationLabel_Base + m_flickeringSequence->sequence[m_currentFlicker]);
         sendMarker(OVTK_StimulationId_VisualSteadyStateStimulationStart);
     }
