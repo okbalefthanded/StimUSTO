@@ -560,6 +560,11 @@ void Speller::externalCommunication()
     }
 }
 
+QString Speller::getDesiredPhrase() const
+{
+    return m_desiredPhrase;
+}
+
 void Speller::initLogger()
 {
 

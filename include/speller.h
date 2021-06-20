@@ -44,6 +44,8 @@ public:
     friend class Hybrid;
     friend class HybridStimulation;
 
+    QString getDesiredPhrase() const;
+
 signals:
     void markerTag(uint64_t t_ovStimulation);
     void slotTerminated();

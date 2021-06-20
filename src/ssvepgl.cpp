@@ -493,7 +493,7 @@ void SsvepGL::initColors()
 
     m_colors.resize(vectorsSize);
 
-    if( m_ssvep->controlMode() == control_mode::SYNC)
+    if(m_ssvep->controlMode() == control_mode::SYNC)
     {
         for (int i=0; i<m_colors.count(); i++)
         {
@@ -515,7 +515,16 @@ void SsvepGL::initColors()
         m_colors.resize(vectorsSize);
         for (int i=glUtils::POINTS_PER_SQUARE; i<m_colors.count(); i++)
         {
-            m_colors[i] = glColors::white;
+            // m_colors[i] = glColors::white;
+            if (i < m_colors.count() - m_ssvep->nrElements())
+            {
+                m_colors[i] = glColors::white;
+            }
+            else
+            {
+
+                m_colors[i] = glColors::red;
+            }
         }
     }
 

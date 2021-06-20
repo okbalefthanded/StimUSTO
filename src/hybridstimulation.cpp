@@ -43,6 +43,7 @@ HybridStimulation::HybridStimulation(Hybrid *hybridStimulation, Speller *ERPspel
             operation_mode::FREE_MODE)
     {
         m_trials = m_hybridStimulaiton->m_ERPparadigm->desiredPhrase().count();
+        qDebug()<< Q_FUNC_INFO << m_hybridStimulaiton->m_ERPparadigm->desiredPhrase();
     }
     /*
     else if(m_hybridStimulation->experimentMode() == operation_mode::FREE_MODE)
@@ -57,7 +58,7 @@ HybridStimulation::HybridStimulation(Hybrid *hybridStimulation, Speller *ERPspel
 
 void HybridStimulation::hybridPreTrial()
 {
-    qDebug() << "[HYBRID PRETRIAL START]" << Q_FUNC_INFO;
+    // qDebug() << "[HYBRID PRETRIAL START]" << Q_FUNC_INFO;
 
     if(m_hybridStimulaiton->experimentMode() == operation_mode::CALIBRATION)
     {
@@ -82,7 +83,7 @@ void HybridStimulation::hybridPreTrial()
 
 void HybridStimulation::startTrial()
 {
-    qDebug() << "[HYBRID TRIAL START]" << Q_FUNC_INFO;
+    // qDebug() << "[HYBRID TRIAL START]" << Q_FUNC_INFO;
 
     if(m_hybridState == trial_state::PRE_TRIAL)
     {
@@ -94,15 +95,16 @@ void HybridStimulation::startTrial()
 
         if(m_switchStimulation)
         {
-            qDebug() << Q_FUNC_INFO << "ERP trial";
+            // qDebug() << Q_FUNC_INFO << "ERP trial";
             swichStimWindows();
             m_ERPspeller->startTrial();
         }
 
         else
         {
-            qDebug() << Q_FUNC_INFO << "SSVEP trial";
+            // qDebug() << Q_FUNC_INFO << "SSVEP trial";
             swichStimWindows();
+            utils::wait(50);
             m_ssvepStimulation->startTrial();
         }
     }
@@ -130,12 +132,12 @@ void HybridStimulation::swichStimWindows()
 
     if(m_switchStimulation)
     {
-        qDebug()<< QTime::currentTime();
+        // qDebug()<< QTime::currentTime();
         m_ssvepStimulation->hide();
 
         // m_ERPspeller->setProperty("opactity", 1);
         // m_ERPspeller->setProperty("opacity", 0.7);
-        qDebug()<< QTime::currentTime();
+        // qDebug()<< QTime::currentTime();
         m_ERPspeller->show();
         // m_ssvepStimulation->setOpacity(0.01);
     }
@@ -152,12 +154,13 @@ void HybridStimulation::swichStimWindows()
         animation->start(QPropertyAnimation::DeleteWhenStopped);
         */
         // m_ssvepStimulation->setOpacity(0.7);
-        qDebug()<< QTime::currentTime();
+        // qDebug()<< QTime::currentTime();
+        utils::wait(50);
         m_ssvepStimulation->setScreen(QGuiApplication::screens().last());
         m_ssvepStimulation->showFullScreen();
-        qDebug()<< QTime::currentTime();
+        // qDebug()<< QTime::currentTime();
         m_ERPspeller->hide();
-        qDebug()<< QTime::currentTime();
+        // qDebug()<< QTime::currentTime();
         // m_ERPspeller->setProperty("opacity", 0.01);
 
     }
@@ -241,8 +244,11 @@ void HybridStimulation::externalComm()
 
 void HybridStimulation::hybridPostTrial()
 {
-    qDebug() << "[HYBRID POST TRIAL]" << Q_FUNC_INFO;
+    // qDebug() << "[HYBRID POST TRIAL]" << Q_FUNC_INFO;
+
     bool correct = false;
+    bool doExternalComm = true;
+
     // recieve feedback from both paradigms:
     // m_ERPspeller->receiveFeedback();
     // m_ssvepStimulation->receiveFeedback();
@@ -252,8 +258,8 @@ void HybridStimulation::hybridPostTrial()
     {
         m_ERPFeedback = m_ERPspeller->m_text;
         m_SSVEPFeedback += m_ssvepStimulation->m_sessionFeedback;
-        qDebug() << Q_FUNC_INFO << "ERP feedback: " << m_ERPFeedback;
-        qDebug() << Q_FUNC_INFO << "SSVEP feedback: " << m_SSVEPFeedback;
+        // qDebug() << Q_FUNC_INFO << "ERP feedback: " << m_ERPFeedback;
+        // qDebug() << Q_FUNC_INFO << "SSVEP feedback: " << m_SSVEPFeedback;
     }
 
     // Send and Recieve feedback to/from Robot if external communication is enabled
@@ -261,15 +267,34 @@ void HybridStimulation::hybridPostTrial()
     {
         m_SSVEPFeedback[m_currentTrial] = m_SSVEPFeedback[m_currentTrial].digitValue() - 1;
     }
-    m_hybridCommand = m_ERPFeedback[m_currentTrial] + m_SSVEPFeedback.at(m_currentTrial);
+    // m_hybridCommand = m_ERPFeedback[m_currentTrial] + m_SSVEPFeedback.at(m_currentTrial);
+    m_hybridCommand = m_ERPFeedback[m_ERPFeedback.length() - 1] + m_SSVEPFeedback.at(m_SSVEPFeedback.length() - 1);
 
     correct = m_ssvepStimulation->isCorrect();
     // show feedback on ERP speller for 500 ms
     m_ssvepStimulation->hide();
     m_ERPspeller->show();
     m_ERPspeller->showFeedback(m_hybridCommand, correct);
+
+    // check if correct feedback, send it to robot, otherwise
+    // repeat until feedback is correct in COPY MODE
+    if(m_hybridStimulaiton->experimentMode() == operation_mode::COPY_MODE)
+    {
+        if(m_ERPFeedback[m_ERPFeedback.length() - 1] != m_ERPspeller->getDesiredPhrase())
+        {
+            doExternalComm = false;
+            --m_currentTrial;
+            //  qDebug()<< Q_FUNC_INFO << "ERP feedback :"<< m_ERPFeedback << "Desired "<< m_ERPspeller->getDesiredPhrase();
+            //  qDebug() << Q_FUNC_INFO << "Repeat TRIAL: with: " << m_currentTrial;
+        }
+        else
+        {
+            doExternalComm = true;
+        }
+    }
+
     //
-    if (m_hybridCommand[0] != '#')
+    if (m_hybridCommand[0] != '#' && doExternalComm)
     {
         externalComm();
     }
@@ -281,13 +306,27 @@ void HybridStimulation::hybridPostTrial()
 void HybridStimulation::hybridPostTrialEnd()
 {
     ++m_currentTrial;
+    // qDebug() << Q_FUNC_INFO << "Repeat TRIAL: with: " << m_currentTrial;
     m_hybridState = trial_state::PRE_TRIAL;
 
-    // if(m_currentTrial < m_trials || m_hybridStimulaiton->experimentMode() == operation_mode::FREE_MODE)
-    if(m_currentTrial < m_trials)
+    if(m_currentTrial < m_trials || m_hybridStimulaiton->experimentMode() == operation_mode::FREE_MODE)
+        // if(m_currentTrial < m_trials)
     {
-        startTrial();
+
+        qDebug()<< Q_FUNC_INFO << m_ERPFeedback << " " << m_ERPFeedback[m_ERPFeedback.length() - 1];
+        if(m_ERPFeedback[m_ERPFeedback.length() - 1] == '5' && m_hybridStimulaiton->experimentMode() == operation_mode::FREE_MODE) // stop command in ERP
+        {
+            qDebug()<< "Terminate FREE experiment";
+            terminateExperiment();
+        }
+        else
+        {
+
+            startTrial();
+        }
+
     }
+
     else
     {
         if(m_hybridStimulaiton->experimentMode() == operation_mode::COPY_MODE)
@@ -298,13 +337,18 @@ void HybridStimulation::hybridPostTrialEnd()
             qDebug()<< "Accuracy in SSVEP: "<< m_SSVEPCorrect;
         }
 
-        qDebug() << "Hybrid Experiment End";
-        m_ERPspeller->sendMarker(OVTK_StimulationId_ExperimentStop);
-        utils::wait(2000);
-        // m_ERPspeller->close();
-        // m_ssvepStimulation->close();
-        //emit experimentEnd();
+        terminateExperiment();
     }
+}
+
+void HybridStimulation::terminateExperiment()
+{
+    qDebug() << "Hybrid Experiment End";
+    m_ERPspeller->sendMarker(OVTK_StimulationId_ExperimentStop);
+    utils::wait(2000);
+    // m_ERPspeller->close();
+    // m_ssvepStimulation->close();
+    // emit experimentEnd();
 }
 
 void HybridStimulation::initERPspeller(ERP *erp)

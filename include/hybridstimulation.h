@@ -36,6 +36,7 @@ private slots:
     void swichStimWindows();
     void initExternalComm();
     void externalComm();
+    void terminateExperiment();
 
 private:
     int m_hybridState = trial_state::PRE_TRIAL;
