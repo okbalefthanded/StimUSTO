@@ -34,6 +34,9 @@ void FaceSpeller::startFlashing()
         stimulationInvertedColoredFace();
         break;
     }
+    case speller_type::MISMATCH:
+        stimulationMismatchFace();
+        break;
     }
 
     switchStimulationTimers();
@@ -144,7 +147,7 @@ void FaceSpeller::stimulationInvertedColoredFace()
 {
 
     int currentStim = m_flashingSequence->sequence[m_currentStimulation];
-   // qDebug()<< Q_FUNC_INFO << currentStim;
+    // qDebug()<< Q_FUNC_INFO << currentStim;
 
     QPixmap pixmap;
     m_element = new QLabel();
@@ -173,4 +176,48 @@ void FaceSpeller::stimulationInvertedColoredFace()
                                   widget(),
                                   m_element,
                                   Qt::FindDirectChildrenOnly);
+}
+
+void FaceSpeller::stimulationMismatchFace()
+{
+    qDebug()<< Q_FUNC_INFO;
+
+    int id = m_flashingSequence->sequence[m_currentStimulation];
+
+    QPixmap pixmap(":/images/bennabi_face_red_inverted.png");
+    QPixmap pixmap_mismatch(":/images/bennabi_face.png");
+
+    m_element = new QLabel();
+    m_element->setPixmap(pixmap);
+    m_element->setAlignment(Qt::AlignCenter);
+
+    this->layout()->replaceWidget(this->
+                                  layout()->
+                                  itemAt(id-1)->
+                                  widget(),
+                                  m_element,
+                                  Qt::FindDirectChildrenOnly);
+
+
+    for (int i=0;i<9;i++)
+    {
+        if(i != (id-1))
+        {
+
+            m_element = new QLabel();
+            m_element->setPixmap(pixmap_mismatch);
+            m_element->setAlignment(Qt::AlignCenter);
+
+
+            this->layout()->replaceWidget(this->
+                                          layout()->
+                                          itemAt(i)->
+                                          widget(),
+                                          m_element,
+                                          Qt::FindDirectChildrenOnly);
+        }
+
+    }
+
+
 }

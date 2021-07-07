@@ -43,7 +43,7 @@ HybridStimulation::HybridStimulation(Hybrid *hybridStimulation, Speller *ERPspel
             operation_mode::FREE_MODE)
     {
         m_trials = m_hybridStimulaiton->m_ERPparadigm->desiredPhrase().count();
-        qDebug()<< Q_FUNC_INFO << m_hybridStimulaiton->m_ERPparadigm->desiredPhrase();
+        // qDebug()<< Q_FUNC_INFO << m_hybridStimulaiton->m_ERPparadigm->desiredPhrase();
     }
     /*
     else if(m_hybridStimulation->experimentMode() == operation_mode::FREE_MODE)
@@ -265,11 +265,18 @@ void HybridStimulation::hybridPostTrial()
     // Send and Recieve feedback to/from Robot if external communication is enabled
     if (m_hybridStimulaiton->m_SSVEPparadigm->controlMode() == control_mode::ASYNC)
     {
-        m_SSVEPFeedback[m_currentTrial] = m_SSVEPFeedback[m_currentTrial].digitValue() - 1;
+        if(m_SSVEPFeedback[m_currentTrial].digitValue() == 1)
+        {
+            m_SSVEPFeedback[m_currentTrial] = '0';
+
+        }
+        else{
+            m_SSVEPFeedback[m_currentTrial] = m_SSVEPFeedback[m_currentTrial].digitValue() - 1;
+        }
+
     }
     // m_hybridCommand = m_ERPFeedback[m_currentTrial] + m_SSVEPFeedback.at(m_currentTrial);
     m_hybridCommand = m_ERPFeedback[m_ERPFeedback.length() - 1] + m_SSVEPFeedback.at(m_SSVEPFeedback.length() - 1);
-
     correct = m_ssvepStimulation->isCorrect();
     // show feedback on ERP speller for 500 ms
     m_ssvepStimulation->hide();
@@ -278,22 +285,23 @@ void HybridStimulation::hybridPostTrial()
 
     // check if correct feedback, send it to robot, otherwise
     // repeat until feedback is correct in COPY MODE
-    if(m_hybridStimulaiton->experimentMode() == operation_mode::COPY_MODE)
+    if (m_hybridStimulaiton->externalComm() == external_comm::ENABLED)
     {
-        if(m_ERPFeedback[m_ERPFeedback.length() - 1] != m_ERPspeller->getDesiredPhrase())
+        if(m_hybridStimulaiton->experimentMode() == operation_mode::COPY_MODE)
         {
-            doExternalComm = false;
-            --m_currentTrial;
-            //  qDebug()<< Q_FUNC_INFO << "ERP feedback :"<< m_ERPFeedback << "Desired "<< m_ERPspeller->getDesiredPhrase();
-            //  qDebug() << Q_FUNC_INFO << "Repeat TRIAL: with: " << m_currentTrial;
-        }
-        else
-        {
-            doExternalComm = true;
+            if(m_ERPFeedback[m_ERPFeedback.length() - 1] != m_ERPspeller->getDesiredPhrase())
+            {
+                doExternalComm = false;
+                --m_currentTrial;
+                //  qDebug()<< Q_FUNC_INFO << "ERP feedback :"<< m_ERPFeedback << "Desired "<< m_ERPspeller->getDesiredPhrase();
+                //  qDebug() << Q_FUNC_INFO << "Repeat TRIAL: with: " << m_currentTrial;
+            }
+            else
+            {
+                doExternalComm = true;
+            }
         }
     }
-
-    //
     if (m_hybridCommand[0] != '#' && doExternalComm)
     {
         externalComm();
@@ -313,7 +321,7 @@ void HybridStimulation::hybridPostTrialEnd()
         // if(m_currentTrial < m_trials)
     {
 
-        qDebug()<< Q_FUNC_INFO << m_ERPFeedback << " " << m_ERPFeedback[m_ERPFeedback.length() - 1];
+       //  qDebug()<< Q_FUNC_INFO << m_ERPFeedback << " " << m_ERPFeedback[m_ERPFeedback.length() - 1];
         if(m_ERPFeedback[m_ERPFeedback.length() - 1] == '5' && m_hybridStimulaiton->experimentMode() == operation_mode::FREE_MODE) // stop command in ERP
         {
             qDebug()<< "Terminate FREE experiment";

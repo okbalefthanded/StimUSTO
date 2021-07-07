@@ -75,17 +75,33 @@ void Speller::pauseFlashing()
     //   this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
     //                widget()->setStyleSheet("QLabel { color : gray; font: 40pt }");
 
-    m_element = new QLabel();
-    m_element->setPixmap(m_icons[m_flashingSequence->sequence[m_currentStimulation] - 1]);
-    m_element->setAlignment(Qt::AlignCenter);
+    if (m_ERP->stimulationType() != speller_type::MISMATCH)
+    {
+        m_element = new QLabel();
+        m_element->setPixmap(m_icons[m_flashingSequence->sequence[m_currentStimulation] - 1]);
+        m_element->setAlignment(Qt::AlignCenter);
 
-    this->layout()->replaceWidget(this->
-                                  layout()->
-                                  itemAt(m_flashingSequence->sequence[m_currentStimulation]-1)->
-                                  widget(),
-                                  m_element,
-                                  Qt::FindDirectChildrenOnly);
+        this->layout()->replaceWidget(this->
+                                      layout()->
+                                      itemAt(m_flashingSequence->sequence[m_currentStimulation]-1)->
+                                      widget(),
+                                      m_element,
+                                      Qt::FindDirectChildrenOnly);
+    }
+    else {
+        for (int i=0; i<9; i++) {
+            m_element = new QLabel();
+            m_element->setPixmap(m_icons[i]);
+            m_element->setAlignment(Qt::AlignCenter);
 
+            this->layout()->replaceWidget(this->
+                                          layout()->
+                                          itemAt(i)->
+                                          widget(),
+                                          m_element,
+                                          Qt::FindDirectChildrenOnly);
+        }
+    }
     switchStimulationTimers();
     ++m_currentStimulation;
 

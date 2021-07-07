@@ -13,5 +13,6 @@ private:
     void stimulationColoredFace();
     void stimulationInvertedFace();
     void stimulationInvertedColoredFace();
+    void stimulationMismatchFace();
 };
 #endif // FACESPELLER_H

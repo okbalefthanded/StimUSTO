@@ -89,6 +89,7 @@ private:
     void refresh(int feedbackIndex);
     void initLogger();
     void scheduleRedraw();
+    void renderText();
 
     bool m_firstRun = true;
     bool m_stateFinished = true;

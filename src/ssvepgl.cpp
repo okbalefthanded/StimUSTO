@@ -6,6 +6,8 @@
 #include <Qapplication>
 #include <QDateTime>
 #include <QDir>
+#include <QPainter>
+#include <QFont>
 //
 #include "ssvepgl.h"
 #include "ovtk_stimulations.h"
@@ -146,6 +148,11 @@ void SsvepGL::paintGL()
         m_vaObject.release();
     }
     m_programShader->release();
+
+    if (m_ssvep->experimentMode() == operation_mode::FREE_MODE)
+    {
+        renderText();
+    }
 
 }
 
@@ -699,10 +706,21 @@ void SsvepGL::refresh(int feedbackIndex)
 {
 
     int squareIndex = feedbackIndex + (glUtils::VERTICES_PER_TRIANGLE*feedbackIndex);
+
+    if(feedbackIndex == 0 && m_ssvep->controlMode() == control_mode::ASYNC)
+    {
+        m_colors[squareIndex] = glColors::gray;
+        m_colors[squareIndex + 1] = glColors::gray;
+        m_colors[squareIndex + 2] = glColors::gray;
+        m_colors[squareIndex + 3] = glColors::gray;
+    }
+    else{
+
     m_colors[squareIndex] = glColors::white;
     m_colors[squareIndex + 1] = glColors::white;
     m_colors[squareIndex + 2] = glColors::white;
     m_colors[squareIndex + 3] = glColors::white;
+    }
 
     scheduleRedraw();
 
@@ -743,6 +761,48 @@ void SsvepGL::scheduleRedraw()
     m_colorBuffer.release();
 
     QOpenGLWindow::update();
+}
+
+void SsvepGL::renderText()
+{
+    int screenWidth, screenHeight;
+      int x, y;
+      QPainter painter(this);
+
+      /*
+      painter.beginNativePainting();
+      glClear(GL_COLOR_BUFFER_BIT);
+      painter.endNativePainting();
+      */
+
+      painter.setPen(Qt::red);
+      // painter.setPen(Qt::gray);
+
+      painter.setFont(QFont("Arial", 20, 20));
+
+      x = 0;
+      y = 0;
+
+      QSize screenSize = utils::getScreenSize();
+
+      screenWidth = screenSize.width();
+      screenHeight = screenSize.height();
+       int k[4] = {1,2,4,3};
+      //int k[4] = {1,2,3,4}; // for one-line
+
+      for (int i=0; i<m_centers.length(); i++)
+      {
+          // leftPixels = leftPercent * screenWidth /2;
+          // topPixels = topPercent * screenHeight /2;
+          x = int(m_centers[i].x() * (screenWidth / 2));
+          // y = int(m_centers[i].y() * (screenHeight/ 2) - 50);
+          y = int(m_centers[i].y() * (screenHeight/ 2)- 75); // for one-line
+          // painter.drawText(x, y, width(), height(), Qt::AlignCenter, QString::number(i+1));
+          painter.drawText(x, y, width(), height(), Qt::AlignCenter, QString::number(k[i]));
+
+      }
+
+      painter.end();
 }
 
 bool SsvepGL::presentFeedback() const

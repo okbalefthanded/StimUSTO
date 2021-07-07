@@ -267,6 +267,7 @@ Speller *ConfigPanel::createSpeller(int t_spellerType)
     case speller_type::INVERTED_FACE:
     case speller_type::COLORED_FACE:
     case speller_type::INVERTED_COLORED_FACE:
+    case speller_type::MISMATCH:
     {
         FaceSpeller *faceSpeller = new FaceSpeller();
         connectStimulation(faceSpeller);
