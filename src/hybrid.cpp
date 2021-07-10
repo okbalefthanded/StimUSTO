@@ -108,8 +108,8 @@ void Hybrid::fromVariant(const QVariant &variant)
     if(str.isEmpty())
     {
         // RandomFlashSequence *randomPhrase = new RandomFlashSequence(9, 6);
-        RandomFlashSequence *randomPhrase = new RandomFlashSequence(9, 4);
-        // RandomFlashSequence *randomPhrase = new RandomFlashSequence(9, 8);
+        // RandomFlashSequence *randomPhrase = new RandomFlashSequence(9, 4);
+        RandomFlashSequence *randomPhrase = new RandomFlashSequence(9, 8);
         m_ERPparadigm->setDesiredPhrase(randomPhrase->toString());
     }
     else
@@ -120,7 +120,15 @@ void Hybrid::fromVariant(const QVariant &variant)
     m_ERPparadigm->setStimulationType(map.value("ERP_stimulationType").toInt());
     m_ERPparadigm->setFlashingMode(map.value("ERP_flashingMode").toInt());
     // SSVEP config
-    m_SSVEPparadigm->setExperimentMode(map.value("experimentMode").toInt());
+    if (map.contains("SSVEP_experimentMode"))
+    {
+        m_SSVEPparadigm->setExperimentMode(map.value("SSVEP_experimentMode").toInt());
+
+    }
+    else
+    {
+        m_SSVEPparadigm->setExperimentMode(map.value("experimentMode").toInt());
+    }
     m_SSVEPparadigm->setControlMode(map.value("SSVEP_controlMode").toInt());
     m_SSVEPparadigm->setType(map.value("paradigmType").toInt());
     m_SSVEPparadigm->setStimulationDuration(map.value("SSVEP_stimulationDuration").toInt());

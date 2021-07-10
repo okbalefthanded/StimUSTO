@@ -8,6 +8,7 @@
 #include <QDir>
 #include <QPainter>
 #include <QFont>
+#include <array>
 //
 #include "ssvepgl.h"
 #include "ovtk_stimulations.h"
@@ -274,7 +275,7 @@ void SsvepGL::postTrialEnd()
             m_flickeringSequence->sequence.length() != 1 &&
             (m_ssvep->experimentMode() == operation_mode::COPY_MODE ||
              m_ssvep->experimentMode() == operation_mode::CALIBRATION ||
-            m_ssvep->experimentMode() == operation_mode::FREE_MODE))
+             m_ssvep->experimentMode() == operation_mode::FREE_MODE))
     {
         startTrial();
     }
@@ -459,7 +460,6 @@ void SsvepGL::initRects()
 
     for(int i=0;i<m_vertices.count() - m_ssvep->nrElements(); i+=glUtils::POINTS_PER_SQUARE)
     {
-
         m_vertices[i] = refPoints::topPoints[(i+offset)/glUtils::POINTS_PER_SQUARE];
         sx = 1;
         for(int j=i+1; j<i+glUtils::POINTS_PER_SQUARE; ++j)
@@ -489,6 +489,7 @@ void SsvepGL::initRects()
         m_vertices[ind] = m_centers[i];
         ++i;
     }
+
 }
 
 void SsvepGL::initColors()
@@ -510,7 +511,6 @@ void SsvepGL::initColors()
             }
             else
             {
-
                 m_colors[i] = glColors::red;
             }
         }
@@ -529,7 +529,6 @@ void SsvepGL::initColors()
             }
             else
             {
-
                 m_colors[i] = glColors::red;
             }
         }
@@ -561,7 +560,7 @@ void SsvepGL::initIndices()
     for (int i=0;i<m_centerindices.count();++i)
     {
         m_centerindices[i] = centerStart + i;
-    }  
+    }
 
 }
 
@@ -716,10 +715,10 @@ void SsvepGL::refresh(int feedbackIndex)
     }
     else{
 
-    m_colors[squareIndex] = glColors::white;
-    m_colors[squareIndex + 1] = glColors::white;
-    m_colors[squareIndex + 2] = glColors::white;
-    m_colors[squareIndex + 3] = glColors::white;
+        m_colors[squareIndex] = glColors::white;
+        m_colors[squareIndex + 1] = glColors::white;
+        m_colors[squareIndex + 2] = glColors::white;
+        m_colors[squareIndex + 3] = glColors::white;
     }
 
     scheduleRedraw();
@@ -766,43 +765,50 @@ void SsvepGL::scheduleRedraw()
 void SsvepGL::renderText()
 {
     int screenWidth, screenHeight;
-      int x, y;
-      QPainter painter(this);
+    int x, y;
+    QPainter painter(this);
 
-      /*
+    /*
       painter.beginNativePainting();
       glClear(GL_COLOR_BUFFER_BIT);
       painter.endNativePainting();
       */
 
-      painter.setPen(Qt::red);
-      // painter.setPen(Qt::gray);
+    painter.setPen(Qt::red);
+    // painter.setPen(Qt::gray);
 
-      painter.setFont(QFont("Arial", 20, 20));
+    painter.setFont(QFont("Arial", 20, 20));
 
-      x = 0;
-      y = 0;
+    x = 0;
+    y = 0;
 
-      QSize screenSize = utils::getScreenSize();
+    QSize screenSize = utils::getScreenSize();
 
-      screenWidth = screenSize.width();
-      screenHeight = screenSize.height();
-       int k[4] = {1,2,4,3};
-      //int k[4] = {1,2,3,4}; // for one-line
+    screenWidth = screenSize.width();
+    screenHeight = screenSize.height();
+    // int k[4] = {1,2,4,3};
+    // int k[4] = {1,2,3,4}; // for one-line
+    std::array<int, 5> k = {1,2,4,3,0};
+    if (m_ssvep->controlMode() == control_mode::ASYNC)
+    {
+         k = {1,2,3,4,5};
+    }
 
-      for (int i=0; i<m_centers.length(); i++)
-      {
-          // leftPixels = leftPercent * screenWidth /2;
-          // topPixels = topPercent * screenHeight /2;
-          x = int(m_centers[i].x() * (screenWidth / 2));
-          // y = int(m_centers[i].y() * (screenHeight/ 2) - 50);
-          y = int(m_centers[i].y() * (screenHeight/ 2)- 75); // for one-line
-          // painter.drawText(x, y, width(), height(), Qt::AlignCenter, QString::number(i+1));
-          painter.drawText(x, y, width(), height(), Qt::AlignCenter, QString::number(k[i]));
+    for (int i=0; i<m_centers.length(); i++)
+    {
 
-      }
+        // leftPixels = leftPercent * screenWidth /2;
+        // topPixels = topPercent * screenHeight /2;
+        x = int(m_centers[i].x() * (screenWidth / 2));
+        // y = int(m_centers[i].y() * (screenHeight/ 2) - 50);
+        // y = int(m_centers[i].y() * (screenHeight/ 2)- 75); // for one-line
+        y = int(m_centers[i].y() * (screenHeight/ 2) + 80);
+        // painter.drawText(x, y, width(), height(), Qt::AlignCenter, QString::number(i+1));
+        painter.drawText(x, -y, width(), height(), Qt::AlignCenter, QString::number(k[i]));
 
-      painter.end();
+    }
+
+    painter.end();
 }
 
 bool SsvepGL::presentFeedback() const
@@ -834,7 +840,7 @@ bool SsvepGL::isCorrect() const
 
 void SsvepGL::update()
 {
-//    qDebug()<< "[update ] Index : "<< m_lostFrames << " " << m_index << "current time: " << QTime::currentTime().msec();
+    //    qDebug()<< "[update ] Index : "<< m_lostFrames << " " << m_index << "current time: " << QTime::currentTime().msec();
 
     if(m_index == 0)
     {

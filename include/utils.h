@@ -78,7 +78,7 @@ const quint8 ASYNC = 1;
 }
 
 namespace operation_mode {
-// operation modes
+// operation modes (experiment mode)
 const quint8 CALIBRATION = 0;
 const quint8 COPY_MODE  = 1;
 const quint8 FREE_MODE = 2;

@@ -69,7 +69,14 @@ void HybridStimulation::hybridPreTrial()
     else if(m_hybridStimulaiton->experimentMode() == operation_mode::COPY_MODE)
     {
         m_ERPspeller->setDesiredPhrase(m_hybridStimulaiton->m_ERPparadigm->desiredPhrase()[m_currentTrial].toLower());
-        m_ssvepStimulation->m_flickeringSequence->sequence[0] = m_hybridStimulaiton->m_SSVEPparadigm->desiredPhrase()[m_currentTrial].digitValue();
+        if (m_hybridStimulaiton->m_SSVEPparadigm->experimentMode() == operation_mode::COPY_MODE)
+        {
+            m_ssvepStimulation->m_flickeringSequence->sequence[0] = m_hybridStimulaiton->m_SSVEPparadigm->desiredPhrase()[m_currentTrial].digitValue();
+        }
+        else
+        {
+             m_ssvepStimulation->m_flickeringSequence->sequence[0] = 0;
+        }
     }
 
     else if(m_hybridStimulaiton->experimentMode() == operation_mode::FREE_MODE)
@@ -104,7 +111,7 @@ void HybridStimulation::startTrial()
         {
             // qDebug() << Q_FUNC_INFO << "SSVEP trial";
             swichStimWindows();
-            utils::wait(50);
+            utils::wait(100); // pause before switching
             m_ssvepStimulation->startTrial();
         }
     }
@@ -155,7 +162,7 @@ void HybridStimulation::swichStimWindows()
         */
         // m_ssvepStimulation->setOpacity(0.7);
         // qDebug()<< QTime::currentTime();
-        utils::wait(50);
+        // utils::wait(50);
         m_ssvepStimulation->setScreen(QGuiApplication::screens().last());
         m_ssvepStimulation->showFullScreen();
         // qDebug()<< QTime::currentTime();
@@ -261,20 +268,24 @@ void HybridStimulation::hybridPostTrial()
         // qDebug() << Q_FUNC_INFO << "ERP feedback: " << m_ERPFeedback;
         // qDebug() << Q_FUNC_INFO << "SSVEP feedback: " << m_SSVEPFeedback;
     }
-
+    /*
     // Send and Recieve feedback to/from Robot if external communication is enabled
     if (m_hybridStimulaiton->m_SSVEPparadigm->controlMode() == control_mode::ASYNC)
     {
+
         if(m_SSVEPFeedback[m_currentTrial].digitValue() == 1)
         {
             m_SSVEPFeedback[m_currentTrial] = '0';
 
         }
-        else{
-            m_SSVEPFeedback[m_currentTrial] = m_SSVEPFeedback[m_currentTrial].digitValue() - 1;
+        else
+        {
+            m_SSVEPFeedback[m_currentTrial] = QString::number(m_SSVEPFeedback[m_currentTrial].digitValue() - 1).at(0);
+
         }
 
     }
+    */
     // m_hybridCommand = m_ERPFeedback[m_currentTrial] + m_SSVEPFeedback.at(m_currentTrial);
     m_hybridCommand = m_ERPFeedback[m_ERPFeedback.length() - 1] + m_SSVEPFeedback.at(m_SSVEPFeedback.length() - 1);
     correct = m_ssvepStimulation->isCorrect();
@@ -286,7 +297,21 @@ void HybridStimulation::hybridPostTrial()
     // check if correct feedback, send it to robot, otherwise
     // repeat until feedback is correct in COPY MODE
     if (m_hybridStimulaiton->externalComm() == external_comm::ENABLED)
-    {
+    {        
+        // Send and Recieve feedback to/from Robot if external communication is enabled
+        if (m_hybridStimulaiton->m_SSVEPparadigm->controlMode() == control_mode::ASYNC)
+        {
+            if(m_SSVEPFeedback[m_currentTrial].digitValue() == 1)
+            {
+                m_SSVEPFeedback[m_currentTrial] = '0';
+            }
+            else
+            {
+                m_SSVEPFeedback[m_currentTrial] = QString::number(m_SSVEPFeedback[m_currentTrial].digitValue() - 1).at(0);
+            }
+        }
+
+
         if(m_hybridStimulaiton->experimentMode() == operation_mode::COPY_MODE)
         {
             if(m_ERPFeedback[m_ERPFeedback.length() - 1] != m_ERPspeller->getDesiredPhrase())
@@ -302,6 +327,14 @@ void HybridStimulation::hybridPostTrial()
             }
         }
     }
+
+    else
+    {
+        // increase waiting time after feedabck by 500 ms
+        // only when control of external device is disabled
+        utils::wait(500);
+    }
+
     if (m_hybridCommand[0] != '#' && doExternalComm)
     {
         externalComm();
