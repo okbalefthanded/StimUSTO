@@ -2,6 +2,7 @@
 #include <QtDebug>
 //
 #include "hybrid.h"
+#include "utils.h"
 //
 
 Hybrid::Hybrid()
@@ -96,6 +97,17 @@ void Hybrid::fromVariant(const QVariant &variant)
         m_externalComm = map.value("externalComm").toInt();
         m_externalAddress = map.value("ip").toString();
     }
+
+    // stimulations order
+    if(map.contains("order"))
+    {
+       m_order = map.value("order").toInt();
+    }
+    else
+    {
+         m_order = order::ERP_FIRST;
+    }
+
     // ERP config
     m_ERPparadigm->setExperimentMode(map.value("experimentMode").toInt());
     m_ERPparadigm->setControlMode(map.value("ERP_controlMode").toInt());

@@ -110,6 +110,11 @@ const int REFRESH_RATE = 60;
 const double PHASE = M_PI;
 }
 
+namespace order {
+const quint8 ERP_FIRST = 0;
+const quint8 SSVEP_FIRST = 1;
+}
+
 namespace external_comm {
 const quint8 DISABLED = 0;
 const quint8 ENABLED = 1;
