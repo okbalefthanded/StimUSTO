@@ -230,6 +230,7 @@ void ConfigPanel::on_initHybrid_clicked()
         HybridStimulation *hybrid = new HybridStimulation(hybridParadigm, speller, ssvepStimulation);
         connectParadigm(hybrid, launchTimer);
         connect(hybrid, SIGNAL(experimentEnd()), this, SLOT(on_quitSpeller_clicked()));
+
     }
 }
 

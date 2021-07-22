@@ -54,6 +54,18 @@ HybridStimulation::HybridStimulation(Hybrid *hybridStimulation, Speller *ERPspel
 
     connect(m_ERPspeller, SIGNAL(slotTerminated()), this, SLOT(switchState()) );
     connect(m_ssvepStimulation, SIGNAL(slotTerminated()), this, SLOT(switchState()));
+
+    if(m_hybridStimulaiton->m_order == order::ERP_FIRST)
+    {
+        m_ssvepStimulation->hide();
+        m_ERPspeller->show();
+    }
+    else
+    {
+        m_ERPspeller->hide();
+        m_ssvepStimulation->setScreen(QGuiApplication::screens().last());
+        m_ssvepStimulation->showFullScreen();
+    }
 }
 
 void HybridStimulation::hybridPreTrial()
@@ -122,13 +134,14 @@ void HybridStimulation::startTrial()
             if(m_switchStimulation)
             {
                 swichStimWindows();
+                utils::wait(100);
                 m_ssvepStimulation->startTrial();
             }
 
             else
             {
                 swichStimWindows();
-                utils::wait(100); // pause before switching
+                // utils::wait(100); // pause before switching
                 m_ERPspeller->startTrial();
             }
         }
@@ -330,7 +343,6 @@ void HybridStimulation::hybridPostTrial()
     correct = m_ssvepStimulation->isCorrect();
     // show feedback on ERP speller for 500 ms
     m_ssvepStimulation->hide();
-    qDebug() << Q_FUNC_INFO << "FEEDBACk "<< m_hybridCommand;
     m_ERPspeller->show();
     m_ERPspeller->showFeedback(m_hybridCommand, correct);
 
@@ -370,9 +382,9 @@ void HybridStimulation::hybridPostTrial()
 
     else
     {
-        // increase waiting time after feedabck by 500 ms
+        // increase waiting time after feedabck by 500 or 1000 ms
         // only when control of external device is disabled
-        utils::wait(500);
+        utils::wait(1000);
     }
 
     if (m_hybridCommand[0] != '#' && doExternalComm)

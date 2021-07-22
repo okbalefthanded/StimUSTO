@@ -60,9 +60,9 @@ void ERP::fromVariant(const QVariant &variant)
     m_desiredPhrase = map.value("desiredPhrase").toString();
     if(m_desiredPhrase.isEmpty())
     {
-        // RandomFlashSequence *randomPhrase = new RandomFlashSequence(9, 2);
+        RandomFlashSequence *randomPhrase = new RandomFlashSequence(9, 2);
         // RandomFlashSequence *randomPhrase = new RandomFlashSequence(9, 4);
-        RandomFlashSequence *randomPhrase = new RandomFlashSequence(9, 3);
+        // RandomFlashSequence *randomPhrase = new RandomFlashSequence(9, 3);
         m_desiredPhrase = randomPhrase->toString();
     }
 
