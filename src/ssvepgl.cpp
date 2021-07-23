@@ -204,15 +204,21 @@ void SsvepGL::preTrial()
         }
 
     }
+
     else if(m_preTrialCount == 2)
     {
         if (m_ssvep->experimentMode() == operation_mode::CALIBRATION ||
                 m_ssvep->experimentMode() == operation_mode::COPY_MODE)
         {
+            // refresh only for idle
+            if (m_ssvep->controlMode() == control_mode::ASYNC && m_flickeringSequence->sequence[m_currentFlicker] == 1)
+            {
             // qDebug() << "Refresh target SSVEP ";
             refreshTarget();
+            }
         }
     }
+
 
     m_preTrialTimer->start();
     m_preTrialCount++;
@@ -247,8 +253,8 @@ void SsvepGL::postTrial()
         feedback();  // wait for feedback
         if (m_presentFeedback)
         {
-            utils::wait(300);
-            // utils::wait(500);
+            // utils::wait(300);
+            utils::wait(500);
             // feedback for 1 sec & refresh
             // utils::wait(1000);
             refresh(m_sessionFeedback[m_currentFlicker].digitValue()-1);

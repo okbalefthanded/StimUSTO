@@ -37,11 +37,11 @@ static const QVector<QVector3D> topPoints =
 
     // original points
     // QVector3D(-0.10f, 0.10f, 1.0f), QVector3D(-0.75f, 0.10f, 1.0f),
-    QVector3D(-0.10f, 0.15f, 1.0f), QVector3D(-0.75f, 0.15f, 1.0f),
+    QVector3D(-0.10f, 0.10f, 1.0f), QVector3D(-0.75f, 0.10f, 1.0f),
 
     // QVector3D(0.55f, 0.10f, 1.0f), QVector3D(-0.10f, 0.75f, 1.0f),
                                    // -.1, .7
-    QVector3D(0.56f, 0.15f, 1.0f), QVector3D(-0.10f, 0.75f, 1.0f),
+    QVector3D(0.56f, 0.10f, 1.0f), QVector3D(-0.10f, 0.70f, 1.0f),
 
     //QVector3D(-0.10f, -0.45f, 1.0f)
     // -0.1,-0.5,
