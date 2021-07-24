@@ -15,6 +15,7 @@ HybridStimulation::HybridStimulation(Hybrid *hybridStimulation)
     m_hybridStimulaiton = new Hybrid();
     initERPspeller(hybridStimulation->m_ERPparadigm);
     initSSVEP(hybridStimulation->m_SSVEPparadigm);
+    initAnimations();
 }
 
 HybridStimulation::HybridStimulation(Hybrid *hybridStimulation, Speller *ERPspeller, SsvepGL *ssvepGL)
@@ -66,6 +67,8 @@ HybridStimulation::HybridStimulation(Hybrid *hybridStimulation, Speller *ERPspel
         m_ssvepStimulation->setScreen(QGuiApplication::screens().last());
         m_ssvepStimulation->showFullScreen();
     }
+
+    initAnimations();
 }
 
 void HybridStimulation::hybridPreTrial()
@@ -118,14 +121,14 @@ void HybridStimulation::startTrial()
             {
                 qDebug() << Q_FUNC_INFO << "ERP trial";
                 swichStimWindows();
-                m_ERPspeller->startTrial();
+                // m_ERPspeller->startTrial();
             }
             else
             {
                 qDebug() << Q_FUNC_INFO << "SSVEP trial";
                 swichStimWindows();
                 utils::wait(100); // pause before switching
-                m_ssvepStimulation->startTrial();
+                // m_ssvepStimulation->startTrial();
             }
         }
 
@@ -134,15 +137,15 @@ void HybridStimulation::startTrial()
             if(m_switchStimulation)
             {
                 swichStimWindows();
-                utils::wait(100);
-                m_ssvepStimulation->startTrial();
+                //utils::wait(100);
+                //m_ssvepStimulation->startTrial();
             }
 
             else
             {
                 swichStimWindows();
                 // utils::wait(100); // pause before switching
-                m_ERPspeller->startTrial();
+                // m_ERPspeller->startTrial();
             }
         }
     }
@@ -181,6 +184,7 @@ void HybridStimulation::swichStimWindows()
             // m_ERPspeller->setProperty("opacity", 0.7);
             // qDebug()<< QTime::currentTime();
             m_ERPspeller->show();
+            // m_ERPspeller->showFullScreen();
             // m_ssvepStimulation->setOpacity(0.01);
         }
         else
@@ -204,23 +208,32 @@ void HybridStimulation::swichStimWindows()
             m_ERPspeller->hide();
             // qDebug()<< QTime::currentTime();
             // m_ERPspeller->setProperty("opacity", 0.01);
-
         }
     }
     else
     {
         if(m_switchStimulation)
         {
-            m_ERPspeller->hide();
-            m_ssvepStimulation->setScreen(QGuiApplication::screens().last());
-            m_ssvepStimulation->showFullScreen();
-            // m_ERPspeller->hide();
-
+            if(m_currentTrial == 0)
+            {
+                m_ERPspeller->hide();
+                m_ssvepStimulation->startTrial();
+                return;
+            }
+            else
+            {
+                m_SSVEPanimation->start();
+                m_ssvepStimulation->setScreen(QGuiApplication::screens().last());
+                m_ssvepStimulation->showFullScreen();
+                m_ERPspeller->hide();
+            }
         }
         else
         {
+            m_ERPanimation->start();
+            // m_ERPspeller->show();
+            m_ERPspeller->showFullScreen();
             m_ssvepStimulation->hide();
-            m_ERPspeller->show();
         }
     }
 }
@@ -441,6 +454,22 @@ void HybridStimulation::terminateExperiment()
     // m_ERPspeller->close();
     // m_ssvepStimulation->close();
     // emit experimentEnd();
+}
+
+void HybridStimulation::initAnimations()
+{
+
+  m_ERPanimation = new QPropertyAnimation(m_ERPspeller, "geometry");
+    m_ERPanimation->setDuration(500);
+    m_ERPanimation->setStartValue(QRect(1366, 0, 1366, 768));
+    m_ERPanimation->setEndValue(QRect(0, 0, 1366, 768));
+    connect(m_ERPanimation, SIGNAL(finished()), m_ERPspeller, SLOT(startTrial()));
+
+    m_SSVEPanimation = new QPropertyAnimation(m_ssvepStimulation, "x");
+    m_SSVEPanimation->setDuration(500);
+    m_SSVEPanimation->setStartValue(1366);
+    m_SSVEPanimation->setEndValue(0);
+    connect(m_SSVEPanimation, SIGNAL(finished()), m_ssvepStimulation, SLOT(startTrial()));
 }
 
 void HybridStimulation::initERPspeller(ERP *erp)

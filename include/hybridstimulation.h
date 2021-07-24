@@ -37,6 +37,7 @@ private slots:
     void initExternalComm();
     void externalComm();
     void terminateExperiment();
+    void initAnimations();
 
 private:
     int m_hybridState = trial_state::PRE_TRIAL;
@@ -58,7 +59,9 @@ private:
     // QUdpSocket *m_robotSocket;
     QTcpSocket *m_robotSocket;
     //
-    QPropertyAnimation *m_animation;
+    QPropertyAnimation *m_ERPanimation;
+    QPropertyAnimation *m_SSVEPanimation;
+
 };
 
 

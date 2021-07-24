@@ -90,7 +90,6 @@ protected:
 
     void externalCommunication();
 
-
     // Ui::Speller *ui;
 
     int m_rows;
