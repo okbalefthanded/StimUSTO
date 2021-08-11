@@ -134,6 +134,8 @@ void HybridStimulation::startTrial()
 
         else
         {
+           swichStimWindows();
+            /*
             if(m_switchStimulation)
             {
                 swichStimWindows();
@@ -147,6 +149,7 @@ void HybridStimulation::startTrial()
                 // utils::wait(100); // pause before switching
                 // m_ERPspeller->startTrial();
             }
+            */
         }
     }
 
@@ -177,37 +180,17 @@ void HybridStimulation::swichStimWindows()
 
         if(m_switchStimulation)
         {
-            // qDebug()<< QTime::currentTime();
-            m_ssvepStimulation->hide();
 
-            // m_ERPspeller->setProperty("opactity", 1);
-            // m_ERPspeller->setProperty("opacity", 0.7);
-            // qDebug()<< QTime::currentTime();
+            m_ssvepStimulation->hide();
             m_ERPspeller->show();
-            // m_ERPspeller->showFullScreen();
-            // m_ssvepStimulation->setOpacity(0.01);
         }
         else
         {
-            /*
-        QGraphicsOpacityEffect* fade_effect = new QGraphicsOpacityEffect();
-        m_ERPspeller->setGraphicsEffect(fade_effect);
-        QPropertyAnimation *animation = new QPropertyAnimation(fade_effect, "opacity");
-        animation->setEasingCurve(QEasingCurve::InOutQuad);
-        animation->setDuration(50);
-        animation->setStartValue(0.7);
-        animation->setEndValue(0.01);
-        animation->start(QPropertyAnimation::DeleteWhenStopped);
-        */
-            // m_ssvepStimulation->setOpacity(0.7);
-            // qDebug()<< QTime::currentTime();
-            // utils::wait(50);
+
             m_ssvepStimulation->setScreen(QGuiApplication::screens().last());
             m_ssvepStimulation->showFullScreen();
-            // qDebug()<< QTime::currentTime();
             m_ERPspeller->hide();
-            // qDebug()<< QTime::currentTime();
-            // m_ERPspeller->setProperty("opacity", 0.01);
+
         }
     }
     else
@@ -459,7 +442,7 @@ void HybridStimulation::terminateExperiment()
 void HybridStimulation::initAnimations()
 {
 
-  m_ERPanimation = new QPropertyAnimation(m_ERPspeller, "geometry");
+    m_ERPanimation = new QPropertyAnimation(m_ERPspeller, "geometry");
     m_ERPanimation->setDuration(500);
     m_ERPanimation->setStartValue(QRect(1366, 0, 1366, 768));
     m_ERPanimation->setEndValue(QRect(0, 0, 1366, 768));

@@ -21,7 +21,7 @@
 #include "randomflashsequence.h"
 #include "utils.h"
 //
-Speller::Speller(QWidget *parent) : QWidget(parent)
+Speller::Spxeller(QWidget *parent) : QWidget(parent)
   //ui(new Ui::Speller)
 {
 
@@ -37,6 +37,8 @@ Speller::Speller(QWidget *parent) : QWidget(parent)
     initFeedbackSocket();
 
     m_state = trial_state::PRE_TRIAL;
+
+    // this->setWindowFlag(Qt::Popup);
 
 }
 
@@ -410,11 +412,12 @@ void Speller::refreshTarget()
     /*
     this->layout()->replaceWidget(this->
                                   layout()->
-                                  itemAt(m_currentTarget)->
+                                  itemAt(m_currentTarget-1)->
                                   widget(),
                                   m_element,
                                   Qt::FindDirectChildrenOnly);
-                                  */
+     */
+
 
     // qDebug()<< Q_FUNC_INFO << "[current target] "<< m_currentTarget <<"[map] "<< m_currentTarget-1;
 
@@ -639,8 +642,9 @@ void Speller::initTimers()
 
     m_preTrialTimer->setTimerType(Qt::PreciseTimer);
     // m_preTrialTimer->setInterval(1000);
-    m_preTrialTimer->setInterval(500);
+    // m_preTrialTimer->setInterval(500);
     // m_preTrialTimer->setInterval(200);
+    m_preTrialTimer->setInterval(300);
     m_preTrialTimer->setSingleShot(true);
 
     connect( m_stimTimer, SIGNAL(timeout()), this, SLOT(pauseFlashing()) );

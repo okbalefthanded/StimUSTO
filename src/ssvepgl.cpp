@@ -47,6 +47,8 @@ SsvepGL::SsvepGL(SSVEP *paradigm, int t_port)
     //
     m_state = trial_state::PRE_TRIAL;
 
+    // this->setFlag(Qt::Desktop);
+
 }
 
 void SsvepGL::initializeGL()
