@@ -11,7 +11,7 @@ CONFIG += c++11 console
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = LaresiBCI
+TARGET = StimUSTO
 TEMPLATE = app
 
 
