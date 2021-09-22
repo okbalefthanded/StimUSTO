@@ -36,6 +36,15 @@
         <file>rsz_bennabi_face_red_inverted.png</file>
         <file>rsz_whitehouse_small.png</file>
         <file>rsz_yin_yang_small_croped.png</file>
+        <file>1_blue.png</file>
+        <file>2_blue.png</file>
+        <file>3_blue.png</file>
+        <file>4_yellow.png</file>
+        <file>5_yellow.png</file>
+        <file>6_yellow.png</file>
+        <file>7_magenta.png</file>
+        <file>8_magenta.png</file>
+        <file>9_magenta.png</file>
     </qresource>
     <qresource prefix="/shaders">
         <file>../src/shaders/sh_f.frag</file>

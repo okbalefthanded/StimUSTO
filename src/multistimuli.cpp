@@ -71,7 +71,6 @@ void MultiStimuli::preTrial()
 
         if(m_ERP->stimulationType() == speller_type::DUAL_STIM)
         {
-
             t_stimMap = m_stimuliMapDual;
         }
         else if(m_ERP->stimulationType() == speller_type::MULTI_STIM)
@@ -83,7 +82,6 @@ void MultiStimuli::preTrial()
         foreach(QString value, t_stimMap)
         {
             QPixmap pic(":/images/"+value);
-
             m_stimuli.append(pic);
         }
     }

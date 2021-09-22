@@ -7,6 +7,7 @@
 #include <QElapsedTimer>
 #include <QUdpSocket>
 #include <QTcpSocket>
+#include <QColor>
 //
 #include "ui_spellerform.h"
 //
@@ -126,6 +127,9 @@ protected:
     QList<QPixmap> m_icons;
     MatrixLayout *m_mLayout;
     QLabel *m_element;
+    QColor m_highlightColor = Qt::yellow;
+    QColor m_correctColor = Qt::green;
+    QColor m_incorrectColor = Qt::blue;
     // Timers
     QTimer *m_preTrialTimer;
     QTimer *m_stimTimer;

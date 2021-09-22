@@ -17,6 +17,7 @@ TEMPLATE = app
 
 SOURCES += src\main.cpp\
     src/arabicspeller.cpp \
+    src/chromaspeller.cpp \
     src/hybrid.cpp \
     src/hybridstimulation.cpp \
     src/multistimuli.cpp \
@@ -38,6 +39,7 @@ SOURCES += src\main.cpp\
 
 HEADERS  += include\configpanel.h \
     include/arabicspeller.h \
+    include/chromaspeller.h \
     include/hybrid.h \
     include/hybridstimulation.h \
     include/multistimuli.h \

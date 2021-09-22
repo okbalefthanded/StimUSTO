@@ -21,7 +21,7 @@
 #include "randomflashsequence.h"
 #include "utils.h"
 //
-Speller::Spxeller(QWidget *parent) : QWidget(parent)
+Speller::Speller(QWidget *parent) : QWidget(parent)
   //ui(new Ui::Speller)
 {
 
@@ -178,7 +178,8 @@ void Speller::feedback()
                 {
                     //            this->layout()->itemAt(m_currentTarget)->
                     //                    widget()->setStyleSheet("QLabel { color : green; font: 40pt }");
-                    map.fill(Qt::green);
+                    //map.fill(Qt::green);
+                    map.fill(m_correctColor);
                     isCorrect = true;
                     ++m_correct;
                 }
@@ -186,7 +187,8 @@ void Speller::feedback()
                 {
                     // this->layout()->itemAt(m_currentTarget)->
                     //         widget()->setStyleSheet("QLabel { color : blue; font: 40pt }");
-                    map.fill(Qt::blue);
+                    // map.fill(Qt::blue);
+                    map.fill(m_incorrectColor);
                     isCorrect = false;
                 }
                 // qDebug()<< Q_FUNC_INFO << "element id: "<< id;
@@ -206,7 +208,8 @@ void Speller::feedback()
             {
                 int id = m_text[m_text.length()-1].digitValue();
                 QPixmap map = m_icons[id-1];
-                map.fill(Qt::blue);
+                // map.fill(Qt::blue);
+                map.fill(m_incorrectColor);
                 m_element = new QLabel();
                 m_element->setPixmap(map);
                 m_element->setAlignment(Qt::AlignCenter);
@@ -383,7 +386,8 @@ void Speller::highlightTarget()
 
     // qDebug()<< Q_FUNC_INFO << "current tg "<< m_currentTarget << "current letter " << m_desiredPhrase[m_currentLetter];
     QPixmap map = m_icons[m_currentTarget - 1];
-    map.fill(Qt::yellow);
+    // map.fill(Qt::yellow);
+    map.fill(m_highlightColor);
 
     m_element = new QLabel();
     m_element->setPixmap(map);

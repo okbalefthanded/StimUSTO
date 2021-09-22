@@ -17,6 +17,7 @@
 #include "facespeller.h"
 #include "arabicspeller.h"
 #include "multistimuli.h"
+#include "chromaspeller.h"
 #include "erp.h"
 #include "ssvep.h"
 #include "hybrid.h"
@@ -272,7 +273,14 @@ Speller *ConfigPanel::createSpeller(int t_spellerType)
     {
         FaceSpeller *faceSpeller = new FaceSpeller();
         connectStimulation(faceSpeller);
-        return  faceSpeller;
+        return faceSpeller;
+    }
+
+    case speller_type::CHROMA:
+    {
+        ChromaSpeller *chromaSpeller = new ChromaSpeller();
+        connectStimulation(chromaSpeller);
+        return chromaSpeller;
     }
 
     case speller_type::ARABIC_SPELLER:
