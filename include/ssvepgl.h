@@ -129,7 +129,7 @@ private:
     int m_index;
     //
     // QVector <QVector <int>> m_flicker;
-    QVector <QVector <double>> m_flicker;
+    QVector <QVector <double> > m_flicker;
     QVector<QVector3D> m_vertices;
     QVector<QVector3D> m_centers;
     QVector<QVector3D> m_colors;

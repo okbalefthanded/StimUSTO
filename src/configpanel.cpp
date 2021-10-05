@@ -18,6 +18,7 @@
 #include "arabicspeller.h"
 #include "multistimuli.h"
 #include "chromaspeller.h"
+#include "auditoryspeller.h"
 #include "erp.h"
 #include "ssvep.h"
 #include "hybrid.h"
@@ -297,6 +298,14 @@ Speller *ConfigPanel::createSpeller(int t_spellerType)
         MultiStimuli *multiStimuli = new MultiStimuli();
         connectStimulation(multiStimuli);
         return multiStimuli;
+    }
+
+    case speller_type::AUDITORY:
+    {
+        AuditorySpeller *auditorySpeller = new AuditorySpeller();
+        connectStimulation(auditorySpeller);
+        return auditorySpeller;
+
     }
 
     }

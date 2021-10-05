@@ -50,4 +50,11 @@
         <file>../src/shaders/sh_f.frag</file>
         <file>../src/shaders/sh_v.vert</file>
     </qresource>
+    <qresource prefix="/audio">
+        <file>audio/dove.wav</file>
+        <file>audio/duck.wav</file>
+        <file>audio/frog.wav</file>
+        <file>audio/seagull.wav</file>
+        <file>audio/singing_bird.wav</file>
+    </qresource>
 </RCC>

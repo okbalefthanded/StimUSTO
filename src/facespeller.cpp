@@ -162,11 +162,11 @@ void FaceSpeller::stimulationInvertedColoredFace()
 
     else if (currentStim <= 6)
     {
-        pixmap = QPixmap(":/images/bennabi_face_green_inverted.png");
+        pixmap = QPixmap(":/images/bennabi_face_blue_inverted.png");
     }
     else if (currentStim <= 9)
     {
-        pixmap = QPixmap(":/images/bennabi_face_blue_inverted.png");
+        pixmap = QPixmap(":/images/bennabi_face_magenta_inverted.png");
     }
 
     m_element->setPixmap(pixmap);

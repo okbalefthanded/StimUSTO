@@ -413,14 +413,14 @@ void Speller::refreshTarget()
     QPixmap map = m_icons[m_currentTarget - 1];
     m_element->setPixmap(map);
     m_element->setAlignment(Qt::AlignCenter);
-    /*
+
     this->layout()->replaceWidget(this->
                                   layout()->
                                   itemAt(m_currentTarget-1)->
                                   widget(),
                                   m_element,
                                   Qt::FindDirectChildrenOnly);
-     */
+
 
 
     // qDebug()<< Q_FUNC_INFO << "[current target] "<< m_currentTarget <<"[map] "<< m_currentTarget-1;
@@ -646,9 +646,9 @@ void Speller::initTimers()
 
     m_preTrialTimer->setTimerType(Qt::PreciseTimer);
     // m_preTrialTimer->setInterval(1000);
-    // m_preTrialTimer->setInterval(500);
+    m_preTrialTimer->setInterval(500); //
     // m_preTrialTimer->setInterval(200);
-    m_preTrialTimer->setInterval(300);
+    // m_preTrialTimer->setInterval(300);
     m_preTrialTimer->setSingleShot(true);
 
     connect( m_stimTimer, SIGNAL(timeout()), this, SLOT(pauseFlashing()) );

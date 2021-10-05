@@ -67,6 +67,7 @@ const quint8 MULTI_STIM = 7;
 const quint8 DUAL_STIM = 8;
 const quint8 MISMATCH = 9;
 const quint8 CHROMA = 10;
+const quint8 AUDITORY = 11;
 //const quint8 MOTION_BAR = 2;
 //const quint8 MOTION_FACE = 3;
 //const quint8 MOVING_FACE = 4;

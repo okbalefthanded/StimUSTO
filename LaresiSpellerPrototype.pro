@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network opengl
+QT       += core gui network opengl multimedia
 
 CONFIG += c++11 console
 # CONFIG += c++11
@@ -17,6 +17,7 @@ TEMPLATE = app
 
 SOURCES += src\main.cpp\
     src/arabicspeller.cpp \
+    src/auditoryspeller.cpp \
     src/chromaspeller.cpp \
     src/hybrid.cpp \
     src/hybridstimulation.cpp \
@@ -39,6 +40,7 @@ SOURCES += src\main.cpp\
 
 HEADERS  += include\configpanel.h \
     include/arabicspeller.h \
+    include/auditoryspeller.h \
     include/chromaspeller.h \
     include/hybrid.h \
     include/hybridstimulation.h \

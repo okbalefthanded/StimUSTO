@@ -221,10 +221,8 @@ void SsvepGL::preTrial()
         }
     }
 
-
     m_preTrialTimer->start();
     m_preTrialCount++;
-
 
     if (m_preTrialCount > m_preTrialWait)
     {
@@ -877,10 +875,18 @@ void SsvepGL::update()
     }
     for(int i = 0; i<m_flicker.size() ;++i)
     {
+
         m_colors[k]   = QVector3D(m_flicker[i][m_index], m_flicker[i][m_index], m_flicker[i][m_index]);
         m_colors[k+1] = QVector3D(m_flicker[i][m_index], m_flicker[i][m_index], m_flicker[i][m_index]);
         m_colors[k+2] = QVector3D(m_flicker[i][m_index], m_flicker[i][m_index], m_flicker[i][m_index]);
         m_colors[k+3] = QVector3D(m_flicker[i][m_index], m_flicker[i][m_index], m_flicker[i][m_index]);
+
+        /*
+        m_colors[k]   = QVector3D(1.0f, m_flicker[i][m_index], m_flicker[i][m_index]);
+        m_colors[k+1] = QVector3D(1.0f, m_flicker[i][m_index], m_flicker[i][m_index]);
+        m_colors[k+2] = QVector3D(1.0f, m_flicker[i][m_index], m_flicker[i][m_index]);
+        m_colors[k+3] = QVector3D(1.0f, m_flicker[i][m_index], m_flicker[i][m_index]);
+        */
         k += glUtils::POINTS_PER_SQUARE;
     }
 
