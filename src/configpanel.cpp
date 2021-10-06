@@ -121,7 +121,6 @@ void ConfigPanel::on_initSpeller_clicked()
         Speller *speller = createSpeller(spellerType);
         speller->setERP(erpParadigm);
         connectParadigm(speller, launchTimer);
-
     }
 }
 
@@ -305,11 +304,8 @@ Speller *ConfigPanel::createSpeller(int t_spellerType)
         AuditorySpeller *auditorySpeller = new AuditorySpeller();
         connectStimulation(auditorySpeller);
         return auditorySpeller;
-
     }
-
     }
-
 }
 
 SSVEP *ConfigPanel::initParadigmSSVEPGui()

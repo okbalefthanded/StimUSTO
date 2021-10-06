@@ -4,15 +4,15 @@
 #include "randomflashsequence.h"
 
 ERP::ERP() : Paradigm (),
-             m_stimulationType(speller_type::INVERTED_FACE), m_flashingMode(flashing_mode::SC)
+    m_stimulationType(speller_type::INVERTED_FACE), m_flashingMode(flashing_mode::SC)
 {
 
 }
 
 ERP::ERP(quint8 mode, quint8 control, quint8 type, quint8 comm, int dur, quint8 bDur,
          quint8 nrSeq, QString phrase,  QString ip, quint8 sType, quint8 fMode):
-        Paradigm(mode, control, type, comm, dur, bDur, nrSeq, phrase, ip),
-        m_stimulationType(sType), m_flashingMode(fMode)
+    Paradigm(mode, control, type, comm, dur, bDur, nrSeq, phrase, ip),
+    m_stimulationType(sType), m_flashingMode(fMode)
 {
 
 }
@@ -58,15 +58,32 @@ void ERP::fromVariant(const QVariant &variant)
     m_nrSequences = map.value("nrSequences").toInt();
 
     m_desiredPhrase = map.value("desiredPhrase").toString();
+    m_stimulationType = map.value("stimulationType").toInt();
+
     if(m_desiredPhrase.isEmpty())
     {
-        RandomFlashSequence *randomPhrase = new RandomFlashSequence(9, 2);
-        // RandomFlashSequence *randomPhrase = new RandomFlashSequence(9, 4);
-        // RandomFlashSequence *randomPhrase = new RandomFlashSequence(9, 3);
+        RandomFlashSequence *randomPhrase;
+
+        if(m_stimulationType != speller_type::AUDITORY)
+        {
+            randomPhrase = new RandomFlashSequence(9, 2);
+
+            // RandomFlashSequence *randomPhrase = new RandomFlashSequence(9, 2);
+            // RandomFlashSequence *randomPhrase = new RandomFlashSequence(9, 4);
+            // RandomFlashSequence *randomPhrase = new RandomFlashSequence(9, 3);
+        }
+        else
+        {
+            // RandomFlashSequence *randomPhrase = new RandomFlashSequence(5, 2);
+            qDebug()<< Q_FUNC_INFO << "setting random phrase";
+            randomPhrase = new RandomFlashSequence(5, 2);
+        }
+
         m_desiredPhrase = randomPhrase->toString();
+        qDebug()<< Q_FUNC_INFO << "random phrase" << m_desiredPhrase;
     }
 
-    m_stimulationType = map.value("stimulationType").toInt();
+
     m_flashingMode = map.value("flashingMode").toInt();
 }
 

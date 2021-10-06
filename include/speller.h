@@ -78,7 +78,7 @@ protected:
 
     bool isTarget();
     bool isTarget(int t_stim);
-    void highlightTarget();
+    virtual void highlightTarget();
     virtual void refreshTarget();
 
     virtual void sendStimulationInfo();

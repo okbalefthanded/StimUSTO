@@ -3,6 +3,7 @@
 #include <QTime>
 #include <QMap>
 #include <QSound>
+#include <QSoundEffect>
 #include <QDebug>
 //
 #include "auditoryspeller.h"
@@ -23,6 +24,7 @@ AuditorySpeller:: AuditorySpeller(QWidget *parent) : Speller(0)
 
     createLayout();
     initTimers();
+    initSounds();
     initFeedbackSocket();
 
     m_state = trial_state::PRE_TRIAL;
@@ -30,6 +32,8 @@ AuditorySpeller:: AuditorySpeller(QWidget *parent) : Speller(0)
 
 void AuditorySpeller::startFlashing()
 {
+    // qDebug()<< Q_FUNC_INFO;
+
     sendStimulationInfo();
 
     // play audio sounds
@@ -37,27 +41,32 @@ void AuditorySpeller::startFlashing()
     {
     case 1:
     {
-        QSound::play(":/audio/audio/duck.wav");
+        // QSound::play(":/audio/audio/duck.wav");
+        m_soundStim->at(0)->play();
         break;
     }
     case 2:
     {
-        QSound::play(":/audio/audio/singing_bird.wav");
+        // QSound::play(":/audio/audio/singing_bird.wav");
+        m_soundStim->at(1)->play();
         break;
     }
     case 3:
     {
-        QSound::play(":/audio/audio/frog.wav");
+        // QSound::play(":/audio/audio/frog.wav");
+        m_soundStim->at(2)->play();
         break;
     }
     case 4:
     {
-        QSound::play(":/audio/audio/seagull.wav");
+        // QSound::play(":/audio/audio/seagull.wav");
+        m_soundStim->at(3)->play();
         break;
     }
     case 5:
     {
-        QSound::play(":/audio/audio/dove.wav");
+        // QSound::play(":/audio/audio/dove.wav");
+        m_soundStim->at(4)->play();
         break;
     }
     }
@@ -67,6 +76,9 @@ void AuditorySpeller::startFlashing()
 
 void AuditorySpeller::pauseFlashing()
 {
+    // qDebug()<< Q_FUNC_INFO;
+
+   //  m_soundStim->at(m_flashingSequence->sequence[m_currentStimulation]-1)->stop();
     switchStimulationTimers();
     ++m_currentStimulation;
     trialEnd();
@@ -75,30 +87,24 @@ void AuditorySpeller::pauseFlashing()
 void AuditorySpeller::highlightTarget()
 {
     // qDebug() << Q_FUNC_INFO;
-
-    int currentTarget = getCurrentTarget();
+    int currentTarget = getCurrentTarget()-1; //
 
     this->layout()->itemAt(currentTarget)->
             widget()->setStyleSheet("QLabel { color : red; font: 60pt }");
-
-   // this->layout()->itemAt(m_currentTarget)->
-   //         widget()->setStyleSheet("QLabel { color : red; font: 60pt }");
 }
 
 void AuditorySpeller::refreshTarget()
 {
-
-       this->layout()->itemAt(m_currentTarget)->
-               widget()->setStyleSheet("QLabel { color : gray; font: 40pt }");
-    // qDebug()<< Q_FUNC_INFO << m_currentTarget;
-    // qDebug()<< Q_FUNC_INFO << "[current target] "<< m_currentTarget <<"[map] "<< m_currentTarget-1;
+    // qDebug()<< Q_FUNC_INFO;
+    this->layout()->itemAt(m_currentTarget-1)->
+            widget()->setStyleSheet("QLabel { color : gray; font: 40pt }");
 
 }
 
 
 void AuditorySpeller::feedback()
 {
-    //qDebug() << Q_FUNC_INFO;
+    qDebug() << Q_FUNC_INFO;
 
     receiveFeedback();
 
@@ -137,9 +143,39 @@ void AuditorySpeller::feedback()
     postTrial();
 }
 
+void AuditorySpeller::initSounds()
+{
+    qDebug()<< Q_FUNC_INFO;
+    // m_soundStim = new QList<QSound *>;
+    m_soundStim = new QList<QSoundEffect *>;
+    m_soundStim->reserve(m_nrElements);
+
+    QSoundEffect *sound1 = new QSoundEffect;
+    sound1->setSource(QUrl::fromLocalFile(":/audio/audio/duck.wav"));
+    m_soundStim->insert(0, sound1);
+
+    QSoundEffect *sound2 = new QSoundEffect;
+    sound2->setSource(QUrl::fromLocalFile(":/audio/audio/singing_bird.wav"));
+    m_soundStim->insert(1, sound2);
+
+    QSoundEffect *sound3 = new QSoundEffect;
+    sound3->setSource(QUrl::fromLocalFile(":/audio/audio/frog.wav"));
+    m_soundStim->insert(2, sound3);
+
+    QSoundEffect *sound4 = new QSoundEffect;
+    sound4->setSource(QUrl::fromLocalFile(":/audio/audio/seagull.wav"));
+    m_soundStim->insert(3, sound4);
+
+    QSoundEffect *sound5 = new QSoundEffect;
+    sound5->setSource(QUrl::fromLocalFile(":/audio/audio/dove.wav"));
+    m_soundStim->insert(4, sound5);
+
+    //  m_soundStim->insert(4, new QSound(":/audio/audio/dove.wav"));
+}
+
 void AuditorySpeller::postTrial()
 {
-   // qDebug()<< Q_FUNC_INFO;
+    qDebug()<< Q_FUNC_INFO;
 
     ++m_trials;
 
@@ -194,7 +230,6 @@ void AuditorySpeller::postTrial()
 }
 
 
-
 void AuditorySpeller::createLayout()
 {
     // qDebug()<< Q_FUNC_INFO;
@@ -214,31 +249,29 @@ void AuditorySpeller::createLayout()
     m_textRow->setAlignment(Qt::AlignLeft);
     m_textRow->setObjectName("Desired Phrase Row");
 
-    layout->setHorizontalSpacing(400);
-    layout->setVerticalSpacing(100);
+    // layout->setHorizontalSpacing(400);
+    // layout->setVerticalSpacing(75);
 
     m_textRow->setText(m_desiredPhrase);
-
     int k = 0;
     QString stimName;
     QPixmap pic;
     QImage iconImage;
-    int label_h, label_w;
+    // int label_h, label_w;
     // add speller ellements
     for(int i=1; i<m_rows+1; i++)
     {
         for(int j=0; j<m_cols; j++)
         {
             QLabel *element = new QLabel(this);
-            label_h = element->height() + 40;
-            label_w = element->width() + 40;
-
+            // label_h = element->height() + 40;
+            // label_w = element->width() + 30;
             element->setText(QString::number(k));
             element->setStyleSheet("font: 40pt; color:gray");
             element->setAlignment(Qt::AlignCenter);
             layout->addWidget(element, i, j);
 
-            m_presentedLetters.append(QString::number(k));
+            m_presentedLetters.append(QString::number(k+1));
             k++;
         }
     }

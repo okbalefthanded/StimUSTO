@@ -125,7 +125,7 @@ void Speller::preTrial()
         sendMarker(OVTK_StimulationId_TrialStart);
         m_flashingSequence = new RandomFlashSequence(m_nrElements, m_ERP->nrSequences());
 
-        // qDebug() << Q_FUNC_INFO << m_flashingSequence->sequence;
+       //  qDebug() << Q_FUNC_INFO << m_flashingSequence->sequence;
 
         if (m_ERP->experimentMode() == operation_mode::CALIBRATION)
         {
@@ -365,6 +365,8 @@ bool Speller::isTarget(int t_stim)
 
 void Speller::highlightTarget()
 {
+
+    qDebug()<< Q_FUNC_INFO << "inside Base class";
     int idx = 0;
 
     for (int i=0; i<m_rows; i++)
@@ -493,7 +495,7 @@ void Speller::startPreTrial()
 
 void Speller::endPreTrial()
 {
-    // qDebug() << Q_FUNC_INFO;
+    qDebug() << Q_FUNC_INFO;
     if (m_preTrialCount > m_preTrialWait || m_ERP->experimentMode() == operation_mode::FREE_MODE)
     {
         if(m_ERP->experimentMode() == operation_mode::COPY_MODE ||
@@ -672,6 +674,9 @@ void Speller::setERP(ERP *erp)
     m_ERP = erp;
     setTimers(m_ERP->stimulationDuration(), m_ERP->breakDuration());
     setDesiredPhrase(m_ERP->desiredPhrase());
+
+    qDebug()<< Q_FUNC_INFO << m_desiredPhrase;
+
     m_textRow->setText(m_desiredPhrase);
     // external comm
     // a temporary hack
