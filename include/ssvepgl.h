@@ -80,7 +80,6 @@ protected:
     void externalCommunication();
     void initExternalSocket();
 
-
 private:
     //    bool isTarget();
     void highlightTarget();

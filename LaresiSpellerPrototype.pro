@@ -22,6 +22,7 @@ SOURCES += src\main.cpp\
     src/hybrid.cpp \
     src/hybridstimulation.cpp \
     src/multistimuli.cpp \
+    src/phonekeypad.cpp \
     src\configpanel.cpp \
     src\matrixlayout.cpp \
     src\ovmarkersender.cpp \
@@ -45,6 +46,7 @@ HEADERS  += include\configpanel.h \
     include/hybrid.h \
     include/hybridstimulation.h \
     include/multistimuli.h \
+    include/phonekeypad.h \
     include\ovtk_stimulations.h \
     include\matrixlayout.h \
     include\ovmarkersender.h \

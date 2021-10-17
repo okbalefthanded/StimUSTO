@@ -41,6 +41,7 @@ qint8 sign(double value);
 //
 QSize getScreenSize();
 
+int screenCount();
 }
 //
 namespace paradigm_type{

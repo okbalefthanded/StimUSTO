@@ -103,6 +103,11 @@ QSize getScreenSize()
     }
 }
 
+int screenCount()
+{
+    return QGuiApplication::screens().size();
+}
+
 }
 
 

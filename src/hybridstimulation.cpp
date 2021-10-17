@@ -205,8 +205,9 @@ void HybridStimulation::swichStimWindows()
             }
             else
             {
-                m_SSVEPanimation->start();
                 m_ssvepStimulation->setScreen(QGuiApplication::screens().last());
+                m_SSVEPanimation->start();
+               //  m_ssvepStimulation->setScreen(QGuiApplication::screens().last());
                 m_ssvepStimulation->showFullScreen();
                 m_ERPspeller->hide();
             }
@@ -442,16 +443,40 @@ void HybridStimulation::terminateExperiment()
 void HybridStimulation::initAnimations()
 {
 
+    int nScreens = utils::screenCount();
+    QRect erpStart, erpEnd;
+    int ssvepStart, ssvepEnd;
+
+    if (nScreens == 1)
+    {
+        erpStart = QRect(1366, 0, 1366, 768);
+        erpEnd = QRect(0, 0, 1366, 768);
+        ssvepStart = 1366;
+        ssvepEnd = 0;
+    }
+    else
+    {
+        erpStart = QRect(0, 0, 1366, 768);
+        erpEnd = QRect(-1366, 0, 1366, 768);
+        ssvepStart = 0;
+        ssvepEnd = -1366;
+    }
+
     m_ERPanimation = new QPropertyAnimation(m_ERPspeller, "geometry");
+
     m_ERPanimation->setDuration(500);
-    m_ERPanimation->setStartValue(QRect(1366, 0, 1366, 768));
-    m_ERPanimation->setEndValue(QRect(0, 0, 1366, 768));
+    // m_ERPanimation->setStartValue(QRect(1366, 0, 1366, 768)); //
+    // m_ERPanimation->setEndValue(QRect(0, 0, 1366, 768)); // (
+    m_ERPanimation->setStartValue(erpStart); //
+    m_ERPanimation->setEndValue(erpEnd); //
     connect(m_ERPanimation, SIGNAL(finished()), m_ERPspeller, SLOT(startTrial()));
 
     m_SSVEPanimation = new QPropertyAnimation(m_ssvepStimulation, "x");
     m_SSVEPanimation->setDuration(500);
-    m_SSVEPanimation->setStartValue(1366);
-    m_SSVEPanimation->setEndValue(0);
+    // m_SSVEPanimation->setStartValue(2800);//1366
+    // m_SSVEPanimation->setEndValue(1440); // 0
+    m_SSVEPanimation->setStartValue(ssvepStart);//1366
+    m_SSVEPanimation->setEndValue(ssvepEnd); // 0
     connect(m_SSVEPanimation, SIGNAL(finished()), m_ssvepStimulation, SLOT(startTrial()));
 }
 

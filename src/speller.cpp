@@ -366,7 +366,7 @@ bool Speller::isTarget(int t_stim)
 void Speller::highlightTarget()
 {
 
-    qDebug()<< Q_FUNC_INFO << "inside Base class";
+    // qDebug()<< Q_FUNC_INFO << "inside Base class";
     int idx = 0;
 
     for (int i=0; i<m_rows; i++)
@@ -495,7 +495,7 @@ void Speller::startPreTrial()
 
 void Speller::endPreTrial()
 {
-    qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
     if (m_preTrialCount > m_preTrialWait || m_ERP->experimentMode() == operation_mode::FREE_MODE)
     {
         if(m_ERP->experimentMode() == operation_mode::COPY_MODE ||
@@ -675,7 +675,7 @@ void Speller::setERP(ERP *erp)
     setTimers(m_ERP->stimulationDuration(), m_ERP->breakDuration());
     setDesiredPhrase(m_ERP->desiredPhrase());
 
-    qDebug()<< Q_FUNC_INFO << m_desiredPhrase;
+    // qDebug()<< Q_FUNC_INFO << m_desiredPhrase;
 
     m_textRow->setText(m_desiredPhrase);
     // external comm
@@ -871,6 +871,7 @@ void Speller::createLayout()
     layout->setVerticalSpacing(100);
 
     m_textRow->setText(m_desiredPhrase);
+    m_textRow->hide();
     // qDebug()<< Q_FUNC_INFO<< m_desiredPhrase;
 
     int k = 1;

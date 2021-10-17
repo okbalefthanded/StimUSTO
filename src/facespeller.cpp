@@ -157,7 +157,8 @@ void FaceSpeller::stimulationInvertedColoredFace()
 
     if(currentStim <= 3)
     {
-        pixmap = QPixmap(":/images/bennabi_face_red_inverted.png");
+       // pixmap = QPixmap(":/images/bennabi_face_red_inverted.png");
+         pixmap = QPixmap(":/images/bennabi_face_magenta_inverted.png");
     }
 
     else if (currentStim <= 6)
@@ -166,7 +167,8 @@ void FaceSpeller::stimulationInvertedColoredFace()
     }
     else if (currentStim <= 9)
     {
-        pixmap = QPixmap(":/images/bennabi_face_magenta_inverted.png");
+       // pixmap = QPixmap(":/images/bennabi_face_magenta_inverted.png");
+        pixmap = QPixmap(":/images/bennabi_face_red_inverted.png");
     }
 
     m_element->setPixmap(pixmap);
