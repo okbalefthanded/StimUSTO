@@ -27,6 +27,7 @@ private:
     quint8 m_nrElements;
     QString m_frequencies;
     quint8 m_stimulationMode;
+    quint8 m_stimShape;
 
 };
 

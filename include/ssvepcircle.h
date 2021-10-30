@@ -1,5 +1,5 @@
-#ifndef SSVEPGL_H
-#define SSVEPGL_H
+#ifndef SSVEPCIRCLE_H
+#define SSVEPCIRCLE_H
 //
 #include <QOpenGLWindow>
 #include <QOpenGLFunctions>
@@ -17,13 +17,13 @@
 #include "ssvep.h"
 #include "logger.h"
 //
-class SsvepGL : public QOpenGLWindow, protected QOpenGLFunctions
+class SsvepCircle : public QOpenGLWindow, protected QOpenGLFunctions
 {
     Q_OBJECT
 
 public:
-    SsvepGL(SSVEP *paradigm, int t_port);
-    ~SsvepGL();
+    SsvepCircle(SSVEP *paradigm, int t_port);
+    ~SsvepCircle();
 
     void setFrequencies(QString t_freqs);
     void setFeedbackPort(int t_port);
@@ -60,7 +60,7 @@ private slots:
     void update();
 
     void initElements();
-    void initRects();
+    void initCircles();
     void initColors();
     void initIndices();
 
@@ -89,6 +89,7 @@ private:
     void initLogger();
     void scheduleRedraw();
     void renderText();
+    void setVertex(int t_index, float x, float y, float z);
 
     bool m_firstRun = true;
     bool m_stateFinished = true;
@@ -121,11 +122,13 @@ private:
     // OpenGL State Information
     QOpenGLBuffer m_vertexBuffer; //vbo
     QOpenGLBuffer m_colorBuffer; //vbo
+
     QOpenGLVertexArrayObject m_vaObject; //vao
     QOpenGLShaderProgram *m_programShader;
 
     int m_index;
-    //
+
+    // QVector <QVector <int>> m_flicker;
     QVector <QVector <double> > m_flicker;
     QVector<QVector3D> m_vertices;
     QVector<QVector3D> m_centers;
@@ -137,8 +140,5 @@ private:
     QString m_hybridCommand = "";
     quint16 m_robotPort = 12347;
     QTcpSocket *m_robotSocket;
-
-
 };
-
-#endif // SSVEPGL_H
+#endif // SSVEPCIRCLE_H

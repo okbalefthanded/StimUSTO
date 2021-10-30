@@ -21,6 +21,7 @@
 #include "auditoryspeller.h"
 #include "erp.h"
 #include "ssvep.h"
+#include "ssvepcircle.h"
 #include "hybrid.h"
 #include "jsonserializer.h"
 #include "ovtk_stimulations.h"
@@ -152,7 +153,8 @@ void ConfigPanel::on_initSSVEP_clicked()
         launchTimer->setInterval(10000);
         launchTimer->setSingleShot(true);
 
-        SsvepGL *ssvepStimulation = createSSVEP(ssvepParadigm, 12345);
+        // SsvepGL *ssvepStimulation = createSSVEP(ssvepParadigm, 12345);
+        SsvepCircle *ssvepStimulation = createSSVEP(ssvepParadigm, 12345);
         connectParadigm(ssvepStimulation, launchTimer);
         // ssvepStimulation->show();
         ssvepStimulation->showFullScreen();
@@ -204,13 +206,11 @@ void ConfigPanel::on_initHybrid_clicked()
     {
         initParadigmJSon(hybridParadigm);
     }
-
     else
     {
         ERP *erpParadigm = initParadigmERPGui();
         SSVEP *ssvepParadigm = initParadigmSSVEPGui();
         *hybridParadigm = Hybrid(erpParadigm, ssvepParadigm);
-
     }
     if(!m_markerSender->connectedOnce())
     {
@@ -225,13 +225,14 @@ void ConfigPanel::on_initHybrid_clicked()
         Speller *speller = createSpeller(hybridParadigm->m_ERPparadigm->stimulationType());
         speller->setERP(hybridParadigm->m_ERPparadigm);
         speller->setPresentFeedback(false);
-        SsvepGL *ssvepStimulation = createSSVEP(hybridParadigm->m_SSVEPparadigm, 12346);
+        // SsvepGL *ssvepStimulation = createSSVEP(hybridParadigm->m_SSVEPparadigm, 12346);
+        SsvepGL *ssvepStimulation =new SsvepGL(hybridParadigm->m_SSVEPparadigm, 12346);
+        // SsvepCircle *ssvepStimulation = createSSVEP(hybridParadigm->m_SSVEPparadigm, 12346);
         ssvepStimulation->setPresentFeedback(false);
 
         HybridStimulation *hybrid = new HybridStimulation(hybridParadigm, speller, ssvepStimulation);
         connectParadigm(hybrid, launchTimer);
         connect(hybrid, SIGNAL(experimentEnd()), this, SLOT(on_quitSpeller_clicked()));
-
     }
 }
 
@@ -347,9 +348,9 @@ SSVEP *ConfigPanel::initParadigmSSVEPGui()
     return ssvepParadigm;
 }
 
-SsvepGL *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
+// SsvepGL *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
+SsvepCircle *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
 {
-
     QSurfaceFormat format;
     format.setRenderableType(QSurfaceFormat::OpenGL);
     format.setProfile(QSurfaceFormat::CoreProfile);
@@ -359,7 +360,8 @@ SsvepGL *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
     format.setVersion(3 ,0); // ANGLE supports ES 3.0, higher versions raise exceptions
     // format.setVersion(4, 5); // HP ProBook
 
-    SsvepGL *ssvepStimulation = new SsvepGL(t_ssvep, t_port);
+    // SsvepGL *ssvepStimulation = new SsvepGL(t_ssvep, t_port);
+    SsvepCircle *ssvepStimulation = new SsvepCircle(t_ssvep, t_port);
     ssvepStimulation->setFormat(format);
 
     if(QGuiApplication::screens().size() == 2)
@@ -375,12 +377,10 @@ SsvepGL *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
     connectStimulation(ssvepStimulation);
 
     return ssvepStimulation;
-
 }
 
 void ConfigPanel::initParadigmJSon(Paradigm *prdg)
 {
-
     m_markerSender = new OVMarkerSender(this);
     if(!m_markerSender->Connect("127.0.0.1", "15361"))
     {

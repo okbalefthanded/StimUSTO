@@ -1,4 +1,3 @@
-//
 #include <QWindow>
 #include <QDebug>
 #include <QTime>
@@ -10,27 +9,24 @@
 #include <QFont>
 #include <array>
 //
-#include "ssvepgl.h"
+#include "ssvepcircle.h"
 #include "ovtk_stimulations.h"
 #include "utils.h"
 #include "glutils.h"
 //
-SsvepGL::SsvepGL(SSVEP *paradigm, int t_port)
+SsvepCircle::SsvepCircle(SSVEP *paradigm, int t_port)
 {
     m_ssvep = paradigm;
     setFrequencies(m_ssvep->frequencies());
     setFeedbackPort(t_port);
-    // m_preTrialWait = m_ssvep->breakDuration();
 
     m_preTrialWait = 3;
-    //    qDebug() << "SSVEP stim duration : " << m_ssvep->stimulationDuration();
-    // set vertices, vertices indeices & colors
+
+    // set vertices, vertices indices & colors
     initElements();
 
     m_preTrialTimer = new QTimer(this);
     m_preTrialTimer->setTimerType(Qt::PreciseTimer);
-    // m_preTrialTimer->setInterval(1000);
-    // m_preTrialTimer->setInterval((m_ssvep->breakDuration()*1000) / 2);
     m_preTrialTimer->setInterval(m_ssvep->breakDuration() / 2);
     m_preTrialTimer->setSingleShot(true);
 
@@ -43,15 +39,10 @@ SsvepGL::SsvepGL(SSVEP *paradigm, int t_port)
     //
     initLogger();
     //
-
-    //
     m_state = trial_state::PRE_TRIAL;
-
-    // this->setFlag(Qt::Desktop);
-
 }
 
-void SsvepGL::initializeGL()
+void SsvepCircle::initializeGL()
 {
     // Initialize OpenGL Backend
     initializeOpenGLFunctions();
@@ -62,19 +53,6 @@ void SsvepGL::initializeGL()
     glEnable(GL_PROGRAM_POINT_SIZE); //
     glEnable(GL_FRAMEBUFFER_SRGB);
 
-    /*
-    if(QGuiApplication::screens().size() == 2)
-    {
-        this->setScreen(QGuiApplication::screens().last());
-        this->showFullScreen();
-    }
-    */
-
-    // set vertices, vertices indeices & colors
-    // initElements();
-
-    // static const int samplesLength = REFRESH_RATE * (stimulationDuration);
-
     m_flicker.resize(m_frequencies.size());
     double phase = 0.0;
     for (int i=0; i < m_frequencies.size(); ++i)
@@ -83,7 +61,7 @@ void SsvepGL::initializeGL()
         phase = config::PHASE * (i%2);
         m_flicker[i] = utils::gen_flick(m_frequencies[i], config::REFRESH_RATE, m_ssvep->stimulationDuration(), m_ssvep->stimulationMode(), phase);
     }
-    //qDebug() << "flicker size: "<< m_flicker[0].size();
+
     // Application-specific initialization
     {
         // Create shaders (Do not release until VAO is created)
@@ -122,10 +100,11 @@ void SsvepGL::initializeGL()
         m_colorBuffer.release();
         m_programShader->release();
     }
+
     initExternalSocket();
 }
 
-void SsvepGL::resizeGL(int w, int h)
+void SsvepCircle::resizeGL(int w, int h)
 {
     //TODO
     //    (void)w;
@@ -133,18 +112,18 @@ void SsvepGL::resizeGL(int w, int h)
     // initElements();
 }
 
-void SsvepGL::paintGL()
+void SsvepCircle::paintGL()
 {
     // clear
     glClear(GL_COLOR_BUFFER_BIT);
-    int nVertices = glUtils::VERTICES_PER_TRIANGLE * (m_ssvep->nrElements()) * glUtils::TRIANGLES_PER_SQUARE;
+
     int centerVertices = m_ssvep->nrElements();
+
     // Render using our shader
     m_programShader->bind();
     {
         m_vaObject.bind();
-        // nr_triangles = 3 * Nr_elments * 2 (3 : vertices per triangle), (2: 2 triangles per rectangle)
-        glDrawElements(GL_TRIANGLES, nVertices, GL_UNSIGNED_INT, m_vindices.data());
+        glDrawElements(GL_TRIANGLES, m_vindices.count(), GL_UNSIGNED_INT, m_vindices.data());
         // draw rectangles center points in red
         glDrawElements(GL_POINTS, centerVertices, GL_UNSIGNED_INT, m_centerindices.data());
         m_vaObject.release();
@@ -155,13 +134,10 @@ void SsvepGL::paintGL()
     {
         renderText();
     }
-
 }
 
-void SsvepGL::startTrial()
+void SsvepCircle::startTrial()
 {
-    // qDebug()<< "[TRIAL START]" << Q_FUNC_INFO;
-
     if (m_state == trial_state::PRE_TRIAL)
     {
         preTrial();
@@ -176,10 +152,8 @@ void SsvepGL::startTrial()
     }
 }
 
-void SsvepGL::preTrial()
+void SsvepCircle::preTrial()
 {
-
-    //    if(m_trials == 0 && m_preTrialCount == 0)
     if(m_trials == 0)
     {
         sendMarker(OVTK_StimulationId_ExperimentStart);
@@ -188,8 +162,6 @@ void SsvepGL::preTrial()
     if(m_firstRun)
     {
         m_flickeringSequence = new RandomFlashSequence(m_ssvep->nrElements(), m_ssvep->nrSequences() / m_ssvep->nrElements());
-        // qDebug()<< "sequence "<<m_flickeringSequence->sequence;
-
         m_firstRun = false;
     }
 
@@ -200,10 +172,8 @@ void SsvepGL::preTrial()
         if (m_ssvep->experimentMode() == operation_mode::CALIBRATION ||
                 m_ssvep->experimentMode() == operation_mode::COPY_MODE)
         {
-            // qDebug() << "Higlight target SSVEP ";
-            highlightTarget();
+         //   highlightTarget();
         }
-
     }
 
     else if(m_preTrialCount == 2)
@@ -214,8 +184,7 @@ void SsvepGL::preTrial()
             // refresh only for idle
             if (m_ssvep->controlMode() == control_mode::ASYNC && m_flickeringSequence->sequence[m_currentFlicker] == 1)
             {
-            // qDebug() << "Refresh target SSVEP ";
-            refreshTarget();
+              //  refreshTarget();
             }
         }
     }
@@ -225,44 +194,38 @@ void SsvepGL::preTrial()
 
     if (m_preTrialCount > m_preTrialWait)
     {
-        // refreshTarget();
         scheduleRedraw();
         m_preTrialTimer->stop();
-        // m_preTrialCount = 0;
         m_preTrialCount = 1;
         m_state = trial_state::STIMULUS;
     }
 }
 
-void SsvepGL::postTrial()
+void SsvepCircle::postTrial()
 {
-
     disconnect(this, SIGNAL(frameSwapped()), this, SLOT(update()));
     initElements();
 
     m_index = 0;
-    // m_lostFrames = 0;
     m_state = trial_state::PRE_TRIAL;
 
     // feedback
     if(m_ssvep->experimentMode() == operation_mode::COPY_MODE || m_ssvep->experimentMode() == operation_mode::FREE_MODE)
     {
 
-        // utils::wait(100); // wait for OV processing
         feedback();  // wait for feedback
         if (m_presentFeedback)
         {
+            // feedback for 0.5 sec & refresh
             // utils::wait(300);
             utils::wait(500);
-            // feedback for 1 sec & refresh
-            // utils::wait(1000);
-            refresh(m_sessionFeedback[m_currentFlicker].digitValue()-1);
+            // refresh(m_sessionFeedback[m_currentFlicker].digitValue()-1);
         }
     }
 
     else // calibration mode
     {
-        refreshTarget();
+        // )refreshTarget();
     }
 
     externalCommunication();
@@ -271,7 +234,7 @@ void SsvepGL::postTrial()
 
 }
 
-void SsvepGL::postTrialEnd()
+void SsvepCircle::postTrialEnd()
 {
     ++m_currentFlicker;
     ++m_trials;
@@ -297,76 +260,53 @@ void SsvepGL::postTrialEnd()
         qDebug()<< "Experiment End, closing SSVEP stimulation";
         sendMarker(OVTK_StimulationId_ExperimentStop);
         utils::wait(2000);
-        // emit(slotTerminated());
-        // this->close();
     }
 }
 
-
-void SsvepGL::Flickering()
+void SsvepCircle::Flickering()
 {
-
     if(m_index == 0)
     {
-        // qDebug()<< Q_FUNC_INFO << "connecting frameswapped to update" << "index " << index;
         connect(this, SIGNAL(frameSwapped()), this, SLOT(update()));
-        // qDebug()<< Q_FUNC_INFO << "[update ]Index (first): "<< m_index << "current time: " << QTime::currentTime().msec();
     }
-
-    //    sendMarker(config::OVTK_StimulationLabel_Base + m_flickeringSequence->sequence[m_currentFlicker]);
-    //    sendMarker(OVTK_StimulationId_VisualSteadyStateStimulationStart);
-    //        qDebug()<< Q_FUNC_INFO << "markers sent" << "current time: " << QTime::currentTime().msec();
-    // qDebug()<< Q_FUNC_INFO << "Stim : " << "current time: " << QTime::currentTime().msec();
-
 
     while(m_index <= m_flicker[0].size())
     {
         QCoreApplication::processEvents(QEventLoop::AllEvents);
     }
 
-    // utils::wait(17);
     sendMarker(OVTK_StimulationId_TrialStop);
-    //  qDebug()<< Q_FUNC_INFO << "[update ]Index (last) : "<< m_index << "current time: " << QTime::currentTime().msec();
-
-    //++m_currentFlicker;
-
     m_state = trial_state::POST_TRIAL;
 }
 
-void SsvepGL::feedback()
+void SsvepCircle::feedback()
 {
     // receiveFeedback
-    // m_feedbackSocket->waitForReadyRead(500);
-    // qDebug()<< QTime::currentTime();
-    // m_feedbackSocket->waitForReadyRead(100);
-    // m_feedbackSocket->waitForReadyRead(90);
     m_feedbackSocket->waitForReadyRead();
 
     if(m_presentFeedback)
     {
-        // m_feedbackSocket->waitForReadyRead(100);
-
         if(m_ssvep->experimentMode() == operation_mode::COPY_MODE)
         {
 
             if(m_sessionFeedback[m_currentFlicker].digitValue() == m_flickeringSequence->sequence[m_currentFlicker])
             {
-                highlightFeedback(glColors::green, m_flickeringSequence->sequence[m_currentFlicker]-1);
+               //  highlightFeedback(glColors::green, m_flickeringSequence->sequence[m_currentFlicker]-1);
                 ++m_correct;
             }
             else
             {
-                highlightFeedback(glColors::blue, m_sessionFeedback[m_currentFlicker].digitValue()-1);
+//                highlightFeedback(glColors::blue, m_sessionFeedback[m_currentFlicker].digitValue()-1);
             }
         }
         else if(m_ssvep->experimentMode() == operation_mode::FREE_MODE)
         {
-            highlightFeedback(glColors::red, m_sessionFeedback[m_currentFlicker].digitValue()-1);
+        //     highlightFeedback(glColors::red, m_sessionFeedback[m_currentFlicker].digitValue()-1);
         }
     }
 }
 
-void SsvepGL::receiveFeedback()
+void SsvepCircle::receiveFeedback()
 {
     // wait for OV python script to write in UDP feedback socket
     // wait(500);
@@ -380,110 +320,61 @@ void SsvepGL::receiveFeedback()
     {
         m_feedbackSocket->readDatagram(buffer->data(), buffer->size(), &sender, &senderPort);
     }
+
     log->write(buffer->data());
 
     if (m_flickeringSequence->sequence.length() == 1) // Hybrid stimulation mode
     {
-
         m_sessionFeedback = buffer->data();
     }
     else
     {
         m_sessionFeedback += buffer->data();
     }
-
-    // qDebug() << Q_FUNC_INFO << "SSVEP FEEDBACK "<< m_sessionFeedback;
-
 }
 
-void SsvepGL::initElements()
+void SsvepCircle::initElements()
 {
-
-    double dx = 0.2;
-    double dy = 0.2;
-    int isNullX = 0, isNullY = 0, sx=1;
-
-    if(m_ssvep->nrElements() == 1)
-    {
-        m_vertices.resize(glUtils::POINTS_PER_SQUARE);
-        m_vertices[0] = refPoints::topPoints[0];
-        m_colors.resize(glUtils::POINTS_PER_SQUARE);
-        m_colors[0] = glColors::white;
-        for(int i=1; i<glUtils::POINTS_PER_SQUARE; ++i)
-        {
-            // init points
-            isNullX = i % 2;
-            isNullY = (i+1) % 2;
-            m_vertices[i].setX(m_vertices[i-1].x() + (dx * isNullX *sx));
-            m_vertices[i].setY(m_vertices[i-1].y() - (dy * isNullY));
-            m_vertices[i].setZ(refPoints::topPoints[0].z());
-            sx--;
-            // init colors
-            m_colors[i] = glColors::white;
-        }
-
-    }
-    else
-    {
-        // init vectors
-        int vectorsSize = m_ssvep->nrElements() * glUtils::POINTS_PER_SQUARE;
-        // int vectorsSize = glUtils::VERTICES_PER_TRIANGLE * (m_ssvep->nrElements()) * glUtils::TRIANGLES_PER_SQUARE;
-        vectorsSize += m_ssvep->nrElements();
-        m_vertices.resize(vectorsSize);
-
-        initRects();
-        initColors();
-    }
+    // init vectors
+    int numberOfVertices = glUtils::SIDES_PER_CIRCLE + 2;
+    int vectorsSize = m_ssvep->nrElements() * numberOfVertices;
+    vectorsSize += m_ssvep->nrElements();
+    m_vertices.resize(vectorsSize);
     //
-    initIndices();
+    initCircles(); // vertices
+    initColors();  // vertices' colors
+    initIndices(); // vertices indices
     //
     scheduleRedraw();
 }
 
-void SsvepGL::initRects()
+void SsvepCircle::initCircles()
 {
-    double pixelSize = 250.0; // length of a stimulus vertex in pixels (150x150 square)
-    // double dx = 0.2;
-    // double dy = 0.2;
-    QSize screenSize = utils::getScreenSize();
-    double dx = pixelSize / screenSize.width();
-    double dy = pixelSize / screenSize.height();
-    int isNullX = 0, isNullY = 0, sx=1;
-    int offset;
+    float twicePi = 2.0f * M_PI;
+    float x, y, z, xx, yy;
+    int numberOfVertices = glUtils::SIDES_PER_CIRCLE + 2;
+    int stop = numberOfVertices;
+    int k=0;
 
     m_centers.resize(m_ssvep->nrElements());
-    int k=0; // centers index counter
 
-    if( m_ssvep->controlMode() == control_mode::SYNC)
+    for (int j = 0; j<m_ssvep->nrElements(); ++j)
     {
-        offset = glUtils::POINTS_PER_SQUARE;
-    }
-    else
-    {
-        offset = 0;
-    }
+        // circles center points
+        x = refPoints::centers[j].x();
+        y = refPoints::centers[j].y();
+        z = refPoints::centers[j].z();
+        setVertex(k, x, y, z);
 
-    for(int i=0;i<m_vertices.count() - m_ssvep->nrElements(); i+=glUtils::POINTS_PER_SQUARE)
-    {
-        m_vertices[i] = refPoints::topPoints[(i+offset)/glUtils::POINTS_PER_SQUARE];
-        sx = 1;
-        for(int j=i+1; j<i+glUtils::POINTS_PER_SQUARE; ++j)
+        // circles vertices
+        for ( int i = k+1; i < stop; i++ )
         {
-            isNullX = j % 2;
-            isNullY = (j+1) % 2;
-            m_vertices[j].setX(m_vertices[j-1].x() + (dx * isNullX * sx));
-            m_vertices[j].setY(m_vertices[j-1].y() - (dy * isNullY));
-            m_vertices[j].setZ(refPoints::topPoints[0].z());
-            sx--;
-            // calculate center point
-            if (j==(i+2))
-            {
-                m_centers[k].setX((m_vertices[j].x() + m_vertices[i].x()) / 2);
-                m_centers[k].setY((m_vertices[j].y() + m_vertices[i].y()) / 2);
-                m_centers[k].setZ(refPoints::topPoints[0].z());
-                ++k;
-            }
+            xx = (x + (glUtils::RADIUS * cos(i * twicePi / glUtils::SIDES_PER_CIRCLE)));
+            yy = (y + (glUtils::RADIUS * sin(i * twicePi /glUtils::SIDES_PER_CIRCLE)));
+            setVertex(i, xx, yy, z);
         }
+        k = stop;
+        stop += numberOfVertices;
     }
 
     k = m_vertices.count() - m_ssvep->nrElements();
@@ -491,17 +382,18 @@ void SsvepGL::initRects()
     int i =0;
     for (int ind=k; ind<m_vertices.count();++ind)
     {
-        m_vertices[ind] = m_centers[i];
+        // m_vertices[ind] = m_centers[i];
+        setVertex(ind, refPoints::centers[i].x(), refPoints::centers[i].y(), refPoints::centers[i].z());
         ++i;
     }
 
+    qDebug()<< Q_FUNC_INFO << m_ssvep->nrElements() << m_vertices.count();
 }
 
-void SsvepGL::initColors()
+void SsvepCircle::initColors()
 {
-
-    int vectorsSize = m_ssvep->nrElements() * glUtils::POINTS_PER_SQUARE;
-
+    int numberOfVertices = glUtils::SIDES_PER_CIRCLE + 2;
+    int vectorsSize = (m_ssvep->nrElements() * numberOfVertices);
     vectorsSize += m_ssvep->nrElements(); // for centers
 
     m_colors.resize(vectorsSize);
@@ -523,11 +415,14 @@ void SsvepGL::initColors()
     else
     {
         // init colors
-        m_colors = {glColors::gray, glColors::gray, glColors::gray, glColors::gray};
-        m_colors.resize(vectorsSize);
-        for (int i=glUtils::POINTS_PER_SQUARE; i<m_colors.count(); i++)
+        // center idle stim
+        for (int i=0; i<numberOfVertices; ++i)
         {
-            // m_colors[i] = glColors::white;
+            m_colors[i] = glColors::gray;
+        }
+
+        for (int i=numberOfVertices; i<m_colors.count(); i++)
+        {
             if (i < m_colors.count() - m_ssvep->nrElements())
             {
                 m_colors[i] = glColors::white;
@@ -538,44 +433,48 @@ void SsvepGL::initColors()
             }
         }
     }
-
+    qDebug()<< Q_FUNC_INFO << m_colors.count();
 }
 
-void SsvepGL::initIndices()
+void SsvepCircle::initIndices()
 {
     // init indices
-    m_vindices.resize(m_ssvep->nrElements()*glUtils::INDICES_PER_SQUARE);
+    int circleCount = m_ssvep->nrElements();
+    int numberOfVertices = glUtils::SIDES_PER_CIRCLE + 2;
+
+    m_vindices.resize(3*(numberOfVertices*circleCount-(circleCount*2)));
     m_centerindices.resize(m_ssvep->nrElements());
 
-    int k=0; int val = 0;
-    for(int i=0; i<(m_ssvep->nrElements()*glUtils::INDICES_PER_SQUARE); i+=glUtils::INDICES_PER_SQUARE)
+    int circleIndices = 3*glUtils::SIDES_PER_CIRCLE;
+    int k = 0;
+    for (int i=0; i<m_vindices.count(); i+=3)
     {
-        val = 2*k;
-        m_vindices[i] =  val;
-        m_vindices[i+1] = val + 1;
-        m_vindices[i+2] = val + 2;
-        m_vindices[i+3] = m_vindices[i];
-        m_vindices[i+4] = m_vindices[i+2];
-        m_vindices[i+5] = val + 3;
-        k +=2;
+        if((i%3)==0)
+        {
+            m_vindices[i] = numberOfVertices * (i / circleIndices);
+        }
+
+        if( (i % circleIndices) == 0)
+        {
+            k = m_vindices[i];
+        }
+
+        m_vindices[i+1] = k+1;
+        m_vindices[i+2] = k+2;
+        k++;
     }
 
     int centerStart = m_vertices.count() - m_ssvep->nrElements();
-
     for (int i=0;i<m_centerindices.count();++i)
     {
         m_centerindices[i] = centerStart + i;
     }
-
-    qDebug()<< Q_FUNC_INFO << "Vertices "<< m_vertices.count() << "Indices "<< m_vindices.count();
-    qDebug()<< Q_FUNC_INFO << "Vertices "<< m_vertices << "Indices "<< m_vindices;
-
+    qDebug()<< Q_FUNC_INFO << m_vindices.count() << m_centerindices;
 }
 
-void SsvepGL::externalCommunication()
+void SsvepCircle::externalCommunication()
 {
     // Send and Recieve feedback to/from Robot if external communication is enabled
-    // qDebug()<< Q_FUNC_INFO << m_sessionFeedback;
     std::string cmd = QString(m_sessionFeedback[m_currentFlicker]).toStdString();
 
     if(m_ssvep->externalComm() == external_comm::ENABLED)
@@ -590,7 +489,6 @@ void SsvepGL::externalCommunication()
         {
             std::string str = cmd;
             const char* p = str.c_str();
-            // qDebug()<< "command to send to Robot: " << QString::fromStdString(cmd) << m_sessionFeedback[m_currentFlicker];
             QByteArray byteovStimulation;
             QDataStream streamovs(&byteovStimulation, QIODevice::WriteOnly);
             streamovs.setByteOrder(QDataStream::LittleEndian);
@@ -615,44 +513,30 @@ void SsvepGL::externalCommunication()
             qDebug()<< "Correct State";
             m_state = trial_state::PRE_TRIAL;
         }
-
     }
 }
 
-void SsvepGL::highlightTarget()
+void SsvepCircle::highlightTarget()
 {
-
     if(m_ssvep->nrElements() == 1)
     {
-        //        m_colors = {glColors::green, glColors::green, glColors::green, glColors::green};
-        //        m_colors = {glColors::red, glColors::red, glColors::red, glColors::red};
         m_colors = {glColors::yellow, glColors::yellow, glColors::yellow, glColors::yellow};
     }
     else
     {
         int tmp = m_flickeringSequence->sequence[m_currentFlicker]-1;
         int squareIndex = tmp + (glUtils::VERTICES_PER_TRIANGLE*tmp);
-        //        m_colors[squareIndex] = glColors::green;
-        //        m_colors[squareIndex + 1] = glColors::green;
-        //        m_colors[squareIndex + 2] = glColors::green;
-        //        m_colors[squareIndex + 3] = glColors::green;
-        //        m_colors[squareIndex] = glColors::red;
-        //        m_colors[squareIndex + 1] = glColors::red;
-        //        m_colors[squareIndex + 2] = glColors::red;
-        //        m_colors[squareIndex + 3] = glColors::red;
+
         m_colors[squareIndex] = glColors::yellow;
         m_colors[squareIndex + 1] = glColors::yellow;
         m_colors[squareIndex + 2] = glColors::yellow;
         m_colors[squareIndex + 3] = glColors::yellow;
     }
-
     scheduleRedraw();
-
 }
 
-void SsvepGL::refreshTarget()
+void SsvepCircle::refreshTarget()
 {
-
     if(m_ssvep->nrElements() == 1)
     {
         m_colors = {glColors::white, glColors::white, glColors::white, glColors::white};
@@ -661,11 +545,8 @@ void SsvepGL::refreshTarget()
     {
         if( m_ssvep->controlMode() == control_mode::SYNC)
         {
-
             int tmp = m_flickeringSequence->sequence[m_currentFlicker] - 1;
             int squareIndex = tmp+(glUtils::VERTICES_PER_TRIANGLE*tmp);
-            // qDebug()<< Q_FUNC_INFO << "squareIdx " << tmp;
-            //            int squareIndex = tmp;
             m_colors[squareIndex] = glColors::white;
             m_colors[squareIndex + 1] = glColors::white;
             m_colors[squareIndex + 2] = glColors::white;
@@ -673,7 +554,6 @@ void SsvepGL::refreshTarget()
         }
         else
         {
-
             if(m_flickeringSequence->sequence[m_currentFlicker] == 1)
             {
                 // center rectangle for idle state
@@ -691,15 +571,13 @@ void SsvepGL::refreshTarget()
                 m_colors[squareIndex + 2] = glColors::white;
                 m_colors[squareIndex + 3] = glColors::white;
             }
-
         }
     }
     scheduleRedraw();
 }
 
-void SsvepGL::highlightFeedback(QVector3D feedbackColor, int feebdackIndex)
+void SsvepCircle::highlightFeedback(QVector3D feedbackColor, int feebdackIndex)
 {
-
     int squareIndex = feebdackIndex + (glUtils::VERTICES_PER_TRIANGLE*feebdackIndex);
     m_colors[squareIndex] = feedbackColor;
     m_colors[squareIndex + 1] = feedbackColor;
@@ -709,9 +587,8 @@ void SsvepGL::highlightFeedback(QVector3D feedbackColor, int feebdackIndex)
     scheduleRedraw();
 }
 
-void SsvepGL::refresh(int feedbackIndex)
+void SsvepCircle::refresh(int feedbackIndex)
 {
-
     int squareIndex = feedbackIndex + (glUtils::VERTICES_PER_TRIANGLE*feedbackIndex);
 
     if(feedbackIndex == 0 && m_ssvep->controlMode() == control_mode::ASYNC)
@@ -721,8 +598,8 @@ void SsvepGL::refresh(int feedbackIndex)
         m_colors[squareIndex + 2] = glColors::gray;
         m_colors[squareIndex + 3] = glColors::gray;
     }
-    else{
-
+    else
+    {
         m_colors[squareIndex] = glColors::white;
         m_colors[squareIndex + 1] = glColors::white;
         m_colors[squareIndex + 2] = glColors::white;
@@ -730,12 +607,10 @@ void SsvepGL::refresh(int feedbackIndex)
     }
 
     scheduleRedraw();
-
 }
 
-void SsvepGL::initLogger()
+void SsvepCircle::initLogger()
 {
-
     QDir logsDir(QCoreApplication::applicationDirPath() + "/logs");
     if(!logsDir.exists())
     {
@@ -755,12 +630,8 @@ void SsvepGL::initLogger()
     log = new Logger(this, fileName);
 }
 
-void SsvepGL::scheduleRedraw()
+void SsvepCircle::scheduleRedraw()
 {
-
-    // qDebug()<< "ScheduleRedraw [update ] Index : "<< m_index << "current time: " << QTime::currentTime().msec();
-    // QOpenGLWindow::update();
-
     m_vaObject.bind();
     m_colorBuffer.bind();
     m_colorBuffer.write(0, m_colors.data(), m_colors.count() * sizeof(QVector3D)); // number of vertices to avoid * sizeof QVector3D
@@ -770,20 +641,13 @@ void SsvepGL::scheduleRedraw()
     QOpenGLWindow::update();
 }
 
-void SsvepGL::renderText()
+void SsvepCircle::renderText()
 {
     int screenWidth, screenHeight;
     int x, y;
     QPainter painter(this);
 
-    /*
-      painter.beginNativePainting();
-      glClear(GL_COLOR_BUFFER_BIT);
-      painter.endNativePainting();
-      */
-
     painter.setPen(Qt::red);
-    // painter.setPen(Qt::gray);
 
     painter.setFont(QFont("Arial", 20, 20));
 
@@ -799,12 +663,11 @@ void SsvepGL::renderText()
     std::array<int, 5> k = {1,2,4,3,0};
     if (m_ssvep->controlMode() == control_mode::ASYNC)
     {
-         k = {1,2,3,4,5};
+        k = {1,2,3,4,5};
     }
 
     for (int i=0; i<m_centers.length(); i++)
     {
-
         // leftPixels = leftPercent * screenWidth /2;
         // topPixels = topPercent * screenHeight /2;
         x = int(m_centers[i].x() * (screenWidth / 2));
@@ -813,47 +676,48 @@ void SsvepGL::renderText()
         y = int(m_centers[i].y() * (screenHeight/ 2) + 80);
         // painter.drawText(x, y, width(), height(), Qt::AlignCenter, QString::number(i+1));
         painter.drawText(x, -y, width(), height(), Qt::AlignCenter, QString::number(k[i]));
-
     }
-
     painter.end();
 }
 
-bool SsvepGL::presentFeedback() const
+void SsvepCircle::setVertex(int t_index, float x, float y, float z)
+{
+    m_vertices[t_index].setX(x);
+    m_vertices[t_index].setY(y);
+    m_vertices[t_index].setZ(z);
+}
+
+bool SsvepCircle::presentFeedback() const
 {
     return m_presentFeedback;
 }
 
-void SsvepGL::setPresentFeedback(bool presentFeedback)
+void SsvepCircle::setPresentFeedback(bool presentFeedback)
 {
     m_presentFeedback = presentFeedback;
 }
 
 
-SSVEP *SsvepGL::ssvep() const
+SSVEP *SsvepCircle::ssvep() const
 {
     return m_ssvep;
 }
 
-void SsvepGL::setSsvep(SSVEP *ssvep)
+void SsvepCircle::setSsvep(SSVEP *ssvep)
 {
     m_ssvep = ssvep;
 }
 
 
-bool SsvepGL::isCorrect() const
+bool SsvepCircle::isCorrect() const
 {
     return m_sessionFeedback[m_sessionFeedback.length()-1].digitValue() == m_flickeringSequence->sequence[m_currentFlicker];
 }
 
-void SsvepGL::update()
+void SsvepCircle::update()
 {
-    //    qDebug()<< "[update ] Index : "<< m_lostFrames << " " << m_index << "current time: " << QTime::currentTime().msec();
-
     if(m_index == 0)
     {
-        // qDebug()<< "[update ] first correct: " << QTime::currentTime();
-
         sendMarker(config::OVTK_StimulationLabel_Base + m_flickeringSequence->sequence[m_currentFlicker]);
         sendMarker(OVTK_StimulationId_VisualSteadyStateStimulationStart);
     }
@@ -872,69 +736,58 @@ void SsvepGL::update()
         }
         else
         {
-            k = glUtils::POINTS_PER_SQUARE;
+            k = glUtils::SIDES_PER_CIRCLE + 2;
         }
     }
     for(int i = 0; i<m_flicker.size() ;++i)
     {
-
+        for(k; k< (m_colors.count()- m_ssvep->nrElements()); k+=glUtils::SIDES_PER_CIRCLE + 2)
+        {
+           // m_colors[k]   = QVector3D(m_flicker[i][m_index], m_flicker[i][m_index], m_flicker[i][m_index]);
+        }
+        /*
         m_colors[k]   = QVector3D(m_flicker[i][m_index], m_flicker[i][m_index], m_flicker[i][m_index]);
         m_colors[k+1] = QVector3D(m_flicker[i][m_index], m_flicker[i][m_index], m_flicker[i][m_index]);
         m_colors[k+2] = QVector3D(m_flicker[i][m_index], m_flicker[i][m_index], m_flicker[i][m_index]);
         m_colors[k+3] = QVector3D(m_flicker[i][m_index], m_flicker[i][m_index], m_flicker[i][m_index]);
-
-        /*
-        m_colors[k]   = QVector3D(1.0f, m_flicker[i][m_index], m_flicker[i][m_index]);
-        m_colors[k+1] = QVector3D(1.0f, m_flicker[i][m_index], m_flicker[i][m_index]);
-        m_colors[k+2] = QVector3D(1.0f, m_flicker[i][m_index], m_flicker[i][m_index]);
-        m_colors[k+3] = QVector3D(1.0f, m_flicker[i][m_index], m_flicker[i][m_index]);
-        */
         k += glUtils::POINTS_PER_SQUARE;
+        */
     }
 
     ++m_index;
-
     scheduleRedraw();
 }
 
 // Setters
 
-void SsvepGL::setFrequencies(QString freqs)
+void SsvepCircle::setFrequencies(QString freqs)
 {
-
     QStringList freqsList = freqs.split(',');
 
     if (m_ssvep->nrElements() == 1)
     {
-
-        //        frequencies[0] = freqsList[0].toDouble();
         m_frequencies.append(freqsList[0].toDouble());
     }
     else
     {
         foreach(QString str, freqsList)
         {
-
             m_frequencies.append(str.toDouble());
         }
     }
 }
 
-void SsvepGL::setFeedbackPort(int t_port)
+void SsvepCircle::setFeedbackPort(int t_port)
 {
     m_feedbackPort = t_port;
 }
 
-void SsvepGL::initExternalSocket()
+void SsvepCircle::initExternalSocket()
 {
-    // qDebug()<< "Lets see external comm" <<m_ssvep->externalComm();
     if(m_ssvep->externalComm() == external_comm::ENABLED)
     {
         qDebug()<< "External Comm is enabled;";
         m_robotSocket = new QTcpSocket();
-        //    m_robotSocket->connectToHost(QHostAddress("10.3.66.5"), m_robotPort);
-        // 10.3.66.5 / 10.6.65.128 /10.3.64.92
-        // m_robotSocket->connectToHost(QHostAddress("10.3.64.92"), m_robotPort);
         m_robotSocket->connectToHost(QHostAddress(m_ssvep->externalAddress()), m_robotPort);
 
         if(m_robotSocket->waitForConnected())
@@ -948,8 +801,7 @@ void SsvepGL::initExternalSocket()
     }
 }
 
-
-SsvepGL::~SsvepGL()
+SsvepCircle::~SsvepCircle()
 {
     makeCurrent();
 }

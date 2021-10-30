@@ -12,6 +12,7 @@
 #include "paradigm.h"
 #include "erp.h"
 #include "ssvep.h"
+#include "ssvepcircle.h"
 //
 namespace Ui {
 class ConfigPanel;
@@ -56,7 +57,8 @@ private:
     ERP *initParadigmERPGui();
     SSVEP *initParadigmSSVEPGui();
     Speller *createSpeller(int t_spellerType);
-    SsvepGL *createSSVEP(SSVEP *t_ssvep, int t_port);
+    // SsvepGL *createSSVEP(SSVEP *t_ssvep, int t_port);
+    SsvepCircle *createSSVEP(SSVEP *t_ssvep, int t_port);
     void connectStimulation(QObject *t_obj);
     void connectParadigm(QObject *pr, QTimer *timer);
     Ui::ConfigPanel *ui;

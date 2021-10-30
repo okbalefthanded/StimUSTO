@@ -463,10 +463,9 @@ void HybridStimulation::initAnimations()
     }
 
     m_ERPanimation = new QPropertyAnimation(m_ERPspeller, "geometry");
-
     m_ERPanimation->setDuration(500);
     // m_ERPanimation->setStartValue(QRect(1366, 0, 1366, 768)); //
-    // m_ERPanimation->setEndValue(QRect(0, 0, 1366, 768)); // (
+    // m_ERPanimation->setEndValue(QRect(0, 0, 1366, 768)); //
     m_ERPanimation->setStartValue(erpStart); //
     m_ERPanimation->setEndValue(erpEnd); //
     connect(m_ERPanimation, SIGNAL(finished()), m_ERPspeller, SLOT(startTrial()));
@@ -475,7 +474,7 @@ void HybridStimulation::initAnimations()
     m_SSVEPanimation->setDuration(500);
     // m_SSVEPanimation->setStartValue(2800);//1366
     // m_SSVEPanimation->setEndValue(1440); // 0
-    m_SSVEPanimation->setStartValue(ssvepStart);//1366
+    m_SSVEPanimation->setStartValue(ssvepStart); //1366
     m_SSVEPanimation->setEndValue(ssvepEnd); // 0
     connect(m_SSVEPanimation, SIGNAL(finished()), m_ssvepStimulation, SLOT(startTrial()));
 }
