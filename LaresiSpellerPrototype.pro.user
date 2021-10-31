@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.10.0, 2021-10-30T16:59:15. -->
+<!-- Written by QtCreator 4.10.0, 2021-10-30T23:20:55. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -71,7 +71,7 @@
    </valuelist>
    <value type="bool" key="ClangCodeModel.UseGlobalConfig">false</value>
    <value type="bool" key="ClangCodeModel.UseGlobalWarningConfig">true</value>
-   <value type="QString" key="ClangCodeModel.WarningConfigId">Builtin.Questionable</value>
+   <value type="QString" key="ClangCodeModel.WarningConfigId">{3442b998-2ed3-41b3-b7c6-3e99c641acb9}</value>
    <valuelist type="QVariantList" key="ClangStaticAnalyzer.SuppressedDiagnostics"/>
    <valuemap type="QVariantMap" key="ClangTools">
     <value type="bool" key="ClangTools.AnalyzeOpenFiles">false</value>

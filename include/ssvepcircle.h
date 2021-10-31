@@ -84,12 +84,13 @@ private:
     //    bool isTarget();
     void highlightTarget();
     void refreshTarget();
-    void highlightFeedback(QVector3D feedbackColor, int feebdackIndex);
+    void highlightFeedback(QVector3D feedbackColor, int feedbackIndex);
     void refresh(int feedbackIndex);
     void initLogger();
     void scheduleRedraw();
     void renderText();
     void setVertex(int t_index, float x, float y, float z);
+
 
     bool m_firstRun = true;
     bool m_stateFinished = true;
@@ -127,6 +128,7 @@ private:
     QOpenGLShaderProgram *m_programShader;
 
     int m_index;
+    int m_vertexPerCircle;
 
     // QVector <QVector <int>> m_flicker;
     QVector <QVector <double> > m_flicker;

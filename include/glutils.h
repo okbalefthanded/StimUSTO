@@ -11,7 +11,7 @@ static const qint8 POINTS_PER_SQUARE     = 4;
 static const qint8 INDICES_PER_SQUARE    = 6;
 static const qint8 TRIANGLES_PER_SQUARE  = 2;
 static const qint16 SIDES_PER_CIRCLE = 60; //
-static const double RADIUS = 0.15;
+static const double RADIUS = 0.16;
 static const int TUPLESIZE    = 3;
 static const int MAX_ELEMENTS = 4;
 
@@ -73,9 +73,9 @@ static const QVector<QVector3D> topPoints =
 // centers for circles stimulations
 static const QVector<QVector3D> centers =
 {
-    QVector3D(0.0f, 0.0f, 1.0f), QVector3D(-0.5f, 0.0f, 1.0f),
-    QVector3D(0.5f, 0.0f, 1.0f), QVector3D(0.0f, 0.50f, 1.0f),
-    QVector3D(0.0f, -0.50f, 1.0f)
+    QVector3D(0.0f, 0.0f, 1.0f), QVector3D(-0.6f, 0.0f, 1.0f),
+    QVector3D(0.6f, 0.0f, 1.0f), QVector3D(0.0f, 0.60f, 1.0f),
+    QVector3D(0.0f, -0.60f, 1.0f)
 };
 }
 

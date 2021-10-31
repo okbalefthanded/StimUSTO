@@ -172,7 +172,7 @@ void SsvepCircle::preTrial()
         if (m_ssvep->experimentMode() == operation_mode::CALIBRATION ||
                 m_ssvep->experimentMode() == operation_mode::COPY_MODE)
         {
-         //   highlightTarget();
+            highlightTarget();
         }
     }
 
@@ -184,7 +184,7 @@ void SsvepCircle::preTrial()
             // refresh only for idle
             if (m_ssvep->controlMode() == control_mode::ASYNC && m_flickeringSequence->sequence[m_currentFlicker] == 1)
             {
-              //  refreshTarget();
+                refreshTarget();
             }
         }
     }
@@ -219,19 +219,18 @@ void SsvepCircle::postTrial()
             // feedback for 0.5 sec & refresh
             // utils::wait(300);
             utils::wait(500);
-            // refresh(m_sessionFeedback[m_currentFlicker].digitValue()-1);
+            refresh(m_sessionFeedback[m_currentFlicker].digitValue()-1);
         }
     }
 
     else // calibration mode
     {
-        // )refreshTarget();
+        refreshTarget();
     }
 
     externalCommunication();
 
     postTrialEnd();
-
 }
 
 void SsvepCircle::postTrialEnd()
@@ -291,17 +290,17 @@ void SsvepCircle::feedback()
 
             if(m_sessionFeedback[m_currentFlicker].digitValue() == m_flickeringSequence->sequence[m_currentFlicker])
             {
-               //  highlightFeedback(glColors::green, m_flickeringSequence->sequence[m_currentFlicker]-1);
+                highlightFeedback(glColors::green, m_flickeringSequence->sequence[m_currentFlicker]-1);
                 ++m_correct;
             }
             else
             {
-//                highlightFeedback(glColors::blue, m_sessionFeedback[m_currentFlicker].digitValue()-1);
+                highlightFeedback(glColors::blue, m_sessionFeedback[m_currentFlicker].digitValue()-1);
             }
         }
         else if(m_ssvep->experimentMode() == operation_mode::FREE_MODE)
         {
-        //     highlightFeedback(glColors::red, m_sessionFeedback[m_currentFlicker].digitValue()-1);
+            highlightFeedback(glColors::red, m_sessionFeedback[m_currentFlicker].digitValue()-1);
         }
     }
 }
@@ -336,10 +335,10 @@ void SsvepCircle::receiveFeedback()
 void SsvepCircle::initElements()
 {
     // init vectors
-    int numberOfVertices = glUtils::SIDES_PER_CIRCLE + 2;
-    int vectorsSize = m_ssvep->nrElements() * numberOfVertices;
-    vectorsSize += m_ssvep->nrElements();
-    m_vertices.resize(vectorsSize);
+    // int m_vertexPerCircle = glUtils::SIDES_PER_CIRCLE + 2;
+    m_vertexPerCircle = glUtils::SIDES_PER_CIRCLE + 2;
+    int vectorsSize = (m_ssvep->nrElements() * m_vertexPerCircle) + m_ssvep->nrElements();
+     m_vertices.resize(vectorsSize);
     //
     initCircles(); // vertices
     initColors();  // vertices' colors
@@ -351,14 +350,27 @@ void SsvepCircle::initElements()
 void SsvepCircle::initCircles()
 {
     float twicePi = 2.0f * M_PI;
-    float x, y, z, xx, yy;
-    int numberOfVertices = glUtils::SIDES_PER_CIRCLE + 2;
-    int stop = numberOfVertices;
+    int start = 0;
+    int stop = m_vertexPerCircle;
     int k=0;
+    int elements = m_ssvep->nrElements();
+    float x, y, z, xx, yy;
+
+    if(m_ssvep->controlMode() == control_mode::SYNC)
+    {
+        start = 1;
+
+        // k = m_vertexPerCircle;
+       //  stop = m_vertexPerCircle*2;
+    }
+    else
+    {
+        --elements;
+    }
 
     m_centers.resize(m_ssvep->nrElements());
 
-    for (int j = 0; j<m_ssvep->nrElements(); ++j)
+    for (int j = start; j<=elements; ++j)
     {
         // circles center points
         x = refPoints::centers[j].x();
@@ -374,27 +386,25 @@ void SsvepCircle::initCircles()
             setVertex(i, xx, yy, z);
         }
         k = stop;
-        stop += numberOfVertices;
+        stop += m_vertexPerCircle;
     }
 
     k = m_vertices.count() - m_ssvep->nrElements();
 
-    int i =0;
+    // center points vertices
+    int i=start;
     for (int ind=k; ind<m_vertices.count();++ind)
     {
-        // m_vertices[ind] = m_centers[i];
         setVertex(ind, refPoints::centers[i].x(), refPoints::centers[i].y(), refPoints::centers[i].z());
         ++i;
     }
 
-    qDebug()<< Q_FUNC_INFO << m_ssvep->nrElements() << m_vertices.count();
+    // qDebug()<< Q_FUNC_INFO << m_ssvep->nrElements() << m_vertices.count();
 }
 
 void SsvepCircle::initColors()
 {
-    int numberOfVertices = glUtils::SIDES_PER_CIRCLE + 2;
-    int vectorsSize = (m_ssvep->nrElements() * numberOfVertices);
-    vectorsSize += m_ssvep->nrElements(); // for centers
+    int vectorsSize = (m_ssvep->nrElements() * m_vertexPerCircle) + m_ssvep->nrElements();
 
     m_colors.resize(vectorsSize);
 
@@ -416,12 +426,12 @@ void SsvepCircle::initColors()
     {
         // init colors
         // center idle stim
-        for (int i=0; i<numberOfVertices; ++i)
+        for (int i=0; i<m_vertexPerCircle; ++i)
         {
             m_colors[i] = glColors::gray;
         }
 
-        for (int i=numberOfVertices; i<m_colors.count(); i++)
+        for (int i=m_vertexPerCircle; i<m_colors.count(); i++)
         {
             if (i < m_colors.count() - m_ssvep->nrElements())
             {
@@ -433,25 +443,25 @@ void SsvepCircle::initColors()
             }
         }
     }
-    qDebug()<< Q_FUNC_INFO << m_colors.count();
+ //   qDebug()<< Q_FUNC_INFO << m_colors.count(); // << m_colors;
 }
 
 void SsvepCircle::initIndices()
 {
     // init indices
     int circleCount = m_ssvep->nrElements();
-    int numberOfVertices = glUtils::SIDES_PER_CIRCLE + 2;
 
-    m_vindices.resize(3*(numberOfVertices*circleCount-(circleCount*2)));
+    m_vindices.resize(3*(m_vertexPerCircle*circleCount-(circleCount*2)));
     m_centerindices.resize(m_ssvep->nrElements());
 
     int circleIndices = 3*glUtils::SIDES_PER_CIRCLE;
     int k = 0;
+
     for (int i=0; i<m_vindices.count(); i+=3)
     {
         if((i%3)==0)
         {
-            m_vindices[i] = numberOfVertices * (i / circleIndices);
+            m_vindices[i] = m_vertexPerCircle * (i / circleIndices);
         }
 
         if( (i % circleIndices) == 0)
@@ -465,11 +475,13 @@ void SsvepCircle::initIndices()
     }
 
     int centerStart = m_vertices.count() - m_ssvep->nrElements();
-    for (int i=0;i<m_centerindices.count();++i)
+    for (int i=0; i<m_centerindices.count(); ++i)
     {
         m_centerindices[i] = centerStart + i;
     }
-    qDebug()<< Q_FUNC_INFO << m_vindices.count() << m_centerindices;
+
+   //  qDebug()<< Q_FUNC_INFO << m_vindices.count() << m_centerindices;
+   //  qDebug()<< Q_FUNC_INFO << m_vindices.count() << m_vindices;
 }
 
 void SsvepCircle::externalCommunication()
@@ -518,20 +530,27 @@ void SsvepCircle::externalCommunication()
 
 void SsvepCircle::highlightTarget()
 {
+    // int m_vertexPerCircle = glUtils::SIDES_PER_CIRCLE + 2;
+
     if(m_ssvep->nrElements() == 1)
     {
-        m_colors = {glColors::yellow, glColors::yellow, glColors::yellow, glColors::yellow};
+        for (int i=0; i<m_vertexPerCircle; ++i)
+        {
+            m_colors[i] = glColors::yellow;
+        }
     }
     else
     {
         int tmp = m_flickeringSequence->sequence[m_currentFlicker]-1;
-        int squareIndex = tmp + (glUtils::VERTICES_PER_TRIANGLE*tmp);
+        int circleIndex = m_vertexPerCircle*tmp;
+        for(int i=circleIndex;i<circleIndex+m_vertexPerCircle; ++i)
+        {
+            m_colors[i] = glColors::yellow;
+        }
 
-        m_colors[squareIndex] = glColors::yellow;
-        m_colors[squareIndex + 1] = glColors::yellow;
-        m_colors[squareIndex + 2] = glColors::yellow;
-        m_colors[squareIndex + 3] = glColors::yellow;
+        // qDebug()<< Q_FUNC_INFO << tmp << circleIndex;
     }
+
     scheduleRedraw();
 }
 
@@ -539,71 +558,72 @@ void SsvepCircle::refreshTarget()
 {
     if(m_ssvep->nrElements() == 1)
     {
-        m_colors = {glColors::white, glColors::white, glColors::white, glColors::white};
+        for (int i=0; i<m_vertexPerCircle; ++i)
+        {
+            m_colors[i] = glColors::white;
+        }
     }
     else
     {
+        int tmp = m_flickeringSequence->sequence[m_currentFlicker]-1;
+        int circleIndex = m_vertexPerCircle*tmp;
+
         if( m_ssvep->controlMode() == control_mode::SYNC)
         {
-            int tmp = m_flickeringSequence->sequence[m_currentFlicker] - 1;
-            int squareIndex = tmp+(glUtils::VERTICES_PER_TRIANGLE*tmp);
-            m_colors[squareIndex] = glColors::white;
-            m_colors[squareIndex + 1] = glColors::white;
-            m_colors[squareIndex + 2] = glColors::white;
-            m_colors[squareIndex + 3] = glColors::white;
+            for(int i=circleIndex;i<circleIndex+m_vertexPerCircle; ++i)
+            {
+                m_colors[i] = glColors::white;
+            }
         }
         else
         {
             if(m_flickeringSequence->sequence[m_currentFlicker] == 1)
             {
-                // center rectangle for idle state
-                m_colors[0] = glColors::gray;
-                m_colors[1] = glColors::gray;
-                m_colors[2] = glColors::gray;
-                m_colors[3] = glColors::gray;
+                for(int i=0; i<m_vertexPerCircle; ++i)
+                {
+                    m_colors[i] = glColors::gray;
+                }
             }
             else
             {
-                int tmp = m_flickeringSequence->sequence[m_currentFlicker]-1;
-                int squareIndex = tmp+(glUtils::VERTICES_PER_TRIANGLE*tmp);
-                m_colors[squareIndex] = glColors::white;
-                m_colors[squareIndex + 1] = glColors::white;
-                m_colors[squareIndex + 2] = glColors::white;
-                m_colors[squareIndex + 3] = glColors::white;
+                for(int i=circleIndex;i<circleIndex+m_vertexPerCircle; ++i)
+                {
+                    m_colors[i] = glColors::white;
+                }
             }
         }
     }
     scheduleRedraw();
 }
 
-void SsvepCircle::highlightFeedback(QVector3D feedbackColor, int feebdackIndex)
+void SsvepCircle::highlightFeedback(QVector3D feedbackColor, int feedbackIndex)
 {
-    int squareIndex = feebdackIndex + (glUtils::VERTICES_PER_TRIANGLE*feebdackIndex);
-    m_colors[squareIndex] = feedbackColor;
-    m_colors[squareIndex + 1] = feedbackColor;
-    m_colors[squareIndex + 2] = feedbackColor;
-    m_colors[squareIndex + 3] = feedbackColor;
+    int circleIndex = m_vertexPerCircle*feedbackIndex;
+    for(int i=circleIndex;i<circleIndex+m_vertexPerCircle; ++i)
+    {
+        m_colors[i] = feedbackColor;
+    }
 
     scheduleRedraw();
 }
 
 void SsvepCircle::refresh(int feedbackIndex)
 {
-    int squareIndex = feedbackIndex + (glUtils::VERTICES_PER_TRIANGLE*feedbackIndex);
+    int circleIndex = m_vertexPerCircle*feedbackIndex;
+    QVector3D color;
 
     if(feedbackIndex == 0 && m_ssvep->controlMode() == control_mode::ASYNC)
     {
-        m_colors[squareIndex] = glColors::gray;
-        m_colors[squareIndex + 1] = glColors::gray;
-        m_colors[squareIndex + 2] = glColors::gray;
-        m_colors[squareIndex + 3] = glColors::gray;
+        color = glColors::gray;
     }
     else
     {
-        m_colors[squareIndex] = glColors::white;
-        m_colors[squareIndex + 1] = glColors::white;
-        m_colors[squareIndex + 2] = glColors::white;
-        m_colors[squareIndex + 3] = glColors::white;
+        color = glColors::white;
+    }
+
+    for(int i=circleIndex;i<circleIndex+m_vertexPerCircle; ++i)
+    {
+        m_colors[i] = color;
     }
 
     scheduleRedraw();
@@ -716,42 +736,41 @@ bool SsvepCircle::isCorrect() const
 
 void SsvepCircle::update()
 {
+    // qDebug()<< "[update ] Index : "<< m_index << "current time: " << QTime::currentTime().msec();
+
     if(m_index == 0)
     {
         sendMarker(config::OVTK_StimulationLabel_Base + m_flickeringSequence->sequence[m_currentFlicker]);
         sendMarker(OVTK_StimulationId_VisualSteadyStateStimulationStart);
     }
 
-    int k;
+    int k, offset;
 
     if(m_ssvep->nrElements() == 1)
     {
         k = 0;
+        offset = 1;
     }
     else
     {
         if (m_ssvep->controlMode() == control_mode::SYNC)
         {
             k = 0;
+            offset = 1;
         }
         else
         {
-            k = glUtils::SIDES_PER_CIRCLE + 2;
+            k = m_vertexPerCircle;
+            offset = 2;
         }
     }
     for(int i = 0; i<m_flicker.size() ;++i)
     {
-        for(k; k< (m_colors.count()- m_ssvep->nrElements()); k+=glUtils::SIDES_PER_CIRCLE + 2)
+        for(int j=k; j<m_vertexPerCircle*(i+offset); j++)
         {
-           // m_colors[k]   = QVector3D(m_flicker[i][m_index], m_flicker[i][m_index], m_flicker[i][m_index]);
+            m_colors[j] = QVector3D(m_flicker[i][m_index], m_flicker[i][m_index], m_flicker[i][m_index]);
         }
-        /*
-        m_colors[k]   = QVector3D(m_flicker[i][m_index], m_flicker[i][m_index], m_flicker[i][m_index]);
-        m_colors[k+1] = QVector3D(m_flicker[i][m_index], m_flicker[i][m_index], m_flicker[i][m_index]);
-        m_colors[k+2] = QVector3D(m_flicker[i][m_index], m_flicker[i][m_index], m_flicker[i][m_index]);
-        m_colors[k+3] = QVector3D(m_flicker[i][m_index], m_flicker[i][m_index], m_flicker[i][m_index]);
-        k += glUtils::POINTS_PER_SQUARE;
-        */
+        k += m_vertexPerCircle;
     }
 
     ++m_index;
