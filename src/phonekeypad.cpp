@@ -9,12 +9,12 @@
 #include <QFont>
 #include <array>
 //
-#include "ssvepcircle.h"
+#include "phonekeypad.h"
 #include "ovtk_stimulations.h"
 #include "utils.h"
 #include "glutils.h"
 //
-SsvepCircle::SsvepCircle(SSVEP *paradigm, int t_port)
+PhoneKeypad::PhoneKeypad(SSVEP *paradigm, int t_port)
 {
     m_ssvep = paradigm;
     setFrequencies(m_ssvep->frequencies());
@@ -42,7 +42,7 @@ SsvepCircle::SsvepCircle(SSVEP *paradigm, int t_port)
     m_state = trial_state::PRE_TRIAL;
 }
 
-void SsvepCircle::initializeGL()
+void PhoneKeypad::initializeGL()
 {
     // Initialize OpenGL Backend
     initializeOpenGLFunctions();
@@ -58,7 +58,9 @@ void SsvepCircle::initializeGL()
     for (int i=0; i < m_frequencies.size(); ++i)
     {
         // phase = config::PHASE * ((i+1)%2);
-        phase = config::PHASE * (i%2);
+        // phase = config::PHASE * (i%2);
+        phase = config::PHASE * (i%4);
+        // qDebug()<<"phases " << i << phase;
         m_flicker[i] = utils::gen_flick(m_frequencies[i], config::REFRESH_RATE, m_ssvep->stimulationDuration(), m_ssvep->stimulationMode(), phase);
     }
 
@@ -104,7 +106,7 @@ void SsvepCircle::initializeGL()
     initExternalSocket();
 }
 
-void SsvepCircle::resizeGL(int w, int h)
+void PhoneKeypad::resizeGL(int w, int h)
 {
     //TODO
     //    (void)w;
@@ -112,7 +114,7 @@ void SsvepCircle::resizeGL(int w, int h)
     // initElements();
 }
 
-void SsvepCircle::paintGL()
+void PhoneKeypad::paintGL()
 {
     // clear
     glClear(GL_COLOR_BUFFER_BIT);
@@ -136,7 +138,7 @@ void SsvepCircle::paintGL()
     }
 }
 
-void SsvepCircle::startTrial()
+void PhoneKeypad::startTrial()
 {
     if (m_state == trial_state::PRE_TRIAL)
     {
@@ -152,7 +154,7 @@ void SsvepCircle::startTrial()
     }
 }
 
-void SsvepCircle::preTrial()
+void PhoneKeypad::preTrial()
 {
     if(m_trials == 0)
     {
@@ -201,7 +203,7 @@ void SsvepCircle::preTrial()
     }
 }
 
-void SsvepCircle::postTrial()
+void PhoneKeypad::postTrial()
 {
     disconnect(this, SIGNAL(frameSwapped()), this, SLOT(update()));
     initElements();
@@ -233,7 +235,7 @@ void SsvepCircle::postTrial()
     postTrialEnd();
 }
 
-void SsvepCircle::postTrialEnd()
+void PhoneKeypad::postTrialEnd()
 {
     ++m_currentFlicker;
     ++m_trials;
@@ -262,7 +264,7 @@ void SsvepCircle::postTrialEnd()
     }
 }
 
-void SsvepCircle::Flickering()
+void PhoneKeypad::Flickering()
 {
     if(m_index == 0)
     {
@@ -278,7 +280,7 @@ void SsvepCircle::Flickering()
     m_state = trial_state::POST_TRIAL;
 }
 
-void SsvepCircle::feedback()
+void PhoneKeypad::feedback()
 {
     // receiveFeedback
     m_feedbackSocket->waitForReadyRead();
@@ -305,7 +307,7 @@ void SsvepCircle::feedback()
     }
 }
 
-void SsvepCircle::receiveFeedback()
+void PhoneKeypad::receiveFeedback()
 {
     // wait for OV python script to write in UDP feedback socket
     // wait(500);
@@ -332,13 +334,13 @@ void SsvepCircle::receiveFeedback()
     }
 }
 
-void SsvepCircle::initElements()
+void PhoneKeypad::initElements()
 {
     // init vectors
     // int m_vertexPerCircle = glUtils::SIDES_PER_CIRCLE + 2;
     m_vertexPerCircle = glUtils::SIDES_PER_CIRCLE + 2;
     int vectorsSize = (m_ssvep->nrElements() * m_vertexPerCircle) + m_ssvep->nrElements();
-     m_vertices.resize(vectorsSize);
+    m_vertices.resize(vectorsSize);
     //
     initCircles(); // vertices
     initColors();  // vertices' colors
@@ -347,103 +349,108 @@ void SsvepCircle::initElements()
     scheduleRedraw();
 }
 
-void SsvepCircle::initCircles()
+void PhoneKeypad::initCircles()
 {
     float twicePi = 2.0f * M_PI;
-    int start = 0;
     int stop = m_vertexPerCircle;
-    int k=0;
+    int k = 0;
     int elements = m_ssvep->nrElements();
     float x, y, z, xx, yy;
+    float cx, cy, cz; // 1st center point
+    float distancex =  0.11621f;
+    float distancey = 0.20671f;
+    float offsetx = 0.0f;
+    float offsety = 0.0f;
 
-    if(m_ssvep->controlMode() == control_mode::SYNC)
-    {
-        start = 1;
-    }
-    else
-    {
-        --elements;
-    }
+    cx = -0.4f;
+    cy = 0.4f;
+    cz = 0.0f;
 
     m_centers.resize(m_ssvep->nrElements());
 
-    for (int j = start; j<=elements; ++j)
+    for (int j = 0; j<elements; ++j)
     {
         // circles center points
-        x = refPoints::centers[j].x();
-        y = refPoints::centers[j].y();
-        z = refPoints::centers[j].z();
+        if(j == 0)
+        {
+            x = cx;
+            y = cy;
+            z = cz;
+        }
+        else
+        {
+            if(j%3 == 0)
+            {
+                offsetx += distancex*2;
+                offsety = 0.0f;
+            }
+            else
+            {
+                offsetx = 0;
+                offsety += -distancey*2;
+            }
+
+            x = cx + offsetx;
+            y = cy + offsety;
+            z = cz;
+        }
+
         setVertex(k, x, y, z);
 
         // circles vertices
         for ( int i = k+1; i < stop; i++ )
         {
             xx = (x + (glUtils::RADIUS * cos(i * twicePi / glUtils::SIDES_PER_CIRCLE)));
-            yy = (y + (glUtils::RADIUS * sin(i * twicePi /glUtils::SIDES_PER_CIRCLE)));
+            // yy = (y + (glUtils::RADIUS * sin(i * twicePi /glUtils::SIDES_PER_CIRCLE)));
+            yy = (y + (0.155 * sin(i * twicePi / glUtils::SIDES_PER_CIRCLE)));
             setVertex(i, xx, yy, z);
         }
         k = stop;
         stop += m_vertexPerCircle;
+
+        if(j != 0 && j%3 ==0)
+        {
+            cx = x;
+            cy = y;
+            cz = z;
+        }
     }
 
     k = m_vertices.count() - m_ssvep->nrElements();
 
     // center points vertices
-    int i=start;
+    int i=0;
     for (int ind=k; ind<m_vertices.count();++ind)
     {
-        setVertex(ind, refPoints::centers[i].x(), refPoints::centers[i].y(), refPoints::centers[i].z());
-        ++i;
+        setVertex(ind, m_vertices[i].x(), m_vertices[i].y(), m_vertices[i].z());
+        i+=m_vertexPerCircle;
     }
 
     // qDebug()<< Q_FUNC_INFO << m_ssvep->nrElements() << m_vertices.count();
 }
 
-void SsvepCircle::initColors()
+void PhoneKeypad::initColors()
 {
     int vectorsSize = (m_ssvep->nrElements() * m_vertexPerCircle) + m_ssvep->nrElements();
 
     m_colors.resize(vectorsSize);
 
-    if(m_ssvep->controlMode() == control_mode::SYNC)
+    for (int i=0; i<m_colors.count(); i++)
     {
-        for (int i=0; i<m_colors.count(); i++)
+        if (i < m_colors.count() - m_ssvep->nrElements())
         {
-            if (i < m_colors.count() - m_ssvep->nrElements())
-            {
-                m_colors[i] = glColors::white;
-            }
-            else
-            {
-                m_colors[i] = glColors::red;
-            }
+            m_colors[i] = glColors::white;
+        }
+        else
+        {
+            m_colors[i] = glColors::red;
         }
     }
-    else
-    {
-        // init colors
-        // center idle stim
-        for (int i=0; i<m_vertexPerCircle; ++i)
-        {
-            m_colors[i] = glColors::gray;
-        }
 
-        for (int i=m_vertexPerCircle; i<m_colors.count(); i++)
-        {
-            if (i < m_colors.count() - m_ssvep->nrElements())
-            {
-                m_colors[i] = glColors::white;
-            }
-            else
-            {
-                m_colors[i] = glColors::red;
-            }
-        }
-    }
- //   qDebug()<< Q_FUNC_INFO << m_colors.count(); // << m_colors;
+    //   qDebug()<< Q_FUNC_INFO << m_colors.count(); // << m_colors;
 }
 
-void SsvepCircle::initIndices()
+void PhoneKeypad::initIndices()
 {
     // init indices
     int circleCount = m_ssvep->nrElements();
@@ -477,11 +484,11 @@ void SsvepCircle::initIndices()
         m_centerindices[i] = centerStart + i;
     }
 
-   //  qDebug()<< Q_FUNC_INFO << m_vindices.count() << m_centerindices;
-   //  qDebug()<< Q_FUNC_INFO << m_vindices.count() << m_vindices;
+    //  qDebug()<< Q_FUNC_INFO << m_vindices.count() << m_centerindices;
+    //  qDebug()<< Q_FUNC_INFO << m_vindices.count() << m_vindices;
 }
 
-void SsvepCircle::externalCommunication()
+void PhoneKeypad::externalCommunication()
 {
     // Send and Recieve feedback to/from Robot if external communication is enabled
     std::string cmd = QString(m_sessionFeedback[m_currentFlicker]).toStdString();
@@ -525,75 +532,36 @@ void SsvepCircle::externalCommunication()
     }
 }
 
-void SsvepCircle::highlightTarget()
+void PhoneKeypad::highlightTarget()
 {
     // int m_vertexPerCircle = glUtils::SIDES_PER_CIRCLE + 2;
 
-    if(m_ssvep->nrElements() == 1)
+    int tmp = m_flickeringSequence->sequence[m_currentFlicker]-1;
+    int circleIndex = m_vertexPerCircle*tmp;
+    for(int i=circleIndex;i<circleIndex+m_vertexPerCircle; ++i)
     {
-        for (int i=0; i<m_vertexPerCircle; ++i)
-        {
-            m_colors[i] = glColors::yellow;
-        }
-    }
-    else
-    {
-        int tmp = m_flickeringSequence->sequence[m_currentFlicker]-1;
-        int circleIndex = m_vertexPerCircle*tmp;
-        for(int i=circleIndex;i<circleIndex+m_vertexPerCircle; ++i)
-        {
-            m_colors[i] = glColors::yellow;
-        }
-
-        // qDebug()<< Q_FUNC_INFO << tmp << circleIndex;
+        m_colors[i] = glColors::yellow;
     }
 
+    // qDebug()<< Q_FUNC_INFO << tmp << circleIndex;
     scheduleRedraw();
 }
 
-void SsvepCircle::refreshTarget()
+void PhoneKeypad::refreshTarget()
 {
-    if(m_ssvep->nrElements() == 1)
-    {
-        for (int i=0; i<m_vertexPerCircle; ++i)
-        {
-            m_colors[i] = glColors::white;
-        }
-    }
-    else
-    {
-        int tmp = m_flickeringSequence->sequence[m_currentFlicker]-1;
-        int circleIndex = m_vertexPerCircle*tmp;
+    int tmp = m_flickeringSequence->sequence[m_currentFlicker]-1;
+    int circleIndex = m_vertexPerCircle*tmp;
 
-        if( m_ssvep->controlMode() == control_mode::SYNC)
-        {
-            for(int i=circleIndex;i<circleIndex+m_vertexPerCircle; ++i)
-            {
-                m_colors[i] = glColors::white;
-            }
-        }
-        else
-        {
-            if(m_flickeringSequence->sequence[m_currentFlicker] == 1)
-            {
-                for(int i=0; i<m_vertexPerCircle; ++i)
-                {
-                    m_colors[i] = glColors::gray;
-                }
-            }
-            else
-            {
-                for(int i=circleIndex;i<circleIndex+m_vertexPerCircle; ++i)
-                {
-                    m_colors[i] = glColors::white;
-                }
-            }
-        }
+
+    for(int i=circleIndex;i<circleIndex+m_vertexPerCircle; ++i)
+    {
+        m_colors[i] = glColors::white;
     }
+
     scheduleRedraw();
 }
 
-void SsvepCircle::highlightFeedback(QVector3D feedbackColor, int feedbackIndex)
+void PhoneKeypad::highlightFeedback(QVector3D feedbackColor, int feedbackIndex)
 {
     int circleIndex = m_vertexPerCircle*feedbackIndex;
     for(int i=circleIndex;i<circleIndex+m_vertexPerCircle; ++i)
@@ -604,29 +572,20 @@ void SsvepCircle::highlightFeedback(QVector3D feedbackColor, int feedbackIndex)
     scheduleRedraw();
 }
 
-void SsvepCircle::refresh(int feedbackIndex)
+void PhoneKeypad::refresh(int feedbackIndex)
 {
     int circleIndex = m_vertexPerCircle*feedbackIndex;
     QVector3D color;
 
-    if(feedbackIndex == 0 && m_ssvep->controlMode() == control_mode::ASYNC)
-    {
-        color = glColors::gray;
-    }
-    else
-    {
-        color = glColors::white;
-    }
-
     for(int i=circleIndex;i<circleIndex+m_vertexPerCircle; ++i)
     {
-        m_colors[i] = color;
+        m_colors[i] = glColors::white;
     }
 
     scheduleRedraw();
 }
 
-void SsvepCircle::initLogger()
+void PhoneKeypad::initLogger()
 {
     QDir logsDir(QCoreApplication::applicationDirPath() + "/logs");
     if(!logsDir.exists())
@@ -647,7 +606,7 @@ void SsvepCircle::initLogger()
     log = new Logger(this, fileName);
 }
 
-void SsvepCircle::scheduleRedraw()
+void PhoneKeypad::scheduleRedraw()
 {
     m_vaObject.bind();
     m_colorBuffer.bind();
@@ -658,7 +617,7 @@ void SsvepCircle::scheduleRedraw()
     QOpenGLWindow::update();
 }
 
-void SsvepCircle::renderText()
+void PhoneKeypad::renderText()
 {
     int screenWidth, screenHeight;
     int x, y;
@@ -697,43 +656,43 @@ void SsvepCircle::renderText()
     painter.end();
 }
 
-void SsvepCircle::setVertex(int t_index, float x, float y, float z)
+void PhoneKeypad::setVertex(int t_index, float x, float y, float z)
 {
     m_vertices[t_index].setX(x);
     m_vertices[t_index].setY(y);
     m_vertices[t_index].setZ(z);
 }
 
-bool SsvepCircle::presentFeedback() const
+bool PhoneKeypad::presentFeedback() const
 {
     return m_presentFeedback;
 }
 
-void SsvepCircle::setPresentFeedback(bool presentFeedback)
+void PhoneKeypad::setPresentFeedback(bool presentFeedback)
 {
     m_presentFeedback = presentFeedback;
 }
 
 
-SSVEP *SsvepCircle::ssvep() const
+SSVEP *PhoneKeypad::ssvep() const
 {
     return m_ssvep;
 }
 
-void SsvepCircle::setSsvep(SSVEP *ssvep)
+void PhoneKeypad::setSsvep(SSVEP *ssvep)
 {
     m_ssvep = ssvep;
 }
 
 
-bool SsvepCircle::isCorrect() const
+bool PhoneKeypad::isCorrect() const
 {
     return m_sessionFeedback[m_sessionFeedback.length()-1].digitValue() == m_flickeringSequence->sequence[m_currentFlicker];
 }
 
-void SsvepCircle::update()
+void PhoneKeypad::update()
 {
-    // qDebug()<< "[update ] Index : "<< m_index << "current time: " << QTime::currentTime().msec();
+     qDebug()<< "[update ] Index : "<< m_index << "current time: " << QTime::currentTime().msec();
 
     if(m_index == 0)
     {
@@ -742,25 +701,9 @@ void SsvepCircle::update()
     }
 
     int k, offset;
+    k = 0;
+    offset = 1;
 
-    if(m_ssvep->nrElements() == 1)
-    {
-        k = 0;
-        offset = 1;
-    }
-    else
-    {
-        if (m_ssvep->controlMode() == control_mode::SYNC)
-        {
-            k = 0;
-            offset = 1;
-        }
-        else
-        {
-            k = m_vertexPerCircle;
-            offset = 2;
-        }
-    }
     for(int i = 0; i<m_flicker.size() ;++i)
     {
         for(int j=k; j<m_vertexPerCircle*(i+offset); j++)
@@ -776,29 +719,23 @@ void SsvepCircle::update()
 
 // Setters
 
-void SsvepCircle::setFrequencies(QString freqs)
+void PhoneKeypad::setFrequencies(QString freqs)
 {
-    QStringList freqsList = freqs.split(',');
+    for (int i=0; i < m_ssvep->nrElements(); i++)
+    {
+        m_frequencies.append(freqs.toDouble() + (0.5 * i));
 
-    if (m_ssvep->nrElements() == 1)
-    {
-        m_frequencies.append(freqsList[0].toDouble());
     }
-    else
-    {
-        foreach(QString str, freqsList)
-        {
-            m_frequencies.append(str.toDouble());
-        }
-    }
+
+    qDebug()<< Q_FUNC_INFO << m_frequencies;
 }
 
-void SsvepCircle::setFeedbackPort(int t_port)
+void PhoneKeypad::setFeedbackPort(int t_port)
 {
     m_feedbackPort = t_port;
 }
 
-void SsvepCircle::initExternalSocket()
+void PhoneKeypad::initExternalSocket()
 {
     if(m_ssvep->externalComm() == external_comm::ENABLED)
     {
@@ -817,7 +754,7 @@ void SsvepCircle::initExternalSocket()
     }
 }
 
-SsvepCircle::~SsvepCircle()
+PhoneKeypad::~PhoneKeypad()
 {
     makeCurrent();
 }

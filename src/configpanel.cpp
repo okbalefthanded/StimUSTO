@@ -22,6 +22,7 @@
 #include "erp.h"
 #include "ssvep.h"
 #include "ssvepcircle.h"
+#include "phonekeypad.h"
 #include "hybrid.h"
 #include "jsonserializer.h"
 #include "ovtk_stimulations.h"
@@ -144,6 +145,7 @@ void ConfigPanel::on_initSSVEP_clicked()
     if(!m_markerSender->connectedOnce())
     {
         QMessageBox::information(this,"Socket connection","Not Connected");
+        return;
     }
 
     else
@@ -154,7 +156,8 @@ void ConfigPanel::on_initSSVEP_clicked()
         launchTimer->setSingleShot(true);
 
         // SsvepGL *ssvepStimulation = createSSVEP(ssvepParadigm, 12345);
-        SsvepCircle *ssvepStimulation = createSSVEP(ssvepParadigm, 12345);
+        // SsvepCircle *ssvepStimulation = createSSVEP(ssvepParadigm, 12345);
+        PhoneKeypad *ssvepStimulation = createSSVEP(ssvepParadigm, 12345);
         connectParadigm(ssvepStimulation, launchTimer);
         // ssvepStimulation->show();
         ssvepStimulation->showFullScreen();
@@ -349,7 +352,8 @@ SSVEP *ConfigPanel::initParadigmSSVEPGui()
 }
 
 // SsvepGL *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
-SsvepCircle *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
+// SsvepCircle *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
+PhoneKeypad *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
 {
     QSurfaceFormat format;
     format.setRenderableType(QSurfaceFormat::OpenGL);
@@ -361,7 +365,8 @@ SsvepCircle *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
     // format.setVersion(4, 5); // HP ProBook
 
     // SsvepGL *ssvepStimulation = new SsvepGL(t_ssvep, t_port);
-    SsvepCircle *ssvepStimulation = new SsvepCircle(t_ssvep, t_port);
+    // SsvepCircle *ssvepStimulation = new SsvepCircle(t_ssvep, t_port);
+    PhoneKeypad *ssvepStimulation = new PhoneKeypad(t_ssvep, t_port);
     ssvepStimulation->setFormat(format);
 
     if(QGuiApplication::screens().size() == 2)

@@ -58,7 +58,15 @@ void SSVEP::fromVariant(const QVariant &variant)
     m_breakDuration = map.value("breakDuration").toInt();
     m_nrSequences = map.value("nrSequences").toInt();
     m_desiredPhrase = map.value("desiredPhrase").toString();
-    m_nrElements = map.value("nrElements").toInt();
+    // m_nrElements = map.value("nrElements").toInt();
+    if (map.value("nrElements").isNull())
+    {
+        m_nrElements = 12; // phonekeypad
+    }
+    else
+    {
+        m_nrElements = map.value("nrElements").toInt();
+    }
     m_frequencies = map.value("frequencies").toString();
     m_stimulationMode = map.value("stimulationMode").toInt();
 }
