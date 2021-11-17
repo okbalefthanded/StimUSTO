@@ -10,10 +10,12 @@ static const qint8 VERTICES_PER_TRIANGLE = 3;
 static const qint8 POINTS_PER_SQUARE     = 4;
 static const qint8 INDICES_PER_SQUARE    = 6;
 static const qint8 TRIANGLES_PER_SQUARE  = 2;
-static const qint16 SIDES_PER_CIRCLE = 600; //2400; //1000; //600; // 60; //
+static const qint16 SIDES_PER_CIRCLE = 800; //2400; //1000; //600; // 60; //
 static const double RADIUS = 0.08761; //0.13;
+static const double RADIUS_CM = 3.5; // 3;
 static const int TUPLESIZE    = 3;
 static const int MAX_ELEMENTS = 4;
+static const double PIXEL_CM = 0.0264583333;
 
 }
 

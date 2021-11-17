@@ -66,7 +66,9 @@ void ERP::fromVariant(const QVariant &variant)
 
         if(m_stimulationType != speller_type::AUDITORY)
         {
-            randomPhrase = new RandomFlashSequence(9, 3);
+            randomPhrase = new RandomFlashSequence(9, 5);
+            // randomPhrase = new RandomFlashSequence(9, 3);
+            // randomPhrase = new RandomFlashSequence(9, 2);
 
             // RandomFlashSequence *randomPhrase = new RandomFlashSequence(9, 2);
             // RandomFlashSequence *randomPhrase = new RandomFlashSequence(9, 4);

@@ -130,6 +130,7 @@ protected:
     QColor m_highlightColor = Qt::yellow;
     QColor m_correctColor = Qt::green;
     QColor m_incorrectColor = Qt::blue;
+    QPixmap m_highlight;
     // Timers
     QTimer *m_preTrialTimer;
     QTimer *m_stimTimer;

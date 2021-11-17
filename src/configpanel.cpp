@@ -156,8 +156,8 @@ void ConfigPanel::on_initSSVEP_clicked()
         launchTimer->setSingleShot(true);
 
         // SsvepGL *ssvepStimulation = createSSVEP(ssvepParadigm, 12345);
-        // SsvepCircle *ssvepStimulation = createSSVEP(ssvepParadigm, 12345);
-        PhoneKeypad *ssvepStimulation = createSSVEP(ssvepParadigm, 12345);
+        SsvepCircle *ssvepStimulation = createSSVEP(ssvepParadigm, 12345);
+        // PhoneKeypad *ssvepStimulation = createSSVEP(ssvepParadigm, 12345);
         connectParadigm(ssvepStimulation, launchTimer);
         // ssvepStimulation->show();
         ssvepStimulation->showFullScreen();
@@ -229,8 +229,8 @@ void ConfigPanel::on_initHybrid_clicked()
         speller->setERP(hybridParadigm->m_ERPparadigm);
         speller->setPresentFeedback(false);
         // SsvepGL *ssvepStimulation = createSSVEP(hybridParadigm->m_SSVEPparadigm, 12346);
-        SsvepGL *ssvepStimulation =new SsvepGL(hybridParadigm->m_SSVEPparadigm, 12346);
-        // SsvepCircle *ssvepStimulation = createSSVEP(hybridParadigm->m_SSVEPparadigm, 12346);
+        // SsvepGL *ssvepStimulation =new SsvepGL(hybridParadigm->m_SSVEPparadigm, 12346);
+        SsvepCircle *ssvepStimulation = createSSVEP(hybridParadigm->m_SSVEPparadigm, 12346);
         ssvepStimulation->setPresentFeedback(false);
 
         HybridStimulation *hybrid = new HybridStimulation(hybridParadigm, speller, ssvepStimulation);
@@ -302,13 +302,13 @@ Speller *ConfigPanel::createSpeller(int t_spellerType)
         connectStimulation(multiStimuli);
         return multiStimuli;
     }
-
+        /*
     case speller_type::AUDITORY:
     {
         AuditorySpeller *auditorySpeller = new AuditorySpeller();
         connectStimulation(auditorySpeller);
         return auditorySpeller;
-    }
+    }*/
     }
 }
 
@@ -352,8 +352,8 @@ SSVEP *ConfigPanel::initParadigmSSVEPGui()
 }
 
 // SsvepGL *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
-// SsvepCircle *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
-PhoneKeypad *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
+// PhoneKeypad *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
+SsvepCircle *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
 {
     QSurfaceFormat format;
     format.setRenderableType(QSurfaceFormat::OpenGL);
@@ -361,12 +361,13 @@ PhoneKeypad *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
     format.setSwapInterval(1); // vsync on
     format.setSwapBehavior(QSurfaceFormat::TripleBuffer); //
     // format.setVersion(3,0);
-    format.setVersion(3 ,0); // ANGLE supports ES 3.0, higher versions raise exceptions
+    format.setVersion(3, 0); // ANGLE supports ES 3.0, higher versions raise exceptions
     // format.setVersion(4, 5); // HP ProBook
 
-    // SsvepGL *ssvepStimulation = new SsvepGL(t_ssvep, t_port);
-    // SsvepCircle *ssvepStimulation = new SsvepCircle(t_ssvep, t_port);
-    PhoneKeypad *ssvepStimulation = new PhoneKeypad(t_ssvep, t_port);
+    // PhoneKeypad *ssvepStimulation = new PhoneKeypad(t_ssvep, t_port);
+    // SsvepGL *ssvepStimulation = new SsvepGL(t_ssvep, t_port);    
+    SsvepCircle *ssvepStimulation = new SsvepCircle(t_ssvep, t_port);
+
     ssvepStimulation->setFormat(format);
 
     if(QGuiApplication::screens().size() == 2)
@@ -404,7 +405,6 @@ void ConfigPanel::connectStimulation(QObject *t_obj)
 
 void ConfigPanel::connectParadigm(QObject *pr, QTimer *timer)
 {
-
     if(noGui)
     {
         connect(timer, SIGNAL(timeout()), pr, SLOT(startTrial()));
@@ -413,7 +413,6 @@ void ConfigPanel::connectParadigm(QObject *pr, QTimer *timer)
     else
     {
         connect(ui->startSpeller, SIGNAL(clicked()), pr, SLOT(startTrial()));
-
     }
 }
 

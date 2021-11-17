@@ -18,7 +18,8 @@ HybridStimulation::HybridStimulation(Hybrid *hybridStimulation)
     initAnimations();
 }
 
-HybridStimulation::HybridStimulation(Hybrid *hybridStimulation, Speller *ERPspeller, SsvepGL *ssvepGL)
+//HybridStimulation::HybridStimulation(Hybrid *hybridStimulation, Speller *ERPspeller, SsvepGL *ssvepGL)
+HybridStimulation::HybridStimulation(Hybrid *hybridStimulation, Speller *ERPspeller, SsvepCircle *ssvepGL)
 {
     m_hybridStimulaiton = hybridStimulation;
     m_ERPspeller = ERPspeller;
@@ -520,7 +521,8 @@ void HybridStimulation::initSSVEP(SSVEP *ssvep)
     format.setVersion(3,0); // ANGLE supports ES 3.0, higher versions raise exceptions
 
 
-    m_ssvepStimulation = new SsvepGL(ssvep, 12346);
+    // m_ssvepStimulation = new SsvepGL(ssvep, 12346);
+    m_ssvepStimulation = new SsvepCircle(ssvep, 12346);
     m_ssvepStimulation->setFormat(format);
 
     if(QGuiApplication::screens().size() == 2)

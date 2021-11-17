@@ -95,6 +95,7 @@ private:
     bool m_firstRun = true;
     bool m_stateFinished = true;
     bool m_presentFeedback = true;
+    bool m_receivedFeedback = false;
     int m_preTrialCount=1;
     int m_preTrialWait;
     int m_currentFlicker=0;

@@ -24,7 +24,6 @@
 Speller::Speller(QWidget *parent) : QWidget(parent)
   //ui(new Ui::Speller)
 {
-
     // qDebug()<< Q_FUNC_INFO;
     // ui->setupUi(this);
     setupUi(this);
@@ -37,9 +36,13 @@ Speller::Speller(QWidget *parent) : QWidget(parent)
     initFeedbackSocket();
 
     m_state = trial_state::PRE_TRIAL;
-
+    m_highlight = QPixmap(":/images/bennabi_face_red_inverted.png");
+    QLabel label;
+    int label_h = label.height() + 40;
+    int label_w = label.width() + 40;
+    m_highlight.scaled(label_w, label_h, Qt::KeepAspectRatio);
+    m_highlight.fill(m_highlightColor);
     // this->setWindowFlag(Qt::Popup);
-
 }
 
 Speller::Speller(int i)
@@ -50,6 +53,7 @@ Speller::Speller(int i)
 void Speller::startTrial()
 {
     // qDebug()<< "[TRIAL START]" << Q_FUNC_INFO;
+    qDebug()<< "[TRIAL :] " << m_trials << " Target : "<< m_desiredPhrase.at(m_trials);
 
     if (m_state == trial_state::PRE_TRIAL)
     {
@@ -104,6 +108,7 @@ void Speller::pauseFlashing()
                                           Qt::FindDirectChildrenOnly);
         }
     }
+
     switchStimulationTimers();
     ++m_currentStimulation;
 
@@ -117,15 +122,27 @@ void Speller::preTrial()
     if(m_trials == 0)
     {
         sendMarker(OVTK_StimulationId_ExperimentStart);
+        // setting a pre-trail duration longer for calibration phase
+        // than Copy_mode/Free mode phases
+        if (m_ERP->experimentMode() == operation_mode::CALIBRATION)
+        {
+            m_preTrialTimer->setInterval(1000);
+        }
+        else
+        {
+            m_preTrialTimer->setInterval(500);
+        }
+
         //        initLogger();
     }
 
     if (m_preTrialCount == 0)
     {
         sendMarker(OVTK_StimulationId_TrialStart);
+        // setTimers(m_ERP->stimulationDuration(), m_ERP->breakDuration()); //
         m_flashingSequence = new RandomFlashSequence(m_nrElements, m_ERP->nrSequences());
 
-       //  qDebug() << Q_FUNC_INFO << m_flashingSequence->sequence;
+        //  qDebug() << Q_FUNC_INFO << m_flashingSequence->sequence;
 
         if (m_ERP->experimentMode() == operation_mode::CALIBRATION)
         {
@@ -293,8 +310,8 @@ void Speller::postTrial()
         qDebug()<< "Experiment End, closing speller";
         sendMarker(OVTK_StimulationId_ExperimentStop);
         utils::wait(2000);
-        // emit(slotTerminated());
-        // this->close();
+        emit(slotTerminated());
+        this->close();
     }
     else if(m_desiredPhrase.length() <= 1)
     {
@@ -318,11 +335,11 @@ void Speller::receiveFeedback()
     // wait for OV python script to write in UDP feedback socket
     // utils::wait(500);
     // utils::wait(250);
-
     // utils::wait(200);
     // utils::wait(80);
     // m_feedbackSocket->waitForReadyRead(90);
     // qDebug()<< QTime::currentTime();
+
     m_feedbackSocket->waitForReadyRead();
     QHostAddress sender;
     quint16 senderPort;
@@ -387,12 +404,14 @@ void Speller::highlightTarget()
     }
 
     // qDebug()<< Q_FUNC_INFO << "current tg "<< m_currentTarget << "current letter " << m_desiredPhrase[m_currentLetter];
-    QPixmap map = m_icons[m_currentTarget - 1];
+    // QPixmap map = m_icons[m_currentTarget - 1];
     // map.fill(Qt::yellow);
-    map.fill(m_highlightColor);
+    // QPixmap map;
+    // map.fill(m_highlightColor);
 
     m_element = new QLabel();
-    m_element->setPixmap(map);
+    //m_element->setPixmap(map);
+    m_element->setPixmap(m_highlight);
     m_element->setAlignment(Qt::AlignCenter);
 
     this->layout()->replaceWidget(this->
@@ -412,8 +431,9 @@ void Speller::refreshTarget()
     // qDebug()<< Q_FUNC_INFO << m_currentTarget;
 
     m_element = new QLabel();
-    QPixmap map = m_icons[m_currentTarget - 1];
-    m_element->setPixmap(map);
+    // QPixmap map = m_icons[m_currentTarget - 1];
+    // m_element->setPixmap(map);
+    m_element->setPixmap(m_icons[m_currentTarget - 1]);
     m_element->setAlignment(Qt::AlignCenter);
 
     this->layout()->replaceWidget(this->
@@ -431,7 +451,7 @@ void Speller::refreshTarget()
 
 void Speller::sendStimulationInfo()
 {
-    sendMarker(OVTK_StimulationId_VisualStimulationStart);
+    // sendMarker(OVTK_StimulationId_VisualStimulationStart);
     sendMarker(config::OVTK_StimulationLabel_Base + m_flashingSequence->sequence[m_currentStimulation]);
 
     // send target marker
@@ -501,13 +521,13 @@ void Speller::endPreTrial()
         if(m_ERP->experimentMode() == operation_mode::COPY_MODE ||
                 m_ERP->experimentMode() == operation_mode::CALIBRATION)
         {
-
             refreshTarget();
         }
         m_preTrialTimer->stop();
         m_preTrialCount = 0;
         m_state = trial_state::STIMULUS;
     }
+
     else return;
 }
 
@@ -647,8 +667,9 @@ void Speller::initTimers()
     m_isiTimer->setInterval(100); //default value
 
     m_preTrialTimer->setTimerType(Qt::PreciseTimer);
-    // m_preTrialTimer->setInterval(1000);
-    m_preTrialTimer->setInterval(500); //
+    m_preTrialTimer->setInterval(1000);
+    // m_preTrialTimer->setInterval(600);
+    // m_preTrialTimer->setInterval(500); //
     // m_preTrialTimer->setInterval(200);
     // m_preTrialTimer->setInterval(300);
     m_preTrialTimer->setSingleShot(true);
@@ -708,7 +729,12 @@ bool Speller::presentFeedback() const
 
 void Speller::setTimers(int t_stimulation, int t_isi)
 {
+    m_stimTimer->setTimerType(Qt::PreciseTimer);
+    m_stimTimer->setSingleShot(true);
     m_stimTimer->setInterval(t_stimulation);
+
+    m_isiTimer->setTimerType(Qt::PreciseTimer);
+    m_isiTimer->setSingleShot(true);
     m_isiTimer->setInterval(t_isi);
 }
 

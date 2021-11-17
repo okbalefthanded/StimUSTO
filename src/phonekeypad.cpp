@@ -357,13 +357,13 @@ void PhoneKeypad::initCircles()
     int elements = m_ssvep->nrElements();
     float x, y, z, xx, yy;
     float cx, cy, cz; // 1st center point
-    float distancex =  0.11621f;
-    float distancey = 0.20671f;
+    float distancex =  0.23242; //0.11621f;
+    float distancey = 0.2667; // 0.20671f;
     float offsetx = 0.0f;
     float offsety = 0.0f;
 
-    cx = -0.4f;
-    cy = 0.4f;
+    cx = -0.7f;
+    cy = 0.45f;
     cz = 0.0f;
 
     m_centers.resize(m_ssvep->nrElements());
@@ -692,7 +692,7 @@ bool PhoneKeypad::isCorrect() const
 
 void PhoneKeypad::update()
 {
-     qDebug()<< "[update ] Index : "<< m_index << "current time: " << QTime::currentTime().msec();
+    // qDebug()<< "[update ] Index : "<< m_index << "current time: " << QTime::currentTime().msec();
 
     if(m_index == 0)
     {
@@ -727,7 +727,7 @@ void PhoneKeypad::setFrequencies(QString freqs)
 
     }
 
-    qDebug()<< Q_FUNC_INFO << m_frequencies;
+   //  qDebug()<< Q_FUNC_INFO << m_frequencies;
 }
 
 void PhoneKeypad::setFeedbackPort(int t_port)

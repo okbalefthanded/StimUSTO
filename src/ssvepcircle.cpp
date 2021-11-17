@@ -154,6 +154,8 @@ void SsvepCircle::startTrial()
 
 void SsvepCircle::preTrial()
 {
+    m_receivedFeedback = false;
+
     if(m_trials == 0)
     {
         sendMarker(OVTK_StimulationId_ExperimentStart);
@@ -212,7 +214,6 @@ void SsvepCircle::postTrial()
     // feedback
     if(m_ssvep->experimentMode() == operation_mode::COPY_MODE || m_ssvep->experimentMode() == operation_mode::FREE_MODE)
     {
-
         feedback();  // wait for feedback
         if (m_presentFeedback)
         {
@@ -223,7 +224,8 @@ void SsvepCircle::postTrial()
         }
     }
 
-    else // calibration mode
+    // calibration mode
+    else
     {
         refreshTarget();
     }
@@ -272,6 +274,8 @@ void SsvepCircle::Flickering()
     while(m_index <= m_flicker[0].size())
     {
         QCoreApplication::processEvents(QEventLoop::AllEvents);
+        if (m_receivedFeedback)
+            break;
     }
 
     sendMarker(OVTK_StimulationId_TrialStop);
@@ -307,6 +311,7 @@ void SsvepCircle::feedback()
 
 void SsvepCircle::receiveFeedback()
 {
+    // qDebug()<< Q_FUNC_INFO << "Feedback received";
     // wait for OV python script to write in UDP feedback socket
     // wait(500);
     QHostAddress sender;
@@ -322,14 +327,19 @@ void SsvepCircle::receiveFeedback()
 
     log->write(buffer->data());
 
-    if (m_flickeringSequence->sequence.length() == 1) // Hybrid stimulation mode
-    {
-        m_sessionFeedback = buffer->data();
-    }
-    else
-    {
-        m_sessionFeedback += buffer->data();
-    }
+   //  if(!strcmp(buffer->data(),"-1"))
+  //  {
+        if (m_flickeringSequence->sequence.length() == 1) // Hybrid stimulation mode
+        {
+            m_sessionFeedback = buffer->data();
+        }
+        else
+        {
+            m_sessionFeedback += buffer->data();
+        }
+   // }
+
+    m_receivedFeedback = true;
 }
 
 void SsvepCircle::initElements()
@@ -338,7 +348,7 @@ void SsvepCircle::initElements()
     // int m_vertexPerCircle = glUtils::SIDES_PER_CIRCLE + 2;
     m_vertexPerCircle = glUtils::SIDES_PER_CIRCLE + 2;
     int vectorsSize = (m_ssvep->nrElements() * m_vertexPerCircle) + m_ssvep->nrElements();
-     m_vertices.resize(vectorsSize);
+    m_vertices.resize(vectorsSize);
     //
     initCircles(); // vertices
     initColors();  // vertices' colors
@@ -354,6 +364,9 @@ void SsvepCircle::initCircles()
     int stop = m_vertexPerCircle;
     int k=0;
     int elements = m_ssvep->nrElements();
+    QSize screenSize = utils::getScreenSize();
+    float radiusx = glUtils::RADIUS_CM / (screenSize.width() * glUtils::PIXEL_CM);
+    float radiusy = glUtils::RADIUS_CM / (screenSize.height() * glUtils::PIXEL_CM);
     float x, y, z, xx, yy;
 
     if(m_ssvep->controlMode() == control_mode::SYNC)
@@ -378,8 +391,10 @@ void SsvepCircle::initCircles()
         // circles vertices
         for ( int i = k+1; i < stop; i++ )
         {
-            xx = (x + (glUtils::RADIUS * cos(i * twicePi / glUtils::SIDES_PER_CIRCLE)));
-            yy = (y + (glUtils::RADIUS * sin(i * twicePi /glUtils::SIDES_PER_CIRCLE)));
+            // xx = (x + (glUtils::RADIUS * cos(i * twicePi / glUtils::SIDES_PER_CIRCLE)));
+            // yy = (y + (glUtils::RADIUS * sin(i * twicePi /glUtils::SIDES_PER_CIRCLE)));
+            xx = (x + (radiusx * cos(i * twicePi / glUtils::SIDES_PER_CIRCLE)));
+            yy = (y + (radiusy * sin(i * twicePi /glUtils::SIDES_PER_CIRCLE)));
             setVertex(i, xx, yy, z);
         }
         k = stop;
@@ -440,7 +455,7 @@ void SsvepCircle::initColors()
             }
         }
     }
- //   qDebug()<< Q_FUNC_INFO << m_colors.count(); // << m_colors;
+    //   qDebug()<< Q_FUNC_INFO << m_colors.count(); // << m_colors;
 }
 
 void SsvepCircle::initIndices()
@@ -477,8 +492,8 @@ void SsvepCircle::initIndices()
         m_centerindices[i] = centerStart + i;
     }
 
-   //  qDebug()<< Q_FUNC_INFO << m_vindices.count() << m_centerindices;
-   //  qDebug()<< Q_FUNC_INFO << m_vindices.count() << m_vindices;
+    //  qDebug()<< Q_FUNC_INFO << m_vindices.count() << m_centerindices;
+    //  qDebug()<< Q_FUNC_INFO << m_vindices.count() << m_vindices;
 }
 
 void SsvepCircle::externalCommunication()

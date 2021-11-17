@@ -6,6 +6,7 @@
 #include <QPropertyAnimation>
 //
 #include "ssvepgl.h"
+#include "ssvepcircle.h"
 #include "speller.h"
 #include "paradigm.h"
 #include "erp.h"
@@ -18,8 +19,9 @@ class HybridStimulation : public QObject
 
 public:
     explicit HybridStimulation(Hybrid *hybridStimulation);
-    explicit HybridStimulation(Hybrid *hybridStimulation, Speller *ERPspeller,
-                               SsvepGL *ssvepGL);
+    // explicit HybridStimulation(Hybrid *hybridStimulation, Speller *ERPspeller, SsvepGL *ssvepGL);
+    explicit HybridStimulation(Hybrid *hybridStimulation, Speller *ERPspeller, SsvepCircle *ssvepGL);
+
     ~HybridStimulation();
     void initERPspeller(ERP *erp);
     void initSSVEP(SSVEP *ssvep);
@@ -55,7 +57,8 @@ private:
     //
     Hybrid *m_hybridStimulaiton;
     Speller *m_ERPspeller;
-    SsvepGL *m_ssvepStimulation;
+    // SsvepGL *m_ssvepStimulation;
+    SsvepCircle *m_ssvepStimulation;
     // QUdpSocket *m_robotSocket;
     QTcpSocket *m_robotSocket;
     //
