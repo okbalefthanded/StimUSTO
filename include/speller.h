@@ -8,6 +8,7 @@
 #include <QUdpSocket>
 #include <QTcpSocket>
 #include <QColor>
+#include <QDialog>
 //
 #include "ui_spellerform.h"
 //
@@ -23,7 +24,8 @@ namespace Ui {
 class Speller;
 }
 */
-class Speller : public QWidget, protected Ui::SpellerForm
+// class Speller : public QWidget, protected Ui::SpellerForm
+class Speller : public QDialog, protected Ui::SpellerForm
 {
     Q_OBJECT
 

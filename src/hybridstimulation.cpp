@@ -64,6 +64,7 @@ HybridStimulation::HybridStimulation(Hybrid *hybridStimulation, Speller *ERPspel
     }
     else
     {
+        m_ERPspeller->move(-1366, 0);//quick hack
         m_ERPspeller->hide();
         m_ssvepStimulation->setScreen(QGuiApplication::screens().last());
         m_ssvepStimulation->showFullScreen();
@@ -178,20 +179,16 @@ void HybridStimulation::swichStimWindows()
 
     if(m_hybridStimulaiton->m_order == order::ERP_FIRST)
     {
-
         if(m_switchStimulation)
         {
-
             m_ssvepStimulation->hide();
             m_ERPspeller->show();
         }
         else
         {
-
             m_ssvepStimulation->setScreen(QGuiApplication::screens().last());
             m_ssvepStimulation->showFullScreen();
             m_ERPspeller->hide();
-
         }
     }
     else
@@ -217,6 +214,7 @@ void HybridStimulation::swichStimWindows()
         {
             m_ERPanimation->start();
             // m_ERPspeller->show();
+
             m_ERPspeller->showFullScreen();
             m_ssvepStimulation->hide();
         }
@@ -443,7 +441,7 @@ void HybridStimulation::terminateExperiment()
 
 void HybridStimulation::initAnimations()
 {
-
+    /*
     int nScreens = utils::screenCount();
     QRect erpStart, erpEnd;
     int ssvepStart, ssvepEnd;
@@ -462,21 +460,28 @@ void HybridStimulation::initAnimations()
         ssvepStart = 0;
         ssvepEnd = -1366;
     }
+    */
 
-    m_ERPanimation = new QPropertyAnimation(m_ERPspeller, "geometry");
-    m_ERPanimation->setDuration(500);
+    // m_ERPanimation = new QPropertyAnimation(m_ERPspeller, "geometry");
+    m_ERPanimation = new QPropertyAnimation(m_ERPspeller, "windowOpacity");
+    m_ERPanimation->setDuration(500); //500
     // m_ERPanimation->setStartValue(QRect(1366, 0, 1366, 768)); //
     // m_ERPanimation->setEndValue(QRect(0, 0, 1366, 768)); //
-    m_ERPanimation->setStartValue(erpStart); //
-    m_ERPanimation->setEndValue(erpEnd); //
+    // m_ERPanimation->setStartValue(erpStart); //
+    // m_ERPanimation->setEndValue(erpEnd); //
+    m_ERPanimation->setStartValue(0.0); //
+    m_ERPanimation->setEndValue(1.0); //
     connect(m_ERPanimation, SIGNAL(finished()), m_ERPspeller, SLOT(startTrial()));
 
-    m_SSVEPanimation = new QPropertyAnimation(m_ssvepStimulation, "x");
-    m_SSVEPanimation->setDuration(500);
+    // m_SSVEPanimation = new QPropertyAnimation(m_ssvepStimulation, "x");
+    m_SSVEPanimation = new QPropertyAnimation(m_ssvepStimulation, "opacity");
+    m_SSVEPanimation->setDuration(500); //500
     // m_SSVEPanimation->setStartValue(2800);//1366
     // m_SSVEPanimation->setEndValue(1440); // 0
-    m_SSVEPanimation->setStartValue(ssvepStart); //1366
-    m_SSVEPanimation->setEndValue(ssvepEnd); // 0
+    // m_SSVEPanimation->setStartValue(ssvepStart); //1366
+    // m_SSVEPanimation->setEndValue(ssvepEnd); // 0
+    m_SSVEPanimation->setStartValue(0.0); //1366
+    m_SSVEPanimation->setEndValue(1.0); // 0
     connect(m_SSVEPanimation, SIGNAL(finished()), m_ssvepStimulation, SLOT(startTrial()));
 }
 

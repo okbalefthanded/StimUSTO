@@ -1,16 +1,13 @@
 #ifndef FACESPELLER_H
 #define FACESPELLER_H
 
-
 #include "speller.h"
 #include "erp.h"
 
 class FaceSpeller : public Speller
 {
 
-
 public:
-
     void startFlashing();
 
 private:

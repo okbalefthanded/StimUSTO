@@ -66,13 +66,19 @@ void ERP::fromVariant(const QVariant &variant)
 
         if(m_stimulationType != speller_type::AUDITORY)
         {
-            randomPhrase = new RandomFlashSequence(9, 5);
-            // randomPhrase = new RandomFlashSequence(9, 3);
-            // randomPhrase = new RandomFlashSequence(9, 2);
+            if (m_experimentMode == operation_mode::CALIBRATION)
+            {
+                // randomPhrase = new RandomFlashSequence(9, 3);
+                randomPhrase = new RandomFlashSequence(9, 2);
 
-            // RandomFlashSequence *randomPhrase = new RandomFlashSequence(9, 2);
-            // RandomFlashSequence *randomPhrase = new RandomFlashSequence(9, 4);
-            // RandomFlashSequence *randomPhrase = new RandomFlashSequence(9, 3);
+                // RandomFlashSequence *randomPhrase = new RandomFlashSequence(9, 2);
+                // RandomFlashSequence *randomPhrase = new RandomFlashSequence(9, 4);
+                // RandomFlashSequence *randomPhrase = new RandomFlashSequence(9, 3);
+            }
+            else
+            {
+                randomPhrase = new RandomFlashSequence(9, 6);
+            }
         }
         else
         {
@@ -84,7 +90,6 @@ void ERP::fromVariant(const QVariant &variant)
         m_desiredPhrase = randomPhrase->toString();
         // qDebug()<< Q_FUNC_INFO << "random phrase" << m_desiredPhrase;
     }
-
 
     m_flashingMode = map.value("flashingMode").toInt();
 }

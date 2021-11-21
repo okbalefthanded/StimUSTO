@@ -13,6 +13,7 @@
 #include <QPixmap>
 #include <QDir>
 #include <QPainter>
+
 //
 #include "speller.h"
 //#include "ui_speller.h"
@@ -21,7 +22,8 @@
 #include "randomflashsequence.h"
 #include "utils.h"
 //
-Speller::Speller(QWidget *parent) : QWidget(parent)
+// Speller::Speller(QWidget *parent) : QWidget(parent)
+Speller::Speller(QWidget *parent) : QDialog(parent)
   //ui(new Ui::Speller)
 {
     // qDebug()<< Q_FUNC_INFO;
@@ -518,8 +520,9 @@ void Speller::endPreTrial()
     // qDebug() << Q_FUNC_INFO;
     if (m_preTrialCount > m_preTrialWait || m_ERP->experimentMode() == operation_mode::FREE_MODE)
     {
-        if(m_ERP->experimentMode() == operation_mode::COPY_MODE ||
-                m_ERP->experimentMode() == operation_mode::CALIBRATION)
+     //   if(m_ERP->experimentMode() == operation_mode::COPY_MODE ||
+     //            m_ERP->experimentMode() == operation_mode::CALIBRATION)
+     if( m_ERP->experimentMode() == operation_mode::COPY_MODE)
         {
             refreshTarget();
         }
@@ -890,11 +893,13 @@ void Speller::createLayout()
     m_textRow->setStyleSheet("font:30pt; color:gray; border-color:white;");
     m_textRow->setAlignment(Qt::AlignLeft);
     m_textRow->setObjectName("Desired Phrase Row");
-    //    textRow->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    // textRow->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     // layout->addWidget(m_textRow, 0, 0, 1, 0);
 
-    layout->setHorizontalSpacing(400);
-    layout->setVerticalSpacing(100);
+    // layout->setHorizontalSpacing(400);
+    // layout->setVerticalSpacing(100);
+    layout->setHorizontalSpacing(100);
+    layout->setVerticalSpacing(40);
 
     m_textRow->setText(m_desiredPhrase);
     m_textRow->hide();
@@ -941,7 +946,6 @@ void Speller::createLayout()
             m_icons.append(pic.scaled(label_w, label_h, Qt::KeepAspectRatio));
 
             //            m_icons->append(element);
-
             //            m_icons.append(element);
             layout->addWidget(element, i, j);
 

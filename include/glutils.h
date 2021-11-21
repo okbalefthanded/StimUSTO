@@ -34,10 +34,10 @@ namespace refPoints
 static const QVector<QVector3D> topPoints =
 {
 
-             /*    QVector3D(-0.10f, 0.10f, 1.0f), QVector3D(-0.68f, 0.10f, 1.0f),
-                    QVector3D(0.50f, 0.10f, 1.0f), QVector3D(-0.10f, 0.70f, 1.0f),
-                    QVector3D(-0.10f, -0.38f, 1.0f)
-             */
+    /*    QVector3D(-0.10f, 0.10f, 1.0f), QVector3D(-0.68f, 0.10f, 1.0f),
+                        QVector3D(0.50f, 0.10f, 1.0f), QVector3D(-0.10f, 0.70f, 1.0f),
+                        QVector3D(-0.10f, -0.38f, 1.0f)
+                 */
 
 
     // original points
@@ -45,7 +45,7 @@ static const QVector<QVector3D> topPoints =
     QVector3D(-0.10f, 0.10f, 1.0f), QVector3D(-0.75f, 0.10f, 1.0f),
 
     // QVector3D(0.55f, 0.10f, 1.0f), QVector3D(-0.10f, 0.75f, 1.0f),
-                                   // -.1, .7
+    // -.1, .7
     QVector3D(0.56f, 0.10f, 1.0f), QVector3D(-0.10f, 0.70f, 1.0f),
 
     //QVector3D(-0.10f, -0.45f, 1.0f)
@@ -54,30 +54,34 @@ static const QVector<QVector3D> topPoints =
 
 
     /*
-    // different layout top points on screen corners
-    QVector3D(-0.10f, 0.10f, 1.0f), QVector3D(-0.75f, 0.75f, 1.0f),
-    QVector3D(0.55f, 0.75f, 1.0f), QVector3D(0.55f, -0.45f, 1.0f),
-    QVector3D(-0.75f, -0.45f, 1.0f)
-    */
-
-        /*
-        // closer points- one line
-        QVector3D(-0.10f, 0.15f, 1.0f), QVector3D(-0.85f, 0.15f, 1.0f),
-
-        // QVector3D(0.55f, 0.10f, 1.0f), QVector3D(-0.10f, 0.75f, 1.0f),
-        QVector3D(-0.35f, 0.15f, 1.0f), QVector3D(0.15f, 0.15f, 1.0f),
-
-        //QVector3D(-0.10f, -0.45f, 1.0f)
-        QVector3D(0.65f, 0.15f, 1.0f)
+        // different layout top points on screen corners
+        QVector3D(-0.10f, 0.10f, 1.0f), QVector3D(-0.75f, 0.75f, 1.0f),
+        QVector3D(0.55f, 0.75f, 1.0f), QVector3D(0.55f, -0.45f, 1.0f),
+        QVector3D(-0.75f, -0.45f, 1.0f)
         */
+
+    /*
+            // closer points- one line
+            QVector3D(-0.10f, 0.15f, 1.0f), QVector3D(-0.85f, 0.15f, 1.0f),
+
+            // QVector3D(0.55f, 0.10f, 1.0f), QVector3D(-0.10f, 0.75f, 1.0f),
+            QVector3D(-0.35f, 0.15f, 1.0f), QVector3D(0.15f, 0.15f, 1.0f),
+
+            //QVector3D(-0.10f, -0.45f, 1.0f)
+            QVector3D(0.65f, 0.15f, 1.0f)
+            */
 
 };
 // centers for circles stimulations
 static const QVector<QVector3D> centers =
 {
-    QVector3D(0.0f, 0.0f, 1.0f), QVector3D(-0.5f, 0.0f, 1.0f),
-    QVector3D(0.5f, 0.0f, 1.0f), QVector3D(0.0f, 0.5f, 1.0f),
-    QVector3D(0.0f, -0.5f, 1.0f)
+    // QVector3D(0.0f, 0.0f, 1.0f), QVector3D(-0.5f, 0.0f, 1.0f),
+    // QVector3D(0.5f, 0.0f, 1.0f), QVector3D(0.0f, 0.5f, 1.0f),
+    // QVector3D(0.0f, -0.5f, 1.0f)
+
+    QVector3D(0.0f, 0.0f, 1.0f), QVector3D(-0.6f, 0.0f, 1.0f),
+    QVector3D(0.6f, 0.0f, 1.0f), QVector3D(0.0f, 0.6f, 1.0f),
+    QVector3D(0.0f, -0.6f, 1.0f)
 };
 }
 
