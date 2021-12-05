@@ -20,6 +20,6 @@ private:
     QList<QPixmap> m_multStimuli = {QPixmap(":/images/bennabi_face_magenta_inverted.png"),
                                     QPixmap(":/images/bennabi_face_blue_inverted.png"),
                                     QPixmap(":/images/bennabi_face_red_inverted.png")};
-    // QLabel *m_element = new QLabel();
+
 };
 #endif // FACESPELLER_H

@@ -116,7 +116,6 @@ void HybridStimulation::startTrial()
 
     if(m_hybridState == trial_state::STIMULUS)
     {
-
         if(m_hybridStimulaiton->m_order == order::ERP_FIRST)
         {
             if(m_switchStimulation)
@@ -464,7 +463,7 @@ void HybridStimulation::initAnimations()
 
     // m_ERPanimation = new QPropertyAnimation(m_ERPspeller, "geometry");
     m_ERPanimation = new QPropertyAnimation(m_ERPspeller, "windowOpacity");
-    m_ERPanimation->setDuration(500); //500
+    m_ERPanimation->setDuration(250); //500
     // m_ERPanimation->setStartValue(QRect(1366, 0, 1366, 768)); //
     // m_ERPanimation->setEndValue(QRect(0, 0, 1366, 768)); //
     // m_ERPanimation->setStartValue(erpStart); //
@@ -475,7 +474,7 @@ void HybridStimulation::initAnimations()
 
     // m_SSVEPanimation = new QPropertyAnimation(m_ssvepStimulation, "x");
     m_SSVEPanimation = new QPropertyAnimation(m_ssvepStimulation, "opacity");
-    m_SSVEPanimation->setDuration(500); //500
+    m_SSVEPanimation->setDuration(250); //500
     // m_SSVEPanimation->setStartValue(2800);//1366
     // m_SSVEPanimation->setEndValue(1440); // 0
     // m_SSVEPanimation->setStartValue(ssvepStart); //1366

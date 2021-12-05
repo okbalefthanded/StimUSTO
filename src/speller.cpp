@@ -13,7 +13,6 @@
 #include <QPixmap>
 #include <QDir>
 #include <QPainter>
-
 //
 #include "speller.h"
 //#include "ui_speller.h"
@@ -55,7 +54,7 @@ Speller::Speller(int i)
 void Speller::startTrial()
 {
     // qDebug()<< "[TRIAL START]" << Q_FUNC_INFO;
-    qDebug()<< "[TRIAL :] " << m_trials << " Target : "<< m_desiredPhrase.at(m_trials);
+    // qDebug()<< "[TRIAL :] " << m_trials << " Target : "<< m_desiredPhrase.at(m_trials);
 
     if (m_state == trial_state::PRE_TRIAL)
     {
@@ -80,9 +79,12 @@ void Speller::pauseFlashing()
     // sendMarker(OVTK_StimulationId_VisualStimulationStop);
     // qDebug() << Q_FUNC_INFO << QTime::currentTime().msec();
 
-    //   this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation])->
-    //                widget()->setStyleSheet("QLabel { color : gray; font: 40pt }");
+    //   this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation]-1)->
+   //                 widget()->setStyleSheet("QLabel { color : gray; font: 40pt }");
 
+    this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation]-1)->
+            widget()->setProperty("pixmap", m_icons[m_flashingSequence->sequence[m_currentStimulation] - 1]);
+    /*
     if (m_ERP->stimulationType() != speller_type::MISMATCH)
     {
         m_element = new QLabel();
@@ -95,6 +97,7 @@ void Speller::pauseFlashing()
                                       widget(),
                                       m_element,
                                       Qt::FindDirectChildrenOnly);
+
     }
     else {
         for (int i=0; i<9; i++) {
@@ -110,6 +113,7 @@ void Speller::pauseFlashing()
                                           Qt::FindDirectChildrenOnly);
         }
     }
+    */
 
     switchStimulationTimers();
     ++m_currentStimulation;
@@ -140,8 +144,8 @@ void Speller::preTrial()
 
     if (m_preTrialCount == 0)
     {
+        setTimers(m_ERP->stimulationDuration(), m_ERP->breakDuration());
         sendMarker(OVTK_StimulationId_TrialStart);
-        // setTimers(m_ERP->stimulationDuration(), m_ERP->breakDuration()); //
         m_flashingSequence = new RandomFlashSequence(m_nrElements, m_ERP->nrSequences());
 
         //  qDebug() << Q_FUNC_INFO << m_flashingSequence->sequence;
@@ -151,7 +155,6 @@ void Speller::preTrial()
             highlightTarget();
             m_text += m_desiredPhrase[m_currentLetter];
             m_textRow->setText(m_text);
-
         }
         else if(m_ERP->experimentMode() == operation_mode::COPY_MODE)
         {
@@ -176,9 +179,6 @@ void Speller::feedback()
     receiveFeedback();
     m_textRow->setText(m_text);
 
-    // qDebug()<< Q_FUNC_INFO << "setting TEXT ROW with "<< m_text;
-    // qDebug()<< "m text row "<< m_textRow->text();
-
     // Presenting Feedback
     if (m_presentFeedback)
     {
@@ -193,11 +193,10 @@ void Speller::feedback()
                 QPixmap map = m_icons[id-1];
                 // feedback: green correct selection, highlight the target icon
                 //           blue incorrect selection, highlight the selected icon
-                if( m_text[m_text.length()-1] == m_desiredPhrase[m_currentLetter - 1])
+                if(m_text[m_text.length()-1] == m_desiredPhrase[m_currentLetter - 1])
                 {
                     //            this->layout()->itemAt(m_currentTarget)->
                     //                    widget()->setStyleSheet("QLabel { color : green; font: 40pt }");
-                    //map.fill(Qt::green);
                     map.fill(m_correctColor);
                     isCorrect = true;
                     ++m_correct;
@@ -206,7 +205,6 @@ void Speller::feedback()
                 {
                     // this->layout()->itemAt(m_currentTarget)->
                     //         widget()->setStyleSheet("QLabel { color : blue; font: 40pt }");
-                    // map.fill(Qt::blue);
                     map.fill(m_incorrectColor);
                     isCorrect = false;
                 }
@@ -227,7 +225,6 @@ void Speller::feedback()
             {
                 int id = m_text[m_text.length()-1].digitValue();
                 QPixmap map = m_icons[id-1];
-                // map.fill(Qt::blue);
                 map.fill(m_incorrectColor);
                 m_element = new QLabel();
                 m_element->setPixmap(map);
@@ -243,6 +240,7 @@ void Speller::feedback()
             }
         }
     }
+
     postTrial();
 }
 
@@ -259,6 +257,7 @@ void Speller::postTrial()
     // utils::wait(250); // showing feedback for 0.25 sec
     // refreshTarget();
 
+    // refreshing feedback
     if (m_presentFeedback)
     {
         // utils::wait(1000);
@@ -272,6 +271,7 @@ void Speller::postTrial()
             {
                 int id = m_text[m_text.length()-1].digitValue();
                 // qDebug()<< Q_FUNC_INFO << "element ID" << id;
+
                 QPixmap map = m_icons[id-1];
                 m_element = new QLabel();
                 m_element->setPixmap(map);
@@ -285,15 +285,14 @@ void Speller::postTrial()
                                               Qt::FindDirectChildrenOnly);
 
 
+
             }
             else if(m_ERP->experimentMode() == operation_mode::CALIBRATION)
             {
-                refreshTarget();
+               refreshTarget();
             }
         }
     }
-    // m_textRow->setText(m_text);
-    // m_textRow->show();
 
     // Send and Recieve feedback to/from Robot if external communication is enabled
     externalCommunication();
@@ -312,8 +311,8 @@ void Speller::postTrial()
         qDebug()<< "Experiment End, closing speller";
         sendMarker(OVTK_StimulationId_ExperimentStop);
         utils::wait(2000);
-        emit(slotTerminated());
-        this->close();
+        // emit(slotTerminated());
+        // this->close();
     }
     else if(m_desiredPhrase.length() <= 1)
     {
@@ -324,7 +323,7 @@ void Speller::postTrial()
     }
     else
     {
-        this->layout()->update();
+        // this->layout()->update();
         startTrial();
     }
 
@@ -453,7 +452,7 @@ void Speller::refreshTarget()
 
 void Speller::sendStimulationInfo()
 {
-    // sendMarker(OVTK_StimulationId_VisualStimulationStart);
+    sendMarker(OVTK_StimulationId_VisualStimulationStart);
     sendMarker(config::OVTK_StimulationLabel_Base + m_flashingSequence->sequence[m_currentStimulation]);
 
     // send target marker
@@ -898,8 +897,8 @@ void Speller::createLayout()
 
     // layout->setHorizontalSpacing(400);
     // layout->setVerticalSpacing(100);
-    layout->setHorizontalSpacing(100);
-    layout->setVerticalSpacing(40);
+    // layout->setHorizontalSpacing(10); //100
+    // layout->setVerticalSpacing(5); //40
 
     m_textRow->setText(m_desiredPhrase);
     m_textRow->hide();
@@ -916,6 +915,7 @@ void Speller::createLayout()
         for(int j=0; j<m_cols; j++)
         {
             QLabel *element = new QLabel(this);
+
             label_h = element->height() + 40;
             label_w = element->width() + 40;
 

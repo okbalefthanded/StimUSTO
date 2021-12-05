@@ -1,5 +1,5 @@
 #include "matrixlayout.h"
-
+#include <cmath>
 MatrixLayout::MatrixLayout(QObject *parent) : QObject(parent)
 {
 
@@ -27,8 +27,8 @@ MatrixLayout::MatrixLayout(QPair<int, int> size, int rows, int cols)
     {
         for(int j=0;j<cols;j++)
         {
-            x = round(distx * j - width / 2);
-            y = round(disty * i - height / 2);
+            x = std::round(distx * j - width / 2);
+            y = std::round(disty * i - height / 2);
             positions.append(qMakePair(x, y));
         }
     }
