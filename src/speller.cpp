@@ -405,22 +405,9 @@ void Speller::highlightTarget()
     }
 
     // qDebug()<< Q_FUNC_INFO << "current tg "<< m_currentTarget << "current letter " << m_desiredPhrase[m_currentLetter];
-    // QPixmap map = m_icons[m_currentTarget - 1];
-    // map.fill(Qt::yellow);
-    // QPixmap map;
-    // map.fill(m_highlightColor);
 
-    m_element = new QLabel();
-    //m_element->setPixmap(map);
-    m_element->setPixmap(m_highlight);
-    m_element->setAlignment(Qt::AlignCenter);
-
-    this->layout()->replaceWidget(this->
-                                  layout()->
-                                  itemAt(m_currentTarget-1)->
-                                  widget(),
-                                  m_element,
-                                  Qt::FindDirectChildrenOnly);
+    this->layout()->itemAt(m_currentTarget-1)->
+            widget()->setProperty("pixmap", m_highlight);
 
 }
 
@@ -431,20 +418,8 @@ void Speller::refreshTarget()
     //           widget()->setStyleSheet("QLabel { color : gray; font: 40pt }");
     // qDebug()<< Q_FUNC_INFO << m_currentTarget;
 
-    m_element = new QLabel();
-    // QPixmap map = m_icons[m_currentTarget - 1];
-    // m_element->setPixmap(map);
-    m_element->setPixmap(m_icons[m_currentTarget - 1]);
-    m_element->setAlignment(Qt::AlignCenter);
-
-    this->layout()->replaceWidget(this->
-                                  layout()->
-                                  itemAt(m_currentTarget-1)->
-                                  widget(),
-                                  m_element,
-                                  Qt::FindDirectChildrenOnly);
-
-
+    this->layout()->itemAt(m_currentTarget-1)->
+            widget()->setProperty("pixmap", m_icons[m_currentTarget - 1]);
 
     // qDebug()<< Q_FUNC_INFO << "[current target] "<< m_currentTarget <<"[map] "<< m_currentTarget-1;
 
