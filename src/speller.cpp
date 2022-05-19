@@ -29,6 +29,7 @@ Speller::Speller(QWidget *parent) : QDialog(parent)
     // ui->setupUi(this);
     setupUi(this);
     this->setProperty("windowTitle", "ERP Speller");
+    this->setStyleSheet("background-color:white");
     this->show();
 
     showWindow();
@@ -53,9 +54,6 @@ Speller::Speller(int i)
 
 void Speller::startTrial()
 {
-    // qDebug()<< "[TRIAL START]" << Q_FUNC_INFO;
-    // qDebug()<< "[TRIAL :] " << m_trials << " Target : "<< m_desiredPhrase.at(m_trials);
-
     if (m_state == trial_state::PRE_TRIAL)
     {
         preTrial();
@@ -80,7 +78,7 @@ void Speller::pauseFlashing()
     // qDebug() << Q_FUNC_INFO << QTime::currentTime().msec();
 
     //   this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation]-1)->
-   //                 widget()->setStyleSheet("QLabel { color : gray; font: 40pt }");
+    //                 widget()->setStyleSheet("QLabel { color : gray; font: 40pt }");
 
     this->layout()->itemAt(m_flashingSequence->sequence[m_currentStimulation]-1)->
             widget()->setProperty("pixmap", m_icons[m_flashingSequence->sequence[m_currentStimulation] - 1]);
@@ -123,7 +121,6 @@ void Speller::pauseFlashing()
 
 void Speller::preTrial()
 {
-    // qDebug()<< Q_FUNC_INFO;
 
     if(m_trials == 0)
     {
@@ -148,8 +145,6 @@ void Speller::preTrial()
         sendMarker(OVTK_StimulationId_TrialStart);
         m_flashingSequence = new RandomFlashSequence(m_nrElements, m_ERP->nrSequences());
 
-        //  qDebug() << Q_FUNC_INFO << m_flashingSequence->sequence;
-
         if (m_ERP->experimentMode() == operation_mode::CALIBRATION)
         {
             highlightTarget();
@@ -170,7 +165,7 @@ void Speller::preTrial()
 
     m_preTrialTimer->start();
     ++m_preTrialCount;
-    // qDebug() << Q_FUNC_INFO << m_preTrialCount;
+
     endPreTrial();
 }
 
@@ -271,25 +266,12 @@ void Speller::postTrial()
             {
                 int id = m_text[m_text.length()-1].digitValue();
                 // qDebug()<< Q_FUNC_INFO << "element ID" << id;
-
-                QPixmap map = m_icons[id-1];
-                m_element = new QLabel();
-                m_element->setPixmap(map);
-                m_element->setAlignment(Qt::AlignCenter);
-
-                this->layout()->replaceWidget(this->
-                                              layout()->
-                                              itemAt(id-1)->
-                                              widget(),
-                                              m_element,
-                                              Qt::FindDirectChildrenOnly);
-
-
-
+                this->layout()->itemAt(id-1)->
+                        widget()->setProperty("pixmap", m_icons[id-1]);
             }
             else if(m_ERP->experimentMode() == operation_mode::CALIBRATION)
             {
-               refreshTarget();
+                refreshTarget();
             }
         }
     }
@@ -316,7 +298,6 @@ void Speller::postTrial()
     }
     else if(m_desiredPhrase.length() <= 1)
     {
-        // qDebug() << "[POST TRIAL 1]" << Q_FUNC_INFO;
         m_currentLetter = 0;
         emit(slotTerminated());
         return;
@@ -331,31 +312,19 @@ void Speller::postTrial()
 
 void Speller::receiveFeedback()
 {
-    // qDebug() << Q_FUNC_INFO;
-    // qDebug() << "FEEDBACK SOCKET PORT" << m_feedbackPort;
     // wait for OV python script to write in UDP feedback socket
-    // utils::wait(500);
-    // utils::wait(250);
-    // utils::wait(200);
-    // utils::wait(80);
-    // m_feedbackSocket->waitForReadyRead(90);
-    // qDebug()<< QTime::currentTime();
-
     m_feedbackSocket->waitForReadyRead();
     QHostAddress sender;
     quint16 senderPort;
     QByteArray *buffer = new QByteArray();
 
     buffer->resize(m_feedbackSocket->pendingDatagramSize());
-    // qDebug() << "buffer size" << buffer->size();
 
-    //m_feedbackSocket->readDatagram(buffer->data(), buffer->size(), &sender, &senderPort);
     while(m_feedbackSocket->hasPendingDatagrams())
     {
         m_feedbackSocket->readDatagram(buffer->data(), buffer->size(), &sender, &senderPort);
     }
-    //  feedback_socket->waitForBytesWritten();
-    // qDebug()<< "Received: "<< QString(buffer->data());
+
     m_text += QString(buffer->data());
 }
 
@@ -383,8 +352,6 @@ bool Speller::isTarget(int t_stim)
 
 void Speller::highlightTarget()
 {
-
-    // qDebug()<< Q_FUNC_INFO << "inside Base class";
     int idx = 0;
 
     for (int i=0; i<m_rows; i++)
@@ -413,16 +380,12 @@ void Speller::highlightTarget()
 
 void Speller::refreshTarget()
 {
-
     //   this->layout()->itemAt(m_currentTarget)->
     //           widget()->setStyleSheet("QLabel { color : gray; font: 40pt }");
     // qDebug()<< Q_FUNC_INFO << m_currentTarget;
 
     this->layout()->itemAt(m_currentTarget-1)->
             widget()->setProperty("pixmap", m_icons[m_currentTarget - 1]);
-
-    // qDebug()<< Q_FUNC_INFO << "[current target] "<< m_currentTarget <<"[map] "<< m_currentTarget-1;
-
 }
 
 void Speller::sendStimulationInfo()
@@ -436,7 +399,6 @@ void Speller::sendStimulationInfo()
     {
         if (isTarget())
         {
-            // qDebug()<< desired_phrase[currentLetter];
             sendMarker(OVTK_StimulationId_Target);
         }
         else
@@ -464,13 +426,11 @@ void Speller::switchStimulationTimers()
 
 void Speller::startPreTrial()
 {
-    // qDebug() << Q_FUNC_INFO;
-
     if (m_preTrialCount == 0)
     {
         sendMarker(OVTK_StimulationId_TrialStart);
         m_flashingSequence = new RandomFlashSequence(m_nrElements, m_ERP->nrSequences());
-        // qDebug() << "about to test mode";
+
         if (m_ERP->experimentMode() == operation_mode::CALIBRATION)
         {
             highlightTarget();
@@ -491,12 +451,11 @@ void Speller::startPreTrial()
 
 void Speller::endPreTrial()
 {
-    // qDebug() << Q_FUNC_INFO;
     if (m_preTrialCount > m_preTrialWait || m_ERP->experimentMode() == operation_mode::FREE_MODE)
     {
-     //   if(m_ERP->experimentMode() == operation_mode::COPY_MODE ||
-     //            m_ERP->experimentMode() == operation_mode::CALIBRATION)
-     if( m_ERP->experimentMode() == operation_mode::COPY_MODE)
+        //   if(m_ERP->experimentMode() == operation_mode::COPY_MODE ||
+        //            m_ERP->experimentMode() == operation_mode::CALIBRATION)
+        if( m_ERP->experimentMode() == operation_mode::COPY_MODE)
         {
             refreshTarget();
         }
@@ -761,16 +720,9 @@ void Speller::showFeedback(QString command, bool correct)
             painter.setFont(QFont("Arial", 30));
             painter.drawText(QPoint(25, 50), speed);
 
-            m_element = new QLabel();
-            m_element->setPixmap(map);
-            m_element->setAlignment(Qt::AlignCenter);
+            this->layout()->itemAt(id-1)->
+                    widget()->setProperty("pixmap", map);
 
-            this->layout()->replaceWidget(this->
-                                          layout()->
-                                          itemAt(id-1)->
-                                          widget(),
-                                          m_element,
-                                          Qt::FindDirectChildrenOnly);
         }
 
         else if (m_ERP->experimentMode() == operation_mode::FREE_MODE)
@@ -782,16 +734,8 @@ void Speller::showFeedback(QString command, bool correct)
             painter.setFont(QFont("Arial", 30));
             painter.drawText(QPoint(25, 50), speed);
 
-            m_element = new QLabel();
-            m_element->setPixmap(map);
-            m_element->setAlignment(Qt::AlignCenter);
-
-            this->layout()->replaceWidget(this->
-                                          layout()->
-                                          itemAt(id-1)->
-                                          widget(),
-                                          m_element,
-                                          Qt::FindDirectChildrenOnly);
+            this->layout()->itemAt(id-1)->
+                    widget()->setProperty("pixmap", map);
 
         }
         //
@@ -802,17 +746,8 @@ void Speller::showFeedback(QString command, bool correct)
                 m_ERP->experimentMode() == operation_mode::FREE_MODE)
         {
             map = m_icons[id-1];
-            m_element = new QLabel();
-            m_element->setPixmap(map);
-            m_element->setAlignment(Qt::AlignCenter);
-
-            this->layout()->replaceWidget(this->
-                                          layout()->
-                                          itemAt(id-1)->
-                                          widget(),
-                                          m_element,
-                                          Qt::FindDirectChildrenOnly);
-
+            this->layout()->itemAt(id-1)->
+                    widget()->setProperty("pixmap", map);
 
         }
     }
@@ -872,8 +807,9 @@ void Speller::createLayout()
 
     // layout->setHorizontalSpacing(400);
     // layout->setVerticalSpacing(100);
-    // layout->setHorizontalSpacing(10); //100
+    layout->setHorizontalSpacing(110); //110 for alignment
     // layout->setVerticalSpacing(5); //40
+
 
     m_textRow->setText(m_desiredPhrase);
     m_textRow->hide();
@@ -885,6 +821,7 @@ void Speller::createLayout()
     QImage iconImage;
     int label_h, label_w;
     // add speller ellements
+    Qt::AlignmentFlag alignment = Qt::AlignCenter;
     for(int i=1; i<m_rows+1; i++)
     {
         for(int j=0; j<m_cols; j++)
@@ -894,15 +831,8 @@ void Speller::createLayout()
             label_h = element->height() + 40;
             label_w = element->width() + 40;
 
-            //            QLabel element;
-            //            label_h = element.height() + 40;
-            //            label_w = element.width() + 40;
-
             stimName = ":/images/" + QString::number(k) + ".png"; // directions images
             pic = QPixmap(stimName);
-
-            //            element.setPixmap(pic.scaled(label_w, label_h, Qt::KeepAspectRatio));
-            //            element.setAlignment(Qt::AlignCenter);
 
             // element->setText(letters[i-1][j]);
 
@@ -922,7 +852,21 @@ void Speller::createLayout()
 
             //            m_icons->append(element);
             //            m_icons.append(element);
-            layout->addWidget(element, i, j);
+
+            // QuickHack: FIXME
+            if (j ==0)
+            {
+                alignment = Qt::AlignRight;
+            }
+            else if (j==1)
+            {
+                alignment = Qt::AlignCenter;
+            }
+            else {
+                alignment= Qt::AlignLeft;
+            }
+
+            layout->addWidget(element, i, j, alignment);
 
             m_presentedLetters.append(QString::number(k));
             k++;
@@ -931,6 +875,7 @@ void Speller::createLayout()
     }
 
     this->setLayout(layout);
+    // this->setStyleSheet("background-color:gray"); //brown
 }
 
 void Speller::refreshLayout()

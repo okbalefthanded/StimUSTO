@@ -69,8 +69,8 @@ void ERP::fromVariant(const QVariant &variant)
             if (m_experimentMode == operation_mode::CALIBRATION)
             {
                 // randomPhrase = new RandomFlashSequence(9, 4);
-                // randomPhrase = new RandomFlashSequence(9, 3);
-                randomPhrase = new RandomFlashSequence(9, 2);
+                randomPhrase = new RandomFlashSequence(9, 3);
+                // randomPhrase = new RandomFlashSequence(9, 2);
                 // randomPhrase = new RandomFlashSequence(9, 1);
 
                 // RandomFlashSequence *randomPhrase = new RandomFlashSequence(9, 2);

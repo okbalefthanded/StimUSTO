@@ -205,6 +205,7 @@ void SsvepCircle::preTrial()
 
 void SsvepCircle::postTrial()
 {
+    // initElements();
     disconnect(this, SIGNAL(frameSwapped()), this, SLOT(update()));
     initElements();
 
@@ -212,7 +213,8 @@ void SsvepCircle::postTrial()
     m_state = trial_state::PRE_TRIAL;
 
     // feedback
-    if(m_ssvep->experimentMode() == operation_mode::COPY_MODE || m_ssvep->experimentMode() == operation_mode::FREE_MODE)
+    if(m_ssvep->experimentMode() == operation_mode::COPY_MODE ||
+            m_ssvep->experimentMode() == operation_mode::FREE_MODE)
     {
         feedback();  // wait for feedback
         if (m_presentFeedback)
@@ -274,10 +276,15 @@ void SsvepCircle::Flickering()
     while(m_index <= m_flicker[0].size())
     {
         QCoreApplication::processEvents(QEventLoop::AllEvents);
-        if (m_receivedFeedback)
-            break;
+        //if (m_receivedFeedback)
+       //     break;
     }
-
+    /*
+    if (m_index > m_flicker[0].size())
+    {
+        initElements();
+    }
+    */
     sendMarker(OVTK_StimulationId_TrialStop);
     m_state = trial_state::POST_TRIAL;
 }
@@ -291,7 +298,6 @@ void SsvepCircle::feedback()
     {
         if(m_ssvep->experimentMode() == operation_mode::COPY_MODE)
         {
-
             if(m_sessionFeedback[m_currentFlicker].digitValue() == m_flickeringSequence->sequence[m_currentFlicker])
             {
                 highlightFeedback(glColors::green, m_flickeringSequence->sequence[m_currentFlicker]-1);
@@ -729,7 +735,6 @@ void SsvepCircle::setPresentFeedback(bool presentFeedback)
     m_presentFeedback = presentFeedback;
 }
 
-
 SSVEP *SsvepCircle::ssvep() const
 {
     return m_ssvep;
@@ -739,7 +744,6 @@ void SsvepCircle::setSsvep(SSVEP *ssvep)
 {
     m_ssvep = ssvep;
 }
-
 
 bool SsvepCircle::isCorrect() const
 {

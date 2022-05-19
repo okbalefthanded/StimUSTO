@@ -136,9 +136,17 @@ void FaceSpeller::stimulationInvertedColoredFace()
     {
         pixmap = m_multStimuli[0];
     }
+
     else if (currentStim <= 6)
     {
-        pixmap = m_multStimuli[1];
+        if (currentStim == 5)
+        {
+            pixmap = m_multStimuli[3];
+        }
+        else
+        {
+            pixmap = m_multStimuli[1];
+        }
     }
     else if (currentStim <= 9)
     {
