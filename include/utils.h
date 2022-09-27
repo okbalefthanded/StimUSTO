@@ -19,8 +19,8 @@ static QChar letters[6][6] = {
 };
 
 // static QString ArabicLetters = "أبتثجحخدذرزسشصضطظغفقكلمنهوي";
-static QString ArabicLetters = "دخحجثتبأطضصشسزرذنملكقفغظيوه";
-static QString numbers = "0123456789<_>";
+const static QString ArabicLetters = "دخحجثتبأطضصشسزرذنملكقفغظيوه";
+const static QString numbers = "0123456789<_>";
 
 // rectangle flickering
 QVector<double> gen_flick(double freq, int refreshRate, float length, quint8 stimMode, double phase=0.0);

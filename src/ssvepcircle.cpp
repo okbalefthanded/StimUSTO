@@ -109,7 +109,7 @@ void SsvepCircle::resizeGL(int w, int h)
     //TODO
     //    (void)w;
     //    (void)h;
-    // initElements();
+    initElements();
 }
 
 void SsvepCircle::paintGL()
@@ -206,8 +206,9 @@ void SsvepCircle::preTrial()
 void SsvepCircle::postTrial()
 {
     // initElements();
+    // qDebug()<< Q_FUNC_INFO;
     disconnect(this, SIGNAL(frameSwapped()), this, SLOT(update()));
-    initElements();
+    refreshCircles(); // initElements();
 
     m_index = 0;
     m_state = trial_state::PRE_TRIAL;
@@ -231,6 +232,8 @@ void SsvepCircle::postTrial()
     {
         refreshTarget();
     }
+
+    // refreshCircles();
 
     externalCommunication();
 
@@ -276,23 +279,32 @@ void SsvepCircle::Flickering()
     while(m_index <= m_flicker[0].size())
     {
         QCoreApplication::processEvents(QEventLoop::AllEvents);
-        //if (m_receivedFeedback)
-       //     break;
+        if (m_receivedFeedback)
+        {
+
+            break;
+        }
     }
+
     /*
     if (m_index > m_flicker[0].size())
     {
         initElements();
     }
     */
+
     sendMarker(OVTK_StimulationId_TrialStop);
     m_state = trial_state::POST_TRIAL;
 }
 
 void SsvepCircle::feedback()
 {
+
     // receiveFeedback
-    m_feedbackSocket->waitForReadyRead();
+    if (!m_receivedFeedback)
+    {
+        m_feedbackSocket->waitForReadyRead();
+      }
 
     if(m_presentFeedback)
     {
@@ -333,17 +345,17 @@ void SsvepCircle::receiveFeedback()
 
     log->write(buffer->data());
 
-   //  if(!strcmp(buffer->data(),"-1"))
-  //  {
-        if (m_flickeringSequence->sequence.length() == 1) // Hybrid stimulation mode
-        {
-            m_sessionFeedback = buffer->data();
-        }
-        else
-        {
-            m_sessionFeedback += buffer->data();
-        }
-   // }
+    //  if(!strcmp(buffer->data(),"-1"))
+    //  {
+    if (m_flickeringSequence->sequence.length() == 1) // Hybrid stimulation mode
+    {
+        m_sessionFeedback = buffer->data();
+    }
+    else
+    {
+        m_sessionFeedback += buffer->data();
+    }
+    // }
 
     m_receivedFeedback = true;
 }
@@ -502,6 +514,14 @@ void SsvepCircle::initIndices()
     //  qDebug()<< Q_FUNC_INFO << m_vindices.count() << m_vindices;
 }
 
+void SsvepCircle::refreshCircles()
+{
+    // qDebug()<< Q_FUNC_INFO ;
+    initColors();  // vertices' colors
+    //
+    scheduleRedraw();
+}
+
 void SsvepCircle::externalCommunication()
 {
     // Send and Recieve feedback to/from Robot if external communication is enabled
@@ -611,6 +631,7 @@ void SsvepCircle::refreshTarget()
             }
         }
     }
+
     scheduleRedraw();
 }
 
@@ -753,7 +774,6 @@ bool SsvepCircle::isCorrect() const
 void SsvepCircle::update()
 {
     // qDebug()<< "[update ] Index : "<< m_index << "current time: " << QTime::currentTime().msec();
-
     if(m_index == 0)
     {
         sendMarker(config::OVTK_StimulationLabel_Base + m_flickeringSequence->sequence[m_currentFlicker]);
@@ -790,11 +810,11 @@ void SsvepCircle::update()
     }
 
     ++m_index;
+
     scheduleRedraw();
 }
 
 // Setters
-
 void SsvepCircle::setFrequencies(QString freqs)
 {
     QStringList freqsList = freqs.split(',');

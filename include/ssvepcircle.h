@@ -67,7 +67,7 @@ private slots:
 public slots:
 
     //    void create_layout();
-    //    void refresh_layout();
+    void refreshCircles();
 
     void sendMarker(uint64_t ovStimulation){
         emit markerTag(ovStimulation);
@@ -104,7 +104,6 @@ private:
     float m_correct = 0;
 
     int m_lostFrames = 0;
-
     //
     SSVEP *m_ssvep;
     QList<double> m_frequencies;

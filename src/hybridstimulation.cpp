@@ -202,9 +202,9 @@ void HybridStimulation::swichStimWindows()
         {
             m_ERPanimation->start();
             // m_ERPspeller->show();
-
             m_ERPspeller->showFullScreen();
             m_ssvepStimulation->hide();
+
         }
     }
 }
@@ -349,7 +349,7 @@ void HybridStimulation::hybridPostTrial()
     {
         // increase waiting time after feedabck by 500 or 1000 ms (experimenting with 2000ms)
         // only when control of external device is disabled
-        utils::wait(2000); // 1000
+        utils::wait(1000); // 1000
     }
 
     if (m_hybridCommand[0] != '#' && doExternalComm)
@@ -408,13 +408,13 @@ void HybridStimulation::terminateExperiment()
 void HybridStimulation::initAnimations()
 {
     m_ERPanimation = new QPropertyAnimation(m_ERPspeller, "windowOpacity");
-    m_ERPanimation->setDuration(1000); //500 //250
+    m_ERPanimation->setDuration(1000); //2000 //500 //250
     m_ERPanimation->setStartValue(0.0); //
     m_ERPanimation->setEndValue(1.0); //
     connect(m_ERPanimation, SIGNAL(finished()), m_ERPspeller, SLOT(startTrial()));
 
     m_SSVEPanimation = new QPropertyAnimation(m_ssvepStimulation, "opacity");
-    m_SSVEPanimation->setDuration(500); //500 //250
+    m_SSVEPanimation->setDuration(500); //1000  //500 //250
     m_SSVEPanimation->setStartValue(0.0); //1366
     m_SSVEPanimation->setEndValue(1.0); // 0
     connect(m_SSVEPanimation, SIGNAL(finished()), m_ssvepStimulation, SLOT(startTrial()));
