@@ -541,6 +541,15 @@ void Speller::externalCommunication()
     }
 }
 
+void Speller::fillFeedBackMap(QPixmap *map, QColor t_mapColor, QColor t_textColor, QString text)
+{
+    map->fill(t_mapColor);
+    QPainter painter(map);
+    painter.setPen(t_textColor);
+    painter.setFont(QFont("Arial", 30));
+    painter.drawText(QPoint(25, 50), text);
+}
+
 QString Speller::getDesiredPhrase() const
 {
     return m_desiredPhrase;
@@ -687,52 +696,47 @@ void Speller::showFeedback(QString command, bool correct)
     {
         id = command[0].digitValue();
         QString speed = command.at(1);
+        QColor mapColor, textColor;
         // qDebug()<< "speed "<< speed << command;
-        // present feedbck
+        // present feedbck : copy mode
         if (m_ERP->experimentMode() == operation_mode::COPY_MODE)
         {
-            map = m_icons[id-1];
+
             // feedback: green correct selection, highlight the target icon
             //           blue incorrect selection, highlight the selected icon
+            map = m_icons[id-1];
             if( m_text[m_text.length()-1] == m_desiredPhrase[m_desiredPhrase.length() - 1])
             {
-                map.fill(Qt::green);
+                mapColor = Qt::green;
                 isCorrect = true;
                 ++m_correct;
             }
             else
             {
-                map.fill(Qt::blue);
+                mapColor = Qt::blue;
                 isCorrect = false;
             }
-            QColor color;
+
             if (correct)
             {
-                color = Qt::red;
+                textColor = Qt::red;
             }
             else
             {
-                color = Qt::black;
+                textColor = Qt::black;
             }
-            QPainter painter(&map);
-            // painter.setPen(Qt::white);
-            painter.setPen(color);
-            painter.setFont(QFont("Arial", 30));
-            painter.drawText(QPoint(25, 50), speed);
+
+            fillFeedBackMap(&map, mapColor, textColor, speed);
 
             this->layout()->itemAt(id-1)->
                     widget()->setProperty("pixmap", map);
 
         }
-
+        // present feedback: FREE mode
         else if (m_ERP->experimentMode() == operation_mode::FREE_MODE)
         {
             map = m_icons[id-1];
-            map.fill(Qt::blue);
-            QPainter painter(&map);
-            painter.setPen(Qt::black);
-            painter.setFont(QFont("Arial", 30));
-            painter.drawText(QPoint(25, 50), speed);
+            fillFeedBackMap(&map, Qt::blue, Qt::black, speed);
 
             this->layout()->itemAt(id-1)->
                     widget()->setProperty("pixmap", map);

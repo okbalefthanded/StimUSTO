@@ -92,7 +92,7 @@ protected:
     void trialEnd();
 
     void externalCommunication();
-
+    void fillFeedBackMap(QPixmap *map, QColor t_mapColor, QColor t_textColor, QString text="");
     // Ui::Speller *ui;
 
     int m_rows;

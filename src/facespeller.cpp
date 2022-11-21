@@ -53,6 +53,7 @@ void FaceSpeller::stimulationFace()
 void FaceSpeller::stimulationColoredFace()
 {
     // TODO FIXME
+    /*
     switch (m_flashingSequence->sequence[m_currentStimulation])
     {
     case 1:
@@ -111,6 +112,33 @@ void FaceSpeller::stimulationColoredFace()
     }
 
     }
+    */
+
+    int currentStim = m_flashingSequence->sequence[m_currentStimulation];
+    QPixmap pixmap;
+
+    if(currentStim <= 3)
+    {
+        pixmap = QPixmap(":/images/bennabi_face_magenta.png");
+    }
+
+    else if (currentStim <= 6)
+    {
+        if (currentStim == 5)
+        {
+            pixmap =  QPixmap(":/images/bennabi_face_orange.png");
+        }
+        else
+        {
+            pixmap = QPixmap(":/images/bennabi_face_blue.png");
+        }
+    }
+    else if (currentStim <= 9)
+    {
+        pixmap = QPixmap(":/images/bennabi_face_red.png");
+    }
+
+    this->layout()->itemAt(currentStim-1)->widget()->setProperty("pixmap", pixmap);
 
 }
 

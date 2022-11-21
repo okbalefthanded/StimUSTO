@@ -47,4 +47,11 @@ StimUSTO.exe --nogui True --file "/config/default_.json"
 ---
 
 ## Citation
-
+@misc{bekhelifi2022fast,
+    title={Towards Fast Single-Trial Online ERP based Brain-Computer Interface using dry EEG electrodes and neural networks: a pilot study},
+    author={Okba Bekhelifi and Nasr-Eddine Berrached},
+    year={2022},
+    eprint={2211.10352},
+    archivePrefix={arXiv},
+    primaryClass={eess.SP}
+}

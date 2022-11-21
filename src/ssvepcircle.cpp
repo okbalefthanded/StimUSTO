@@ -218,6 +218,7 @@ void SsvepCircle::postTrial()
             m_ssvep->experimentMode() == operation_mode::FREE_MODE)
     {
         feedback();  // wait for feedback
+
         if (m_presentFeedback)
         {
             // feedback for 0.5 sec & refresh
@@ -299,7 +300,6 @@ void SsvepCircle::Flickering()
 
 void SsvepCircle::feedback()
 {
-
     // receiveFeedback
     if (!m_receivedFeedback)
     {
