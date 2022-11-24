@@ -279,6 +279,9 @@ void Speller::postTrial()
     // Send and Recieve feedback to/from Robot if external communication is enabled
     externalCommunication();
 
+    // pause for 1 sec
+    utils::wait(1000);
+    //
     m_currentStimulation = 0;
     m_state = trial_state::PRE_TRIAL;
     //

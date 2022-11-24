@@ -54,6 +54,8 @@ void SsvepCircle::initializeGL()
     glEnable(GL_FRAMEBUFFER_SRGB);
 
     m_flicker.resize(m_frequencies.size());
+    qDebug()<< Q_FUNC_INFO << m_frequencies;
+
     double phase = 0.0;
     for (int i=0; i < m_frequencies.size(); ++i)
     {
@@ -134,6 +136,12 @@ void SsvepCircle::paintGL()
     {
         renderText();
     }
+
+    // a hacky way to render text with feedback
+    if(m_state == trial_state::POST_TRIAL && m_showExternalFeedback && m_receivedFeedback)
+    {
+        renderFeedBackText();
+    }
 }
 
 void SsvepCircle::startTrial()
@@ -211,7 +219,7 @@ void SsvepCircle::postTrial()
     refreshCircles(); // initElements();
 
     m_index = 0;
-    m_state = trial_state::PRE_TRIAL;
+    //  m_state = trial_state::PRE_TRIAL;
 
     // feedback
     if(m_ssvep->experimentMode() == operation_mode::COPY_MODE ||
@@ -234,6 +242,7 @@ void SsvepCircle::postTrial()
         refreshTarget();
     }
 
+    m_state = trial_state::PRE_TRIAL;
     // refreshCircles();
 
     externalCommunication();
@@ -304,7 +313,7 @@ void SsvepCircle::feedback()
     if (!m_receivedFeedback)
     {
         m_feedbackSocket->waitForReadyRead();
-      }
+    }
 
     if(m_presentFeedback)
     {
@@ -368,11 +377,48 @@ void SsvepCircle::initElements()
     int vectorsSize = (m_ssvep->nrElements() * m_vertexPerCircle) + m_ssvep->nrElements();
     m_vertices.resize(vectorsSize);
     //
+    initCenters(); // circles centers points
     initCircles(); // vertices
     initColors();  // vertices' colors
     initIndices(); // vertices indices
     //
     scheduleRedraw();
+}
+
+void SsvepCircle::initCenters()
+{
+    int n_elements = m_ssvep->nrElements();
+    QSize screenSize = utils::getScreenSize();
+    float radiusx = glUtils::STIM_RADIUS / (screenSize.width() * glUtils::PIXEL_CM);
+    float radiusy = glUtils::STIM_RADIUS / (screenSize.height() * glUtils::PIXEL_CM);
+    int start = 0;
+
+    m_centerPoints.resize(n_elements);
+
+    // circular layout, experimental
+    /*
+    if(m_ssvep->controlMode() == control_mode::ASYNC)
+    {
+        m_centerPoints[0] = QVector3D(0.0f, 0.0f, 1.0f);
+        --n_elements;
+        start = 1;
+    }
+
+    for(int i=start; i<=n_elements; ++i)
+    {
+         m_centerPoints[i].setX(radiusx * cos(i));
+         m_centerPoints[i].setY(radiusy * sin(i));
+         m_centerPoints[i].setZ(1.0f);
+    }
+    */
+
+    for (int j = 0; j<=n_elements; ++j)
+    {
+        // circles center points
+        m_centerPoints[j].setX(refPoints::centers[j].x());
+        m_centerPoints[j].setY(refPoints::centers[j].y());
+        m_centerPoints[j].setZ(refPoints::centers[j].z());
+    }
 }
 
 void SsvepCircle::initCircles()
@@ -401,9 +447,13 @@ void SsvepCircle::initCircles()
     for (int j = start; j<=elements; ++j)
     {
         // circles center points
-        x = refPoints::centers[j].x();
-        y = refPoints::centers[j].y();
-        z = refPoints::centers[j].z();
+        // x = refPoints::centers[j].x();
+        // y = refPoints::centers[j].y();
+        // z = refPoints::centers[j].z();
+        x = m_centerPoints[j].x();
+        y = m_centerPoints[j].y();
+        z = m_centerPoints[j].z();
+
         setVertex(k, x, y, z);
 
         // circles vertices
@@ -425,7 +475,8 @@ void SsvepCircle::initCircles()
     int i=start;
     for (int ind=k; ind<m_vertices.count();++ind)
     {
-        setVertex(ind, refPoints::centers[i].x(), refPoints::centers[i].y(), refPoints::centers[i].z());
+        //  setVertex(ind, refPoints::centers[i].x(), refPoints::centers[i].y(), refPoints::centers[i].z());
+        setVertex(ind, m_centerPoints[i].x(), m_centerPoints[i].y(), m_centerPoints[i].z());
         ++i;
     }
 
@@ -594,6 +645,7 @@ void SsvepCircle::highlightTarget()
 
 void SsvepCircle::refreshTarget()
 {
+    // Single element
     if(m_ssvep->nrElements() == 1)
     {
         for (int i=0; i<m_vertexPerCircle; ++i)
@@ -605,7 +657,7 @@ void SsvepCircle::refreshTarget()
     {
         int tmp = m_flickeringSequence->sequence[m_currentFlicker]-1;
         int circleIndex = m_vertexPerCircle*tmp;
-
+        // Sync Mode
         if( m_ssvep->controlMode() == control_mode::SYNC)
         {
             for(int i=circleIndex;i<circleIndex+m_vertexPerCircle; ++i)
@@ -613,6 +665,7 @@ void SsvepCircle::refreshTarget()
                 m_colors[i] = glColors::white;
             }
         }
+        // ASync Mode
         else
         {
             if(m_flickeringSequence->sequence[m_currentFlicker] == 1)
@@ -637,8 +690,9 @@ void SsvepCircle::refreshTarget()
 
 void SsvepCircle::highlightFeedback(QVector3D feedbackColor, int feedbackIndex)
 {
+    // qDebug()<< Q_FUNC_INFO;
     int circleIndex = m_vertexPerCircle*feedbackIndex;
-    for(int i=circleIndex;i<circleIndex+m_vertexPerCircle; ++i)
+    for(int i=circleIndex; i<circleIndex+m_vertexPerCircle; ++i)
     {
         m_colors[i] = feedbackColor;
     }
@@ -651,9 +705,13 @@ void SsvepCircle::refresh(int feedbackIndex)
     int circleIndex = m_vertexPerCircle*feedbackIndex;
     QVector3D color;
 
-    if(feedbackIndex == 0 && m_ssvep->controlMode() == control_mode::ASYNC)
+    if(m_ssvep->controlMode() == control_mode::ASYNC)
+
     {
-        color = glColors::gray;
+        if (feedbackIndex == 0)
+        {
+            color = glColors::gray;
+        }
     }
     else
     {
@@ -702,21 +760,22 @@ void SsvepCircle::scheduleRedraw()
 
 void SsvepCircle::renderText()
 {
+    qDebug()<< Q_FUNC_INFO;
+
     int screenWidth, screenHeight;
     int x, y;
     QPainter painter(this);
 
     painter.setPen(Qt::red);
-
     painter.setFont(QFont("Arial", 20, 20));
 
     x = 0;
     y = 0;
 
     QSize screenSize = utils::getScreenSize();
-
-    screenWidth = screenSize.width();
+    screenWidth  = screenSize.width();
     screenHeight = screenSize.height();
+
     // int k[4] = {1,2,4,3};
     // int k[4] = {1,2,3,4}; // for one-line
     std::array<int, 5> k = {1,2,4,3,0};
@@ -725,25 +784,53 @@ void SsvepCircle::renderText()
         k = {1,2,3,4,5};
     }
 
-    for (int i=0; i<m_centers.length(); i++)
+    // for (int i=0; i<m_centers.length(); i++)
+    for (int i=0; i<m_centerPoints.length(); i++)
     {
         // leftPixels = leftPercent * screenWidth /2;
         // topPixels = topPercent * screenHeight /2;
-        x = int(m_centers[i].x() * (screenWidth / 2));
+        // x = int(m_centers[i].x() * (screenWidth / 2));
         // y = int(m_centers[i].y() * (screenHeight/ 2) - 50);
         // y = int(m_centers[i].y() * (screenHeight/ 2)- 75); // for one-line
-        y = int(m_centers[i].y() * (screenHeight/ 2) + 80);
+        // y = int(m_centers[i].y() * (screenHeight/ 2) + 80);
+
+        x = int(m_centerPoints[i].x() * (screenWidth / 2));
+        y = int(m_centerPoints[i].y() * (screenHeight/ 2) + 80);
+
+        // x = 0; y = 0;
+
+        qDebug()<< "x: " << x << " y: "<< y;
         // painter.drawText(x, y, width(), height(), Qt::AlignCenter, QString::number(i+1));
         painter.drawText(x, -y, width(), height(), Qt::AlignCenter, QString::number(k[i]));
     }
-    painter.end();
 }
 
-void SsvepCircle::setVertex(int t_index, float x, float y, float z)
+void SsvepCircle::renderFeedBackText()
 {
-    m_vertices[t_index].setX(x);
-    m_vertices[t_index].setY(y);
-    m_vertices[t_index].setZ(z);
+   // qDebug()<< Q_FUNC_INFO;
+
+    QSize screenSize = utils::getScreenSize();
+    int screenWidth, screenHeight;
+    int x, y;
+    //
+    // int i = m_sessionFeedback[m_currentFlicker].digitValue();
+    int i = m_externalFeedback;
+    QString fbk = QString::number(i);
+
+    QPainter painter(this);
+    painter.setPen(Qt::red);
+    painter.setFont(QFont("Arial", 30, 30));
+
+    screenWidth  = screenSize.width();
+    screenHeight = screenSize.height();
+
+    x = int(m_centerPoints[i].x() * (screenWidth / 2));
+    y = int(m_centerPoints[i].y() * (screenHeight/ 2));
+
+    painter.drawText(x, -y, width(), height(), Qt::AlignCenter, fbk);
+
+    // qDebug()<<Q_FUNC_INFO << m_externalFeedback;
+
 }
 
 bool SsvepCircle::presentFeedback() const
@@ -751,19 +838,9 @@ bool SsvepCircle::presentFeedback() const
     return m_presentFeedback;
 }
 
-void SsvepCircle::setPresentFeedback(bool presentFeedback)
-{
-    m_presentFeedback = presentFeedback;
-}
-
 SSVEP *SsvepCircle::ssvep() const
 {
     return m_ssvep;
-}
-
-void SsvepCircle::setSsvep(SSVEP *ssvep)
-{
-    m_ssvep = ssvep;
 }
 
 bool SsvepCircle::isCorrect() const
@@ -815,6 +892,43 @@ void SsvepCircle::update()
 }
 
 // Setters
+void SsvepCircle::setSsvep(SSVEP *ssvep)
+{
+    m_ssvep = ssvep;
+}
+
+void SsvepCircle::setPresentFeedback(bool presentFeedback)
+{
+    m_presentFeedback = presentFeedback;
+}
+
+void SsvepCircle::setVertex(int t_index, float x, float y, float z)
+{
+    m_vertices[t_index].setX(x);
+    m_vertices[t_index].setY(y);
+    m_vertices[t_index].setZ(z);
+}
+
+bool SsvepCircle::showExternalFeedback() const
+{
+    return m_showExternalFeedback;
+}
+
+void SsvepCircle::setShowExternalFeedback(bool newShowExternalFeedback)
+{
+    m_showExternalFeedback = newShowExternalFeedback;
+}
+
+int SsvepCircle::externalFeedback() const
+{
+    return m_externalFeedback;
+}
+
+void SsvepCircle::setExternalFeedback(int newExternalFeedback)
+{
+    m_externalFeedback = newExternalFeedback;
+}
+
 void SsvepCircle::setFrequencies(QString freqs)
 {
     QStringList freqsList = freqs.split(',');

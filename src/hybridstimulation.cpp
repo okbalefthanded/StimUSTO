@@ -57,18 +57,21 @@ HybridStimulation::HybridStimulation(Hybrid *hybridStimulation, Speller *ERPspel
     connect(m_ERPspeller, SIGNAL(slotTerminated()), this, SLOT(switchState()) );
     connect(m_ssvepStimulation, SIGNAL(slotTerminated()), this, SLOT(switchState()));
 
+    if(utils::screenCount() == 2)
+    {
+        m_ERPspeller->move(-1366, 0);//quick hack
+    }
+
     if(m_hybridStimulaiton->m_order == order::ERP_FIRST)
     {
         m_ssvepStimulation->hide();
+        m_ssvepStimulation->setPresentFeedback(true);
+        m_ssvepStimulation->setShowExternalFeedback(true);
         m_ERPspeller->show();
+
     }
     else
     {
-        if(utils::screenCount() == 2)
-        {
-             m_ERPspeller->move(-1366, 0);//quick hack
-        }
-
         m_ERPspeller->hide();
         m_ssvepStimulation->setScreen(QGuiApplication::screens().last());
         m_ssvepStimulation->showFullScreen();
@@ -124,19 +127,19 @@ void HybridStimulation::startTrial()
         {
             if(m_switchStimulation)
             {
-                qDebug() << Q_FUNC_INFO << "ERP trial";
+                //qDebug() << Q_FUNC_INFO << "ERP trial";
                 swichStimWindows();
                 // m_ERPspeller->startTrial();
             }
             else
             {
-                qDebug() << Q_FUNC_INFO << "SSVEP trial";
+                // qDebug() << Q_FUNC_INFO << "SSVEP trial";
                 swichStimWindows();
-                utils::wait(100); // pause before switching
+                // utils::wait(100); // pause before switching
                 // m_ssvepStimulation->startTrial();
             }
         }
-
+        // SSVEP stim first
         else
         {
             swichStimWindows();
@@ -164,21 +167,39 @@ void HybridStimulation::switchState()
 
 void HybridStimulation::swichStimWindows()
 {
+   // qDebug()<< Q_FUNC_INFO << m_currentTrial;
 
+    // ERP FIRST IN ORDER
     if(m_hybridStimulaiton->m_order == order::ERP_FIRST)
     {
+        // ERP TRIAL
         if(m_switchStimulation)
         {
-            m_ssvepStimulation->hide();
-            m_ERPspeller->show();
+            if(m_currentTrial == 0)
+            {
+                m_ssvepStimulation->hide();
+                m_ERPspeller->show();
+                m_ERPspeller->startTrial();
+                return;
+            }
+            else
+            {
+                m_ERPanimation->start();
+                // m_ERPspeller->show();
+                m_ERPspeller->showFullScreen();
+                m_ssvepStimulation->hide();
+            }
         }
+        // SSVEP TRIAL
         else
         {
             m_ssvepStimulation->setScreen(QGuiApplication::screens().last());
+            m_SSVEPanimation->start();
             m_ssvepStimulation->showFullScreen();
             m_ERPspeller->hide();
         }
     }
+    // SSVEP FIRST IN ORDER
     else
     {
         if(m_switchStimulation)
@@ -287,7 +308,7 @@ void HybridStimulation::externalComm()
 
 void HybridStimulation::hybridPostTrial()
 {
-    // qDebug() << "[HYBRID POST TRIAL]" << Q_FUNC_INFO;
+    qDebug() << "[HYBRID POST TRIAL]" << Q_FUNC_INFO;
 
     bool correct = false;
     bool doExternalComm = true;
@@ -303,14 +324,22 @@ void HybridStimulation::hybridPostTrial()
 
     // m_hybridCommand = m_ERPFeedback[m_currentTrial] + m_SSVEPFeedback.at(m_currentTrial);
     m_hybridCommand = m_ERPFeedback[m_ERPFeedback.length() - 1] + m_SSVEPFeedback.at(m_SSVEPFeedback.length() - 1);
-    correct = m_ssvepStimulation->isCorrect();
-    // show feedback on ERP speller for 500 ms
+
+    // show feedback on SSVEP
     if (m_hybridStimulaiton->m_order == order::ERP_FIRST)
+    {        
+        qDebug()<< m_ERPFeedback[m_ERPFeedback.length() - 1] << "  " << m_ERPFeedback[m_ERPFeedback.length() - 1].digitValue();
+        m_ssvepStimulation->setExternalFeedback(m_ERPFeedback[m_ERPFeedback.length() - 1].digitValue());
+    }
+
+    // show feedback on ERP speller for 500 ms
+    else
     {
+        correct = m_ssvepStimulation->isCorrect();
         m_ssvepStimulation->hide();
         m_ERPspeller->show();
+        m_ERPspeller->showFeedback(m_hybridCommand, correct);
     }
-    m_ERPspeller->showFeedback(m_hybridCommand, correct);
 
     // check if correct feedback, send it to robot, otherwise
     // repeat until feedback is correct in COPY MODE

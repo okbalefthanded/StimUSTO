@@ -38,6 +38,12 @@ public:
     void setPresentFeedback(bool presentFeedback);
 
     // QOpenGLWindow interface
+    int externalFeedback() const;
+    void setExternalFeedback(int newExternalFeedback);
+
+    bool showExternalFeedback() const;
+    void setShowExternalFeedback(bool newShowExternalFeedback);
+
 protected:
     void initializeGL();
     void resizeGL(int w, int h);
@@ -60,6 +66,7 @@ private slots:
     void update();
 
     void initElements();
+    void initCenters();
     void initCircles();
     void initColors();
     void initIndices();
@@ -89,8 +96,8 @@ private:
     void initLogger();
     void scheduleRedraw();
     void renderText();
+    void renderFeedBackText();
     void setVertex(int t_index, float x, float y, float z);
-
 
     bool m_firstRun = true;
     bool m_stateFinished = true;
@@ -102,6 +109,8 @@ private:
     int m_state;
     int m_trials = 0;
     float m_correct = 0;
+    int m_externalFeedback = 0;
+    bool m_showExternalFeedback = false;
 
     int m_lostFrames = 0;
     //
@@ -131,6 +140,7 @@ private:
     int m_vertexPerCircle;
 
     // QVector <QVector <int>> m_flicker;
+    QVector<QVector3D> m_centerPoints;
     QVector <QVector <double> > m_flicker;
     QVector<QVector3D> m_vertices;
     QVector<QVector3D> m_centers;
