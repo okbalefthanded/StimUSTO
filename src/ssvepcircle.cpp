@@ -120,6 +120,7 @@ void SsvepCircle::paintGL()
     glClear(GL_COLOR_BUFFER_BIT);
 
     int centerVertices = m_ssvep->nrElements();
+    //qDebug()<< Q_FUNC_INFO << centerVertices;
 
     // Render using our shader
     m_programShader->bind();
@@ -428,6 +429,7 @@ void SsvepCircle::initCircles()
     int stop = m_vertexPerCircle;
     int k=0;
     int elements = m_ssvep->nrElements();
+    qDebug()<< Q_FUNC_INFO << elements;
     QSize screenSize = utils::getScreenSize();
     float radiusx = glUtils::RADIUS_CM / (screenSize.width() * glUtils::PIXEL_CM);
     float radiusy = glUtils::RADIUS_CM / (screenSize.height() * glUtils::PIXEL_CM);
@@ -442,10 +444,13 @@ void SsvepCircle::initCircles()
         --elements;
     }
 
+
+    qDebug()<< Q_FUNC_INFO <<"after" << elements;
     m_centers.resize(m_ssvep->nrElements());
 
     for (int j = start; j<=elements; ++j)
     {
+        qDebug()<<"j "<<j;
         // circles center points
         // x = refPoints::centers[j].x();
         // y = refPoints::centers[j].y();
@@ -486,7 +491,7 @@ void SsvepCircle::initCircles()
 void SsvepCircle::initColors()
 {
     int vectorsSize = (m_ssvep->nrElements() * m_vertexPerCircle) + m_ssvep->nrElements();
-
+    qDebug()<< "vectorsize"<< vectorsSize;
     m_colors.resize(vectorsSize);
 
     if(m_ssvep->controlMode() == control_mode::SYNC)
@@ -531,7 +536,7 @@ void SsvepCircle::initIndices()
 {
     // init indices
     int circleCount = m_ssvep->nrElements();
-
+    qDebug()<<"circlecount" << circleCount;
     m_vindices.resize(3*(m_vertexPerCircle*circleCount-(circleCount*2)));
     m_centerindices.resize(m_ssvep->nrElements());
 
@@ -813,12 +818,13 @@ void SsvepCircle::renderFeedBackText()
     int screenWidth, screenHeight;
     int x, y;
     //
-    // int i = m_sessionFeedback[m_currentFlicker].digitValue();
-    int i = m_externalFeedback;
-    QString fbk = QString::number(i);
+    int i = m_sessionFeedback[m_currentFlicker].digitValue();
+    // int i = m_externalFeedback;
+    QString fbk = QString::number(m_externalFeedback);
 
     QPainter painter(this);
-    painter.setPen(Qt::red);
+    // painter.setPen(Qt::red);
+    painter.setPen(m_externalFeedbackColor);
     painter.setFont(QFont("Arial", 30, 30));
 
     screenWidth  = screenSize.width();
@@ -924,9 +930,10 @@ int SsvepCircle::externalFeedback() const
     return m_externalFeedback;
 }
 
-void SsvepCircle::setExternalFeedback(int newExternalFeedback)
+void SsvepCircle::setExternalFeedback(int newExternalFeedback, QColor color)
 {
     m_externalFeedback = newExternalFeedback;
+    m_externalFeedbackColor = color;
 }
 
 void SsvepCircle::setFrequencies(QString freqs)

@@ -16,6 +16,7 @@
 #include "randomflashsequence.h"
 #include "ssvep.h"
 #include "logger.h"
+#include "glutils.h"
 //
 class SsvepCircle : public QOpenGLWindow, protected QOpenGLFunctions
 {
@@ -39,7 +40,7 @@ public:
 
     // QOpenGLWindow interface
     int externalFeedback() const;
-    void setExternalFeedback(int newExternalFeedback);
+    void setExternalFeedback(int newExternalFeedback, QColor color=Qt::white);
 
     bool showExternalFeedback() const;
     void setShowExternalFeedback(bool newShowExternalFeedback);
@@ -110,6 +111,7 @@ private:
     int m_trials = 0;
     float m_correct = 0;
     int m_externalFeedback = 0;
+    QColor m_externalFeedbackColor = Qt::white;
     bool m_showExternalFeedback = false;
 
     int m_lostFrames = 0;

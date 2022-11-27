@@ -174,12 +174,11 @@ void Speller::feedback()
     receiveFeedback();
     m_textRow->setText(m_text);
 
+   //  qDebug()<< Q_FUNC_INFO << m_text[m_text.length()-1];
+
     // Presenting Feedback
     if (m_presentFeedback)
     {
-        //receiveFeedback();
-        //m_textRow->setText(m_text);
-
         if (m_text[m_text.length()-1] != "#")
         {
             if (m_ERP->experimentMode() == operation_mode::COPY_MODE)
@@ -351,6 +350,11 @@ bool Speller::isTarget(int t_stim)
         return true;
     else
         return false;
+}
+
+bool Speller::Correct()
+{
+  return  m_text[m_text.length()-1] == m_desiredPhrase[m_desiredPhrase.length() - 1];
 }
 
 void Speller::highlightTarget()

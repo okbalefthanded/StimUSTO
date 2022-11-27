@@ -229,7 +229,7 @@ void ConfigPanel::on_initHybrid_clicked()
         speller->setERP(hybridParadigm->m_ERPparadigm);
         speller->setPresentFeedback(false);
         // SsvepGL *ssvepStimulation = createSSVEP(hybridParadigm->m_SSVEPparadigm, 12346);
-        // SsvepGL *ssvepStimulation =new SsvepGL(hybridParadigm->m_SSVEPparadigm, 12346);
+        // SsvepGL *ssvepStimulation = new SsvepGL(hybridParadigm->m_SSVEPparadigm, 12346);
         SsvepCircle *ssvepStimulation = createSSVEP(hybridParadigm->m_SSVEPparadigm, 12346);
         ssvepStimulation->setPresentFeedback(false);
 

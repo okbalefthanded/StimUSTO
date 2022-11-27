@@ -22,8 +22,8 @@ HybridStimulation::HybridStimulation(Hybrid *hybridStimulation)
 HybridStimulation::HybridStimulation(Hybrid *hybridStimulation, Speller *ERPspeller, SsvepCircle *ssvepGL)
 {
     m_hybridStimulaiton = hybridStimulation;
-    m_ERPspeller = ERPspeller;
-    m_ssvepStimulation = ssvepGL;
+    m_ERPspeller        = ERPspeller;
+    m_ssvepStimulation  = ssvepGL;
     //
     initExternalComm();
     //
@@ -167,8 +167,8 @@ void HybridStimulation::switchState()
 
 void HybridStimulation::swichStimWindows()
 {
-   // qDebug()<< Q_FUNC_INFO << m_currentTrial;
-
+    // qDebug()<< Q_FUNC_INFO << m_currentTrial;
+    QColor fbkColor = Qt::black;
     // ERP FIRST IN ORDER
     if(m_hybridStimulaiton->m_order == order::ERP_FIRST)
     {
@@ -197,6 +197,13 @@ void HybridStimulation::swichStimWindows()
             m_SSVEPanimation->start();
             m_ssvepStimulation->showFullScreen();
             m_ERPspeller->hide();
+            m_ERPFeedback    = m_ERPspeller->m_text;
+            // qDebug()<< m_ERPFeedback << " " << m_ERPspeller->Correct()<< "correct or no";
+            if(m_ERPspeller->Correct())
+            {
+                fbkColor = Qt::red;
+            }
+            m_ssvepStimulation->setExternalFeedback(m_ERPFeedback[m_ERPFeedback.length() - 1].digitValue(), fbkColor);
         }
     }
     // SSVEP FIRST IN ORDER
@@ -308,7 +315,6 @@ void HybridStimulation::externalComm()
 
 void HybridStimulation::hybridPostTrial()
 {
-    qDebug() << "[HYBRID POST TRIAL]" << Q_FUNC_INFO;
 
     bool correct = false;
     bool doExternalComm = true;
@@ -316,7 +322,7 @@ void HybridStimulation::hybridPostTrial()
     if(m_hybridStimulaiton->experimentMode() == operation_mode::COPY_MODE ||
             m_hybridStimulaiton->experimentMode() == operation_mode::FREE_MODE)
     {
-        m_ERPFeedback = m_ERPspeller->m_text;
+        m_ERPFeedback    = m_ERPspeller->m_text;
         m_SSVEPFeedback += m_ssvepStimulation->m_sessionFeedback;
         // qDebug() << Q_FUNC_INFO << "ERP feedback: " << m_ERPFeedback;
         // qDebug() << Q_FUNC_INFO << "SSVEP feedback: " << m_SSVEPFeedback;
@@ -327,9 +333,9 @@ void HybridStimulation::hybridPostTrial()
 
     // show feedback on SSVEP
     if (m_hybridStimulaiton->m_order == order::ERP_FIRST)
-    {        
-        qDebug()<< m_ERPFeedback[m_ERPFeedback.length() - 1] << "  " << m_ERPFeedback[m_ERPFeedback.length() - 1].digitValue();
-        m_ssvepStimulation->setExternalFeedback(m_ERPFeedback[m_ERPFeedback.length() - 1].digitValue());
+    {
+       // qDebug()<< m_ERPFeedback[m_ERPFeedback.length() - 1] << "  " << m_ERPFeedback[m_ERPFeedback.length() - 1].digitValue();
+       m_ssvepStimulation->setExternalFeedback(m_ERPFeedback[m_ERPFeedback.length() - 1].digitValue());
     }
 
     // show feedback on ERP speller for 500 ms
@@ -396,6 +402,7 @@ void HybridStimulation::hybridPostTrialEnd()
 
     m_hybridState = trial_state::PRE_TRIAL;
 
+    // More trials to conduct
     if(m_currentTrial < m_trials || m_hybridStimulaiton->experimentMode() == operation_mode::FREE_MODE)
         // if(m_currentTrial < m_trials)
     {
@@ -410,11 +417,12 @@ void HybridStimulation::hybridPostTrialEnd()
         }
     }
 
+    // Experiment Ends
     else
     {
         if(m_hybridStimulaiton->experimentMode() == operation_mode::COPY_MODE)
         {
-            m_ERPCorrect = (m_ERPspeller->m_correct / m_trials) * 100;
+            m_ERPCorrect   = (m_ERPspeller->m_correct / m_trials) * 100;
             m_SSVEPCorrect = (m_ssvepStimulation->m_correct / m_trials) * 100;
             qDebug()<< "Accuracy in ERP: " << m_ERPCorrect;
             qDebug()<< "Accuracy in SSVEP: "<< m_SSVEPCorrect;

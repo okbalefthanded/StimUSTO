@@ -89,23 +89,23 @@ void Hybrid::fromVariant(const QVariant &variant)
 
     if(map.value("externalComm").isNull())
     {
-        m_externalComm = external_comm::DISABLED;
+        m_externalComm    = external_comm::DISABLED;
         m_externalAddress = "127.0.0.1"; // home sweet home
     }
     else
     {
-        m_externalComm = map.value("externalComm").toInt();
+        m_externalComm    = map.value("externalComm").toInt();
         m_externalAddress = map.value("ip").toString();
     }
 
     // stimulations order
     if(map.contains("order"))
     {
-       m_order = map.value("order").toInt();
+        m_order = map.value("order").toInt();
     }
     else
     {
-         m_order = order::ERP_FIRST;
+        m_order = order::ERP_FIRST;
     }
 
     // ERP config

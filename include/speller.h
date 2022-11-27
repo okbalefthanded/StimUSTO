@@ -80,6 +80,7 @@ protected:
 
     bool isTarget();
     bool isTarget(int t_stim);
+    bool Correct();
     virtual void highlightTarget();
     virtual void refreshTarget();
 

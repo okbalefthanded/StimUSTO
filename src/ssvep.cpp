@@ -45,18 +45,18 @@ void SSVEP::fromVariant(const QVariant &variant)
 
     if(map.value("externalComm").isNull())
     {
-        m_externalComm = external_comm::DISABLED;
+        m_externalComm    = external_comm::DISABLED;
         m_externalAddress = "127.0.0.1"; // home sweet home
     }
     else
     {
-        m_externalComm = map.value("externalComm").toInt();
+        m_externalComm    = map.value("externalComm").toInt();
         m_externalAddress = map.value("ip").toString();
     }
     m_type = map.value("paradigmType").toInt();
     m_stimulationDuration = map.value("stimulationDuration").toInt();
     m_breakDuration = map.value("breakDuration").toInt();
-    m_nrSequences = map.value("nrSequences").toInt();
+    m_nrSequences   = map.value("nrSequences").toInt();
     m_desiredPhrase = map.value("desiredPhrase").toString();
     // m_nrElements = map.value("nrElements").toInt();
     if (map.value("nrElements").isNull())
