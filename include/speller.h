@@ -63,6 +63,7 @@ protected slots:
     virtual void pauseFlashing();
     virtual void receiveFeedback();
     virtual void createLayout();
+    // void createLayout();
     virtual void refreshLayout();
 
 public slots:

@@ -5,6 +5,7 @@
 #include <QUdpSocket>
 #include <QTimer>
 #include <serializable.h>
+#include <QOpenGLWindow>
 //
 #include "ovmarkersender.h"
 #include "speller.h"
@@ -14,6 +15,8 @@
 #include "ssvep.h"
 #include "ssvepcircle.h"
 #include "phonekeypad.h"
+#include "ssvepdirection.h"
+#include "ssvepstimulation.h"
 //
 namespace Ui {
 class ConfigPanel;
@@ -59,8 +62,10 @@ private:
     SSVEP *initParadigmSSVEPGui();
     Speller *createSpeller(int t_spellerType);
     // SsvepGL *createSSVEP(SSVEP *t_ssvep, int t_port);
-    SsvepCircle *createSSVEP(SSVEP *t_ssvep, int t_port);
+    // SsvepCircle *createSSVEP(SSVEP *t_ssvep, int t_port);
+    // SsvepDirection *createSSVEP(SSVEP *t_ssvep, int t_port);
     // PhoneKeypad *createSSVEP(SSVEP *t_ssvep, int t_port);
+    SSVEPstimulation *createSSVEP(SSVEP *t_ssvep, int t_port);
     void connectStimulation(QObject *t_obj);
     void connectParadigm(QObject *pr, QTimer *timer);
     Ui::ConfigPanel *ui;

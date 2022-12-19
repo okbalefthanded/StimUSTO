@@ -121,9 +121,9 @@ void Speller::pauseFlashing()
 
 void Speller::preTrial()
 {
-
     if(m_trials == 0)
     {
+
         sendMarker(OVTK_StimulationId_ExperimentStart);
         // setting a pre-trail duration longer for calibration phase
         // than Copy_mode/Free mode phases
@@ -174,7 +174,7 @@ void Speller::feedback()
     receiveFeedback();
     m_textRow->setText(m_text);
 
-   //  qDebug()<< Q_FUNC_INFO << m_text[m_text.length()-1];
+    //  qDebug()<< Q_FUNC_INFO << m_text[m_text.length()-1];
 
     // Presenting Feedback
     if (m_presentFeedback)
@@ -278,8 +278,8 @@ void Speller::postTrial()
     // Send and Recieve feedback to/from Robot if external communication is enabled
     externalCommunication();
 
-    // pause for 1 sec
-    utils::wait(1000);
+    // pause for 1 sec / 0.5 sec
+    utils::wait(500);// 1000
     //
     m_currentStimulation = 0;
     m_state = trial_state::PRE_TRIAL;
@@ -354,7 +354,7 @@ bool Speller::isTarget(int t_stim)
 
 bool Speller::Correct()
 {
-  return  m_text[m_text.length()-1] == m_desiredPhrase[m_desiredPhrase.length() - 1];
+    return  m_text[m_text.length()-1] == m_desiredPhrase[m_desiredPhrase.length() - 1];
 }
 
 void Speller::highlightTarget()
@@ -791,7 +791,7 @@ void Speller::setDesiredPhrase(const QString &t_desiredPhrase)
 
 void Speller::createLayout()
 {
-    // qDebug()<< Q_FUNC_INFO;
+    qDebug()<< Q_FUNC_INFO;
     // speller settings
     m_rows = 3;
     m_cols = 3;
@@ -820,7 +820,6 @@ void Speller::createLayout()
     // layout->setVerticalSpacing(100);
     layout->setHorizontalSpacing(110); //110 for alignment
     // layout->setVerticalSpacing(5); //40
-
 
     m_textRow->setText(m_desiredPhrase);
     m_textRow->hide();

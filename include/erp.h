@@ -23,7 +23,6 @@ public:
     void setFlashingMode(const quint8 &t_flashingMode);
 
 private:
-    quint8 m_stimulationType;
     quint8 m_flashingMode;
 };
 #endif // ERP_H

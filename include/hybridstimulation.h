@@ -7,6 +7,8 @@
 //
 #include "ssvepgl.h"
 #include "ssvepcircle.h"
+#include "ssvepdirection.h"
+#include "ssvepstimulation.h"
 #include "speller.h"
 #include "paradigm.h"
 #include "erp.h"
@@ -20,7 +22,9 @@ class HybridStimulation : public QObject
 public:
     explicit HybridStimulation(Hybrid *hybridStimulation);
     // explicit HybridStimulation(Hybrid *hybridStimulation, Speller *ERPspeller, SsvepGL *ssvepGL);
-    explicit HybridStimulation(Hybrid *hybridStimulation, Speller *ERPspeller, SsvepCircle *ssvepGL);
+    // explicit HybridStimulation(Hybrid *hybridStimulation, Speller *ERPspeller, SsvepCircle *ssvepGL);
+    // explicit HybridStimulation(Hybrid *hybridStimulation, Speller *ERPspeller, SsvepDirection *ssvepGL);
+    explicit HybridStimulation(Hybrid *hybridStimulation, Speller *ERPspeller, SSVEPstimulation *ssvepGL);
 
     ~HybridStimulation();
     void initERPspeller(ERP *erp);
@@ -55,10 +59,12 @@ private:
     QString m_ERPFeedback = "";
     QString m_SSVEPFeedback = "";
     //
-    Hybrid *m_hybridStimulaiton;
+    Hybrid *m_hybridStimulation;
     Speller *m_ERPspeller;
     // SsvepGL *m_ssvepStimulation;
-    SsvepCircle *m_ssvepStimulation;
+    // SsvepCircle *m_ssvepStimulation;
+    // SsvepDirection *m_ssvepStimulation;
+    SSVEPstimulation *m_ssvepStimulation;
     // QUdpSocket *m_robotSocket;
     QTcpSocket *m_robotSocket;
     //

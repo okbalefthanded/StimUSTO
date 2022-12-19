@@ -1,5 +1,5 @@
-#ifndef SSVEPCIRCLE_H
-#define SSVEPCIRCLE_H
+#ifndef SSVEPDIRECTION_H
+#define SSVEPDIRECTION_H
 
 //
 #include <QOpenGLWindow>
@@ -20,12 +20,12 @@
 #include "logger.h"
 #include "glutils.h"
 //
-class SsvepCircle : public SSVEPstimulation
+class SsvepDirection : public SSVEPstimulation
 {
     Q_OBJECT
 
 public:
-    SsvepCircle(SSVEP *paradigm, int t_port);
+    SsvepDirection(SSVEP *paradigm, int t_port);
 
 private slots:
 
@@ -37,4 +37,6 @@ private slots:
 
 };
 
-#endif // SSVEPCIRCLE_H
+
+
+#endif // SSVEPDIRECTION_H

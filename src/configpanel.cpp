@@ -3,6 +3,7 @@
 #include <QTimer>
 #include <QGuiApplication>
 #include <serializable.h>
+#include <QOpenGLWindow>
 //
 #include "configpanel.h"
 #include "ui_configpanel.h"
@@ -16,6 +17,7 @@
 #include "flashingspeller.h"
 #include "facespeller.h"
 #include "arabicspeller.h"
+#include "spellersmall.h"
 #include "multistimuli.h"
 #include "chromaspeller.h"
 #include "auditoryspeller.h"
@@ -23,6 +25,8 @@
 #include "ssvep.h"
 #include "ssvepcircle.h"
 #include "phonekeypad.h"
+#include "ssvepdirection.h"
+#include "ssvepstimulation.h"
 #include "hybrid.h"
 #include "jsonserializer.h"
 #include "ovtk_stimulations.h"
@@ -156,7 +160,9 @@ void ConfigPanel::on_initSSVEP_clicked()
         launchTimer->setSingleShot(true);
 
         // SsvepGL *ssvepStimulation = createSSVEP(ssvepParadigm, 12345);
-        SsvepCircle *ssvepStimulation = createSSVEP(ssvepParadigm, 12345);
+        // SsvepCircle *ssvepStimulation = createSSVEP(ssvepParadigm, 12345);
+        // SsvepDirection *ssvepStimulation = createSSVEP(ssvepParadigm, 12345);
+        SSVEPstimulation *ssvepStimulation = createSSVEP(ssvepParadigm, 12345);
         // PhoneKeypad *ssvepStimulation = createSSVEP(ssvepParadigm, 12345);
         connectParadigm(ssvepStimulation, launchTimer);
         // ssvepStimulation->show();
@@ -230,7 +236,9 @@ void ConfigPanel::on_initHybrid_clicked()
         speller->setPresentFeedback(false);
         // SsvepGL *ssvepStimulation = createSSVEP(hybridParadigm->m_SSVEPparadigm, 12346);
         // SsvepGL *ssvepStimulation = new SsvepGL(hybridParadigm->m_SSVEPparadigm, 12346);
-        SsvepCircle *ssvepStimulation = createSSVEP(hybridParadigm->m_SSVEPparadigm, 12346);
+        // SsvepCircle *ssvepStimulation = createSSVEP(hybridParadigm->m_SSVEPparadigm, 12346);
+        // SsvepDirection *ssvepStimulation = createSSVEP(hybridParadigm->m_SSVEPparadigm, 12346);
+        SSVEPstimulation *ssvepStimulation = createSSVEP(hybridParadigm->m_SSVEPparadigm, 12346);
         ssvepStimulation->setPresentFeedback(false);
 
         HybridStimulation *hybrid = new HybridStimulation(hybridParadigm, speller, ssvepStimulation);
@@ -302,6 +310,13 @@ Speller *ConfigPanel::createSpeller(int t_spellerType)
         connectStimulation(multiStimuli);
         return multiStimuli;
     }
+
+    case speller_type::SMALL:
+    {
+        SpellerSmall *smallSpeller = new SpellerSmall();
+        connectStimulation(smallSpeller);
+        return smallSpeller;
+    }
         /*
     case speller_type::AUDITORY:
     {
@@ -343,6 +358,7 @@ SSVEP *ConfigPanel::initParadigmSSVEPGui()
                               ui->SSVEP_StimDuration->text().toFloat(),
                               ui->SSVEP_BreakDuration->text().toFloat(),
                               ui->SSVEP_Sequence->text().toInt(),
+                              speller_type::SSVEP_CIRCLE,
                               "",
                               "127.0.0.1",
                               SSVEPNrElements,
@@ -353,7 +369,9 @@ SSVEP *ConfigPanel::initParadigmSSVEPGui()
 
 // SsvepGL *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
 // PhoneKeypad *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
-SsvepCircle *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
+// SsvepCircle *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
+// SsvepDirection *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
+SSVEPstimulation *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
 {
     QSurfaceFormat format;
     format.setRenderableType(QSurfaceFormat::OpenGL);
@@ -365,8 +383,25 @@ SsvepCircle *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
     // format.setVersion(4, 5); // HP ProBook
 
     // PhoneKeypad *ssvepStimulation = new PhoneKeypad(t_ssvep, t_port);
-    // SsvepGL *ssvepStimulation = new SsvepGL(t_ssvep, t_port);    
-    SsvepCircle *ssvepStimulation = new SsvepCircle(t_ssvep, t_port);
+    // SsvepGL *ssvepStimulation = new SsvepGL(t_ssvep, t_port);
+    // SsvepCircle *ssvepStimulation = new SsvepCircle(t_ssvep, t_port);
+    // SsvepDirection *ssvepStimulation = new SsvepDirection(t_ssvep, t_port);
+    SSVEPstimulation *ssvepStimulation;
+
+    switch(t_ssvep->stimulationType())
+    {
+    case speller_type::SSVEP_DIRECTIONS:
+    {
+        ssvepStimulation = new SsvepDirection(t_ssvep, t_port);
+        break;
+    }
+    case speller_type::SSVEP_CIRCLE:
+    {
+        ssvepStimulation = new SsvepCircle(t_ssvep, t_port);
+        break;
+    }
+
+    }
 
     ssvepStimulation->setFormat(format);
 

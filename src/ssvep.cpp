@@ -10,9 +10,9 @@ SSVEP::SSVEP() : Paradigm (),
 }
 
 SSVEP::SSVEP(quint8 mode, quint8 control, quint8 type, quint8 comm, int dur, quint8 bDur,
-             quint8 nrSeq, QString phrase, QString ip, quint8 nElements,
+             quint8 nrSeq, quint8 sType, QString phrase, QString ip, quint8 nElements,
              QString frequnecies, quint8 stimulationMode):
-    Paradigm(mode, control, type, comm, dur, bDur, nrSeq, phrase, ip),
+    Paradigm(mode, control, type, comm, dur, bDur, nrSeq, sType, phrase, ip),
     m_nrElements(nElements), m_frequencies(frequnecies), m_stimulationMode(stimulationMode)
 {
 }
@@ -29,6 +29,7 @@ QVariant SSVEP::toVariant() const
     map.insert("stimulationDuration", m_stimulationDuration);
     map.insert("breakDuration", m_breakDuration);
     map.insert("nrSequences", m_nrSequences);
+    map.insert("stimulationType", m_stimulationType);
     map.insert("desiredPhrase", m_desiredPhrase);
     map.insert("nrElements", m_nrElements);
     map.insert("frequencies", m_frequencies);
@@ -58,6 +59,7 @@ void SSVEP::fromVariant(const QVariant &variant)
     m_breakDuration = map.value("breakDuration").toInt();
     m_nrSequences   = map.value("nrSequences").toInt();
     m_desiredPhrase = map.value("desiredPhrase").toString();
+    m_stimulationType = map.value("stimulationType").toInt();
     // m_nrElements = map.value("nrElements").toInt();
     if (map.value("nrElements").isNull())
     {

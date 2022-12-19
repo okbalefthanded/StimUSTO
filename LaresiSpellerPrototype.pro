@@ -23,7 +23,10 @@ SOURCES += src\main.cpp\
     src/hybridstimulation.cpp \
     src/multistimuli.cpp \
     src/phonekeypad.cpp \
+    src/spellersmall.cpp \
     src/ssvepcircle.cpp \
+    src/ssvepdirection.cpp \    
+    src/ssvepstimulation.cpp \
     src\configpanel.cpp \
     src\matrixlayout.cpp \
     src\ovmarkersender.cpp \
@@ -48,7 +51,10 @@ HEADERS  += include\configpanel.h \
     include/hybridstimulation.h \
     include/multistimuli.h \
     include/phonekeypad.h \
+    include/spellersmall.h \
     include/ssvepcircle.h \
+    include/ssvepdirection.h \    
+    include/ssvepstimulation.h \
     include\ovtk_stimulations.h \
     include\matrixlayout.h \
     include\ovmarkersender.h \
