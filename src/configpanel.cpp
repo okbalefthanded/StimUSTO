@@ -3,7 +3,6 @@
 #include <QTimer>
 #include <QGuiApplication>
 #include <serializable.h>
-#include <QOpenGLWindow>
 //
 #include "configpanel.h"
 #include "ui_configpanel.h"

@@ -181,13 +181,14 @@ void Speller::feedback()
     {
         if (m_text[m_text.length()-1] != "#")
         {
+            int id = m_text[m_text.length()-1].digitValue();
+            QPixmap map = m_icons[id-1];
+
             if (m_ERP->experimentMode() == operation_mode::COPY_MODE)
             {
-                int id = m_text[m_text.length()-1].digitValue();
-                QPixmap map = m_icons[id-1];
                 // feedback: green correct selection, highlight the target icon
                 //           blue incorrect selection, highlight the selected icon
-                if(m_text[m_text.length()-1] == m_desiredPhrase[m_currentLetter - 1])
+                if(Correct())
                 {
                     //            this->layout()->itemAt(m_currentTarget)->
                     //                    widget()->setStyleSheet("QLabel { color : green; font: 40pt }");
@@ -203,35 +204,15 @@ void Speller::feedback()
                     isCorrect = false;
                 }
                 // qDebug()<< Q_FUNC_INFO << "element id: "<< id;
-                m_element = new QLabel();
-                m_element->setPixmap(map);
-                m_element->setAlignment(Qt::AlignCenter);
-
-                this->layout()->replaceWidget(this->
-                                              layout()->
-                                              itemAt(id-1)->
-                                              widget(),
-                                              m_element,
-                                              Qt::FindDirectChildrenOnly);
             }
 
             else if (m_ERP->experimentMode() == operation_mode::FREE_MODE)
             {
-                int id = m_text[m_text.length()-1].digitValue();
-                QPixmap map = m_icons[id-1];
                 map.fill(m_incorrectColor);
-                m_element = new QLabel();
-                m_element->setPixmap(map);
-                m_element->setAlignment(Qt::AlignCenter);
-
-                this->layout()->replaceWidget(this->
-                                              layout()->
-                                              itemAt(id-1)->
-                                              widget(),
-                                              m_element,
-                                              Qt::FindDirectChildrenOnly);
-
             }
+
+            this->layout()->itemAt(id-1)->
+                    widget()->setProperty("pixmap", map);
         }
     }
 
@@ -276,39 +257,14 @@ void Speller::postTrial()
     }
 
     // Send and Recieve feedback to/from Robot if external communication is enabled
-    externalCommunication();
+    // externalCommunication();
 
+    if(m_ERP->externalComm() == external_comm::ENABLED)
+    {
+        m_externComm->communicate(QString(m_text[m_text.length()-1]));
+    }
     // pause for 1 sec / 0.5 sec
-    utils::wait(500);// 1000
-    //
-    m_currentStimulation = 0;
-    m_state = trial_state::PRE_TRIAL;
-    //
-    if (m_currentLetter >= m_desiredPhrase.length() &&
-            m_desiredPhrase.length() != 1 &&
-            (m_ERP->experimentMode() == operation_mode::COPY_MODE ||
-             m_ERP->experimentMode() == operation_mode::CALIBRATION)
-            )
-    {
-        m_correct = (m_correct / m_desiredPhrase.length()) * 100;
-        qDebug()<< "Accuracy on ERP session: " << m_correct;
-        qDebug()<< "Experiment End, closing speller";
-        sendMarker(OVTK_StimulationId_ExperimentStop);
-        utils::wait(2000);
-        // emit(slotTerminated());
-        // this->close();
-    }
-    else if(m_desiredPhrase.length() <= 1)
-    {
-        m_currentLetter = 0;
-        emit(slotTerminated());
-        return;
-    }
-    else
-    {
-        // this->layout()->update();
-        startTrial();
-    }
+    postTrialEnd();
 
 }
 
@@ -354,7 +310,7 @@ bool Speller::isTarget(int t_stim)
 
 bool Speller::Correct()
 {
-    return  m_text[m_text.length()-1] == m_desiredPhrase[m_desiredPhrase.length() - 1];
+    return m_text[m_text.length()-1] == m_desiredPhrase[m_desiredPhrase.length() - 1];
 }
 
 void Speller::highlightTarget()
@@ -474,6 +430,41 @@ void Speller::endPreTrial()
     else return;
 }
 
+void Speller::postTrialEnd()
+{
+    utils::wait(500);// 1000
+    //
+    m_currentStimulation = 0;
+    m_state = trial_state::PRE_TRIAL;
+    //
+    if (m_currentLetter >= m_desiredPhrase.length() &&
+            m_desiredPhrase.length() != 1 &&
+            (m_ERP->experimentMode() == operation_mode::COPY_MODE ||
+             m_ERP->experimentMode() == operation_mode::CALIBRATION)
+            )
+    {
+        m_correct = (m_correct / m_desiredPhrase.length()) * 100;
+        qDebug()<< "Accuracy on ERP session: " << m_correct;
+        qDebug()<< "Experiment End, closing speller";
+        sendMarker(OVTK_StimulationId_ExperimentStop);
+        utils::wait(2000);
+        // emit(slotTerminated());
+        // this->close();
+    }
+    else if(m_desiredPhrase.length() <= 1)
+    {
+        m_currentLetter = 0;
+        emit(slotTerminated());
+        return;
+    }
+    else
+    {
+        // this->layout()->update();
+        startTrial();
+    }
+
+}
+
 void Speller::trialEnd()
 {
     if (m_currentStimulation >= m_flashingSequence->sequence.count())
@@ -496,55 +487,6 @@ void Speller::trialEnd()
         {
             postTrial();
         }
-    }
-}
-
-void Speller::externalCommunication()
-{
-    // Send and Recieve feedback to/from Robot if external communication is enabled
-    // m_hybridCommand = m_text[m_text.length()-1] + "2";
-
-    m_hybridCommand = m_text[m_text.length()-1];
-
-    if(m_ERP->externalComm() == external_comm::ENABLED)
-    {
-        qDebug() << "Sending Feedback to Robot";
-        if (!m_robotSocket->isOpen())
-        {
-            qDebug()<< "Not sending Feedback to Robot : Cannot send feedback socket is not open";
-        }
-
-        try
-        {
-            // m_hybridCommand = "12";
-            std::string str = m_hybridCommand.toStdString();
-            const char* p = str.c_str();
-            // qDebug()<< "command to send to Robot: " << m_hybridCommand;
-            QByteArray byteovStimulation;
-            QDataStream streamovs(&byteovStimulation, QIODevice::WriteOnly);
-            streamovs.setByteOrder(QDataStream::LittleEndian);
-            streamovs.writeRawData(p, m_hybridCommand.length());
-            m_robotSocket->write(byteovStimulation);
-            m_robotSocket->waitForBytesWritten();
-        }
-        catch(...)
-        {
-            qDebug() <<"Send Feedback to Robot, Issue With writting Data";
-        }
-
-        qDebug() << "Recieve State from Robot";
-        m_robotSocket->waitForReadyRead();
-
-        QByteArray robotState = m_robotSocket->readAll();
-
-        quint8 rState = robotState.toUInt();
-        qDebug()<< Q_FUNC_INFO << "Robot State recieved " << rState;
-        if(rState == robot_state::READY)
-        {
-            qDebug()<< "Correct State";
-            m_state = trial_state::PRE_TRIAL;
-        }
-
     }
 }
 
@@ -654,16 +596,18 @@ void Speller::setERP(ERP *erp)
     // external comm
     // a temporary hack
     // qDebug()<< "Lets see external comm" <<m_ERP->externalComm();
+
     if(m_ERP->externalComm() == external_comm::ENABLED)
     {
+        /*
         qDebug()<< "External Comm is enabled;";
-        m_robotSocket = new QTcpSocket();
+        m_machineSocket = new QTcpSocket();
         //    m_robotSocket->connectToHost(QHostAddress("10.3.66.5"), m_robotPort);
         // 10.3.66.5 / 10.6.65.128 /10.3.64.92
         // m_robotSocket->connectToHost(QHostAddress("10.3.64.92"), m_robotPort);
-        m_robotSocket->connectToHost(QHostAddress(m_ERP->externalAddress()), m_robotPort);
+        m_machineSocket->connectToHost(QHostAddress(m_ERP->externalAddress()), m_machinePort);
 
-        if(m_robotSocket->waitForConnected())
+        if(m_machineSocket->waitForConnected())
         {
             qDebug() << "Robot Connection : State Connected";
         }
@@ -671,6 +615,8 @@ void Speller::setERP(ERP *erp)
         {
             qDebug() << "Robot Connection : State Not Connected";
         }
+        */
+        m_externComm = new ExternComm(m_ERP->externalAddress(), 12347, m_ERP->externalComm());
     }
 }
 

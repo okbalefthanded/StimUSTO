@@ -239,36 +239,13 @@ void ArabicSpeller::postTrial()
     }
     //
     // Send and Recieve feedback to/from Robot if external communication is enabled
-    externalCommunication();
+    // externalCommunication();
+    if(m_ERP->externalComm() == external_comm::ENABLED)
+    {
+       m_externComm->communicate(QString(m_text[m_text.length()-1]));
+    }
 
-    m_currentStimulation = 0;
-    m_state = trial_state::PRE_TRIAL;
-    //
-    if (m_currentLetter >= m_desiredPhrase.length() &&
-            m_desiredPhrase.length() != 1 &&
-            (m_ERP->experimentMode() == operation_mode::COPY_MODE ||
-             m_ERP->experimentMode() == operation_mode::CALIBRATION)
-            )
-    {
-        m_correct = (m_correct / m_desiredPhrase.length()) * 100;
-        qDebug()<< "Accuracy on ERP session: " << m_correct;
-        qDebug()<< "Experiment End, closing speller";
-        sendMarker(OVTK_StimulationId_ExperimentStop);
-        utils::wait(2000);
-        emit(slotTerminated());
-        this->close();
-    }
-    else if(m_desiredPhrase.length() <= 1)
-    {
-        // qDebug() << "[POST TRIAL 1]" << Q_FUNC_INFO;
-        m_currentLetter = 0;
-        emit(slotTerminated());
-        return;
-    }
-    else
-    {
-        startTrial();
-    }
+    postTrialEnd();
 
 }
 

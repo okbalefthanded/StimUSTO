@@ -5,7 +5,6 @@
 #include <QUdpSocket>
 #include <QTimer>
 #include <serializable.h>
-#include <QOpenGLWindow>
 //
 #include "ovmarkersender.h"
 #include "speller.h"

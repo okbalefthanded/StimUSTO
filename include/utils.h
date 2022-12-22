@@ -123,7 +123,7 @@ const quint8 DISABLED = 0;
 const quint8 ENABLED  = 1;
 }
 
-namespace robot_state {
+namespace machine_state {
 const quint8 MOVING = 0;
 const quint8 READY  = 1;
 }

@@ -13,6 +13,7 @@
 #include "ui_spellerform.h"
 //
 #include "randomflashsequence.h"
+#include "externComm.h"
 #include "matrixlayout.h"
 #include "erp.h"
 #include "utils.h"
@@ -90,10 +91,10 @@ protected:
 
     void startPreTrial();
     void endPreTrial();
-
+    void postTrialEnd();
     void trialEnd();
 
-    void externalCommunication();
+    // void externalCommunication();
     void fillFeedBackMap(QPixmap *map, QColor t_mapColor, QColor t_textColor, QString text="");
     // Ui::Speller *ui;
 
@@ -132,7 +133,7 @@ protected:
     MatrixLayout *m_mLayout;
     QLabel *m_element;
     QColor m_highlightColor = Qt::yellow;
-    QColor m_correctColor = Qt::green;
+    QColor m_correctColor   = Qt::green;
     QColor m_incorrectColor = Qt::blue;
     QPixmap m_highlight;
     // Timers
@@ -145,9 +146,10 @@ protected:
     RandomFlashSequence *m_flashingSequence;
 
     // external communication
-    QString m_hybridCommand = "";
-    quint16 m_robotPort = 12347;
-    QTcpSocket *m_robotSocket;
+    // QString m_command = "";
+    // quint16 m_machinePort = 12347;
+    // QTcpSocket *m_machineSocket;
+    ExternComm *m_externComm;
 
     // logger
     Logger *log;

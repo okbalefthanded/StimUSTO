@@ -19,6 +19,7 @@ SOURCES += src\main.cpp\
     src/arabicspeller.cpp \
     src/auditoryspeller.cpp \
     src/chromaspeller.cpp \
+    src/externComm.cpp \
     src/hybrid.cpp \
     src/hybridstimulation.cpp \
     src/multistimuli.cpp \
@@ -47,6 +48,7 @@ HEADERS  += include\configpanel.h \
     include/arabicspeller.h \
     include/auditoryspeller.h \
     include/chromaspeller.h \
+    include/externComm.h \
     include/hybrid.h \
     include/hybridstimulation.h \
     include/multistimuli.h \

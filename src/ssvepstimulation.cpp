@@ -432,7 +432,7 @@ void SSVEPstimulation::externalCommunication()
 
         quint8 rState = robotState.toUInt();
         qDebug()<< Q_FUNC_INFO << "Robot State recieved " << rState;
-        if(rState == robot_state::READY)
+        if(rState == machine_state::READY)
         {
             qDebug()<< "Correct State";
             m_state = trial_state::PRE_TRIAL;

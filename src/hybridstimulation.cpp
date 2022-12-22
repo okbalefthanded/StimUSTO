@@ -3,6 +3,7 @@
 #include <QApplication>
 #include <QPropertyAnimation>
 #include <QGraphicsOpacityEffect>
+#include <algorithm>
 //
 #include "hybridstimulation.h"
 #include "ssvepdirection.h"
@@ -309,8 +310,8 @@ void HybridStimulation::externalComm()
         QByteArray robotState = m_robotSocket->readAll();
 
         quint8 rState = robotState.toUInt();
-        qDebug()<< Q_FUNC_INFO << "Robot State recieved " << rState;
-        if(rState == robot_state::READY)
+        qDebug()<< "Robot State recieved " << rState;
+        if(rState == machine_state::READY)
         {
             qDebug()<< "Correct State";
             m_hybridState = trial_state::PRE_TRIAL;
@@ -388,12 +389,13 @@ void HybridStimulation::hybridPostTrial()
             {
                 directionFeedback = m_SSVEPFeedback[m_SSVEPFeedback.length() - 1];
                 directionDesired  = m_hybridStimulation->m_SSVEPparadigm->desiredPhrase()[m_currentTrial];
+                std::reverse(m_hybridCommand.begin(), m_hybridCommand.end());
             }
             // direction controlled by ERP
             else
             {
                 directionFeedback = m_ERPFeedback[m_ERPFeedback.length() - 1];
-                directionDesired = m_ERPspeller->getDesiredPhrase();
+                directionDesired  = m_ERPspeller->getDesiredPhrase();
             }
 
             //  if(m_ERPFeedback[m_ERPFeedback.length() - 1] != m_ERPspeller->getDesiredPhrase())

@@ -245,7 +245,6 @@ void SpellerSmall::preTrial()
 
 void SpellerSmall::feedback()
 {
-    // qDebug() << Q_FUNC_INFO;
 
     receiveFeedback();
 
@@ -258,11 +257,9 @@ void SpellerSmall::feedback()
     {
         if (m_text[m_text.length()-1] != "#")
         {
-
             if (m_ERP->experimentMode() == operation_mode::COPY_MODE)
             {
-
-                if( m_text[m_text.length()-1] == m_desiredPhrase[m_currentLetter - 1])
+                if( Correct())
                 {
                     fbkColor = "green";
                     isCorrect = true;
@@ -277,8 +274,6 @@ void SpellerSmall::feedback()
 
             else if (m_ERP->experimentMode() == operation_mode::FREE_MODE)
             {
-                // this->layout()->itemAt(0)->
-                //         widget()->setStyleSheet("QLabel { color : blue; font: 40pt }");
                 fbkColor = "red";
             }
         }
@@ -316,37 +311,13 @@ void SpellerSmall::postTrial()
     }
     //
     // Send and Recieve feedback to/from Robot if external communication is enabled
-    externalCommunication();
-
-    m_currentStimulation = 0;
-    m_state = trial_state::PRE_TRIAL;
-    //
-    if (m_currentLetter >= m_desiredPhrase.length() &&
-            m_desiredPhrase.length() != 1 &&
-            (m_ERP->experimentMode() == operation_mode::COPY_MODE ||
-             m_ERP->experimentMode() == operation_mode::CALIBRATION)
-            )
+    // externalCommunication();
+    if(m_ERP->externalComm() == external_comm::ENABLED)
     {
-        m_correct = (m_correct / m_desiredPhrase.length()) * 100;
-        qDebug()<< "Accuracy on ERP session: " << m_correct;
-        qDebug()<< "Experiment End, closing speller";
-        sendMarker(OVTK_StimulationId_ExperimentStop);
-        utils::wait(2000);
-        emit(slotTerminated());
-        this->close();
-    }
-    else if(m_desiredPhrase.length() <= 1)
-    {
-        // qDebug() << "[POST TRIAL 1]" << Q_FUNC_INFO;
-        m_currentLetter = 0;
-        emit(slotTerminated());
-        return;
-    }
-    else
-    {
-        startTrial();
+       m_externComm->communicate(QString(m_text[m_text.length()-1]));
     }
 
+    postTrialEnd();
 }
 
 SpellerSmall::~SpellerSmall()
