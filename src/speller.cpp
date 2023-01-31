@@ -745,7 +745,7 @@ void Speller::createLayout()
     //    m_icons = QList<QImage>();
     //    m_icons = QList<QLabel>();
     //    m_icons = QList<QLabel*>();
-    m_icons = QList<QPixmap>();
+    m_icons   = QList<QPixmap>();
     m_element = new QLabel();
     m_element->setAlignment(Qt::AlignCenter);
     //    this->matrix_height = 640;

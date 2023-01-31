@@ -256,6 +256,13 @@ void HybridStimulation::swichStimWindows()
 
 void HybridStimulation::initExternalComm()
 {
+
+    if(m_hybridStimulation->externalComm() == external_comm::ENABLED)
+    {
+        // create an external comm object
+        m_externComm = new ExternComm(m_hybridStimulation->externalAddress(), 12347, m_hybridStimulation->externalComm());
+    }
+    /*
     if(m_hybridStimulation->externalComm() == external_comm::ENABLED)
     {
         m_robotSocket = new QTcpSocket();
@@ -270,7 +277,7 @@ void HybridStimulation::initExternalComm()
         {
             qDebug() << "Robot Connection : State Not Connected";
         }
-    }
+    }*/
 }
 
 void HybridStimulation::externalComm()
@@ -333,6 +340,7 @@ void HybridStimulation::externalComm()
 void HybridStimulation::hybridPostTrial()
 {
 
+    qDebug()<< Q_FUNC_INFO;
     bool correct = false;
     bool doExternalComm = true;
 
@@ -411,6 +419,13 @@ void HybridStimulation::hybridPostTrial()
                 doExternalComm = true;
             }
         }
+
+        if (m_hybridCommand[0] != '#' && doExternalComm)
+        {
+           // externalComm();
+             m_externComm->communicate(m_hybridCommand);
+        }
+
     }
 
     else
@@ -419,11 +434,13 @@ void HybridStimulation::hybridPostTrial()
         // only when control of external device is disabled
         utils::wait(1000); // 1000
     }
-
+    /*
     if (m_hybridCommand[0] != '#' && doExternalComm)
     {
-        externalComm();
+       // externalComm();
+         m_externComm->communicate(m_hybridCommand);
     }
+    */
     //
     hybridPostTrialEnd();
 

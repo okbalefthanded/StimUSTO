@@ -9,6 +9,7 @@
 #include "ssvepcircle.h"
 #include "ssvepdirection.h"
 #include "ssvepstimulation.h"
+#include "externComm.h"
 #include "speller.h"
 #include "paradigm.h"
 #include "erp.h"
@@ -67,6 +68,7 @@ private:
     SSVEPstimulation *m_ssvepStimulation;
     // QUdpSocket *m_robotSocket;
     QTcpSocket *m_robotSocket;
+    ExternComm *m_externComm;
     //
     QPropertyAnimation *m_ERPanimation;
     QPropertyAnimation *m_SSVEPanimation;

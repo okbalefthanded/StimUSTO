@@ -28,7 +28,11 @@ void ExternComm::communicate(const QString t_command)
 {
     qDebug()<<"Extern com communicate";
     sendToMachine(t_command);
-    recieveFromMachine();
+    if(m_blocking == true)
+    {
+      recieveFromMachine();
+    }
+
 }
 
 void ExternComm::sendToMachine(const QString t_command)

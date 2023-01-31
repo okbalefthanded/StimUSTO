@@ -33,6 +33,7 @@ private:
     QTcpSocket *m_machineSocket;
     quint8 m_commState    = external_comm::DISABLED;
     quint8 m_machineState = machine_state::READY;
+    bool m_blocking = false;
 };
 
 
