@@ -177,7 +177,17 @@ void SSVEPstimulation::preTrial()
 
     if(m_firstRun)
     {
-        m_flickeringSequence = new RandomFlashSequence(m_ssvep->nrElements(), m_ssvep->nrSequences() / m_ssvep->nrElements());
+        if(m_ssvep->desiredPhrase().isEmpty())
+        {
+            m_flickeringSequence = new RandomFlashSequence(m_ssvep->nrElements(), m_ssvep->nrSequences() / m_ssvep->nrElements());
+        }
+
+        else
+        {
+            m_flickeringSequence = new RandomFlashSequence();
+            m_flickeringSequence->sequence = RandomFlashSequence::toSequence(m_ssvep->desiredPhrase());
+        }
+
         m_firstRun = false;
     }
 
@@ -531,7 +541,7 @@ void SSVEPstimulation::scheduleRedraw()
 
 void SSVEPstimulation::renderText()
 {
-   // qDebug()<< Q_FUNC_INFO;
+    // qDebug()<< Q_FUNC_INFO;
 
     int screenWidth, screenHeight;
     int x, y;
@@ -575,7 +585,7 @@ void SSVEPstimulation::renderText()
 
 void SSVEPstimulation::renderFeedBackText()
 {
-   // qDebug()<< Q_FUNC_INFO;
+    // qDebug()<< Q_FUNC_INFO;
 
     QSize screenSize = utils::getScreenSize();
     int screenWidth, screenHeight;
