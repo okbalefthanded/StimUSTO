@@ -447,6 +447,10 @@ void Speller::postTrialEnd()
         qDebug()<< "Accuracy on ERP session: " << m_correct;
         qDebug()<< "Experiment End, closing speller";
         sendMarker(OVTK_StimulationId_ExperimentStop);
+        if(m_ERP->externalComm() == external_comm::ENABLED)
+        {
+            m_externComm->communicate("00");
+        }
         utils::wait(2000);
         // emit(slotTerminated());
         // this->close();

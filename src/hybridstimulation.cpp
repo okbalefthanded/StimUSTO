@@ -486,6 +486,10 @@ void HybridStimulation::terminateExperiment()
 {
     qDebug() << "Hybrid Experiment End";
     m_ERPspeller->sendMarker(OVTK_StimulationId_ExperimentStop);
+    if (m_hybridStimulation->externalComm() == external_comm::ENABLED)
+    {
+        m_externComm->communicate("00");
+    }
     utils::wait(2000);
     // m_ERPspeller->close();
     // m_ssvepStimulation->close();

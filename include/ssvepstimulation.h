@@ -16,7 +16,7 @@
 #include "randomflashsequence.h"
 #include "ssvep.h"
 #include "logger.h"
-
+#include "externComm.h"
 
 class SSVEPstimulation : public QOpenGLWindow, protected QOpenGLFunctions
 {
@@ -154,9 +154,10 @@ protected:
     QVector<int> m_centerindices;
 
     // external communication
-    QString m_hybridCommand = "";
-    quint16 m_robotPort = 12347;
-    QTcpSocket *m_robotSocket;
+    ExternComm *m_externComm;
+    // QString m_hybridCommand = "";
+    // quint16 m_robotPort = 12347;
+    // QTcpSocket *m_robotSocket;
 };
 
 #endif // SSVEPSTIMULATION_H

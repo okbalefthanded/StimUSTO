@@ -38,7 +38,7 @@ SSVEPstimulation::SSVEPstimulation(SSVEP *paradigm, int t_port)
     connect(m_feedbackSocket, SIGNAL(readyRead()), this, SLOT(receiveFeedback()));
     //
     initLogger();
-    //
+
     m_state = trial_state::PRE_TRIAL;
 }
 
@@ -108,7 +108,12 @@ void SSVEPstimulation::initializeGL()
         m_programShader->release();
     }
 
-    initExternalSocket();
+    //  initExternalSocket();
+    //
+    if(m_ssvep->externalComm() == external_comm::ENABLED)
+    {
+        m_externComm = new ExternComm(m_ssvep->externalAddress(), 12347, m_ssvep->externalComm());
+    }
 }
 
 void SSVEPstimulation::resizeGL(int w, int h)
@@ -249,7 +254,13 @@ void SSVEPstimulation::postTrial()
     m_state = trial_state::PRE_TRIAL;
     // refreshCircles();
 
-    externalCommunication();
+    // externalCommunication();
+
+    if(m_ssvep->externalComm() == external_comm::ENABLED)
+    {
+        // std::string cmd = QString(m_sessionFeedback[m_currentFlicker]).toStdString();
+        m_externComm->communicate(QString(m_sessionFeedback[m_currentFlicker]));
+    }
 
     postTrialEnd();
 }
@@ -279,6 +290,10 @@ void SSVEPstimulation::postTrialEnd()
         qDebug()<< "Accuracy in SSVEP session: " << m_correct;
         qDebug()<< "Experiment End, closing SSVEP stimulation";
         sendMarker(OVTK_StimulationId_ExperimentStop);
+        if(m_ssvep->externalComm() == external_comm::ENABLED)
+        {
+            m_externComm->communicate("00");
+        }
         utils::wait(2000);
     }
 }
@@ -406,6 +421,7 @@ void SSVEPstimulation::refreshCircles()
     scheduleRedraw();
 }
 
+/*
 void SSVEPstimulation::externalCommunication()
 {
     // Send and Recieve feedback to/from Robot if external communication is enabled
@@ -449,7 +465,7 @@ void SSVEPstimulation::externalCommunication()
         }
     }
 }
-
+*/
 void SSVEPstimulation::highlightTarget()
 {
     // int m_vertexPerCircle = glUtils::SIDES_PER_CIRCLE + 2;
@@ -707,7 +723,7 @@ void SSVEPstimulation::setFeedbackPort(int t_port)
 {
     m_feedbackPort = t_port;
 }
-
+/*
 void SSVEPstimulation::initExternalSocket()
 {
     if(m_ssvep->externalComm() == external_comm::ENABLED)
@@ -726,6 +742,8 @@ void SSVEPstimulation::initExternalSocket()
         }
     }
 }
+
+*/
 
 SSVEPstimulation::~SSVEPstimulation()
 {
