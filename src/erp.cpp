@@ -92,10 +92,9 @@ void ERP::fromVariant(const QVariant &variant)
         }
 
         m_desiredPhrase = randomPhrase->toString();
-        // qDebug()<< Q_FUNC_INFO << "random phrase" << m_desiredPhrase;
     }
 
-    qDebug()<< n_elements << m_desiredPhrase;
+    // qDebug()<< n_elements << m_desiredPhrase;
     m_flashingMode = map.value("flashingMode").toInt();
 }
 

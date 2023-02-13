@@ -310,7 +310,7 @@ bool Speller::isTarget(int t_stim)
 
 bool Speller::Correct()
 {
-    return m_text[m_text.length()-1] == m_desiredPhrase[m_desiredPhrase.length() - 1];
+    return m_text[m_text.length()-1] == m_desiredPhrase[m_text.length()-1];
 }
 
 void Speller::highlightTarget()
@@ -593,8 +593,6 @@ void Speller::setERP(ERP *erp)
     m_ERP = erp;
     setTimers(m_ERP->stimulationDuration(), m_ERP->breakDuration());
     setDesiredPhrase(m_ERP->desiredPhrase());
-
-    // qDebug()<< Q_FUNC_INFO << m_desiredPhrase;
 
     m_textRow->setText(m_desiredPhrase);
     // external comm

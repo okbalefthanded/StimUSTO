@@ -240,7 +240,6 @@ void SpellerSmall::preTrial()
     ++m_preTrialCount;
 
     endPreTrial();
-
 }
 
 void SpellerSmall::feedback()
@@ -281,6 +280,7 @@ void SpellerSmall::feedback()
         this->layout()->itemAt(id-1)->
                 widget()->setStyleSheet("QLabel { color : " + fbkColor + "; font: 40pt }");
     }
+
     postTrial();
 }
 
