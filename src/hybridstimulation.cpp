@@ -340,15 +340,19 @@ void HybridStimulation::externalComm()
 void HybridStimulation::hybridPostTrial()
 {
 
-    qDebug()<< Q_FUNC_INFO;
+    // qDebug()<< Q_FUNC_INFO;
     bool correct = false;
     bool doExternalComm = true;
-
+    QColor erpColor = Qt::black;
     if(m_hybridStimulation->experimentMode() == operation_mode::COPY_MODE ||
             m_hybridStimulation->experimentMode() == operation_mode::FREE_MODE)
     {
         m_ERPFeedback    = m_ERPspeller->m_text;
         m_SSVEPFeedback += m_ssvepStimulation->m_sessionFeedback;
+        if (m_ERPspeller->Correct())
+        {
+            erpColor = Qt::red;
+        }
         // qDebug() << Q_FUNC_INFO << "ERP feedback: " << m_ERPFeedback;
         // qDebug() << Q_FUNC_INFO << "SSVEP feedback: " << m_SSVEPFeedback;
     }
@@ -360,7 +364,7 @@ void HybridStimulation::hybridPostTrial()
     if (m_hybridStimulation->m_order == order::ERP_FIRST)
     {
         // qDebug()<< m_ERPFeedback[m_ERPFeedback.length() - 1] << "  " << m_ERPFeedback[m_ERPFeedback.length() - 1].digitValue();
-        m_ssvepStimulation->setExternalFeedback(m_ERPFeedback[m_ERPFeedback.length() - 1].digitValue());
+        m_ssvepStimulation->setExternalFeedback(m_ERPFeedback[m_ERPFeedback.length() - 1].digitValue(), erpColor);
     }
 
     // show feedback on ERP speller for 500 ms
