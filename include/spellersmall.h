@@ -11,6 +11,7 @@ class SpellerSmall : public Speller
 public:
     explicit SpellerSmall(QWidget *parent = 0);
     ~SpellerSmall();
+    virtual void showFeedback(QString command, bool correct);
 
 protected slots:
     void preTrial();
@@ -20,12 +21,20 @@ protected slots:
     void pauseFlashing();
     void createLayout();
 
+
 protected:
 
     bool isTarget();
     void highlightTarget();
     void refreshTarget();
 
+private:
+    void flashing();
+    void stimulationFace();
+    void stimulationColoredFace();
+    void stimulationInvertedFace();
+    void stimulationInvertedColoredFace();
+    QString getElemColor(int t_index);
 };
 
 #endif // SPELLERSMALL_H

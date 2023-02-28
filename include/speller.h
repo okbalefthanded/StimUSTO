@@ -42,7 +42,7 @@ public:
     void setDesiredPhrase(const QString &t_desiredPhrase);
     void setTimers(int t_stimulation, int t_isi);
     void setPresentFeedback(bool t_do);
-    void showFeedback (QString command, bool correct); // used for HybridStimulation
+    virtual void showFeedback (QString command, bool correct); // used for HybridStimulation
     int getCurrentTarget();
 
     friend class Hybrid;

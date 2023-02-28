@@ -65,7 +65,7 @@ void ERP::fromVariant(const QVariant &variant)
     {
         n_elements = 5;
     }
-    else if (m_stimulationType == speller_type::SMALL)
+    else if (m_stimulationType >= speller_type::SMALL || m_stimulationType <= speller_type::SMALL_ICFACE)
     {
         n_elements = 6;
     }

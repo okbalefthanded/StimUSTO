@@ -311,6 +311,10 @@ Speller *ConfigPanel::createSpeller(int t_spellerType)
     }
 
     case speller_type::SMALL:
+    case speller_type::SMALL_FLASH:
+    case speller_type::SMALL_FACE:
+    case speller_type::SMALL_IFACE:
+    case speller_type::SMALL_ICFACE:
     {
         SpellerSmall *smallSpeller = new SpellerSmall();
         connectStimulation(smallSpeller);

@@ -645,6 +645,7 @@ void Speller::setPresentFeedback(bool t_do)
 
 void Speller::showFeedback(QString command, bool correct)
 {
+
     int id = 0;
     QPixmap map;
     if (command[0] != '#')
@@ -739,7 +740,7 @@ void Speller::setDesiredPhrase(const QString &t_desiredPhrase)
 
 void Speller::createLayout()
 {
-    qDebug()<< Q_FUNC_INFO;
+  //  qDebug()<< Q_FUNC_INFO;
     // speller settings
     m_rows = 3;
     m_cols = 3;
