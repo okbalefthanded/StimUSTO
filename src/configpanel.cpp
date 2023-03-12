@@ -17,6 +17,7 @@
 #include "facespeller.h"
 #include "arabicspeller.h"
 #include "spellersmall.h"
+#include "spellercircular.h"
 #include "multistimuli.h"
 #include "chromaspeller.h"
 #include "auditoryspeller.h"
@@ -319,6 +320,12 @@ Speller *ConfigPanel::createSpeller(int t_spellerType)
         SpellerSmall *smallSpeller = new SpellerSmall();
         connectStimulation(smallSpeller);
         return smallSpeller;
+    }
+    case speller_type::SMALL_CIRCLE:
+    {
+       SpellerCircular *spellerCircle = new SpellerCircular();
+        connectStimulation(spellerCircle);
+        return spellerCircle;
     }
         /*
     case speller_type::AUDITORY:

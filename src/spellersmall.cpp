@@ -46,6 +46,12 @@ SpellerSmall::SpellerSmall(QWidget *parent) : Speller(0)
     // this->setWindowFlag(Qt::Popup);
 }
 
+SpellerSmall::SpellerSmall(int i): Speller(0)
+{
+ //   qDebug()<< Q_FUNC_INFO;
+}
+
+
 
 void SpellerSmall::startFlashing()
 {
@@ -129,7 +135,7 @@ void SpellerSmall::pauseFlashing()
     // this->layout()->itemAt(id - 1)->
     //        widget()->setStyleSheet("QLabel { color : gray; font: 40pt }");
     this->layout()->itemAt(id - 1)->
-                widget()->setStyleSheet("QLabel { color : " + elemColor + "; font: 40pt }");
+            widget()->setStyleSheet("QLabel { color : " + elemColor + "; font: 40pt }");
 
     this->layout()->itemAt(id-1)->
             widget()->setProperty("text", QString::number(id));
@@ -143,7 +149,7 @@ void SpellerSmall::pauseFlashing()
 
 void SpellerSmall::createLayout()
 {
-    //  qDebug()<< Q_FUNC_INFO;
+    qDebug()<< Q_FUNC_INFO;
     // speller settings
     m_rows = 2;
     m_cols = 3;
@@ -198,16 +204,16 @@ void SpellerSmall::createLayout()
             if (j ==0)
             {
                 alignment = Qt::AlignRight;
-                elemColor = "magenta";
+                //         elemColor = "magenta";
             }
             else if (j==1)
             {
                 alignment = Qt::AlignCenter;
-                elemColor = "blue";
+                //       elemColor = "blue";
             }
             else {
                 alignment= Qt::AlignLeft;
-                elemColor = "red";
+                //     elemColor = "red";
             }
             element->setStyleSheet("font: 40pt; color:"+elemColor);
             layout->addWidget(element, i, j, alignment);
@@ -264,17 +270,21 @@ void SpellerSmall::stimulationColoredFace()
 
     if ( (currentStim % 3) == 1 )
     {
-        pixmap = QPixmap(":/images/bennabi_face_magenta.png");
+        // pixmap = QPixmap(":/images/bennabi_face_magenta.png");
+        pixmap = QPixmap(":/images/bennabi_face_blue.png");
     }
 
     else if ((currentStim % 3) == 2)
     {
-        pixmap = QPixmap(":/images/bennabi_face_blue.png");
+        //     pixmap = QPixmap(":/images/bennabi_face_blue.png");
+        pixmap = QPixmap(":/images/bennabi_face_red.png");
     }
 
     else if ((currentStim % 3) == 0)
     {
-        pixmap = QPixmap(":/images/bennabi_face_red.png");
+        //  pixmap = QPixmap(":/images/bennabi_face_red.png");
+        // pixmap = QPixmap(":/images/bennabi_face_blue.png");
+        pixmap = QPixmap(":/images/bennabi_face_magenta.png");
     }
 
     this->layout()->itemAt(currentStim-1)->widget()->setProperty("pixmap", pixmap);
@@ -332,7 +342,8 @@ QString SpellerSmall::getElemColor(int t_index)
         elemColor = "red";
     }
 
-    return elemColor;
+    //return elemColor;
+    return "gray";
 }
 
 void SpellerSmall::preTrial()
@@ -407,7 +418,7 @@ void SpellerSmall::feedback()
                 }
                 else
                 {
-                    fbkColor = "brown"; //"blue";
+                    fbkColor = "white"; //"blue";
                     isCorrect = false;
                 }
             }
@@ -419,7 +430,7 @@ void SpellerSmall::feedback()
         }
 
         this->layout()->itemAt(id-1)->
-                widget()->setStyleSheet("QLabel { color : " + fbkColor + "; font: 40pt }");
+                widget()->setStyleSheet("QLabel { color : " + fbkColor + "; font: 60pt }");
     }
 
     postTrial();
@@ -507,7 +518,8 @@ void SpellerSmall::postTrial()
     QString elemColor = "gray";
     if (m_presentFeedback)
     {
-        utils::wait(100);
+        // utils::wait(100);
+        utils::wait(500);
 
         if (m_text[m_text.length()-1] != "#")
         {

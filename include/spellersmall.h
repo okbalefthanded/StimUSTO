@@ -10,6 +10,7 @@ class SpellerSmall : public Speller
  Q_OBJECT
 public:
     explicit SpellerSmall(QWidget *parent = 0);
+    SpellerSmall(int i);
     ~SpellerSmall();
     virtual void showFeedback(QString command, bool correct);
 
@@ -20,20 +21,20 @@ protected slots:
     void startFlashing();
     void pauseFlashing();
     void createLayout();
-
-
-protected:
-
-    bool isTarget();
-    void highlightTarget();
-    void refreshTarget();
-
-private:
+    //
     void flashing();
     void stimulationFace();
     void stimulationColoredFace();
     void stimulationInvertedFace();
     void stimulationInvertedColoredFace();
+
+
+protected:
+    bool isTarget();
+    void highlightTarget();
+    void refreshTarget();
+
+private:
     QString getElemColor(int t_index);
 };
 
