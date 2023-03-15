@@ -1,6 +1,6 @@
 #include <QtMath>
 #include "circularlayout.h"
-
+#include "utils.h"
 CircularLayout::CircularLayout(QWidget *parent)
 {
 
@@ -15,16 +15,19 @@ QSize CircularLayout::sizeHint() const
 void CircularLayout::setGeometry(const QRect &rect)
 {
      QLayout::setGeometry(rect);
-     const qreal radius = 340;// 346; // 150;//qMin(rect.width(), rect.height()) / 2.0;
-     const QPointF center(683, 384);//1366x768 = rect.center();
-
+     const QSize screenSize = utils::getScreenSize();
+     const qreal radius = screenSize.width() / 4;
+     const QPointF center(screenSize.width() / 2.0, screenSize.height() / 2.0); //1366x768 screensize
+     // qreal angle, x, y = 0;
+     QSize size;
+     QRectF itemRect;
      for (int i = 0; i < itemList.size(); ++i)
      {
-         const qreal angle = i * 2 * M_PI / itemList.size();
-         const qreal x = center.x() + radius * qCos(angle);
-         const qreal y = center.y() + radius * qSin(angle);
-         const QSizeF size = itemList[i]->sizeHint();
-         const QRectF itemRect(QPointF(x - size.width() / 2.0, y - size.height() / 2.0), size);
+         // angle = (i * 2 * M_PI) / itemList.size();
+         // x = center.x() + radius * qCos(angle);
+         // y = center.y() - radius * qSin(angle); // the screen plan is different than the OpenGL (0,0) at center
+         size = itemList[i]->sizeHint();
+         itemRect = QRectF(getPoint(i, center, radius), size);
          itemList[i]->setGeometry(itemRect.toRect());
      }
 }
@@ -49,6 +52,17 @@ QLayoutItem *CircularLayout::takeAt(int index)
 int CircularLayout::count() const
 {
     return itemList.size();
+}
+
+QPointF CircularLayout::getPoint(int index, QPointF center, qreal radius)
+{
+    qreal angle, x, y = 0;
+    QSize size;
+    angle = (index * 2 * M_PI) / itemList.size();
+    x = center.x() + radius * qCos(angle);
+    y = center.y() - radius * qSin(angle); // the screen plan is different than the OpenGL (0,0) at center
+    size = itemList[index]->sizeHint();
+    return QPointF(x - size.width() / 2.0, y - size.height() / 2.0);
 }
 
 CircularLayout::~CircularLayout()

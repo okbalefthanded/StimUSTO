@@ -20,7 +20,9 @@ public:
     int count() const override;
 
 private:
+    QPointF getPoint(int index, QPointF center, qreal radius);
     QList<QLayoutItem *> itemList;
+
 };
 
 #endif // CIRCULARLAYOUT_H

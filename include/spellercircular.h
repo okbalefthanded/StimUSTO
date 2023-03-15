@@ -9,8 +9,11 @@ class SpellerCircular : public SpellerSmall
 public:
     explicit SpellerCircular(QWidget *parent = 0);
     ~SpellerCircular();
-protected slots:
+
+protected:
     void startFlashing();
+    void virtual stimulationColoredFace();
+
 protected:
     void createLayout();
 };

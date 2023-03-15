@@ -22,14 +22,13 @@ protected slots:
     void pauseFlashing();
     void createLayout();
     //
-    void flashing();
-    void stimulationFace();
-    void stimulationColoredFace();
-    void stimulationInvertedFace();
-    void stimulationInvertedColoredFace();
-
 
 protected:
+    void virtual flashing();
+    void virtual stimulationFace();
+    void virtual stimulationColoredFace();
+    void virtual stimulationInvertedFace();
+    void virtual stimulationInvertedColoredFace();
     bool isTarget();
     void highlightTarget();
     void refreshTarget();

@@ -1,12 +1,11 @@
 #include "spellercircular.h"
 #include "circularlayout.h"
 
-
 SpellerCircular::SpellerCircular(QWidget *parent) : SpellerSmall(1)
 {
     // qDebug()<< Q_FUNC_INFO;
     setupUi(this);
-    this->setProperty("windowTitle", "ERP Small Speller");
+    this->setProperty("windowTitle", "ERP Small Circular Speller");
 
     showWindow();
     createLayout();
@@ -30,9 +29,36 @@ void SpellerCircular::startFlashing()
     switchStimulationTimers();
 }
 
+void SpellerCircular::stimulationColoredFace()
+{
+    int currentStim = m_flashingSequence->sequence[m_currentStimulation];
+    QPixmap pixmap;
+
+    if ( (currentStim == 1) || (currentStim == 4))
+    {
+        // pixmap = QPixmap(":/images/bennabi_face_magenta.png");
+        pixmap = QPixmap(":/images/bennabi_face_blue.png");
+    }
+
+    else if ((currentStim == 2) || (currentStim == 6))
+    {
+        //     pixmap = QPixmap(":/images/bennabi_face_blue.png");
+        pixmap = QPixmap(":/images/bennabi_face_red.png");
+    }
+
+    else if ((currentStim == 3) || (currentStim == 5))
+    {
+        //  pixmap = QPixmap(":/images/bennabi_face_red.png");
+        // pixmap = QPixmap(":/images/bennabi_face_blue.png");
+        pixmap = QPixmap(":/images/bennabi_face_magenta.png");
+    }
+
+    this->layout()->itemAt(currentStim-1)->widget()->setProperty("pixmap", pixmap);
+}
+
 void SpellerCircular::createLayout()
 {
-   //  qDebug()<< Q_FUNC_INFO;
+    //  qDebug()<< Q_FUNC_INFO;
     // speller settings
     m_rows = 2;
     m_cols = 3;
@@ -63,7 +89,7 @@ void SpellerCircular::createLayout()
     QImage iconImage;
     int label_h, label_w;
     // add speller ellements
-    Qt::AlignmentFlag alignment = Qt::AlignCenter;
+    // Qt::AlignmentFlag alignment = Qt::AlignCenter;
     QString elemColor = "gray";
 
     for (int i=0; i<m_nrElements; i++)
@@ -80,7 +106,6 @@ void SpellerCircular::createLayout()
             element->setStyleSheet("font: 40pt; color:"+elemColor);
 
             layout->addWidget(element);
-
             m_presentedLetters.append(QString::number(i+1));
     }
     this->setLayout(layout);
