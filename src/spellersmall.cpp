@@ -29,29 +29,11 @@ SpellerSmall::SpellerSmall(QWidget *parent) : Speller(0)
     setupUi(this);
     this->setProperty("windowTitle", "ERP Small Speller");
     // this->setStyleSheet("background-color:white");
-    // this->show();
-
-    showWindow();
     createLayout();
-    initTimers();
-    initFeedbackSocket();
-
-    m_state = trial_state::PRE_TRIAL;
-    m_highlight = QPixmap(":/images/bennabi_face_red_inverted.png");
-    QLabel label;
-    int label_h = label.height() + 40;
-    int label_w = label.width() + 40;
-    m_highlight.scaled(label_w, label_h, Qt::KeepAspectRatio);
-    m_highlight.fill(m_highlightColor);
-    // this->setWindowFlag(Qt::Popup);
+    showWindow();
 }
 
-SpellerSmall::SpellerSmall(int i): Speller(0)
-{
- //   qDebug()<< Q_FUNC_INFO;
-}
-
-
+SpellerSmall::SpellerSmall(int i): Speller(i) {}
 
 void SpellerSmall::startFlashing()
 {
@@ -124,7 +106,6 @@ void SpellerSmall::startFlashing()
     switchStimulationTimers();
 }
 
-
 void SpellerSmall::pauseFlashing()
 {
 
@@ -146,10 +127,9 @@ void SpellerSmall::pauseFlashing()
     trialEnd();
 }
 
-
 void SpellerSmall::createLayout()
 {
-    qDebug()<< Q_FUNC_INFO;
+    // qDebug()<< Q_FUNC_INFO;
     // speller settings
     m_rows = 2;
     m_cols = 3;
@@ -226,7 +206,6 @@ void SpellerSmall::createLayout()
 
     this->setLayout(layout);
 }
-
 
 void SpellerSmall::highlightTarget()
 {
@@ -396,7 +375,6 @@ void SpellerSmall::preTrial()
 
 void SpellerSmall::feedback()
 {
-
     receiveFeedback();
 
     // qDebug()<< m_text[m_text.length()-1] << " "<< m_desiredPhrase[m_currentLetter - 1];
@@ -438,6 +416,8 @@ void SpellerSmall::feedback()
 
 void SpellerSmall::showFeedback(QString command, bool correct)
 {
+
+    // qDebug()<< Q_FUNC_INFO;
     int id = 0;
     QPixmap map;
     if (command[0] != '#')
@@ -445,14 +425,14 @@ void SpellerSmall::showFeedback(QString command, bool correct)
         id = command[0].digitValue();
         QString speed = command.at(1);
         QColor mapColor, textColor;
-
+        map = m_icons[id-1];
         // present feedbck : copy mode
         if (m_ERP->experimentMode() == operation_mode::COPY_MODE)
         {
 
             // feedback: green correct selection, highlight the target icon
             //           blue incorrect selection, highlight the selected icon
-            map = m_icons[id-1];
+
             if( m_text[m_text.length()-1] == m_desiredPhrase[m_desiredPhrase.length() - 1])
             {
                 mapColor = Qt::green;
@@ -476,20 +456,22 @@ void SpellerSmall::showFeedback(QString command, bool correct)
 
             fillFeedBackMap(&map, mapColor, textColor, speed);
 
-            this->layout()->itemAt(id-1)->
-                    widget()->setProperty("pixmap", map);
+           // this->layout()->itemAt(id-1)->
+           //         widget()->setProperty("pixmap", map);
 
         }
         // present feedback: FREE mode
         else if (m_ERP->experimentMode() == operation_mode::FREE_MODE)
         {
-            map = m_icons[id-1];
+           // map = m_icons[id-1];
             fillFeedBackMap(&map, Qt::blue, Qt::black, speed);
 
-            this->layout()->itemAt(id-1)->
-                    widget()->setProperty("pixmap", map);
-
+           // this->layout()->itemAt(id-1)->
+           //         widget()->setProperty("pixmap", map);
         }
+
+        this->layout()->itemAt(id-1)->
+                            widget()->setProperty("pixmap", map);
         //
         utils::wait(500);
 
@@ -497,21 +479,18 @@ void SpellerSmall::showFeedback(QString command, bool correct)
         if (m_ERP->experimentMode() == operation_mode::COPY_MODE ||
                 m_ERP->experimentMode() == operation_mode::FREE_MODE)
         {
-
             this->layout()->itemAt(id-1)->
                     widget()->setStyleSheet("QLabel { color : gray; font: 40pt }");
 
             this->layout()->itemAt(id-1)->
                     widget()->setProperty("text", QString::number(id));
-
         }
     }
-
 }
 
 void SpellerSmall::postTrial()
 {
-    //   qDebug()<< Q_FUNC_INFO;
+    // qDebug()<< Q_FUNC_INFO;
 
     ++m_trials;
     int id = m_text[m_text.length()-1].digitValue();
@@ -548,7 +527,4 @@ void SpellerSmall::postTrial()
     postTrialEnd();
 }
 
-SpellerSmall::~SpellerSmall()
-{
-
-}
+SpellerSmall::~SpellerSmall(){}

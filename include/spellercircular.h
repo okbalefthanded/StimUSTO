@@ -7,7 +7,7 @@ class SpellerCircular : public SpellerSmall
 {
      Q_OBJECT
 public:
-    explicit SpellerCircular(QWidget *parent = 0);
+    explicit SpellerCircular(QWidget *parent = nullptr);
     ~SpellerCircular();
 
 protected:

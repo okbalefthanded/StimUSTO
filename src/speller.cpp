@@ -29,31 +29,25 @@ Speller::Speller(QWidget *parent) : QDialog(parent)
     // ui->setupUi(this);
     setupUi(this);
     this->setProperty("windowTitle", "ERP Speller");
-    this->setStyleSheet("background-color:white");
-    this->show();
+    // this->setStyleSheet("background-color:white");
 
-    showWindow();
     createLayout();
-    initTimers();
-    initFeedbackSocket();
+    endInit();
+    showWindow();
 
-    m_state = trial_state::PRE_TRIAL;
-    m_highlight = QPixmap(":/images/bennabi_face_red_inverted.png");
-    QLabel label;
-    int label_h = label.height() + 40;
-    int label_w = label.width() + 40;
-    m_highlight.scaled(label_w, label_h, Qt::KeepAspectRatio);
-    m_highlight.fill(m_highlightColor);
     // this->setWindowFlag(Qt::Popup);
 }
 
 Speller::Speller(int i)
 {
     // qDebug()<< Q_FUNC_INFO;
+    endInit();
 }
 
 void Speller::startTrial()
 {
+    // qDebug()<< Q_FUNC_INFO << m_state;
+
     if (m_state == trial_state::PRE_TRIAL)
     {
         preTrial();
@@ -496,6 +490,8 @@ void Speller::trialEnd()
 
 void Speller::fillFeedBackMap(QPixmap *map, QColor t_mapColor, QColor t_textColor, QString text)
 {
+    // qDebug()<< Q_FUNC_INFO;
+
     map->fill(t_mapColor);
     QPainter painter(map);
     painter.setPen(t_textColor);
@@ -552,8 +548,8 @@ void Speller::showWindow()
 
 void Speller::initTimers()
 {
-    m_stimTimer = new QTimer(this);
-    m_isiTimer = new QTimer(this);
+    m_stimTimer     = new QTimer(this);
+    m_isiTimer      = new QTimer(this);
     m_preTrialTimer = new QTimer(this);
 
     m_stimTimer->setTimerType(Qt::PreciseTimer);
@@ -581,6 +577,21 @@ void Speller::initFeedbackSocket()
 {
     m_feedbackSocket = new QUdpSocket(this);
     m_feedbackSocket->bind(QHostAddress::LocalHost, m_feedbackPort);
+}
+
+void Speller::endInit()
+{
+    // qDebug()<<Q_FUNC_INFO;
+
+    initTimers();
+    initFeedbackSocket();
+    m_state = trial_state::PRE_TRIAL;
+    m_highlight = QPixmap(":/images/bennabi_face_red_inverted.png");
+    QLabel label;
+    int label_h = label.height() + 40;
+    int label_w = label.width() + 40;
+    m_highlight.scaled(label_w, label_h, Qt::KeepAspectRatio);
+    m_highlight.fill(m_highlightColor);
 }
 
 ERP *Speller::erp() const
@@ -645,7 +656,7 @@ void Speller::setPresentFeedback(bool t_do)
 
 void Speller::showFeedback(QString command, bool correct)
 {
-
+    qDebug()<< Q_FUNC_INFO;
     int id = 0;
     QPixmap map;
     if (command[0] != '#')

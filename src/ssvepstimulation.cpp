@@ -207,7 +207,6 @@ void SSVEPstimulation::preTrial()
         }
     }
 
-
     m_preTrialTimer->start();
     m_preTrialCount++;
 
@@ -224,8 +223,8 @@ void SSVEPstimulation::postTrial()
 {
     // initElements();
     // qDebug()<< Q_FUNC_INFO;
-    disconnect(this, SIGNAL(frameSwapped()), this, SLOT(update()));
-    refreshCircles(); // initElements();
+    // disconnect(this, SIGNAL(frameSwapped()), this, SLOT(update()));
+    // refreshCircles(); // initElements();
 
     m_index = 0;
     //  m_state = trial_state::PRE_TRIAL;
@@ -310,7 +309,6 @@ void SSVEPstimulation::Flickering()
         QCoreApplication::processEvents(QEventLoop::AllEvents);
         if (m_receivedFeedback)
         {
-
             break;
         }
     }
@@ -324,6 +322,9 @@ void SSVEPstimulation::Flickering()
 
     sendMarker(OVTK_StimulationId_TrialStop);
     m_state = trial_state::POST_TRIAL;
+
+    disconnect(this, SIGNAL(frameSwapped()), this, SLOT(update()));
+    refreshCircles();
 }
 
 void SSVEPstimulation::feedback()

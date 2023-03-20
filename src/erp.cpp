@@ -65,7 +65,7 @@ void ERP::fromVariant(const QVariant &variant)
     {
         n_elements = 5;
     }
-    else if (m_stimulationType >= speller_type::SMALL || m_stimulationType <= speller_type::SMALL_ICFACE)
+    else if (m_stimulationType >= speller_type::SMALL || m_stimulationType <= speller_type::SMALL_CIRCLE)
     {
         n_elements = 6;
     }
@@ -94,7 +94,7 @@ void ERP::fromVariant(const QVariant &variant)
         m_desiredPhrase = randomPhrase->toString();
     }
 
-    // qDebug()<< n_elements << m_desiredPhrase;
+
     m_flashingMode = map.value("flashingMode").toInt();
 }
 

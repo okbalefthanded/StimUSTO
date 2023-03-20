@@ -15,17 +15,15 @@ QSize CircularLayout::sizeHint() const
 void CircularLayout::setGeometry(const QRect &rect)
 {
      QLayout::setGeometry(rect);
+
      const QSize screenSize = utils::getScreenSize();
      const qreal radius = screenSize.width() / 4;
      const QPointF center(screenSize.width() / 2.0, screenSize.height() / 2.0); //1366x768 screensize
-     // qreal angle, x, y = 0;
      QSize size;
      QRectF itemRect;
+
      for (int i = 0; i < itemList.size(); ++i)
      {
-         // angle = (i * 2 * M_PI) / itemList.size();
-         // x = center.x() + radius * qCos(angle);
-         // y = center.y() - radius * qSin(angle); // the screen plan is different than the OpenGL (0,0) at center
          size = itemList[i]->sizeHint();
          itemRect = QRectF(getPoint(i, center, radius), size);
          itemList[i]->setGeometry(itemRect.toRect());

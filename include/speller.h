@@ -31,7 +31,7 @@ class Speller : public QDialog, protected Ui::SpellerForm
     Q_OBJECT
 
 public:
-    explicit Speller(QWidget *parent = 0);
+    explicit Speller(QWidget *parent = nullptr);
     Speller(int i);
     ~Speller();
 
@@ -64,7 +64,6 @@ protected slots:
     virtual void pauseFlashing();
     virtual void receiveFeedback();
     virtual void createLayout();
-    // void createLayout();
     virtual void refreshLayout();
 
 public slots:
@@ -75,11 +74,11 @@ public slots:
 
 protected:
 
-    void initLogger();
     void showWindow();
+    void initLogger();
     void initTimers();
     void initFeedbackSocket();
-
+    void endInit();
     bool isTarget();
     bool isTarget(int t_stim);
     bool Correct();

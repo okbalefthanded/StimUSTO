@@ -9,7 +9,7 @@ class SpellerSmall : public Speller
 {
  Q_OBJECT
 public:
-    explicit SpellerSmall(QWidget *parent = 0);
+    explicit SpellerSmall(QWidget *parent = nullptr);
     SpellerSmall(int i);
     ~SpellerSmall();
     virtual void showFeedback(QString command, bool correct);

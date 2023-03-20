@@ -128,7 +128,7 @@ void Hybrid::fromVariant(const QVariant &variant)
             n_erpelement = 5;
         }
 
-        else if (m_ERPparadigm->stimulationType() == speller_type::SMALL)
+        else if (m_ERPparadigm->stimulationType() >= speller_type::SMALL || m_ERPparadigm->stimulationType() <= speller_type::SMALL_CIRCLE)
         {
             n_erpelement = 6;
         }

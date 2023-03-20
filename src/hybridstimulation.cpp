@@ -186,6 +186,7 @@ void HybridStimulation::swichStimWindows()
 {
     // qDebug()<< Q_FUNC_INFO << m_currentTrial;
     QColor fbkColor = Qt::black;
+
     // ERP FIRST IN ORDER
     if(m_hybridStimulation->m_order == order::ERP_FIRST)
     {
@@ -256,7 +257,6 @@ void HybridStimulation::swichStimWindows()
 
 void HybridStimulation::initExternalComm()
 {
-
     if(m_hybridStimulation->externalComm() == external_comm::ENABLED)
     {
         // create an external comm object
@@ -344,6 +344,7 @@ void HybridStimulation::hybridPostTrial()
     bool correct = false;
     bool doExternalComm = true;
     QColor erpColor = Qt::black;
+
     if(m_hybridStimulation->experimentMode() == operation_mode::COPY_MODE ||
             m_hybridStimulation->experimentMode() == operation_mode::FREE_MODE)
     {
@@ -457,8 +458,7 @@ void HybridStimulation::hybridPostTrialEnd()
     m_hybridState = trial_state::PRE_TRIAL;
 
     // More trials to conduct
-    if(m_currentTrial < m_trials || m_hybridStimulation->experimentMode() == operation_mode::FREE_MODE)
-        // if(m_currentTrial < m_trials)
+    if( (m_currentTrial < m_trials) || (m_hybridStimulation->experimentMode() == operation_mode::FREE_MODE))
     {
         if(m_ERPFeedback[m_ERPFeedback.length() - 1] == '5' && m_hybridStimulation->experimentMode() == operation_mode::FREE_MODE) // stop command in ERP
         {
@@ -537,6 +537,7 @@ void HybridStimulation::initERPspeller(ERP *erp)
         //m_ERPspeller->initSpeller(erp);
         break;
     }
+        // TODO: add the rest of Spellers
     }
 
     if(m_hybridStimulation->m_order == order::SSVEP_FIRST)

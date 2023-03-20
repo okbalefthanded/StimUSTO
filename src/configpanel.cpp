@@ -31,9 +31,7 @@
 #include "jsonserializer.h"
 #include "ovtk_stimulations.h"
 //
-ConfigPanel::ConfigPanel(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::ConfigPanel)
+ConfigPanel::ConfigPanel(QWidget *parent) : QMainWindow(parent), ui(new Ui::ConfigPanel)
 {
     ui->setupUi(this);
 }
@@ -249,9 +247,8 @@ void ConfigPanel::on_initHybrid_clicked()
 
 ERP *ConfigPanel::initParadigmERPGui()
 {
-    ERP *erpParadigm = new ERP();
     int spellerType = ui->spellerType->currentIndex();
-    erpParadigm = new ERP(ui->spellingModeChoices->currentIndex(),
+    ERP *erpParadigm = new ERP(ui->spellingModeChoices->currentIndex(),
                           control_mode::SYNC, // TODO : implement async ERP control mode
                           paradigm_type::ERP,
                           external_comm::DISABLED,

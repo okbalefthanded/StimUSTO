@@ -6,21 +6,9 @@ SpellerCircular::SpellerCircular(QWidget *parent) : SpellerSmall(1)
     // qDebug()<< Q_FUNC_INFO;
     setupUi(this);
     this->setProperty("windowTitle", "ERP Small Circular Speller");
-
-    showWindow();
     createLayout();
-    initTimers();
-    initFeedbackSocket();
-
-    m_state = trial_state::PRE_TRIAL;
-    m_highlight = QPixmap(":/images/bennabi_face_red_inverted.png");
-    QLabel label;
-    int label_h = label.height() + 40;
-    int label_w = label.width() + 40;
-    m_highlight.scaled(label_w, label_h, Qt::KeepAspectRatio);
-    m_highlight.fill(m_highlightColor);
+    showWindow();
 }
-
 
 void SpellerCircular::startFlashing()
 {
@@ -32,6 +20,9 @@ void SpellerCircular::startFlashing()
 void SpellerCircular::stimulationColoredFace()
 {
     int currentStim = m_flashingSequence->sequence[m_currentStimulation];
+
+    // qDebug()<< Q_FUNC_INFO << currentStim;
+
     QPixmap pixmap;
 
     if ( (currentStim == 1) || (currentStim == 4))
@@ -58,7 +49,7 @@ void SpellerCircular::stimulationColoredFace()
 
 void SpellerCircular::createLayout()
 {
-    //  qDebug()<< Q_FUNC_INFO;
+    // qDebug()<< Q_FUNC_INFO;
     // speller settings
     m_rows = 2;
     m_cols = 3;
@@ -108,11 +99,8 @@ void SpellerCircular::createLayout()
             layout->addWidget(element);
             m_presentedLetters.append(QString::number(i+1));
     }
+
     this->setLayout(layout);
 }
 
-
-SpellerCircular::~SpellerCircular()
-{
-
-}
+SpellerCircular::~SpellerCircular(){}
