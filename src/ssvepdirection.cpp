@@ -15,7 +15,6 @@
 #include "glutils.h"
 //
 
-
 SsvepDirection::SsvepDirection(SSVEP *paradigm, int t_port): SSVEPstimulation(paradigm, t_port)
 {
     initElements();

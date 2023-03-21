@@ -40,37 +40,6 @@ void SpellerSmall::startFlashing()
     // qDebug()<< Q_FUNC_INFO;
 
     sendStimulationInfo();
-    /*
-    int currentStim = m_flashingSequence->sequence[m_currentStimulation];
-    QPixmap pixmap;
-
-    // if(currentStim <= 3)
-    // {
-    //    pixmap = QPixmap(":/images/bennabi_face_blue.png");
-   // }
-
-   // else if (currentStim <= 6)
-   // {
-   //     pixmap = QPixmap(":/images/bennabi_face_red.png");
-   // }
-
-    if ( (currentStim % 3) == 1 )
-    {
-        pixmap = QPixmap(":/images/bennabi_face_magenta.png");
-    }
-
-    else if ((currentStim % 3) == 2)
-    {
-        pixmap = QPixmap(":/images/bennabi_face_blue.png");
-    }
-
-    else if ((currentStim % 3) == 0)
-    {
-        pixmap = QPixmap(":/images/bennabi_face_red.png");
-    }
-
-    this->layout()->itemAt(currentStim-1)->widget()->setProperty("pixmap", pixmap);
-*/
 
     switch(m_ERP->stimulationType())
     {
@@ -416,23 +385,22 @@ void SpellerSmall::feedback()
 
 void SpellerSmall::showFeedback(QString command, bool correct)
 {
-
-    // qDebug()<< Q_FUNC_INFO;
+    // qDebug()<< Q_FUNC_INFO << command;
     int id = 0;
     QPixmap map;
     if (command[0] != '#')
     {
-        id = command[0].digitValue();
+        id  = command[0].digitValue();
         QString speed = command.at(1);
         QColor mapColor, textColor;
+        mapColor  = Qt::blue;
+        textColor = Qt::black;
         map = m_icons[id-1];
-        // present feedbck : copy mode
+        // present feedbck : COPY mode
         if (m_ERP->experimentMode() == operation_mode::COPY_MODE)
         {
-
             // feedback: green correct selection, highlight the target icon
             //           blue incorrect selection, highlight the selected icon
-
             if( m_text[m_text.length()-1] == m_desiredPhrase[m_desiredPhrase.length() - 1])
             {
                 mapColor = Qt::green;
@@ -454,22 +422,15 @@ void SpellerSmall::showFeedback(QString command, bool correct)
                 textColor = Qt::black;
             }
 
-            fillFeedBackMap(&map, mapColor, textColor, speed);
-
-           // this->layout()->itemAt(id-1)->
-           //         widget()->setProperty("pixmap", map);
-
+            // fillFeedBackMap(&map, mapColor, textColor, speed);
         }
         // present feedback: FREE mode
-        else if (m_ERP->experimentMode() == operation_mode::FREE_MODE)
-        {
-           // map = m_icons[id-1];
-            fillFeedBackMap(&map, Qt::blue, Qt::black, speed);
-
-           // this->layout()->itemAt(id-1)->
-           //         widget()->setProperty("pixmap", map);
-        }
-
+        // else if (m_ERP->experimentMode() == operation_mode::FREE_MODE)
+        //{
+        //    fillFeedBackMap(&map, Qt::blue, Qt::black, speed);
+        //}
+        //
+        fillFeedBackMap(&map, mapColor, textColor, speed);
         this->layout()->itemAt(id-1)->
                             widget()->setProperty("pixmap", map);
         //

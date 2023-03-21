@@ -11,6 +11,7 @@
 #include "flashingspeller.h"
 #include "hybrid.h"
 #include "ovtk_stimulations.h"
+
 //
 HybridStimulation::HybridStimulation(Hybrid *hybridStimulation)
 {
@@ -242,6 +243,12 @@ void HybridStimulation::swichStimWindows()
                 //  m_ssvepStimulation->setScreen(QGuiApplication::screens().last());
                 m_ssvepStimulation->showFullScreen();
                 m_ERPspeller->hide();
+
+                // displacing the break from hybridpostTrial to here
+                //     qDebug()<< Q_FUNC_INFO<< "doing it "<< QTime::currentTime().msec();
+                utils::wait(1000);
+                //     qDebug()<< Q_FUNC_INFO<< "afer doing it "<< QTime::currentTime().msec();
+
             }
         }
         else
@@ -250,7 +257,6 @@ void HybridStimulation::swichStimWindows()
             // m_ERPspeller->show();
             m_ERPspeller->showFullScreen();
             m_ssvepStimulation->hide();
-
         }
     }
 }
@@ -411,13 +417,10 @@ void HybridStimulation::hybridPostTrial()
                 directionDesired  = m_ERPspeller->getDesiredPhrase();
             }
 
-            //  if(m_ERPFeedback[m_ERPFeedback.length() - 1] != m_ERPspeller->getDesiredPhrase())
             if(directionFeedback != directionDesired)
             {
                 doExternalComm = false;
                 --m_currentTrial;
-                //  qDebug()<< Q_FUNC_INFO << "ERP feedback :"<< m_ERPFeedback << "Desired "<< m_ERPspeller->getDesiredPhrase();
-                //  qDebug() << Q_FUNC_INFO << "Repeat TRIAL: with: " << m_currentTrial;
             }
             else
             {
@@ -427,18 +430,21 @@ void HybridStimulation::hybridPostTrial()
 
         if (m_hybridCommand[0] != '#' && doExternalComm)
         {
-           // externalComm();
-             m_externComm->communicate(m_hybridCommand);
+            // externalComm();
+            m_externComm->communicate(m_hybridCommand);
         }
 
     }
 
+    /*
     else
     {
         // increase waiting time after feedabck by 500 or 1000 ms (experimenting with 2000ms)
         // only when control of external device is disabled
         utils::wait(1000); // 1000
     }
+    */
+
     /*
     if (m_hybridCommand[0] != '#' && doExternalComm)
     {
@@ -448,7 +454,6 @@ void HybridStimulation::hybridPostTrial()
     */
     //
     hybridPostTrialEnd();
-
 }
 
 void HybridStimulation::hybridPostTrialEnd()

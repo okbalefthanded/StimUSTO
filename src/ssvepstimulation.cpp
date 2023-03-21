@@ -239,7 +239,9 @@ void SSVEPstimulation::postTrial()
         {
             // feedback for 0.5 sec & refresh
             // utils::wait(300);
+
             utils::wait(500);
+
             refresh(m_sessionFeedback[m_currentFlicker].digitValue()-1);
         }
     }

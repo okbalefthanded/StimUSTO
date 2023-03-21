@@ -6,7 +6,6 @@ CircularLayout::CircularLayout(QWidget *parent)
 
 }
 
-
 QSize CircularLayout::sizeHint() const
 {
     return QSize(1000, 700);
@@ -17,7 +16,7 @@ void CircularLayout::setGeometry(const QRect &rect)
      QLayout::setGeometry(rect);
 
      const QSize screenSize = utils::getScreenSize();
-     const qreal radius = screenSize.width() / 4;
+     const qreal radius = screenSize.width() / 4.5; // 5 //4;
      const QPointF center(screenSize.width() / 2.0, screenSize.height() / 2.0); //1366x768 screensize
      QSize size;
      QRectF itemRect;

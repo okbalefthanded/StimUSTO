@@ -490,7 +490,7 @@ void Speller::trialEnd()
 
 void Speller::fillFeedBackMap(QPixmap *map, QColor t_mapColor, QColor t_textColor, QString text)
 {
-    // qDebug()<< Q_FUNC_INFO;
+   // qDebug()<< Q_FUNC_INFO<< map << t_mapColor << t_textColor << text;
 
     map->fill(t_mapColor);
     QPainter painter(map);

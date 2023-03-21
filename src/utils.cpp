@@ -76,7 +76,7 @@ void wait(int millisecondsToWait)
     QTime dieTime = QTime::currentTime().addMSecs( millisecondsToWait );
     while( QTime::currentTime() < dieTime )
     {
-        //        qDebug()<<"waiting..."<<QTime::currentTime();
+        // qDebug()<<"waiting..."<<QTime::currentTime();
         QCoreApplication::processEvents( QEventLoop::AllEvents, 100);
 
     }

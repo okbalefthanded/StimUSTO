@@ -85,19 +85,19 @@ void SpellerCircular::createLayout()
 
     for (int i=0; i<m_nrElements; i++)
     {
-            stimName = ":/images/" + QString::number(i+1) + ".png"; // directions images
-            pic = QPixmap(stimName);
-            m_icons.append(pic.scaled(label_w, label_h, Qt::KeepAspectRatio));
+        QLabel *element = new QLabel(this);
+        label_h = element->height() + 40;
+        label_w = element->width() + 40;
+        stimName = ":/images/" + QString::number(i+1) + ".png"; // directions images
+        pic = QPixmap(stimName);
+        m_icons.append(pic.scaled(label_w, label_h, Qt::KeepAspectRatio));
 
-            QLabel *element = new QLabel(this);
-            label_h = element->height() + 40;
-            label_w = element->width() + 40;
-            element->setText(QString::number(i+1));
-            element->setAlignment(Qt::AlignCenter);
-            element->setStyleSheet("font: 40pt; color:"+elemColor);
+        element->setText(QString::number(i+1));
+        element->setAlignment(Qt::AlignCenter);
+        element->setStyleSheet("font: 40pt; color:"+elemColor);
 
-            layout->addWidget(element);
-            m_presentedLetters.append(QString::number(i+1));
+        layout->addWidget(element);
+        m_presentedLetters.append(QString::number(i+1));
     }
 
     this->setLayout(layout);
