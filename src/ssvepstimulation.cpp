@@ -42,10 +42,7 @@ SSVEPstimulation::SSVEPstimulation(SSVEP *paradigm, int t_port)
     m_state = trial_state::PRE_TRIAL;
 }
 
-SSVEPstimulation::SSVEPstimulation()
-{
-
-}
+SSVEPstimulation::SSVEPstimulation(){}
 
 void SSVEPstimulation::initializeGL()
 {
@@ -241,7 +238,6 @@ void SSVEPstimulation::postTrial()
             // utils::wait(300);
 
             utils::wait(500);
-
             refresh(m_sessionFeedback[m_currentFlicker].digitValue()-1);
         }
     }

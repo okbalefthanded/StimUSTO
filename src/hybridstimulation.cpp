@@ -246,9 +246,8 @@ void HybridStimulation::swichStimWindows()
 
                 // displacing the break from hybridpostTrial to here
                 //     qDebug()<< Q_FUNC_INFO<< "doing it "<< QTime::currentTime().msec();
-                utils::wait(1000);
+                // utils::wait(1000); // useless
                 //     qDebug()<< Q_FUNC_INFO<< "afer doing it "<< QTime::currentTime().msec();
-
             }
         }
         else
@@ -511,12 +510,14 @@ void HybridStimulation::initAnimations()
     m_ERPanimation->setDuration(500); //1000 //2000 //500 //250
     m_ERPanimation->setStartValue(0.0); //
     m_ERPanimation->setEndValue(1.0); //
+    m_ERPanimation->setEasingCurve(QEasingCurve::OutQuint);
     connect(m_ERPanimation, SIGNAL(finished()), m_ERPspeller, SLOT(startTrial()));
 
     m_SSVEPanimation = new QPropertyAnimation(m_ssvepStimulation, "opacity");
     m_SSVEPanimation->setDuration(500); //1000  //500 //250
     m_SSVEPanimation->setStartValue(0.0); //1366
     m_SSVEPanimation->setEndValue(1.0); // 0
+    m_SSVEPanimation->setEasingCurve(QEasingCurve::OutQuint);
     connect(m_SSVEPanimation, SIGNAL(finished()), m_ssvepStimulation, SLOT(startTrial()));
 }
 
@@ -582,5 +583,4 @@ void HybridStimulation::initSSVEP(SSVEP *ssvep)
     }
 }
 
-HybridStimulation::~HybridStimulation()
-{}
+HybridStimulation::~HybridStimulation(){}
