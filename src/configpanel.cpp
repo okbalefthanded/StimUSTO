@@ -27,6 +27,7 @@
 #include "phonekeypad.h"
 #include "ssvepdirection.h"
 #include "ssvepstimulation.h"
+#include "ssvepdircircle.h"
 #include "hybrid.h"
 #include "jsonserializer.h"
 #include "ovtk_stimulations.h"
@@ -85,17 +86,6 @@ void ConfigPanel::startExperiment()
  */
 void ConfigPanel::on_initSpeller_clicked()
 {
-
-    // QHostAddress sender;
-    // quint16 senderPort = 54321;
-    // QByteArray *buffer = new QByteArray();
-    //    buffer->resize(start_socket->pendingDatagramSize());
-    //    qDebug() << "buffer size" << buffer->size();
-    //    start_socket->readDatagram(buffer->data(), buffer->size(), &sender, &senderPort);
-
-    // m_startSocket = new QUdpSocket(this);
-    // m_startSocket->bind(QHostAddress("10.3.65.37"), 54321);
-
     int spellerType = 0;
 
     ERP *erpParadigm = new ERP();
@@ -324,13 +314,14 @@ Speller *ConfigPanel::createSpeller(int t_spellerType)
         connectStimulation(spellerCircle);
         return spellerCircle;
     }
-        /*
+    /*
     case speller_type::AUDITORY:
     {
         AuditorySpeller *auditorySpeller = new AuditorySpeller();
         connectStimulation(auditorySpeller);
         return auditorySpeller;
-    }*/
+    }
+    */
     }
 }
 
@@ -405,6 +396,12 @@ SSVEPstimulation *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
     case speller_type::SSVEP_CIRCLE:
     {
         ssvepStimulation = new SsvepCircle(t_ssvep, t_port);
+        break;
+    }
+
+    case speller_type::SSVEP_DIRCIRCLE:
+    {
+        ssvepStimulation = new SsvepDirectionCircle(t_ssvep, t_port);
         break;
     }
 

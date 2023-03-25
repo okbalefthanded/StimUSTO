@@ -29,8 +29,6 @@ ChromaSpeller::ChromaSpeller(QWidget *parent) : Speller(0)
 
 }
 
-
-
 void ChromaSpeller::startFlashing()
 {
     sendStimulationInfo();
@@ -52,7 +50,6 @@ void ChromaSpeller::startFlashing()
     switchStimulationTimers();
 
 }
-
 
 void ChromaSpeller::createLayout()
 {

@@ -245,9 +245,7 @@ void HybridStimulation::swichStimWindows()
                 m_ERPspeller->hide();
 
                 // displacing the break from hybridpostTrial to here
-                //     qDebug()<< Q_FUNC_INFO<< "doing it "<< QTime::currentTime().msec();
                 // utils::wait(1000); // useless
-                //     qDebug()<< Q_FUNC_INFO<< "afer doing it "<< QTime::currentTime().msec();
             }
         }
         else

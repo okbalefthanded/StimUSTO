@@ -81,6 +81,7 @@ protected:
     void endInit();
     bool isTarget();
     bool isTarget(int t_stim);
+    bool isAsync();
     bool Correct();
     virtual void highlightTarget();
     virtual void refreshTarget();
@@ -88,11 +89,13 @@ protected:
     virtual void sendStimulationInfo();
     void switchStimulationTimers();
 
+    void experimentStart();
     void startPreTrial();
     void endPreTrial();
     void postTrialEnd();
     void trialEnd();
 
+    virtual int getnElements();
     // void externalCommunication();
     void fillFeedBackMap(QPixmap *map, QColor t_mapColor, QColor t_textColor, QString text="");
     // Ui::Speller *ui;

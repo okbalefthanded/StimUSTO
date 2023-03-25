@@ -117,45 +117,11 @@ void Speller::preTrial()
 {
     if(m_trials == 0)
     {
-
-        sendMarker(OVTK_StimulationId_ExperimentStart);
-        // setting a pre-trail duration longer for calibration phase
-        // than Copy_mode/Free mode phases
-        if (m_ERP->experimentMode() == operation_mode::CALIBRATION)
-        {
-            m_preTrialTimer->setInterval(1000);
-        }
-        else
-        {
-            m_preTrialTimer->setInterval(500);
-        }
-
-        //        initLogger();
+        experimentStart();
+        // initLogger();
     }
 
-    if (m_preTrialCount == 0)
-    {
-        setTimers(m_ERP->stimulationDuration(), m_ERP->breakDuration());
-        sendMarker(OVTK_StimulationId_TrialStart);
-        m_flashingSequence = new RandomFlashSequence(m_nrElements, m_ERP->nrSequences());
-
-        if (m_ERP->experimentMode() == operation_mode::CALIBRATION)
-        {
-            highlightTarget();
-            m_text += m_desiredPhrase[m_currentLetter];
-            m_textRow->setText(m_text);
-        }
-        else if(m_ERP->experimentMode() == operation_mode::COPY_MODE)
-        {
-            highlightTarget();
-            // m_textRow->setText(m_text);
-        }
-        else if(m_ERP->experimentMode() == operation_mode::FREE_MODE)
-        {
-            // utils::wait(500);
-            utils::wait(200);
-        }
-    }
+    startPreTrial();
 
     m_preTrialTimer->start();
     ++m_preTrialCount;
@@ -302,6 +268,11 @@ bool Speller::isTarget(int t_stim)
         return false;
 }
 
+bool Speller::isAsync()
+{
+    return m_ERP->controlMode() == control_mode::ASYNC;
+}
+
 bool Speller::Correct()
 {
     return m_text[m_text.length()-1] == m_desiredPhrase[m_text.length()-1];
@@ -309,7 +280,8 @@ bool Speller::Correct()
 
 void Speller::highlightTarget()
 {
-    int idx = 0;
+    /*
+     * int idx = 0;
 
     for (int i=0; i<m_rows; i++)
     {
@@ -328,10 +300,13 @@ void Speller::highlightTarget()
         }
     }
 
-    // qDebug()<< Q_FUNC_INFO << "current tg "<< m_currentTarget << "current letter " << m_desiredPhrase[m_currentLetter];
+    */
 
-    this->layout()->itemAt(m_currentTarget-1)->
-            widget()->setProperty("pixmap", m_highlight);
+    // qDebug()<< Q_FUNC_INFO << "current tg "<< m_currentTarget << "current letter " << m_desiredPhrase[m_currentLetter];
+    int currentTarget = getCurrentTarget() - 1;
+
+    // this->layout()->itemAt(m_currentTarget-1)->widget()->setProperty("pixmap", m_highlight);
+    this->layout()->itemAt(currentTarget)->widget()->setProperty("pixmap", m_highlight);
 
 }
 
@@ -340,6 +315,7 @@ void Speller::refreshTarget()
     //   this->layout()->itemAt(m_currentTarget)->
     //           widget()->setStyleSheet("QLabel { color : gray; font: 40pt }");
     // qDebug()<< Q_FUNC_INFO << m_currentTarget;
+    //int currentTarget = m_currentTarget;
 
     this->layout()->itemAt(m_currentTarget-1)->
             widget()->setProperty("pixmap", m_icons[m_currentTarget - 1]);
@@ -381,12 +357,27 @@ void Speller::switchStimulationTimers()
     }
 }
 
+void Speller::experimentStart()
+{
+    sendMarker(OVTK_StimulationId_ExperimentStart);
+    // setting a pre-trail duration longer for calibration phase
+    // than Copy_mode/Free mode phases
+    if (m_ERP->experimentMode() == operation_mode::CALIBRATION)
+    {
+        m_preTrialTimer->setInterval(1000);
+    }
+    else
+    {
+        m_preTrialTimer->setInterval(500);
+    }
+}
+
 void Speller::startPreTrial()
 {
     if (m_preTrialCount == 0)
     {
         sendMarker(OVTK_StimulationId_TrialStart);
-        m_flashingSequence = new RandomFlashSequence(m_nrElements, m_ERP->nrSequences());
+        m_flashingSequence = new RandomFlashSequence(getnElements(), m_ERP->nrSequences());
 
         if (m_ERP->experimentMode() == operation_mode::CALIBRATION)
         {
@@ -486,6 +477,11 @@ void Speller::trialEnd()
             postTrial();
         }
     }
+}
+
+int Speller::getnElements()
+{
+    return m_nrElements;
 }
 
 void Speller::fillFeedBackMap(QPixmap *map, QColor t_mapColor, QColor t_textColor, QString text)
@@ -727,7 +723,7 @@ void Speller::showFeedback(QString command, bool correct)
 int Speller::getCurrentTarget()
 {
     int idx = 0;
-
+    /*
     for (int i=0; i<m_rows; i++)
     {
         for (int j=0; j<m_cols; j++)
@@ -740,8 +736,19 @@ int Speller::getCurrentTarget()
             idx++;
         }
     }
+    */
 
-    return m_currentTarget;
+   for (int i=0; i<m_nrElements;i++)
+   {
+       if(m_desiredPhrase[m_currentLetter] == m_presentedLetters[idx][0])
+       {
+           m_currentTarget = idx + 1;
+           break;
+       }
+       idx++;
+   }
+
+   return m_currentTarget;
 }
 
 void Speller::setDesiredPhrase(const QString &t_desiredPhrase)

@@ -7,7 +7,9 @@
 
 class SpellerSmall : public Speller
 {
- Q_OBJECT
+
+    Q_OBJECT
+
 public:
     explicit SpellerSmall(QWidget *parent = nullptr);
     SpellerSmall(int i);
@@ -15,13 +17,11 @@ public:
     virtual void showFeedback(QString command, bool correct);
 
 protected slots:
-    void preTrial();
     void feedback();
     void postTrial();
     void startFlashing();
     void pauseFlashing();
     void createLayout();
-    //
 
 protected:
     void virtual flashing();
@@ -32,9 +32,8 @@ protected:
     bool isTarget();
     void highlightTarget();
     void refreshTarget();
-
-private:
     QString getElemColor(int t_index);
+
 };
 
 #endif // SPELLERSMALL_H

@@ -77,14 +77,13 @@ void SpellerSmall::startFlashing()
 
 void SpellerSmall::pauseFlashing()
 {
-
     int id = m_flashingSequence->sequence[m_currentStimulation];
 
     QString elemColor = getElemColor(id);
 
     // this->layout()->itemAt(id - 1)->
     //        widget()->setStyleSheet("QLabel { color : gray; font: 40pt }");
-    this->layout()->itemAt(id - 1)->
+    this->layout()->itemAt(id-1)->
             widget()->setStyleSheet("QLabel { color : " + elemColor + "; font: 40pt }");
 
     this->layout()->itemAt(id-1)->
@@ -188,9 +187,9 @@ void SpellerSmall::highlightTarget()
 
 void SpellerSmall::refreshTarget()
 {
-    QString elemColor = getElemColor(getCurrentTarget());
+    QString elemColor = getElemColor(m_currentTarget-1);
 
-    this->layout()->itemAt(getCurrentTarget() - 1)->
+    this->layout()->itemAt(m_currentTarget-1)->
             widget()->setStyleSheet("QLabel { color : "+elemColor+"; font: 40pt }");
 }
 
@@ -292,54 +291,6 @@ QString SpellerSmall::getElemColor(int t_index)
 
     //return elemColor;
     return "gray";
-}
-
-void SpellerSmall::preTrial()
-{
-    // qDebug()<< Q_FUNC_INFO;
-
-    if(m_trials == 0)
-    {
-        sendMarker(OVTK_StimulationId_ExperimentStart);
-        // setting a pre-trail duration longer for calibration phase
-        // than Copy_mode/Free mode phases
-        if (m_ERP->experimentMode() == operation_mode::CALIBRATION)
-        {
-            m_preTrialTimer->setInterval(1000);
-        }
-        else
-        {
-            m_preTrialTimer->setInterval(500);
-        }
-    }
-
-    if (m_preTrialCount == 0)
-    {
-        sendMarker(OVTK_StimulationId_TrialStart);
-        m_flashingSequence = new RandomFlashSequence(m_nrElements, m_ERP->nrSequences());
-
-        if (m_ERP->experimentMode() == operation_mode::CALIBRATION)
-        {
-            highlightTarget();
-            m_text += m_desiredPhrase[m_currentLetter];
-            m_textRow->setText(m_text);
-        }
-        else if(m_ERP->experimentMode() == operation_mode::COPY_MODE)
-        {
-            highlightTarget();
-        }
-        else if(m_ERP->experimentMode() == operation_mode::FREE_MODE)
-        {
-            utils::wait(500);
-        }
-    }
-
-    // startPreTrial();
-
-    m_preTrialTimer->start();
-    ++m_preTrialCount;
-
-    endPreTrial();
 }
 
 void SpellerSmall::feedback()
@@ -466,7 +417,6 @@ void SpellerSmall::postTrial()
             if (m_ERP->experimentMode() == operation_mode::COPY_MODE ||
                     m_ERP->experimentMode() == operation_mode::FREE_MODE)
             {
-                // refreshTarget();
                 elemColor = getElemColor(id);
                 this->layout()->itemAt(id-1)->
                         widget()->setStyleSheet("QLabel { color : "+elemColor+"; font: 40pt }");

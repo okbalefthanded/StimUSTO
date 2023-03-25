@@ -28,6 +28,7 @@ SOURCES += src\main.cpp\
     src/spellercircular.cpp \
     src/spellersmall.cpp \
     src/ssvepcircle.cpp \
+    src/ssvepdircircle.cpp \
     src/ssvepdirection.cpp \    
     src/ssvepstimulation.cpp \
     src\configpanel.cpp \
@@ -59,6 +60,7 @@ HEADERS  += include\configpanel.h \
     include/spellercircular.h \
     include/spellersmall.h \
     include/ssvepcircle.h \
+    include/ssvepdircircle.h \
     include/ssvepdirection.h \    
     include/ssvepstimulation.h \
     include\ovtk_stimulations.h \

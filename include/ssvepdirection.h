@@ -37,6 +37,4 @@ private slots:
 
 };
 
-
-
 #endif // SSVEPDIRECTION_H

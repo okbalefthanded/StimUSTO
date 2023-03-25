@@ -3,18 +3,12 @@
 #include "utils.h"
 #include "randomflashsequence.h"
 
-ERP::ERP() : Paradigm (), m_flashingMode(flashing_mode::SC)
-{
-
-}
+ERP::ERP() : Paradigm (), m_flashingMode(flashing_mode::SC){}
 
 ERP::ERP(quint8 mode, quint8 control, quint8 type, quint8 comm, int dur, quint8 bDur,
          quint8 nrSeq, QString phrase,  QString ip, quint8 sType, quint8 fMode):
     Paradigm(mode, control, type, comm, dur, bDur, nrSeq, sType, phrase, ip),
-    m_flashingMode(fMode)
-{
-
-}
+    m_flashingMode(fMode){}
 
 QVariant ERP::toVariant() const
 {
@@ -43,6 +37,7 @@ void ERP::fromVariant(const QVariant &variant)
     QVariantMap map = variant.toMap();
     m_experimentMode = map.value("experimentMode").toInt();
     m_controlMode = map.value("controlMode").toInt();
+
     if(map.value("externalComm").isNull())
     {
         m_externalComm = external_comm::DISABLED;
@@ -58,7 +53,7 @@ void ERP::fromVariant(const QVariant &variant)
     m_breakDuration = map.value("breakDuration").toInt();
     m_nrSequences = map.value("nrSequences").toInt();
 
-    m_desiredPhrase = map.value("desiredPhrase").toString();
+    m_desiredPhrase   = map.value("desiredPhrase").toString();
     m_stimulationType = map.value("stimulationType").toInt();
 
     if (m_stimulationType == speller_type::AUDITORY)
@@ -68,6 +63,11 @@ void ERP::fromVariant(const QVariant &variant)
     else if (m_stimulationType >= speller_type::SMALL || m_stimulationType <= speller_type::SMALL_CIRCLE)
     {
         n_elements = 6;
+    }
+
+    if(m_controlMode == control_mode::ASYNC)
+    {
+        ++n_elements;
     }
 
     if(m_desiredPhrase.isEmpty())
@@ -93,8 +93,7 @@ void ERP::fromVariant(const QVariant &variant)
 
         m_desiredPhrase = randomPhrase->toString();
     }
-
-
+    qDebug()<< Q_FUNC_INFO << m_desiredPhrase;
     m_flashingMode = map.value("flashingMode").toInt();
 }
 
