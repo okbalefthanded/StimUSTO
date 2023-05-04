@@ -660,7 +660,9 @@ void SSVEPstimulation::update()
     {
         for(int j=k; j<m_vertexPerCircle*(i+offset); j++)
         {
-            m_colors[j] = QVector3D(m_flicker[i][m_index], m_flicker[i][m_index], m_flicker[i][m_index]);
+           m_colors[j] = QVector3D(m_flicker[i][m_index], m_flicker[i][m_index], m_flicker[i][m_index]); // white stim
+           // m_colors[j] = QVector3D(m_flicker[i][m_index], 0.0f, 0.0f); // red stim
+           // m_colors[j] = QVector3D(0.0f, m_flicker[i][m_index], 0.0f); // green stim
         }
         k += m_vertexPerCircle;
     }

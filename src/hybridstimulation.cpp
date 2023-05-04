@@ -54,7 +54,8 @@ HybridStimulation::HybridStimulation(Hybrid *hybridStimulation, Speller *ERPspel
             operation_mode::FREE_MODE)
     {
 
-        if(m_hybridStimulation->m_ERPparadigm->stimulationType() != speller_type::SMALL)
+        // if(m_hybridStimulation->m_ERPparadigm->stimulationType() != speller_type::SMALL)
+        if(m_hybridStimulation->m_order == order::ERP_FIRST)
         {
             m_trials = m_hybridStimulation->m_ERPparadigm->desiredPhrase().count();
         }
@@ -70,7 +71,6 @@ HybridStimulation::HybridStimulation(Hybrid *hybridStimulation, Speller *ERPspel
 
     }
     */
-
 
     connect(m_ERPspeller, SIGNAL(slotTerminated()), this, SLOT(switchState()) );
     connect(m_ssvepStimulation, SIGNAL(slotTerminated()), this, SLOT(switchState()));

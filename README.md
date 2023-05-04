@@ -44,6 +44,10 @@ in command prompt type the following command:
 StimUSTO.exe --nogui True --file "/config/default_.json"
 ```
 
+## Demos
+ERP and SSVEP online experiments :
+[Videos playlist](https://www.youtube.com/playlist?list=PL_9LfCNqrqjkDtqOBYhdL84YqzxdYDFV7)
+
 ---
 
 ## Citation

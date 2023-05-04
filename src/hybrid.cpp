@@ -169,8 +169,9 @@ void Hybrid::fromVariant(const QVariant &variant)
     {
      //   RandomFlashSequence *rfseq = new RandomFlashSequence(m_SSVEPparadigm->nrElements(),
       //                                                       m_SSVEPparadigm->nrSequences() / m_SSVEPparadigm->nrElements());
+        int n_ssvepSequences = m_SSVEPparadigm->nrSequences() / m_SSVEPparadigm->nrElements();
         RandomFlashSequence *rfseq = new RandomFlashSequence(m_SSVEPparadigm->nrElements(),
-                                                             6);
+                                                             n_ssvepSequences); // 6
         m_SSVEPparadigm->setDesiredPhrase(rfseq->toString());
     }
     else
