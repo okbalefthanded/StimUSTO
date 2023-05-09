@@ -111,6 +111,7 @@ void HybridStimulation::hybridPreTrial()
     else if(m_hybridStimulation->experimentMode() == operation_mode::COPY_MODE)
     {
         m_ERPspeller->setDesiredPhrase(m_hybridStimulation->m_ERPparadigm->desiredPhrase()[m_currentTrial].toLower());
+      //  qDebug()<< Q_FUNC_INFO << m_hybridStimulation->m_ERPparadigm->desiredPhrase();
         if (m_hybridStimulation->m_SSVEPparadigm->experimentMode() == operation_mode::COPY_MODE)
         {
             m_ssvepStimulation->m_flickeringSequence->sequence[0] = m_hybridStimulation->m_SSVEPparadigm->desiredPhrase()[m_currentTrial].digitValue();
@@ -189,7 +190,7 @@ void HybridStimulation::swichStimWindows()
     QColor fbkColor = Qt::black;
 
     // ERP FIRST IN ORDER
-    if(m_hybridStimulation->m_order == order::ERP_FIRST)
+    if(m_hybridStimulation->m_order ==   order::ERP_FIRST)
     {
         // ERP TRIAL
         if(m_switchStimulation)
@@ -342,7 +343,6 @@ void HybridStimulation::externalComm()
 
 void HybridStimulation::hybridPostTrial()
 {
-
     // qDebug()<< Q_FUNC_INFO;
     bool correct = false;
     bool doExternalComm = true;
@@ -357,7 +357,7 @@ void HybridStimulation::hybridPostTrial()
         {
             erpColor = Qt::red;
         }
-        // qDebug() << Q_FUNC_INFO << "ERP feedback: " << m_ERPFeedback;
+        // qDebug() << Q_FUNC_INFO << "ERP feedback: "   << m_ERPFeedback;
         // qDebug() << Q_FUNC_INFO << "SSVEP feedback: " << m_SSVEPFeedback;
     }
 

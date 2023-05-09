@@ -18,6 +18,7 @@
 #include "arabicspeller.h"
 #include "spellersmall.h"
 #include "spellercircular.h"
+#include "spellercircdir.h"
 #include "multistimuli.h"
 #include "chromaspeller.h"
 #include "auditoryspeller.h"
@@ -239,16 +240,16 @@ ERP *ConfigPanel::initParadigmERPGui()
 {
     int spellerType = ui->spellerType->currentIndex();
     ERP *erpParadigm = new ERP(ui->spellingModeChoices->currentIndex(),
-                          control_mode::SYNC, // TODO : implement async ERP control mode
-                          paradigm_type::ERP,
-                          external_comm::DISABLED,
-                          ui->stimulusDuration->text().toInt(),
-                          ui->interStimulusDuration->text().toInt(),
-                          ui->numberOfRepetition->text().toInt(),
-                          ui->desiredPhrase->text(),
-                          "127.0.0.1",
-                          spellerType,
-                          flashing_mode::SC);
+                               control_mode::SYNC, // TODO : implement async ERP control mode
+                               paradigm_type::ERP,
+                               external_comm::DISABLED,
+                               ui->stimulusDuration->text().toInt(),
+                               ui->interStimulusDuration->text().toInt(),
+                               ui->numberOfRepetition->text().toInt(),
+                               ui->desiredPhrase->text(),
+                               "127.0.0.1",
+                               spellerType,
+                               flashing_mode::SC);
     return erpParadigm;
 }
 
@@ -310,11 +311,18 @@ Speller *ConfigPanel::createSpeller(int t_spellerType)
     }
     case speller_type::SMALL_CIRCLE:
     {
-       SpellerCircular *spellerCircle = new SpellerCircular();
+        SpellerCircular *spellerCircle = new SpellerCircular();
         connectStimulation(spellerCircle);
         return spellerCircle;
     }
-    /*
+
+    case speller_type::CIRC_DIR:
+    {
+        SpellerCircDir *spellerCircleDir = new SpellerCircDir();
+        connectStimulation(spellerCircleDir);
+        return spellerCircleDir;
+    }
+        /*
     case speller_type::AUDITORY:
     {
         AuditorySpeller *auditorySpeller = new AuditorySpeller();

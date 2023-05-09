@@ -54,13 +54,14 @@ void ERP::fromVariant(const QVariant &variant)
     m_nrSequences = map.value("nrSequences").toInt();
 
     m_desiredPhrase   = map.value("desiredPhrase").toString();
-    m_stimulationType = map.value("stimulationType").toInt();
+    m_stimulationType = map.value("stimulationType").toInt();      
+
 
     if (m_stimulationType == speller_type::AUDITORY)
     {
         n_elements = 5;
     }
-    else if (m_stimulationType >= speller_type::SMALL || m_stimulationType <= speller_type::SMALL_CIRCLE)
+    else if (m_stimulationType >= speller_type::SMALL && m_stimulationType <= speller_type::SMALL_CIRCLE)
     {
         n_elements = 6;
     }
@@ -69,6 +70,7 @@ void ERP::fromVariant(const QVariant &variant)
     {
         ++n_elements;
     }
+
 
     if(m_desiredPhrase.isEmpty())
     {
@@ -93,7 +95,7 @@ void ERP::fromVariant(const QVariant &variant)
 
         m_desiredPhrase = randomPhrase->toString();
     }
-    qDebug()<< Q_FUNC_INFO << m_desiredPhrase;
+    // qDebug()<< Q_FUNC_INFO << m_desiredPhrase;
     m_flashingMode = map.value("flashingMode").toInt();
 }
 

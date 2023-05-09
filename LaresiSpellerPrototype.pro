@@ -25,6 +25,7 @@ SOURCES += src\main.cpp\
     src/hybridstimulation.cpp \
     src/multistimuli.cpp \
     src/phonekeypad.cpp \
+    src/spellercircdir.cpp \
     src/spellercircular.cpp \
     src/spellersmall.cpp \
     src/ssvepcircle.cpp \
@@ -57,6 +58,7 @@ HEADERS  += include\configpanel.h \
     include/hybridstimulation.h \
     include/multistimuli.h \
     include/phonekeypad.h \
+    include/spellercircdir.h \
     include/spellercircular.h \
     include/spellersmall.h \
     include/ssvepcircle.h \

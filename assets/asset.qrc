@@ -45,6 +45,15 @@
         <file>7_magenta.png</file>
         <file>8_magenta.png</file>
         <file>9_magenta.png</file>
+        <file>circ0.png</file>
+        <file>circ1.png</file>
+        <file>circ2.png</file>
+        <file>circ3.png</file>
+        <file>circ4.png</file>
+        <file>circ5.png</file>
+        <file>circ6.png</file>
+        <file>circ7.png</file>
+        <file>circ8.png</file>
     </qresource>
     <qresource prefix="/shaders">
         <file>../src/shaders/sh_f.frag</file>

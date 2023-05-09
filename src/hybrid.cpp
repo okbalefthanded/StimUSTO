@@ -128,12 +128,12 @@ void Hybrid::fromVariant(const QVariant &variant)
             n_erpelement = 5;
         }
 
-        else if (m_ERPparadigm->stimulationType() >= speller_type::SMALL || m_ERPparadigm->stimulationType() <= speller_type::SMALL_CIRCLE)
+        else if (m_ERPparadigm->stimulationType() >= speller_type::SMALL && m_ERPparadigm->stimulationType() <= speller_type::SMALL_CIRCLE)
         {
             n_erpelement = 6;
         }
 
-        RandomFlashSequence *randomPhrase = new RandomFlashSequence(n_erpelement, 9);
+        RandomFlashSequence *randomPhrase = new RandomFlashSequence(n_erpelement, 4);
         // RandomFlashSequence *randomPhrase = new RandomFlashSequence(9, 6);
         // RandomFlashSequence *randomPhrase = new RandomFlashSequence(9, 8);
         m_ERPparadigm->setDesiredPhrase(randomPhrase->toString());
@@ -143,12 +143,10 @@ void Hybrid::fromVariant(const QVariant &variant)
         m_ERPparadigm->setDesiredPhrase(str);
     }
 
-
     // SSVEP config
     if (map.contains("SSVEP_experimentMode"))
     {
         m_SSVEPparadigm->setExperimentMode(map.value("SSVEP_experimentMode").toInt());
-
     }
     else
     {
