@@ -43,9 +43,11 @@ int screenCount();
 }
 //
 namespace paradigm_type{
-const quint8 ERP    = 0;
-const quint8 SSVEP  = 1;
-const quint8 HYBRID = 2;
+const quint8 ERP          = 0;
+const quint8 SSVEP        = 1;
+const quint8 HYBRID       = 2;
+const quint8 DOUBLE_ERP   = 3;
+const quint8 DOUBLE_SSVEP = 4;
 }
 //
 namespace flashing_mode {

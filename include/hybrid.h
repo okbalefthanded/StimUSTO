@@ -19,19 +19,18 @@ public:
 
     QVariant toVariant()  const override;
     void fromVariant(const QVariant& variant)  override;
-   // void initERPspeller(ERP *erp);
-   //  void initSSVEP(SSVEP *ssvep);
-friend class HybridStimulation;
-friend class ConfigPanel;
+    // void initERPspeller(ERP *erp);
+    //  void initSSVEP(SSVEP *ssvep);
+    friend class HybridStimulation;
+    friend class HybridERP;
+    friend class ConfigPanel;
 
 private:
-  //   int m_hybridState;
+    //   int m_hybridState;
     ERP *m_ERPparadigm;
     SSVEP *m_SSVEPparadigm;
     quint8 m_order;
     // QString m_externalAddress;
-
-
 };
 
 

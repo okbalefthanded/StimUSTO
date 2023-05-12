@@ -10,6 +10,7 @@
 #include "speller.h"
 #include "ssvepgl.h"
 #include "hybridstimulation.h"
+#include "hybriderp.h"
 #include "utils.h"
 #include "paradigm.h"
 //
@@ -24,6 +25,7 @@
 #include "auditoryspeller.h"
 #include "erp.h"
 #include "ssvep.h"
+#include "doubleerp.h"
 #include "ssvepcircle.h"
 #include "phonekeypad.h"
 #include "ssvepdirection.h"
@@ -77,6 +79,11 @@ void ConfigPanel::startExperiment()
     else if(paradigmType == paradigm_type::HYBRID)
     {
         on_initHybrid_clicked();
+    }
+
+    else if(paradigmType == paradigm_type::DOUBLE_ERP)
+    {
+        initDoubleStim();
     }
 
 }
@@ -231,6 +238,44 @@ void ConfigPanel::on_initHybrid_clicked()
         ssvepStimulation->setPresentFeedback(false);
 
         HybridStimulation *hybrid = new HybridStimulation(hybridParadigm, speller, ssvepStimulation);
+        connectParadigm(hybrid, launchTimer);
+        connect(hybrid, SIGNAL(experimentEnd()), this, SLOT(on_quitSpeller_clicked()));
+    }
+}
+
+void ConfigPanel::initDoubleStim()
+{
+    DoubleERP *hybridParadigm = new DoubleERP();
+
+    if(noGui)
+    {
+        initParadigmJSon(hybridParadigm);
+    }
+    else
+    {
+        ERP *FirstParadigm = initParadigmERPGui();
+        ERP *SecondParadigm = initParadigmERPGui();
+        *hybridParadigm = DoubleERP(FirstParadigm, SecondParadigm);
+    }
+    if(!m_markerSender->connectedOnce())
+    {
+        QMessageBox::information(this,"Socket connection","Not Connected");
+    }
+    else
+    {
+        QTimer *launchTimer = new QTimer();
+        launchTimer->setInterval(10000);
+        launchTimer->setSingleShot(true);
+
+        Speller *speller = createSpeller(hybridParadigm->m_1stParadigm->stimulationType());
+        speller->setERP(hybridParadigm->m_1stParadigm);
+        speller->setPresentFeedback(false);
+
+        Speller *speller2 = createSpeller(hybridParadigm->m_2ndParadigm->stimulationType());
+        speller2->setERP(hybridParadigm->m_2ndParadigm);
+        speller2->setPresentFeedback(false);
+
+        HybridERP *hybrid = new HybridERP(hybridParadigm, speller, speller2);
         connectParadigm(hybrid, launchTimer);
         connect(hybrid, SIGNAL(experimentEnd()), this, SLOT(on_quitSpeller_clicked()));
     }
