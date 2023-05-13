@@ -11,8 +11,8 @@ class SpellerSmall : public Speller
     Q_OBJECT
 
 public:
-    explicit SpellerSmall(QWidget *parent = nullptr);
-    SpellerSmall(int i);
+    explicit SpellerSmall(QWidget *parent = nullptr, quint16 t_port=12345);
+    SpellerSmall(quint16 t_port);
     ~SpellerSmall();
     virtual void showFeedback(QString command, bool correct);
 

@@ -1,7 +1,7 @@
 #include "spellercircdir.h"
 #include "circularlayout.h"
 
-SpellerCircDir::SpellerCircDir(QWidget *parent) : Speller(1)
+SpellerCircDir::SpellerCircDir(QWidget *parent) : Speller(12345)
 {
     // qDebug()<< Q_FUNC_INFO;
     setupUi(this);

@@ -9,7 +9,7 @@
 #include "utils.h"
 //
 
-ChromaSpeller::ChromaSpeller(QWidget *parent) : Speller(0)
+ChromaSpeller::ChromaSpeller(QWidget *parent) : Speller(12345)
 {
     // qDebug()<< Q_FUNC_INFO;
 

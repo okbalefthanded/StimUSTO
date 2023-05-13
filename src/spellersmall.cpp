@@ -21,7 +21,7 @@
 #include "utils.h"
 #include "spellersmall.h"
 
-SpellerSmall::SpellerSmall(QWidget *parent) : Speller(0)
+SpellerSmall::SpellerSmall(QWidget *parent, quint16 t_port) : Speller(t_port)
   //ui(new Ui::Speller)
 {
     // qDebug()<< Q_FUNC_INFO;
@@ -33,7 +33,7 @@ SpellerSmall::SpellerSmall(QWidget *parent) : Speller(0)
     showWindow();
 }
 
-SpellerSmall::SpellerSmall(int i): Speller(i) {}
+SpellerSmall::SpellerSmall(quint16 t_port): Speller(t_port) {}
 
 void SpellerSmall::startFlashing()
 {

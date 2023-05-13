@@ -1,4 +1,5 @@
 #include <QVariantMap>
+#include<QDebug>
 //
 #include "paradigm.h"
 #include "utils.h"

@@ -8,7 +8,7 @@
 #include "ovtk_stimulations.h"
 #include "utils.h"
 //
-MultiStimuli::MultiStimuli(QWidget *parent) : Speller(0)
+MultiStimuli::MultiStimuli(QWidget *parent) : Speller(12345)
 {
     // qDebug()<< Q_FUNC_INFO;
 

@@ -7,7 +7,7 @@ class SpellerCircular : public SpellerSmall
 {
      Q_OBJECT
 public:
-    explicit SpellerCircular(QWidget *parent = nullptr);
+    explicit SpellerCircular(QWidget *parent = nullptr, quint16 t_port=12345);
     ~SpellerCircular();
     void showFeedback(QString command, bool correct);
 

@@ -85,7 +85,6 @@ void ConfigPanel::startExperiment()
     {
         initDoubleStim();
     }
-
 }
 
 // init speller
@@ -120,7 +119,7 @@ void ConfigPanel::on_initSpeller_clicked()
         launchTimer->setInterval(10000);
         launchTimer->setSingleShot(true);
 
-        Speller *speller = createSpeller(spellerType);
+        Speller *speller = createSpeller(spellerType, 12345);
         speller->setERP(erpParadigm);
         connectParadigm(speller, launchTimer);
     }
@@ -227,7 +226,7 @@ void ConfigPanel::on_initHybrid_clicked()
         launchTimer->setInterval(10000);
         launchTimer->setSingleShot(true);
 
-        Speller *speller = createSpeller(hybridParadigm->m_ERPparadigm->stimulationType());
+        Speller *speller = createSpeller(hybridParadigm->m_ERPparadigm->stimulationType(), 12345);
         speller->setERP(hybridParadigm->m_ERPparadigm);
         speller->setPresentFeedback(false);
         // SsvepGL *ssvepStimulation = createSSVEP(hybridParadigm->m_SSVEPparadigm, 12346);
@@ -253,10 +252,11 @@ void ConfigPanel::initDoubleStim()
     }
     else
     {
-        ERP *FirstParadigm = initParadigmERPGui();
+        ERP *FirstParadigm  = initParadigmERPGui();
         ERP *SecondParadigm = initParadigmERPGui();
         *hybridParadigm = DoubleERP(FirstParadigm, SecondParadigm);
     }
+
     if(!m_markerSender->connectedOnce())
     {
         QMessageBox::information(this,"Socket connection","Not Connected");
@@ -267,11 +267,11 @@ void ConfigPanel::initDoubleStim()
         launchTimer->setInterval(10000);
         launchTimer->setSingleShot(true);
 
-        Speller *speller = createSpeller(hybridParadigm->m_1stParadigm->stimulationType());
+        Speller *speller = createSpeller(hybridParadigm->m_1stParadigm->stimulationType(), 12345);
         speller->setERP(hybridParadigm->m_1stParadigm);
         speller->setPresentFeedback(false);
 
-        Speller *speller2 = createSpeller(hybridParadigm->m_2ndParadigm->stimulationType());
+        Speller *speller2 = createSpeller(hybridParadigm->m_2ndParadigm->stimulationType(), 12346);
         speller2->setERP(hybridParadigm->m_2ndParadigm);
         speller2->setPresentFeedback(false);
 
@@ -298,7 +298,7 @@ ERP *ConfigPanel::initParadigmERPGui()
     return erpParadigm;
 }
 
-Speller *ConfigPanel::createSpeller(int t_spellerType)
+Speller *ConfigPanel::createSpeller(int t_spellerType, quint16 t_port)
 {
     switch(t_spellerType)
     {
@@ -350,13 +350,13 @@ Speller *ConfigPanel::createSpeller(int t_spellerType)
     case speller_type::SMALL_IFACE:
     case speller_type::SMALL_ICFACE:
     {
-        SpellerSmall *smallSpeller = new SpellerSmall();
+        SpellerSmall *smallSpeller = new SpellerSmall(nullptr, t_port);
         connectStimulation(smallSpeller);
         return smallSpeller;
     }
     case speller_type::SMALL_CIRCLE:
     {
-        SpellerCircular *spellerCircle = new SpellerCircular();
+        SpellerCircular *spellerCircle = new SpellerCircular(nullptr, t_port);
         connectStimulation(spellerCircle);
         return spellerCircle;
     }

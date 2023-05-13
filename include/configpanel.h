@@ -60,7 +60,7 @@ private:
     void initParadigmJSon(Paradigm *prdg);
     ERP *initParadigmERPGui();
     SSVEP *initParadigmSSVEPGui();
-    Speller *createSpeller(int t_spellerType);
+    Speller *createSpeller(int t_spellerType, quint16 t_port);
     // SsvepGL *createSSVEP(SSVEP *t_ssvep, int t_port);
     // SsvepCircle *createSSVEP(SSVEP *t_ssvep, int t_port);
     // SsvepDirection *createSSVEP(SSVEP *t_ssvep, int t_port);

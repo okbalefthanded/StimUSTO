@@ -52,7 +52,6 @@ QVariant DoubleERP::toVariant() const
     map.insert("experimentMode", m_experimentMode);
     map.insert("externalComm", m_externalComm);
     map.insert("ip", m_externalAddress);
-
     // 1st ERP config
     map.insert("1st_breakDuration",  m_1stParadigm->breakDuration());
     map.insert("1st_desiredPhrase",  m_1stParadigm->desiredPhrase());
@@ -98,7 +97,7 @@ void DoubleERP::fromVariant(const QVariant &variant)
 
     // 1st ERP config
     m_1stParadigm->setExperimentMode(map.value("experimentMode").toInt());
-    m_1stParadigm->setControlMode(map.value("1st_controlMode").toInt());
+    // m_1stParadigm->setControlMode(map.value("1st_controlMode").toInt());
     m_1stParadigm->setType(map.value("1st_paradigmType").toInt());
     m_1stParadigm->setStimulationDuration(map.value("1st_stimulationDuration").toInt());
     m_1stParadigm->setBreakDuration(map.value("1st_breakDuration").toInt());
@@ -121,7 +120,7 @@ void DoubleERP::fromVariant(const QVariant &variant)
     // 2nd ERP config
     m_2ndParadigm->setExperimentMode(map.value("experimentMode").toInt());
     m_2ndParadigm->setExperimentMode(map.value("experimentMode").toInt());
-    m_2ndParadigm->setControlMode(map.value("2nd_controlMode").toInt());
+    // m_2ndParadigm->setControlMode(map.value("2nd_controlMode").toInt());
     m_2ndParadigm->setType(map.value("2nd_paradigmType").toInt());
     m_2ndParadigm->setStimulationDuration(map.value("2nd_stimulationDuration").toInt());
     m_2ndParadigm->setBreakDuration(map.value("2nd_breakDuration").toInt());
@@ -144,7 +143,7 @@ void DoubleERP::fromVariant(const QVariant &variant)
 
 QString DoubleERP::getRandomSequence(ERP *paradigm, int repetitions)
 {
-    int elements = 0;
+    int elements = 9;
 
     if (paradigm->stimulationType() == speller_type::AUDITORY)
     {
@@ -157,7 +156,6 @@ QString DoubleERP::getRandomSequence(ERP *paradigm, int repetitions)
     }
 
     RandomFlashSequence *randomPhrase = new RandomFlashSequence(elements, repetitions);
-
     return randomPhrase->toString();
 }
 

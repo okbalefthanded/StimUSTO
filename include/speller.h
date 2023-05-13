@@ -32,7 +32,7 @@ class Speller : public QDialog, protected Ui::SpellerForm
 
 public:
     explicit Speller(QWidget *parent = nullptr);
-    Speller(int i);
+    Speller(quint16 t_port);
     ~Speller();
 
     ERP *erp() const;
@@ -42,11 +42,14 @@ public:
     void setDesiredPhrase(const QString &t_desiredPhrase);
     void setTimers(int t_stimulation, int t_isi);
     void setPresentFeedback(bool t_do);
+    void setFeedbackPort(quint16 t_port);
     virtual void showFeedback (QString command, bool correct); // used for HybridStimulation
     int getCurrentTarget();
 
     friend class Hybrid;
     friend class HybridStimulation;
+    friend class DoubleERP;
+    friend class HybridERP;
 
     QString getDesiredPhrase() const;
 

@@ -1,7 +1,7 @@
 #include "spellercircular.h"
 #include "circularlayout.h"
 
-SpellerCircular::SpellerCircular(QWidget *parent) : SpellerSmall(1)
+SpellerCircular::SpellerCircular(QWidget *parent, quint16 t_port) : SpellerSmall(t_port)
 {
     // qDebug()<< Q_FUNC_INFO;
     setupUi(this);
@@ -277,7 +277,7 @@ void SpellerCircular::createLayout()
 
 void SpellerCircular::showFeedback(QString command, bool correct)
 {
-    // qDebug()<< Q_FUNC_INFO << command;
+    qDebug()<< Q_FUNC_INFO << command;
     int id = 0;
     QPixmap map;
     if (command[0] != '#')

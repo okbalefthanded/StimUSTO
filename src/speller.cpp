@@ -38,9 +38,10 @@ Speller::Speller(QWidget *parent) : QDialog(parent)
     // this->setWindowFlag(Qt::Popup);
 }
 
-Speller::Speller(int i)
+Speller::Speller(quint16 t_port)
 {
     // qDebug()<< Q_FUNC_INFO;
+    setFeedbackPort(t_port);
     endInit();
 }
 
@@ -657,9 +658,14 @@ void Speller::setPresentFeedback(bool t_do)
     m_presentFeedback = t_do;
 }
 
+void Speller::setFeedbackPort(quint16 t_port)
+{
+    m_feedbackPort = t_port;
+}
+
 void Speller::showFeedback(QString command, bool correct)
 {
-    qDebug()<< Q_FUNC_INFO;
+    qDebug()<< Q_FUNC_INFO<< command;
     int id = 0;
     QPixmap map;
     if (command[0] != '#')
