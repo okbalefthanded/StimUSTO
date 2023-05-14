@@ -28,6 +28,10 @@ HybridSSVEP::HybridSSVEP(DoubleSSVEP *hybridStimulation, SSVEPstimulation *First
     //
     initExternalComm();
     //
+    m_FirstSpeller->m_firstRun = false; // to not create sequence in the preTrial method
+    m_SecondSpeller->m_firstRun = false;
+    m_FirstSpeller->m_flickeringSequence  = new RandomFlashSequence(1, 1);
+    m_SecondSpeller->m_flickeringSequence = new RandomFlashSequence(1, 1);
 
     if(m_hybridStimulation->experimentMode() == operation_mode::CALIBRATION)
     {
@@ -57,15 +61,19 @@ HybridSSVEP::HybridSSVEP(DoubleSSVEP *hybridStimulation, SSVEPstimulation *First
 
 void HybridSSVEP::hybridPreTrial()
 {
-  // qDebug() << "[HYBRID PRETRIAL START]" << Q_FUNC_INFO;
+    qDebug() << "[HYBRID PRETRIAL START]" << Q_FUNC_INFO;
 
-    if(m_hybridStimulation->experimentMode() == operation_mode::CALIBRATION
-            || m_hybridStimulation->experimentMode() == operation_mode::COPY_MODE)
+    if(m_hybridStimulation->experimentMode() == operation_mode::CALIBRATION)
     {
         m_FirstSpeller->m_flickeringSequence->sequence  = RandomFlashSequence::toSequence(m_hybridStimulation->m_1stParadigm->desiredPhrase());
         m_SecondSpeller->m_flickeringSequence->sequence = RandomFlashSequence::toSequence(m_hybridStimulation->m_2ndParadigm->desiredPhrase());
     }
 
+    else if(m_hybridStimulation->experimentMode() == operation_mode::COPY_MODE)
+    {
+        m_FirstSpeller->m_flickeringSequence->sequence[0] = m_hybridStimulation->m_1stParadigm->desiredPhrase()[m_currentTrial].digitValue();
+        m_SecondSpeller->m_flickeringSequence->sequence[0] = m_hybridStimulation->m_2ndParadigm->desiredPhrase()[m_currentTrial].digitValue();
+    }
     else if(m_hybridStimulation->experimentMode() == operation_mode::FREE_MODE)
     {
         m_FirstSpeller->m_flickeringSequence->sequence[0]  = 0;
@@ -77,7 +85,7 @@ void HybridSSVEP::hybridPreTrial()
 
 void HybridSSVEP::startTrial()
 {
-    //  qDebug() << "[HYBRID TRIAL START]" << Q_FUNC_INFO;
+    qDebug() << "[HYBRID TRIAL START]" << Q_FUNC_INFO;
 
     if(m_hybridState == trial_state::PRE_TRIAL)
     {
@@ -109,7 +117,7 @@ void HybridSSVEP::startTrial()
 
 void HybridSSVEP::switchState()
 {
-    //    qDebug() << Q_FUNC_INFO;
+    qDebug() << Q_FUNC_INFO;
 
     if(!m_switchStimulation)
     {
@@ -122,9 +130,33 @@ void HybridSSVEP::switchState()
 
 void HybridSSVEP::swichStimWindows()
 {
-    // qDebug()<< Q_FUNC_INFO << m_currentTrial;
+    qDebug()<< Q_FUNC_INFO << m_currentTrial;
     QColor fbkColor = Qt::black;
 
+    if(m_switchStimulation)
+    {
+        if(m_currentTrial == 0)
+        {
+            m_SecondSpeller->hide();
+            m_FirstSpeller->startTrial();
+            return;
+        }
+        else
+        {
+            m_FirstSpeller->setScreen(QGuiApplication::screens().last());
+            m_FirstAnimation->start();
+            m_FirstSpeller->showFullScreen();
+            m_SecondSpeller->hide();
+        }
+    }
+    else
+    {
+        m_SecondAnimation->start();
+        m_SecondSpeller->setScreen(QGuiApplication::screens().last());
+        m_SecondSpeller->showFullScreen();
+        m_FirstSpeller->hide();
+    }
+    /*
     // 1st SSVEP TRIAL
     if(m_switchStimulation)
     {
@@ -146,7 +178,6 @@ void HybridSSVEP::swichStimWindows()
     else
     {
         m_SecondAnimation->start();
-
         m_SecondSpeller->showFullScreen();
         m_FirstSpeller->hide();
         m_FirstFeedback = "0";
@@ -154,6 +185,7 @@ void HybridSSVEP::swichStimWindows()
         fbkColor = Qt::red;
         m_SecondSpeller->setExternalFeedback(m_FirstFeedback.toInt(), fbkColor);
     }
+    */
 }
 
 void HybridSSVEP::initExternalComm()
@@ -214,7 +246,7 @@ void HybridSSVEP::externalComm()
 
 void HybridSSVEP::hybridPostTrial()
 {
-    // qDebug()<< Q_FUNC_INFO;
+    qDebug()<< Q_FUNC_INFO;
     bool correct = false;
     bool doExternalComm = true;
     QColor firstColor = Qt::black;
@@ -270,7 +302,6 @@ void HybridSSVEP::hybridPostTrial()
             // externalComm();
             m_externComm->communicate(m_hybridCommand);
         }
-
     }
 
     hybridPostTrialEnd();
@@ -278,7 +309,7 @@ void HybridSSVEP::hybridPostTrial()
 
 void HybridSSVEP::hybridPostTrialEnd()
 {
-  //  qDebug()<< Q_FUNC_INFO;
+    //  qDebug()<< Q_FUNC_INFO;
 
     ++m_currentTrial;
 
@@ -329,7 +360,9 @@ void HybridSSVEP::terminateExperiment()
 }
 
 void HybridSSVEP::initAnimations()
-{
+{    
+    qDebug()<< Q_FUNC_INFO;
+
     m_FirstAnimation = new QPropertyAnimation(m_FirstSpeller, "opacity");
     m_FirstAnimation->setDuration(750); //1000 //2000 //500 //250
     m_FirstAnimation->setStartValue(0.0); //

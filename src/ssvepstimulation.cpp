@@ -264,6 +264,7 @@ void SSVEPstimulation::postTrial()
 
 void SSVEPstimulation::postTrialEnd()
 {
+    qDebug()<< Q_FUNC_INFO << m_flickeringSequence->sequence.length();
     ++m_currentFlicker;
     ++m_trials;
 
@@ -277,6 +278,7 @@ void SSVEPstimulation::postTrialEnd()
     }
     else if (m_flickeringSequence->sequence.length() <= 1)
     {
+        qDebug()<< "here about to emit slotTerminated";
         m_currentFlicker = 0;
         emit(slotTerminated());
         return;

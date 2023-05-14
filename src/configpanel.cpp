@@ -499,7 +499,6 @@ SSVEPstimulation *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
         ssvepStimulation = new SsvepDirectionCircle(t_ssvep, t_port);
         break;
     }
-
     }
 
     ssvepStimulation->setFormat(format);
