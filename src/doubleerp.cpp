@@ -131,7 +131,7 @@ void DoubleERP::fromVariant(const QVariant &variant)
     str = map.value("2nd_desiredPhrase").toString();
     if(str.isEmpty())
     {
-        randomStr2 = getRandomSequence(m_2ndParadigm, 4);
+        randomStr2 = getRandomSequence(m_2ndParadigm, 6);
         m_2ndParadigm->setDesiredPhrase(randomStr2);
     }
     else

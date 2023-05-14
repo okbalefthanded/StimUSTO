@@ -53,7 +53,8 @@ private slots:
     void on_quitSpeller_clicked();
     void on_initSSVEP_clicked();
     void on_initHybrid_clicked();
-    void initDoubleStim();
+    void initDoubleERP();
+    void initDoubleSSVEP();
 
 
 private:

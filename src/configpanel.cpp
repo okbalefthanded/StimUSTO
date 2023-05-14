@@ -11,6 +11,7 @@
 #include "ssvepgl.h"
 #include "hybridstimulation.h"
 #include "hybriderp.h"
+#include "hybridssvep.h"
 #include "utils.h"
 #include "paradigm.h"
 //
@@ -25,13 +26,14 @@
 #include "auditoryspeller.h"
 #include "erp.h"
 #include "ssvep.h"
+#include "hybrid.h"
 #include "doubleerp.h"
+#include "doublessvep.h"
 #include "ssvepcircle.h"
 #include "phonekeypad.h"
 #include "ssvepdirection.h"
 #include "ssvepstimulation.h"
 #include "ssvepdircircle.h"
-#include "hybrid.h"
 #include "jsonserializer.h"
 #include "ovtk_stimulations.h"
 //
@@ -83,7 +85,11 @@ void ConfigPanel::startExperiment()
 
     else if(paradigmType == paradigm_type::DOUBLE_ERP)
     {
-        initDoubleStim();
+        initDoubleERP();
+    }
+    else if(paradigmType == paradigm_type::DOUBLE_SSVEP)
+    {
+        initDoubleSSVEP();
     }
 }
 
@@ -242,7 +248,7 @@ void ConfigPanel::on_initHybrid_clicked()
     }
 }
 
-void ConfigPanel::initDoubleStim()
+void ConfigPanel::initDoubleERP()
 {
     DoubleERP *hybridParadigm = new DoubleERP();
 
@@ -276,6 +282,42 @@ void ConfigPanel::initDoubleStim()
         speller2->setPresentFeedback(false);
 
         HybridERP *hybrid = new HybridERP(hybridParadigm, speller, speller2);
+        connectParadigm(hybrid, launchTimer);
+        connect(hybrid, SIGNAL(experimentEnd()), this, SLOT(on_quitSpeller_clicked()));
+    }
+}
+
+void ConfigPanel::initDoubleSSVEP()
+{
+    DoubleSSVEP *hybridParadigm = new DoubleSSVEP();
+
+    if(noGui)
+    {
+        initParadigmJSon(hybridParadigm);
+    }
+    else
+    {
+        SSVEP *FirstParadigm  = initParadigmSSVEPGui();
+        SSVEP *SecondParadigm = initParadigmSSVEPGui();
+        *hybridParadigm = DoubleSSVEP(FirstParadigm, SecondParadigm);
+    }
+    if(!m_markerSender->connectedOnce())
+    {
+        QMessageBox::information(this,"Socket connection","Not Connected");
+    }
+    else
+    {
+        QTimer *launchTimer = new QTimer();
+        launchTimer->setInterval(10000);
+        launchTimer->setSingleShot(true);
+
+        SSVEPstimulation *ssvepSpeller1 = createSSVEP(hybridParadigm->m_1stParadigm, 12345);
+        ssvepSpeller1->setPresentFeedback(false);
+
+        SSVEPstimulation *ssvepSpeller2 = createSSVEP(hybridParadigm->m_2ndParadigm, 12346);
+        ssvepSpeller2->setPresentFeedback(false);
+
+        HybridSSVEP *hybrid = new HybridSSVEP(hybridParadigm, ssvepSpeller1, ssvepSpeller2);
         connectParadigm(hybrid, launchTimer);
         connect(hybrid, SIGNAL(experimentEnd()), this, SLOT(on_quitSpeller_clicked()));
     }

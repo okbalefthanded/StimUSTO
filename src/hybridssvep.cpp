@@ -5,26 +5,26 @@
 #include <QGraphicsOpacityEffect>
 #include <algorithm>
 //
-#include "hybriderp.h"
-#include "facespeller.h"
-#include "flashingspeller.h"
-#include "doubleerp.h"
+#include "hybridssvep.h"
+#include "doublessvep.h"
+#include "ssvepdirection.h"
+#include "ssvepcircle.h"
 #include "ovtk_stimulations.h"
 
 //
-HybridERP::HybridERP(DoubleERP *hybridStimulation)
+HybridSSVEP::HybridSSVEP(DoubleSSVEP *hybridStimulation)
 {
-    m_hybridStimulation = new DoubleERP();
+    m_hybridStimulation = new DoubleSSVEP();
     initFirstSpeller(hybridStimulation->m_1stParadigm);
     initSecondSpeller(hybridStimulation->m_2ndParadigm);
     initAnimations();
 }
 
-HybridERP::HybridERP(DoubleERP *hybridStimulation, Speller *FirstSpeller, Speller *SecondSpeller)
+HybridSSVEP::HybridSSVEP(DoubleSSVEP *hybridStimulation, SSVEPstimulation *FirstStim, SSVEPstimulation *SecondStim)
 {
     m_hybridStimulation = hybridStimulation;
-    m_FirstSpeller      = FirstSpeller;
-    m_SecondSpeller     = SecondSpeller;
+    m_FirstSpeller      = FirstStim;
+    m_SecondSpeller     = SecondStim;
     //
     initExternalComm();
     //
@@ -48,45 +48,34 @@ HybridERP::HybridERP(DoubleERP *hybridStimulation, Speller *FirstSpeller, Spelle
     connect(m_FirstSpeller,  SIGNAL(slotTerminated()), this, SLOT(switchState()));
     connect(m_SecondSpeller, SIGNAL(slotTerminated()), this, SLOT(switchState()));
 
-    if(utils::screenCount() == 2)
-    {
-        m_FirstSpeller->move(-1366, 0);//quick hack
-        m_SecondSpeller->move(-1366, 0);//quick hack
-    }
-
-    m_FirstSpeller->show();
+    m_FirstSpeller->setScreen(QGuiApplication::screens().last());
+    m_FirstSpeller->showFullScreen();
     m_SecondSpeller->hide();
 
     initAnimations();
 }
 
-void HybridERP::hybridPreTrial()
+void HybridSSVEP::hybridPreTrial()
 {
   // qDebug() << "[HYBRID PRETRIAL START]" << Q_FUNC_INFO;
 
-    if(m_hybridStimulation->experimentMode() == operation_mode::CALIBRATION)
+    if(m_hybridStimulation->experimentMode() == operation_mode::CALIBRATION
+            || m_hybridStimulation->experimentMode() == operation_mode::COPY_MODE)
     {
-        m_FirstSpeller->setDesiredPhrase(m_hybridStimulation->m_1stParadigm->desiredPhrase());
-        m_SecondSpeller->setDesiredPhrase(m_hybridStimulation->m_2ndParadigm->desiredPhrase());
-    }
-
-    else if(m_hybridStimulation->experimentMode() == operation_mode::COPY_MODE)
-    {
-        m_FirstSpeller->setDesiredPhrase(m_hybridStimulation->m_1stParadigm->desiredPhrase()[m_currentTrial].toLower());
-        m_SecondSpeller->setDesiredPhrase(m_hybridStimulation->m_2ndParadigm->desiredPhrase()[m_currentTrial].toLower());
-        //  qDebug()<< Q_FUNC_INFO << m_hybridStimulation->m_ERPparadigm->desiredPhrase();
+        m_FirstSpeller->m_flickeringSequence->sequence  = RandomFlashSequence::toSequence(m_hybridStimulation->m_1stParadigm->desiredPhrase());
+        m_SecondSpeller->m_flickeringSequence->sequence = RandomFlashSequence::toSequence(m_hybridStimulation->m_2ndParadigm->desiredPhrase());
     }
 
     else if(m_hybridStimulation->experimentMode() == operation_mode::FREE_MODE)
     {
-        m_FirstSpeller->setDesiredPhrase("");
-        m_SecondSpeller->setDesiredPhrase("");
+        m_FirstSpeller->m_flickeringSequence->sequence[0]  = 0;
+        m_SecondSpeller->m_flickeringSequence->sequence[0] = 0;
     }
 
     m_hybridState = trial_state::STIMULUS;
 }
 
-void HybridERP::startTrial()
+void HybridSSVEP::startTrial()
 {
     //  qDebug() << "[HYBRID TRIAL START]" << Q_FUNC_INFO;
 
@@ -118,7 +107,7 @@ void HybridERP::startTrial()
     }
 }
 
-void HybridERP::switchState()
+void HybridSSVEP::switchState()
 {
     //    qDebug() << Q_FUNC_INFO;
 
@@ -131,18 +120,18 @@ void HybridERP::switchState()
     startTrial();
 }
 
-void HybridERP::swichStimWindows()
+void HybridSSVEP::swichStimWindows()
 {
     // qDebug()<< Q_FUNC_INFO << m_currentTrial;
     QColor fbkColor = Qt::black;
 
-    // 1st ERP TRIAL
+    // 1st SSVEP TRIAL
     if(m_switchStimulation)
     {
         if(m_currentTrial == 0)
         {
             m_SecondSpeller->hide();
-            m_FirstSpeller->show();
+            m_FirstSpeller->showFullScreen();
             m_FirstSpeller->startTrial();
             return;
         }
@@ -160,17 +149,14 @@ void HybridERP::swichStimWindows()
 
         m_SecondSpeller->showFullScreen();
         m_FirstSpeller->hide();
-        m_FirstFeedback    = m_FirstSpeller->m_text;
-        // qDebug()<< m_ERPFeedback << " " << m_ERPspeller->Correct()<< "correct or no";
-        if(m_FirstSpeller->Correct())
-        {
-            fbkColor = Qt::red;
-        }
-        //   m_ssvepStimulation->setExternalFeedback(m_ERPFeedback[m_ERPFeedback.length() - 1].digitValue(), fbkColor);
+        m_FirstFeedback = "0";
+
+        fbkColor = Qt::red;
+        m_SecondSpeller->setExternalFeedback(m_FirstFeedback.toInt(), fbkColor);
     }
 }
 
-void HybridERP::initExternalComm()
+void HybridSSVEP::initExternalComm()
 {
     if(m_hybridStimulation->externalComm() == external_comm::ENABLED)
     {
@@ -180,7 +166,7 @@ void HybridERP::initExternalComm()
 
 }
 
-void HybridERP::externalComm()
+void HybridSSVEP::externalComm()
 {
     if(m_hybridStimulation->externalComm() == external_comm::ENABLED)
     {
@@ -223,27 +209,25 @@ void HybridERP::externalComm()
             qDebug()<< "Correct State";
             m_hybridState = trial_state::PRE_TRIAL;
         }
-
     }
-
 }
 
-void HybridERP::hybridPostTrial()
+void HybridSSVEP::hybridPostTrial()
 {
     // qDebug()<< Q_FUNC_INFO;
     bool correct = false;
     bool doExternalComm = true;
-    QColor erpColor = Qt::black;
+    QColor firstColor = Qt::black;
 
     if(m_hybridStimulation->experimentMode() == operation_mode::COPY_MODE ||
             m_hybridStimulation->experimentMode() == operation_mode::FREE_MODE)
     {
-        m_FirstFeedback  = m_FirstSpeller->m_text;
-        m_SecondFeedback = m_SecondSpeller->m_text;
+        m_FirstFeedback  += m_FirstSpeller->m_sessionFeedback;
+        m_SecondFeedback += m_SecondSpeller->m_sessionFeedback;
 
-        if (m_FirstSpeller->Correct())
+        if (m_FirstSpeller->isCorrect())
         {
-            erpColor = Qt::red;
+            firstColor = Qt::red;
         }
     }
 
@@ -252,11 +236,11 @@ void HybridERP::hybridPostTrial()
     m_hybridCommand.append(m_FirstFeedback.at(m_currentTrial));
     // qDebug()<< Q_FUNC_INFO << m_hybridCommand;
     // show feedback on ERP speller for 500 ms
-    correct = m_FirstSpeller->Correct();
+    correct = m_FirstSpeller->isCorrect();
     m_FirstSpeller->hide();
     m_SecondSpeller->show();
-    m_SecondSpeller->showFeedback(m_hybridCommand, correct);
-
+    // m_SecondSpeller->showFeedback(m_hybridCommand, correct);
+    m_SecondSpeller->setExternalFeedback(m_FirstFeedback.at(m_currentTrial).digitValue(), firstColor);
     // check if correct feedback, send it to robot, otherwise
     // repeat until feedback is correct in COPY MODE
     if (m_hybridStimulation->externalComm() == external_comm::ENABLED)
@@ -268,7 +252,7 @@ void HybridERP::hybridPostTrial()
         {
             // direction controlled by 1st ERP
             directionFeedback = m_FirstFeedback[m_FirstFeedback.length() - 1];
-            directionDesired  = m_FirstSpeller->getDesiredPhrase();
+            directionDesired  = m_hybridStimulation->m_1stParadigm->desiredPhrase()[m_currentTrial];
 
             if(directionFeedback != directionDesired)
             {
@@ -292,7 +276,7 @@ void HybridERP::hybridPostTrial()
     hybridPostTrialEnd();
 }
 
-void HybridERP::hybridPostTrialEnd()
+void HybridSSVEP::hybridPostTrialEnd()
 {
   //  qDebug()<< Q_FUNC_INFO;
 
@@ -330,7 +314,7 @@ void HybridERP::hybridPostTrialEnd()
     }
 }
 
-void HybridERP::terminateExperiment()
+void HybridSSVEP::terminateExperiment()
 {
     qDebug() << "Hybrid Experiment End";
     m_FirstSpeller->sendMarker(OVTK_StimulationId_ExperimentStop);
@@ -344,16 +328,16 @@ void HybridERP::terminateExperiment()
     // emit experimentEnd();
 }
 
-void HybridERP::initAnimations()
+void HybridSSVEP::initAnimations()
 {
-    m_FirstAnimation = new QPropertyAnimation(m_FirstSpeller, "windowOpacity");
+    m_FirstAnimation = new QPropertyAnimation(m_FirstSpeller, "opacity");
     m_FirstAnimation->setDuration(750); //1000 //2000 //500 //250
     m_FirstAnimation->setStartValue(0.0); //
     m_FirstAnimation->setEndValue(1.0); //
     m_FirstAnimation->setEasingCurve(QEasingCurve::OutQuint);
     connect(m_FirstAnimation, SIGNAL(finished()), m_FirstSpeller, SLOT(startTrial()));
 
-    m_SecondAnimation = new QPropertyAnimation(m_SecondSpeller, "windowOpacity");
+    m_SecondAnimation = new QPropertyAnimation(m_SecondSpeller, "opacity");
     m_SecondAnimation->setDuration(750); //1000  //500 //250
     m_SecondAnimation->setStartValue(0.0); //1366
     m_SecondAnimation->setEndValue(1.0); // 0
@@ -361,59 +345,55 @@ void HybridERP::initAnimations()
     connect(m_SecondAnimation, SIGNAL(finished()), m_SecondSpeller, SLOT(startTrial()));
 }
 
-void HybridERP::initFirstSpeller(ERP *erp)
+void HybridSSVEP::initFirstSpeller(SSVEP *ssvep)
 {
-    int spellerType = erp->stimulationType();
+    QSurfaceFormat format;
+    format.setRenderableType(QSurfaceFormat::OpenGL);
+    format.setProfile(QSurfaceFormat::CoreProfile);
+    format.setSwapInterval(1); // vsync on
+    format.setSwapBehavior(QSurfaceFormat::TripleBuffer); //
+    // format.setVersion(3,3);
+    format.setVersion(3,0); // ANGLE supports ES 3.0, higher versions raise exceptions
 
-    switch (spellerType)
-    {
-    case speller_type::FLASHING_SPELLER:
-    {
-        m_FirstSpeller = new FlashingSpeller();
-        // m_ERPspeller->initSpeller(erp);
-        break;
-    }
-        // case speller_type::FACES_SPELLER ... speller_type::INVERTED_COLORED_FACE: //mingw/gcc only
-    case speller_type::FACES_SPELLER:
-    case speller_type::INVERTED_FACE:
-    case speller_type::COLORED_FACE:
-    case speller_type::INVERTED_COLORED_FACE:
-    {
-        m_FirstSpeller = new FaceSpeller();
-        //m_ERPspeller->initSpeller(erp);
-        break;
-    }
-        // TODO: add the rest of Spellers
-    }
 
+    // m_ssvepStimulation = new SsvepGL(ssvep, 12346);
+    // m_ssvepStimulation = new SsvepCircle(ssvep, 12346);
+    m_FirstSpeller = new SsvepDirection(ssvep, 12345);
+    m_FirstSpeller->setFormat(format);
+
+    if(QGuiApplication::screens().size() == 2)
+    {
+        m_FirstSpeller->resize(utils::getScreenSize());
+    }
+    else
+    {
+        m_FirstSpeller->resize(QSize(1366, 768)); //temporaty size;
+    }
 }
 
-void HybridERP::initSecondSpeller(ERP *erp)
+void HybridSSVEP::initSecondSpeller(SSVEP *ssvep)
 {
-    int spellerType = erp->stimulationType();
+    QSurfaceFormat format;
+    format.setRenderableType(QSurfaceFormat::OpenGL);
+    format.setProfile(QSurfaceFormat::CoreProfile);
+    format.setSwapInterval(1); // vsync on
+    format.setSwapBehavior(QSurfaceFormat::TripleBuffer); //
+    // format.setVersion(3,3);
+    format.setVersion(3,0); // ANGLE supports ES 3.0, higher versions raise exceptions
 
-    switch (spellerType)
+    m_SecondSpeller = new SsvepCircle(ssvep, 12346);
+    m_SecondSpeller->setFormat(format);
+
+    if(QGuiApplication::screens().size() == 2)
     {
-    case speller_type::FLASHING_SPELLER:
-    {
-        m_SecondSpeller = new FlashingSpeller();
-        // m_ERPspeller->initSpeller(erp);
-        break;
+        m_SecondSpeller->resize(utils::getScreenSize());
     }
-        // case speller_type::FACES_SPELLER ... speller_type::INVERTED_COLORED_FACE: //mingw/gcc only
-    case speller_type::FACES_SPELLER:
-    case speller_type::INVERTED_FACE:
-    case speller_type::COLORED_FACE:
-    case speller_type::INVERTED_COLORED_FACE:
+    else
     {
-        m_SecondSpeller = new FaceSpeller();
-        //m_ERPspeller->initSpeller(erp);
-        break;
-    }
-        // TODO: add the rest of Spellers
+        m_SecondSpeller->resize(QSize(1366, 768)); //temporaty size;
     }
 
     m_SecondSpeller->hide();
 }
 
-HybridERP::~HybridERP(){}
+HybridSSVEP::~HybridSSVEP(){}

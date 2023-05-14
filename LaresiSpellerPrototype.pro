@@ -21,9 +21,11 @@ SOURCES += src\main.cpp\
     src/chromaspeller.cpp \
     src/circularlayout.cpp \
     src/doubleerp.cpp \
+    src/doublessvep.cpp \
     src/externComm.cpp \
     src/hybrid.cpp \
     src/hybriderp.cpp \
+    src/hybridssvep.cpp \
     src/hybridstimulation.cpp \
     src/multistimuli.cpp \
     src/phonekeypad.cpp \
@@ -56,9 +58,11 @@ HEADERS  += include\configpanel.h \
     include/chromaspeller.h \
     include/circularlayout.h \
     include/doubleerp.h \
+    include/doublessvep.h \
     include/externComm.h \
     include/hybrid.h \
     include/hybriderp.h \
+    include/hybridssvep.h \
     include/hybridstimulation.h \
     include/multistimuli.h \
     include/phonekeypad.h \

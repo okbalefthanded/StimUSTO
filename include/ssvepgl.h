@@ -32,6 +32,7 @@ public:
     void setSsvep(SSVEP *ssvep);
 
     friend class Hybrid;
+    friend class HybridSSVEP;
     friend class HybridStimulation;
     bool isCorrect() const;
     bool presentFeedback() const;

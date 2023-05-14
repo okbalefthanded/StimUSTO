@@ -34,11 +34,12 @@ public:
     void setSsvep(SSVEP *ssvep);
 
     friend class Hybrid;
+    friend class HybridSSVEP;
     friend class HybridStimulation;
+
     bool isCorrect() const;
     bool presentFeedback() const;
     void setPresentFeedback(bool presentFeedback);
-
 
     int externalFeedback() const;
     void setExternalFeedback(int newExternalFeedback, QColor color=Qt::white);

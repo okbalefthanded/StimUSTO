@@ -277,7 +277,7 @@ void SpellerCircular::createLayout()
 
 void SpellerCircular::showFeedback(QString command, bool correct)
 {
-    qDebug()<< Q_FUNC_INFO << command;
+    // qDebug()<< Q_FUNC_INFO << command;
     int id = 0;
     QPixmap map;
     if (command[0] != '#')
