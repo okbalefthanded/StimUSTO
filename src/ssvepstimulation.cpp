@@ -29,7 +29,6 @@ SSVEPstimulation::SSVEPstimulation(SSVEP *paradigm, int t_port)
     m_preTrialTimer->setTimerType(Qt::PreciseTimer);
     m_preTrialTimer->setInterval(m_ssvep->breakDuration() / 2);
     m_preTrialTimer->setSingleShot(true);
-
     connect(m_preTrialTimer, SIGNAL(timeout()), this, SLOT(startTrial()) );
 
     m_feedbackSocket = new QUdpSocket(this);
@@ -170,6 +169,8 @@ void SSVEPstimulation::startTrial()
 
 void SSVEPstimulation::preTrial()
 {
+    qDebug()<< Q_FUNC_INFO << m_preTrialCount << QTime::currentTime();
+
     m_receivedFeedback = false;
 
     if(m_trials == 0)
@@ -197,7 +198,7 @@ void SSVEPstimulation::preTrial()
     {
         sendMarker(OVTK_StimulationId_TrialStart);
 
-        if (m_ssvep->experimentMode() == operation_mode::CALIBRATION ||
+         if (m_ssvep->experimentMode() == operation_mode::CALIBRATION ||
                 m_ssvep->experimentMode() == operation_mode::COPY_MODE)
         {
             highlightTarget();
@@ -264,7 +265,7 @@ void SSVEPstimulation::postTrial()
 
 void SSVEPstimulation::postTrialEnd()
 {
-    qDebug()<< Q_FUNC_INFO << m_flickeringSequence->sequence.length();
+   // qDebug()<< Q_FUNC_INFO << m_flickeringSequence->sequence.length();
     ++m_currentFlicker;
     ++m_trials;
 
@@ -278,7 +279,6 @@ void SSVEPstimulation::postTrialEnd()
     }
     else if (m_flickeringSequence->sequence.length() <= 1)
     {
-        qDebug()<< "here about to emit slotTerminated";
         m_currentFlicker = 0;
         emit(slotTerminated());
         return;
@@ -614,7 +614,7 @@ void SSVEPstimulation::renderFeedBackText()
     QString fbk = QString::number(m_externalFeedback);
 
     QPainter painter(this);
-    // painter.setPen(Qt::red);
+
     painter.setPen(m_externalFeedbackColor);
     painter.setFont(QFont("Arial", 30, 30));
 

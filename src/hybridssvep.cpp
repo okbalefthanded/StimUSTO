@@ -28,10 +28,13 @@ HybridSSVEP::HybridSSVEP(DoubleSSVEP *hybridStimulation, SSVEPstimulation *First
     //
     initExternalComm();
     //
-    m_FirstSpeller->m_firstRun = false; // to not create sequence in the preTrial method
+    m_FirstSpeller->m_firstRun  = false; // to not create sequence in the preTrial method
     m_SecondSpeller->m_firstRun = false;
     m_FirstSpeller->m_flickeringSequence  = new RandomFlashSequence(1, 1);
     m_SecondSpeller->m_flickeringSequence = new RandomFlashSequence(1, 1);
+
+    m_SecondSpeller->setPresentFeedback(true);
+    m_SecondSpeller->setShowExternalFeedback(true);
 
     if(m_hybridStimulation->experimentMode() == operation_mode::CALIBRATION)
     {
@@ -54,6 +57,7 @@ HybridSSVEP::HybridSSVEP(DoubleSSVEP *hybridStimulation, SSVEPstimulation *First
 
     m_FirstSpeller->setScreen(QGuiApplication::screens().last());
     m_FirstSpeller->showFullScreen();
+    m_SecondSpeller->setScreen(QGuiApplication::screens().last());
     m_SecondSpeller->hide();
 
     initAnimations();
@@ -61,7 +65,7 @@ HybridSSVEP::HybridSSVEP(DoubleSSVEP *hybridStimulation, SSVEPstimulation *First
 
 void HybridSSVEP::hybridPreTrial()
 {
-    qDebug() << "[HYBRID PRETRIAL START]" << Q_FUNC_INFO;
+    // qDebug() << "[HYBRID PRETRIAL START]" << Q_FUNC_INFO;
 
     if(m_hybridStimulation->experimentMode() == operation_mode::CALIBRATION)
     {
@@ -85,7 +89,7 @@ void HybridSSVEP::hybridPreTrial()
 
 void HybridSSVEP::startTrial()
 {
-    qDebug() << "[HYBRID TRIAL START]" << Q_FUNC_INFO;
+    // qDebug() << "[HYBRID TRIAL START]" << Q_FUNC_INFO;
 
     if(m_hybridState == trial_state::PRE_TRIAL)
     {
@@ -117,7 +121,7 @@ void HybridSSVEP::startTrial()
 
 void HybridSSVEP::switchState()
 {
-    qDebug() << Q_FUNC_INFO;
+//    qDebug() << Q_FUNC_INFO;
 
     if(!m_switchStimulation)
     {
@@ -130,8 +134,9 @@ void HybridSSVEP::switchState()
 
 void HybridSSVEP::swichStimWindows()
 {
-    qDebug()<< Q_FUNC_INFO << m_currentTrial;
+  //  qDebug()<< Q_FUNC_INFO << m_currentTrial;
     QColor fbkColor = Qt::black;
+    QString firstFbk = "-1";
 
     if(m_switchStimulation)
     {
@@ -151,41 +156,18 @@ void HybridSSVEP::swichStimWindows()
     }
     else
     {
-        m_SecondAnimation->start();
         m_SecondSpeller->setScreen(QGuiApplication::screens().last());
-        m_SecondSpeller->showFullScreen();
-        m_FirstSpeller->hide();
-    }
-    /*
-    // 1st SSVEP TRIAL
-    if(m_switchStimulation)
-    {
-        if(m_currentTrial == 0)
-        {
-            m_SecondSpeller->hide();
-            m_FirstSpeller->showFullScreen();
-            m_FirstSpeller->startTrial();
-            return;
-        }
-        else
-        {
-            m_FirstAnimation->start();
-            m_FirstSpeller->showFullScreen();
-            m_SecondSpeller->hide();
-        }
-    }
-    // 2nd ERP TRIAL
-    else
-    {
         m_SecondAnimation->start();
         m_SecondSpeller->showFullScreen();
         m_FirstSpeller->hide();
-        m_FirstFeedback = "0";
-
-        fbkColor = Qt::red;
-        m_SecondSpeller->setExternalFeedback(m_FirstFeedback.toInt(), fbkColor);
+        firstFbk = m_FirstSpeller->m_sessionFeedback;
+        if (m_FirstSpeller->isCorrect())
+        {
+            fbkColor = Qt::red;
+        }
+        m_SecondSpeller->setExternalFeedback(firstFbk.toInt(), fbkColor);
     }
-    */
+
 }
 
 void HybridSSVEP::initExternalComm()
@@ -246,8 +228,7 @@ void HybridSSVEP::externalComm()
 
 void HybridSSVEP::hybridPostTrial()
 {
-    qDebug()<< Q_FUNC_INFO;
-    bool correct = false;
+  //   qDebug()<< Q_FUNC_INFO;
     bool doExternalComm = true;
     QColor firstColor = Qt::black;
 
@@ -266,13 +247,12 @@ void HybridSSVEP::hybridPostTrial()
     // reversed feedback
     m_hybridCommand.append(m_SecondFeedback.at(m_currentTrial));
     m_hybridCommand.append(m_FirstFeedback.at(m_currentTrial));
-    // qDebug()<< Q_FUNC_INFO << m_hybridCommand;
-    // show feedback on ERP speller for 500 ms
-    correct = m_FirstSpeller->isCorrect();
+
+    // show feedback on 2nd Speller for 500 ms
     m_FirstSpeller->hide();
-    m_SecondSpeller->show();
-    // m_SecondSpeller->showFeedback(m_hybridCommand, correct);
+    m_SecondSpeller->showFullScreen();
     m_SecondSpeller->setExternalFeedback(m_FirstFeedback.at(m_currentTrial).digitValue(), firstColor);
+
     // check if correct feedback, send it to robot, otherwise
     // repeat until feedback is correct in COPY MODE
     if (m_hybridStimulation->externalComm() == external_comm::ENABLED)
@@ -361,7 +341,7 @@ void HybridSSVEP::terminateExperiment()
 
 void HybridSSVEP::initAnimations()
 {    
-    qDebug()<< Q_FUNC_INFO;
+    // qDebug()<< Q_FUNC_INFO;
 
     m_FirstAnimation = new QPropertyAnimation(m_FirstSpeller, "opacity");
     m_FirstAnimation->setDuration(750); //1000 //2000 //500 //250
