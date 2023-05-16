@@ -86,6 +86,7 @@ void Hybrid::fromVariant(const QVariant &variant)
 {
     QVariantMap map = variant.toMap();
     int n_erpelement = 9;
+    int repetitions = 4;
     m_type = map.value("paradigymType").toUInt();
     m_experimentMode = map.value("experimentMode").toUInt();
 
@@ -110,6 +111,11 @@ void Hybrid::fromVariant(const QVariant &variant)
         m_order = order::ERP_FIRST;
     }
 
+    if (m_order == order::SSVEP_FIRST)
+    {
+        repetitions = 6;
+    }
+
     // ERP config
     m_ERPparadigm->setExperimentMode(map.value("experimentMode").toInt());
     m_ERPparadigm->setControlMode(map.value("ERP_controlMode").toInt());
@@ -132,8 +138,8 @@ void Hybrid::fromVariant(const QVariant &variant)
         {
             n_erpelement = 6;
         }
-
-        RandomFlashSequence *randomPhrase = new RandomFlashSequence(n_erpelement, 4);
+        RandomFlashSequence *randomPhrase = new RandomFlashSequence(n_erpelement, repetitions);
+        // RandomFlashSequence *randomPhrase = new RandomFlashSequence(n_erpelement, 4);
         // RandomFlashSequence *randomPhrase = new RandomFlashSequence(9, 6);
         // RandomFlashSequence *randomPhrase = new RandomFlashSequence(9, 8);
         m_ERPparadigm->setDesiredPhrase(randomPhrase->toString());

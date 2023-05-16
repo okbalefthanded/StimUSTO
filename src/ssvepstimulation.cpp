@@ -169,7 +169,7 @@ void SSVEPstimulation::startTrial()
 
 void SSVEPstimulation::preTrial()
 {
-    qDebug()<< Q_FUNC_INFO << m_preTrialCount << QTime::currentTime();
+    // qDebug()<< Q_FUNC_INFO << m_preTrialCount << QTime::currentTime();
 
     m_receivedFeedback = false;
 
