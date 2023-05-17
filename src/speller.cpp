@@ -594,7 +594,8 @@ void Speller::endInit()
     QLabel label;
     int label_h = label.height() + 40;
     int label_w = label.width() + 40;
-    m_highlight.scaled(label_w, label_h, Qt::KeepAspectRatio);
+    // m_highlight.scaled(label_w, label_h, Qt::KeepAspectRatio);
+    m_highlight.scaled(120, 120, Qt::KeepAspectRatio);
     m_highlight.fill(m_highlightColor);
 }
 

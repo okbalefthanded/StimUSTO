@@ -23,24 +23,27 @@ void SpellerCircDir::stimulationColoredFace()
     int mod = currentStim % 3;
     QPixmap pixmap;
 
-
     if(currentStim == 0)
     {
-        pixmap =  QPixmap(":/images/bennabi_face_orange.png");
+        //  pixmap =  QPixmap(":/images/bennabi_face_orange.png");
+        pixmap =  m_multStimuli[3];
     }
     else if( mod == 1)
     {
-        pixmap =  QPixmap(":/images/bennabi_face_magenta.png");
+        // pixmap =  QPixmap(":/images/bennabi_face_magenta.png");
+        pixmap = m_multStimuli[0];
     }
 
     else if(mod == 2)
     {
-        pixmap = QPixmap(":/images/bennabi_face_blue.png");
+        // pixmap = QPixmap(":/images/bennabi_face_blue.png");
+        pixmap = m_multStimuli[1];
     }
 
     else if(mod == 0)
     {
-        pixmap = QPixmap(":/images/bennabi_face_red.png");
+        //  pixmap = QPixmap(":/images/bennabi_face_red.png");
+        pixmap = m_multStimuli[2];
     }
 
     this->layout()->itemAt(currentStim)->widget()->setProperty("pixmap", pixmap);
@@ -118,17 +121,25 @@ void SpellerCircDir::createLayout()
     // Qt::AlignmentFlag alignment = Qt::AlignCenter;
     QString elemColor = "gray";
 
+    for(int i=0; i<m_multStimuli.length(); i++)
+    {
+        m_multStimuli[i] = m_multStimuli[i].scaled(125, 125, Qt::KeepAspectRatio);
+    }
+
     for (int i=0; i<m_nrElements; i++)
     {
         QLabel *element = new QLabel(this);
-        label_h = element->height() + 40;
-        label_w = element->width()  + 40;
+        // label_h = element->height() + 40;
+        // label_w = element->width()  + 40;
+        label_h = element->height() + 10;
+        label_w = element->width() + 10;
 
         stimName = ":/images/circ" + QString::number(i) + ".png"; // directions images
         pic = QPixmap(stimName);
 
         element->setPixmap(pic.scaled(label_w, label_h, Qt::KeepAspectRatio));
         element->setAlignment(Qt::AlignCenter);
+        // element->setAlignment(Qt::AlignTop);
 
         layout->addWidget(element);
         m_presentedLetters.append(QString::number(i+1));

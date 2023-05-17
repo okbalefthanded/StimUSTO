@@ -241,6 +241,7 @@ void HybridStimulation::swichStimWindows()
             {
                 m_ssvepStimulation->setScreen(QGuiApplication::screens().last());
                 m_SSVEPanimation->start();
+                 // QCoreApplication::processEvents(QEventLoop::AllEvents);
                 //  m_ssvepStimulation->setScreen(QGuiApplication::screens().last());
                 m_ssvepStimulation->showFullScreen();
                 m_ERPspeller->hide();
