@@ -120,23 +120,27 @@ void FaceSpeller::stimulationColoredFace()
 
     if(currentStim <= 3)
     {
-        pixmap = QPixmap(":/images/bennabi_face_magenta.png");
+      //  pixmap = QPixmap(":/images/bennabi_face_magenta.png");
+        pixmap = m_multStimuli[0];
     }
 
     else if (currentStim <= 6)
     {
         if (currentStim == 5)
         {
-            pixmap =  QPixmap(":/images/bennabi_face_orange.png");
+        //    pixmap =  QPixmap(":/images/bennabi_face_orange.png");
+            pixmap = m_multStimuli[3];
         }
         else
         {
-            pixmap = QPixmap(":/images/bennabi_face_blue.png");
+           // pixmap = QPixmap(":/images/bennabi_face_blue.png");
+            pixmap = m_multStimuli[1];
         }
     }
     else if (currentStim <= 9)
     {
-        pixmap = QPixmap(":/images/bennabi_face_red.png");
+      //  pixmap = QPixmap(":/images/bennabi_face_red.png");
+        pixmap = m_multStimuli[2];
     }
 
     this->layout()->itemAt(currentStim-1)->widget()->setProperty("pixmap", pixmap);

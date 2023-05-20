@@ -218,7 +218,7 @@ void HybridStimulation::swichStimWindows()
             m_ssvepStimulation->showFullScreen();
             m_ERPspeller->hide();
             m_ERPFeedback    = m_ERPspeller->m_text;
-            // qDebug()<< m_ERPFeedback << " " << m_ERPspeller->Correct()<< "correct or no";
+            // qDebug()<< m_ERPFeedback << " " << m_ERPspeller->Correct() << m_ERPspeller->m_desiredPhrase <<"correct or no";
             if(m_ERPspeller->Correct())
             {
                 fbkColor = Qt::red;
@@ -510,6 +510,7 @@ void HybridStimulation::initAnimations()
     m_ERPanimation->setStartValue(0.0); //
     m_ERPanimation->setEndValue(1.0); //
     m_ERPanimation->setEasingCurve(QEasingCurve::OutQuint);
+    // connect(m_ERPanimation, SIGNAL(started()), m_ERPspeller, SLOT(highlightTarget()));
     connect(m_ERPanimation, SIGNAL(finished()), m_ERPspeller, SLOT(startTrial()));
 
     m_SSVEPanimation = new QPropertyAnimation(m_ssvepStimulation, "opacity");
@@ -517,6 +518,8 @@ void HybridStimulation::initAnimations()
     m_SSVEPanimation->setStartValue(0.0); //1366
     m_SSVEPanimation->setEndValue(1.0); // 0
     m_SSVEPanimation->setEasingCurve(QEasingCurve::OutQuint);
+
+    // connect(m_SSVEPanimation, SIGNAL(started()), m_ssvepStimulation, SLOT(highlightTarget()));
     connect(m_SSVEPanimation, SIGNAL(finished()), m_ssvepStimulation, SLOT(startTrial()));
 }
 

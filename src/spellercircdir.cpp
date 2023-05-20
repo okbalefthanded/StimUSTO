@@ -129,10 +129,9 @@ void SpellerCircDir::createLayout()
     for (int i=0; i<m_nrElements; i++)
     {
         QLabel *element = new QLabel(this);
-        // label_h = element->height() + 40;
-        // label_w = element->width()  + 40;
-        label_h = element->height() + 10;
-        label_w = element->width() + 10;
+
+        label_h = element->height() + 40;
+        label_w = element->width()  + 40;
 
         stimName = ":/images/circ" + QString::number(i) + ".png"; // directions images
         pic = QPixmap(stimName);

@@ -276,7 +276,28 @@ bool Speller::isAsync()
 
 bool Speller::Correct()
 {
-    if (m_text.length() == m_desiredPhrase.length())
+
+    if (m_trials == 0)
+    {
+       return m_text[0] == m_desiredPhrase[0];
+    }
+
+    else if(m_text.length() < m_desiredPhrase.length())
+    {
+        return m_text[m_text.length()-1] == m_desiredPhrase[m_trials];
+    }
+
+    else if(m_text.length() > m_desiredPhrase.length())
+    {
+        return m_text[m_trials-1] == m_desiredPhrase[m_desiredPhrase.length()-1];
+    }
+
+    else
+    {
+        return m_text[m_trials-1] == m_desiredPhrase[m_trials-1];
+    }
+
+    /*if (m_text.length() == m_desiredPhrase.length())
     {
         return m_text[m_text.length()-1] == m_desiredPhrase[m_text.length()-1];
     }
@@ -284,6 +305,7 @@ bool Speller::Correct()
     {
         return m_text[m_text.length()-1] == m_desiredPhrase[m_desiredPhrase.length()-1];
     }
+    */
 }
 
 void Speller::highlightTarget()
@@ -811,6 +833,12 @@ void Speller::createLayout()
     QPixmap pic;
     QImage iconImage;
     int label_h, label_w;
+
+    for(int i=0; i<m_multStimuli.length(); i++)
+    {
+        m_multStimuli[i] = m_multStimuli[i].scaled(125, 125, Qt::KeepAspectRatio);
+    }
+
     // add speller ellements
     Qt::AlignmentFlag alignment = Qt::AlignCenter;
     for(int i=1; i<m_rows+1; i++)
@@ -820,7 +848,7 @@ void Speller::createLayout()
             QLabel *element = new QLabel(this);
 
             label_h = element->height() + 40;
-            label_w = element->width() + 40;
+            label_w = element->width()  + 40;
 
             stimName = ":/images/" + QString::number(k) + ".png"; // directions images
             pic = QPixmap(stimName);

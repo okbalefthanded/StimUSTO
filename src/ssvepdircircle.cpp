@@ -39,8 +39,8 @@ void SsvepDirectionCircle::initCenters()
 {
     int n_elements = m_ssvep->nrElements();
     QSize screenSize = utils::getScreenSize();
-    float radiusx = glUtils::STIM_RADIUS / (screenSize.width() * glUtils::PIXEL_CM);
-    float radiusy = glUtils::STIM_RADIUS / (screenSize.height() * glUtils::PIXEL_CM);
+    float radiusx = glUtils::STIM_RADIUS / (screenSize.width() * glUtils::PIXEL_CM); // 0.52;
+    float radiusy = glUtils::STIM_RADIUS / (screenSize.height() * glUtils::PIXEL_CM);// 0.935;
     int start = 0;
 
     m_centerPoints.resize(n_elements);
@@ -57,7 +57,8 @@ void SsvepDirectionCircle::initCenters()
         m_centerPoints[i].setX(radiusx * cos(angle));
         m_centerPoints[i].setY(radiusy * sin(angle));
         m_centerPoints[i].setZ(1.0f);
-    }
+        qDebug()<< i << m_centerPoints[i].x() << m_centerPoints[i].y();
+      }
 }
 
 void SsvepDirectionCircle::initCircles()

@@ -66,10 +66,20 @@ void SsvepCircle::initCenters()
     */
     for (int j = 0; j<=n_elements; ++j)
     {
-        // circles center points
-        m_centerPoints[j].setX(refPoints::centers[j].x());
-        m_centerPoints[j].setY(refPoints::centers[j].y());
-        m_centerPoints[j].setZ(refPoints::centers[j].z());
+
+        if(m_ssvep->stimulationType() == speller_type::SSVEP_CIRCLE)
+        {
+            // circles center points
+            m_centerPoints[j].setX(refPoints::centers[j].x());
+            m_centerPoints[j].setY(refPoints::centers[j].y());
+            m_centerPoints[j].setZ(refPoints::centers[j].z());
+        }
+        else if(m_ssvep->stimulationType() == speller_type::SSVEP_GRID)
+        {
+            m_centerPoints[j].setX(refPoints::grid_centers[j].x());
+            m_centerPoints[j].setY(refPoints::grid_centers[j].y());
+            m_centerPoints[j].setZ(refPoints::grid_centers[j].z());
+        }
     }
 
 }

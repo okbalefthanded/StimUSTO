@@ -79,6 +79,7 @@ const quint8 SMALL_SR              = 18; // stim color for each
 const quint8 SMALL_CIRCLE          = 19; // cricular layout, needs a refactor
 const quint8 SSVEP_DIRCIRCLE       = 20; // cricular layout, needs a refactor
 const quint8 CIRC_DIR              = 21; // 8 directions erp speller in circular layout
+const quint8 SSVEP_GRID            = 22; // ssvep cicrles in a grid layoutspelle
 //const quint8 MOTION_BAR = 2;
 //const quint8 MOTION_FACE = 3;
 //const quint8 MOVING_FACE = 4;

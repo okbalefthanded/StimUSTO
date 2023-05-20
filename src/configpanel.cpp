@@ -489,6 +489,7 @@ SSVEPstimulation *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
         break;
     }
     case speller_type::SSVEP_CIRCLE:
+    case speller_type::SSVEP_GRID:
     {
         ssvepStimulation = new SsvepCircle(t_ssvep, t_port);
         break;

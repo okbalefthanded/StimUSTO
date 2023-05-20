@@ -12,8 +12,8 @@ static const qint8 INDICES_PER_SQUARE    = 6;
 static const qint8 TRIANGLES_PER_SQUARE  = 2;
 static const qint16 SIDES_PER_CIRCLE = 800; //2400; //1000; //600; // 60; //
 static const double RADIUS    = 0.08761; //0.13;
-static const double RADIUS_CM = 3.96; // 3.5; // 3;
-static const double STIM_RADIUS = 12; //16; //10; // in centimeter
+static const double RADIUS_CM = 3.7; // 3.5//3.96; // 3.5; // 3; ssvep circle stimulus radius
+static const double STIM_RADIUS = 16; //12; 16; //10; // in centimeter, layout radius
 static const int TUPLESIZE    = 3;
 static const int MAX_ELEMENTS = 4;
 static const double PIXEL_CM  = 0.0264583333;
@@ -85,9 +85,9 @@ static const QVector<QVector3D> centers =
     // QVector3D(0.45f, 0.0f, 1.0f), QVector3D(0.0f, 0.57f, 1.0f),
     // QVector3D(0.0f, -0.55f, 1.0f)
 
-     QVector3D(-0.25f, 0.60f, 1.0f), QVector3D(0.25f, 0.60f, 1.0f),
-     QVector3D(-0.50f, 0.00f, 1.0f), QVector3D(0.50f, 0.0f, 1.0f),
-     QVector3D(-0.25f, -0.60f, 1.0f), QVector3D(0.25f, -0.60f, 1.0f)
+     // QVector3D(-0.25f, 0.60f, 1.0f), QVector3D(0.25f, 0.60f, 1.0f),
+    // QVector3D(-0.50f, 0.00f, 1.0f), QVector3D(0.50f, 0.0f, 1.0f),
+   //  QVector3D(-0.25f, -0.60f, 1.0f), QVector3D(0.25f, -0.60f, 1.0f)
 
     // QVector3D(-0.20f, 0.60f, 1.0f),  QVector3D(0.20f, 0.60f, 1.0f),
     // QVector3D(-0.45f, 0.0f, 1.0f),   QVector3D(0.45f, 0.0f, 1.0f),
@@ -97,6 +97,26 @@ static const QVector<QVector3D> centers =
     // QVector3D(-0.45f, 0.0f, 1.0f),  QVector3D(0.45f, 0.0f, 1.0f),
     // QVector3D(-0.45f, -0.60f, 1.0f),  QVector3D(0.45f, -0.60f, 1.0f)
 
+    // QVector3D(-0.3676f, 0.6727f, 1.0f), QVector3D(0.3676f, 0.6727f, 1.0f),
+    // QVector3D(-0.52f, 0.00f, 1.0f), QVector3D(0.52f, 0.0f, 1.0f),
+    // QVector3D(-0.3676f, -0.6727f, 1.0f), QVector3D(0.3676f, -0.6727f, 1.0f)
+
+    //  QVector3D(0.0f, 0.0f, 1.0f), QVector3D(0.52f, 0.0f, 1.0f),
+    //  QVector3D(0.3676f, 0.6727f, 1.0f), QVector3D(0.0f, 0.935f, 1.0f),
+    //  QVector3D(-0.3676f, 0.6727f, 1.0f), QVector3D(-0.52f, 0.0f, 1.0f)
+
+      QVector3D(0.0f, -0.15f, 1.0f), QVector3D(0.52f, -0.15f, 1.0f),
+      QVector3D(0.3676f, 0.5227f, 1.0f), QVector3D(0.0f, 0.785f, 1.0f),
+      QVector3D(-0.3676f, 0.5227f, 1.0f), QVector3D(-0.52f, -0.15f, 1.0f)
+};
+
+
+// centers for circles stimulations in a grid layout
+static const QVector<QVector3D> grid_centers =
+{
+    // 0.5, 0.3873
+    QVector3D(-0.50f, 0.6f, 1.0f), QVector3D(0.00f, 0.6f, 1.0f), QVector3D(0.50f, 0.6f, 1.0f),
+    QVector3D(-0.50f, 0.0f, 1.0f), QVector3D(0.00f, 0.00, 1.0f), QVector3D(0.5f,0.0f, 1.0f)
 };
 
 // centers for circles stimulations
