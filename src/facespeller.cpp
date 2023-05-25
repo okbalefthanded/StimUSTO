@@ -126,6 +126,7 @@ void FaceSpeller::stimulationColoredFace()
 
     else if (currentStim <= 6)
     {
+        /*
         if (currentStim == 5)
         {
         //    pixmap =  QPixmap(":/images/bennabi_face_orange.png");
@@ -136,6 +137,8 @@ void FaceSpeller::stimulationColoredFace()
            // pixmap = QPixmap(":/images/bennabi_face_blue.png");
             pixmap = m_multStimuli[1];
         }
+        */
+        pixmap = m_multStimuli[1];
     }
     else if (currentStim <= 9)
     {

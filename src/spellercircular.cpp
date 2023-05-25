@@ -70,7 +70,6 @@ void SpellerCircular::refreshTarget()
 
 void SpellerCircular::feedback()
 {
-
     receiveFeedback();
 
     m_textRow->setText(m_text);

@@ -15,7 +15,9 @@ protected:
     void virtual stimulationColoredFace();
     void feedback();
     QList<QPixmap> m_multStimuli = {QPixmap(":/images/bennabi_face_magenta.png"),
-                                    QPixmap(":/images/bennabi_face_blue.png"),
+                                    // QPixmap(":/images/bennabi_face_blue.png"),
+                                    QPixmap(":/images/bennabi_face_green.png"),
+                                    // QPixmap(":/images/bennabi_face_yellow.png"),
                                     QPixmap(":/images/bennabi_face_red.png"),
                                     QPixmap(":/images/bennabi_face_orange.png")};
 

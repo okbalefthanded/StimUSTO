@@ -506,7 +506,7 @@ void HybridStimulation::terminateExperiment()
 void HybridStimulation::initAnimations()
 {
     m_ERPanimation = new QPropertyAnimation(m_ERPspeller, "windowOpacity");
-    m_ERPanimation->setDuration(750); //1000 //2000 //500 //250
+    m_ERPanimation->setDuration(600); // 750 //1000 //2000 //500 //250
     m_ERPanimation->setStartValue(0.0); //
     m_ERPanimation->setEndValue(1.0); //
     m_ERPanimation->setEasingCurve(QEasingCurve::OutQuint);
@@ -514,7 +514,7 @@ void HybridStimulation::initAnimations()
     connect(m_ERPanimation, SIGNAL(finished()), m_ERPspeller, SLOT(startTrial()));
 
     m_SSVEPanimation = new QPropertyAnimation(m_ssvepStimulation, "opacity");
-    m_SSVEPanimation->setDuration(750); //1000  //500 //250
+    m_SSVEPanimation->setDuration(600);//750 //1000  //500 //250
     m_SSVEPanimation->setStartValue(0.0); //1366
     m_SSVEPanimation->setEndValue(1.0); // 0
     m_SSVEPanimation->setEasingCurve(QEasingCurve::OutQuint);

@@ -104,7 +104,9 @@ protected:
     // Ui::Speller *ui;
 
     QList<QPixmap> m_multStimuli = {QPixmap(":/images/bennabi_face_magenta.png"),
-                                    QPixmap(":/images/bennabi_face_blue.png"),
+                                    // QPixmap(":/images/bennabi_face_blue.png"),
+                                    QPixmap(":/images/bennabi_face_green.png"),
+                                    // QPixmap(":/images/bennabi_face_yellow.png"),
                                     QPixmap(":/images/bennabi_face_red.png"),
                                     QPixmap(":/images/bennabi_face_orange.png")};
 
@@ -142,8 +144,8 @@ protected:
     QList<QPixmap> m_icons;
     MatrixLayout *m_mLayout;
     QLabel *m_element;
-    QColor m_highlightColor = Qt::yellow;
-    QColor m_correctColor   = Qt::green;
+    QColor m_highlightColor = Qt::white; // Qt::yellow;
+    QColor m_correctColor   = Qt::yellow; //Qt:green
     QColor m_incorrectColor = Qt::blue;
     QPixmap m_highlight;
     // Timers

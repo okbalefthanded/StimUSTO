@@ -22,7 +22,7 @@ void SpellerCircDir::stimulationColoredFace()
     int currentStim = m_flashingSequence->sequence[m_currentStimulation] - 1;
     int mod = currentStim % 3;
     QPixmap pixmap;
-
+    /*
     if(currentStim == 0)
     {
         //  pixmap =  QPixmap(":/images/bennabi_face_orange.png");
@@ -41,6 +41,31 @@ void SpellerCircDir::stimulationColoredFace()
     }
 
     else if(mod == 0)
+    {
+        //  pixmap = QPixmap(":/images/bennabi_face_red.png");
+        pixmap = m_multStimuli[2];
+    }
+    */
+
+    if(currentStim == 0)
+    {
+        //  pixmap =  QPixmap(":/images/bennabi_face_orange.png");
+       // pixmap =  m_multStimuli[3];
+        pixmap =  m_multStimuli[1];
+    }
+    else if( currentStim <= 3)
+    {
+        // pixmap =  QPixmap(":/images/bennabi_face_magenta.png");
+        pixmap = m_multStimuli[0];
+    }
+
+    else if( (currentStim % 4) == 0)
+    {
+        // pixmap = QPixmap(":/images/bennabi_face_blue.png");
+        pixmap = m_multStimuli[1];
+    }
+
+    else if(currentStim <= 7)
     {
         //  pixmap = QPixmap(":/images/bennabi_face_red.png");
         pixmap = m_multStimuli[2];
@@ -123,7 +148,7 @@ void SpellerCircDir::createLayout()
 
     for(int i=0; i<m_multStimuli.length(); i++)
     {
-        m_multStimuli[i] = m_multStimuli[i].scaled(125, 125, Qt::KeepAspectRatio);
+        m_multStimuli[i] = m_multStimuli[i].scaled(130, 130, Qt::KeepAspectRatio);
     }
 
     for (int i=0; i<m_nrElements; i++)

@@ -836,7 +836,7 @@ void Speller::createLayout()
 
     for(int i=0; i<m_multStimuli.length(); i++)
     {
-        m_multStimuli[i] = m_multStimuli[i].scaled(125, 125, Qt::KeepAspectRatio);
+        m_multStimuli[i] = m_multStimuli[i].scaled(130, 130, Qt::KeepAspectRatio);
     }
 
     // add speller ellements
