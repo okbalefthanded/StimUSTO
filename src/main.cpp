@@ -11,6 +11,7 @@
 //
 int main(int argc, char *argv[])
 {
+    QGuiApplication::setAttribute(Qt::AA_UseOpenGLES); // Ensuring a stable perf across different machines.
     QApplication app(argc, argv);
     QApplication::setApplicationName("StimUSTO");
     QApplication::setApplicationVersion("0.1.0-beta");

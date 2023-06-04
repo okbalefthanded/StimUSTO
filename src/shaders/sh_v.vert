@@ -1,10 +1,12 @@
 #version 300 es
-//#version 330
-//#version 300 es
-layout(location = 0) in vec3 position;
-layout(location = 1) in vec3 color;
+// #version 460
+// #version 300 es
+// #version 330
+// #version 300 es
+layout(location = 0) in highp vec3 position;
+layout(location = 1) in highp vec3 color;
 
-out vec3 vColor;
+out highp vec3 vColor;
 
 void main()
 {

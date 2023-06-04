@@ -137,7 +137,7 @@ void SpellerSmall::createLayout()
             QLabel *element = new QLabel(this);
 
             label_h = element->height() + 40;
-            label_w = element->width() + 40;
+            label_w = element->width()  + 40;
 
             stimName = ":/images/" + QString::number(k) + ".png"; // directions images
             pic = QPixmap(stimName);

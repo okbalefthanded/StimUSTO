@@ -114,6 +114,7 @@ void FaceSpeller::stimulationColoredFace()
 
     }
     */
+    // sendMarker(OVTK_StimulationId_VisualStimulationStart);
 
     int currentStim = m_flashingSequence->sequence[m_currentStimulation];
     QPixmap pixmap;

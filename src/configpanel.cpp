@@ -471,10 +471,10 @@ SSVEPstimulation *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
     format.setProfile(QSurfaceFormat::CoreProfile);
     format.setSwapInterval(1); // vsync on
     format.setSwapBehavior(QSurfaceFormat::TripleBuffer); //
-    // format.setVersion(3,0);
     format.setVersion(3, 0); // ANGLE supports ES 3.0, higher versions raise exceptions
-    // format.setVersion(4, 5); // HP ProBook
 
+    // format.setVersion(4, 5); // HP ProBook
+    // format.setVersion(4, 6); // Intel UHD 620
     // PhoneKeypad *ssvepStimulation = new PhoneKeypad(t_ssvep, t_port);
     // SsvepGL *ssvepStimulation = new SsvepGL(t_ssvep, t_port);
     // SsvepCircle *ssvepStimulation = new SsvepCircle(t_ssvep, t_port);
@@ -511,7 +511,8 @@ SSVEPstimulation *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
     }
     else
     {
-        ssvepStimulation->resize(QSize(1366, 768)); // temporaty size;
+     //   ssvepStimulation->resize(QSize(1366, 768)); // temporaty size;
+         ssvepStimulation->resize(QSize(1920, 1080)); // temporaty size;
     }
 
     connectStimulation(ssvepStimulation);

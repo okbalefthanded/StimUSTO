@@ -366,8 +366,8 @@ void HybridSSVEP::initFirstSpeller(SSVEP *ssvep)
     format.setSwapInterval(1); // vsync on
     format.setSwapBehavior(QSurfaceFormat::TripleBuffer); //
     // format.setVersion(3,3);
-    format.setVersion(3,0); // ANGLE supports ES 3.0, higher versions raise exceptions
-
+    // format.setVersion(3,0); // ANGLE supports ES 3.0, higher versions raise exceptions
+    format.setVersion(4, 6); // Intel UHD 620
 
     // m_ssvepStimulation = new SsvepGL(ssvep, 12346);
     // m_ssvepStimulation = new SsvepCircle(ssvep, 12346);
@@ -380,7 +380,8 @@ void HybridSSVEP::initFirstSpeller(SSVEP *ssvep)
     }
     else
     {
-        m_FirstSpeller->resize(QSize(1366, 768)); //temporaty size;
+       // m_FirstSpeller->resize(QSize(1366, 768)); //temporaty size;
+        m_FirstSpeller->resize(QSize(1920, 1080));
     }
 }
 
@@ -392,7 +393,8 @@ void HybridSSVEP::initSecondSpeller(SSVEP *ssvep)
     format.setSwapInterval(1); // vsync on
     format.setSwapBehavior(QSurfaceFormat::TripleBuffer); //
     // format.setVersion(3,3);
-    format.setVersion(3,0); // ANGLE supports ES 3.0, higher versions raise exceptions
+    // format.setVersion(3,0); // ANGLE supports ES 3.0, higher versions raise exceptions
+    format.setVersion(4, 6); // Intel UHD 620
 
     m_SecondSpeller = new SsvepCircle(ssvep, 12346);
     m_SecondSpeller->setFormat(format);
@@ -403,7 +405,8 @@ void HybridSSVEP::initSecondSpeller(SSVEP *ssvep)
     }
     else
     {
-        m_SecondSpeller->resize(QSize(1366, 768)); //temporaty size;
+      //  m_SecondSpeller->resize(QSize(1366, 768)); //temporaty size;
+        m_SecondSpeller->resize(QSize(1920, 1080)); //temporaty size;
     }
 
     m_SecondSpeller->hide();

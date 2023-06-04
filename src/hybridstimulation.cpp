@@ -77,7 +77,8 @@ HybridStimulation::HybridStimulation(Hybrid *hybridStimulation, Speller *ERPspel
 
     if(utils::screenCount() == 2)
     {
-        m_ERPspeller->move(-1366, 0);//quick hack
+      //  m_ERPspeller->move(-1366, 0);//quick hack
+        m_ERPspeller->move(-1920, 0);//quick hack
     }
 
     if(m_hybridStimulation->m_order == order::ERP_FIRST)
@@ -562,9 +563,9 @@ void HybridStimulation::initSSVEP(SSVEP *ssvep)
     format.setSwapInterval(1); // vsync on
     format.setSwapBehavior(QSurfaceFormat::TripleBuffer); //
     // format.setVersion(3,3);
-    format.setVersion(3,0); // ANGLE supports ES 3.0, higher versions raise exceptions
-
-
+    // format.setVersion(3,0); // ANGLE supports ES 3.0, higher versions raise exceptions
+    format.setVersion(4, 6); // Intel UHD 620
+    QSize tmp_size(1920, 1080); // (1366, 768) 15.6 inch
     // m_ssvepStimulation = new SsvepGL(ssvep, 12346);
     // m_ssvepStimulation = new SsvepCircle(ssvep, 12346);
     m_ssvepStimulation = new SsvepDirection(ssvep, 12346);
@@ -576,7 +577,8 @@ void HybridStimulation::initSSVEP(SSVEP *ssvep)
     }
     else
     {
-        m_ssvepStimulation->resize(QSize(1366, 768)); //temporaty size;
+        // m_ssvepStimulation->resize(QSize(1366, 768)); //temporaty size;
+        m_ssvepStimulation->resize(tmp_size); //temporaty size;
     }
 
     if (m_hybridStimulation->m_order == order::ERP_FIRST)

@@ -34,7 +34,7 @@ HybridERP::HybridERP(DoubleERP *hybridStimulation, Speller *FirstSpeller, Spelle
         m_trials = 1;
     }
     else if(m_hybridStimulation->experimentMode() == operation_mode::COPY_MODE ||
-            operation_mode::FREE_MODE)
+             operation_mode::FREE_MODE)
     {
         m_trials = m_hybridStimulation->m_1stParadigm->desiredPhrase().count();
     }
@@ -50,8 +50,10 @@ HybridERP::HybridERP(DoubleERP *hybridStimulation, Speller *FirstSpeller, Spelle
 
     if(utils::screenCount() == 2)
     {
-        m_FirstSpeller->move(-1366, 0);//quick hack
-        m_SecondSpeller->move(-1366, 0);//quick hack
+        //  m_FirstSpeller->move(-1366, 0);//quick hack
+        //  m_SecondSpeller->move(-1366, 0);//quick hack
+        m_FirstSpeller->move(-1920, 0);//quick hack
+        m_SecondSpeller->move(-1920, 0);//quick hack
     }
 
     m_FirstSpeller->show();
@@ -62,7 +64,7 @@ HybridERP::HybridERP(DoubleERP *hybridStimulation, Speller *FirstSpeller, Spelle
 
 void HybridERP::hybridPreTrial()
 {
-  // qDebug() << "[HYBRID PRETRIAL START]" << Q_FUNC_INFO;
+    // qDebug() << "[HYBRID PRETRIAL START]" << Q_FUNC_INFO;
 
     if(m_hybridStimulation->experimentMode() == operation_mode::CALIBRATION)
     {
@@ -236,7 +238,7 @@ void HybridERP::hybridPostTrial()
     QColor erpColor = Qt::black;
 
     if(m_hybridStimulation->experimentMode() == operation_mode::COPY_MODE ||
-            m_hybridStimulation->experimentMode() == operation_mode::FREE_MODE)
+        m_hybridStimulation->experimentMode() == operation_mode::FREE_MODE)
     {
         m_FirstFeedback  = m_FirstSpeller->m_text;
         m_SecondFeedback = m_SecondSpeller->m_text;
@@ -294,7 +296,7 @@ void HybridERP::hybridPostTrial()
 
 void HybridERP::hybridPostTrialEnd()
 {
-  //  qDebug()<< Q_FUNC_INFO;
+    //  qDebug()<< Q_FUNC_INFO;
 
     ++m_currentTrial;
 
@@ -373,7 +375,7 @@ void HybridERP::initFirstSpeller(ERP *erp)
         // m_ERPspeller->initSpeller(erp);
         break;
     }
-        // case speller_type::FACES_SPELLER ... speller_type::INVERTED_COLORED_FACE: //mingw/gcc only
+    // case speller_type::FACES_SPELLER ... speller_type::INVERTED_COLORED_FACE: //mingw/gcc only
     case speller_type::FACES_SPELLER:
     case speller_type::INVERTED_FACE:
     case speller_type::COLORED_FACE:
@@ -383,7 +385,7 @@ void HybridERP::initFirstSpeller(ERP *erp)
         //m_ERPspeller->initSpeller(erp);
         break;
     }
-        // TODO: add the rest of Spellers
+    // TODO: add the rest of Spellers
     }
 
 }
@@ -400,7 +402,7 @@ void HybridERP::initSecondSpeller(ERP *erp)
         // m_ERPspeller->initSpeller(erp);
         break;
     }
-        // case speller_type::FACES_SPELLER ... speller_type::INVERTED_COLORED_FACE: //mingw/gcc only
+    // case speller_type::FACES_SPELLER ... speller_type::INVERTED_COLORED_FACE: //mingw/gcc only
     case speller_type::FACES_SPELLER:
     case speller_type::INVERTED_FACE:
     case speller_type::COLORED_FACE:
@@ -410,7 +412,7 @@ void HybridERP::initSecondSpeller(ERP *erp)
         //m_ERPspeller->initSpeller(erp);
         break;
     }
-        // TODO: add the rest of Spellers
+    // TODO: add the rest of Spellers
     }
 
     m_SecondSpeller->hide();

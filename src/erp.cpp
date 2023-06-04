@@ -90,7 +90,8 @@ void ERP::fromVariant(const QVariant &variant)
         else
         {
             //  randomPhrase = new RandomFlashSequence(9, 6);
-            randomPhrase = new RandomFlashSequence(n_elements, 4);
+             randomPhrase = new RandomFlashSequence(n_elements, 4);
+          //  randomPhrase = new RandomFlashSequence(n_elements, 6);
         }
 
         m_desiredPhrase = randomPhrase->toString();

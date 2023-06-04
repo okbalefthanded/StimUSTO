@@ -48,7 +48,7 @@ void SSVEPstimulation::initializeGL()
     // Initialize OpenGL Backend
     initializeOpenGLFunctions();
 
-    m_index = 0;
+    m_index = -1; //0;
     // Set global information
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glEnable(GL_PROGRAM_POINT_SIZE); //
@@ -198,8 +198,8 @@ void SSVEPstimulation::preTrial()
     {
         sendMarker(OVTK_StimulationId_TrialStart);
 
-         if (m_ssvep->experimentMode() == operation_mode::CALIBRATION ||
-                m_ssvep->experimentMode() == operation_mode::COPY_MODE)
+        if (m_ssvep->experimentMode() == operation_mode::CALIBRATION ||
+            m_ssvep->experimentMode() == operation_mode::COPY_MODE)
         {
             highlightTarget();
         }
@@ -224,12 +224,13 @@ void SSVEPstimulation::postTrial()
     // disconnect(this, SIGNAL(frameSwapped()), this, SLOT(update()));
     // refreshCircles(); // initElements();
 
-    m_index = 0;
+    m_index = -1; //0;
+    m_lostFrames = 0;
     //  m_state = trial_state::PRE_TRIAL;
 
     // feedback
     if(m_ssvep->experimentMode() == operation_mode::COPY_MODE ||
-            m_ssvep->experimentMode() == operation_mode::FREE_MODE)
+        m_ssvep->experimentMode() == operation_mode::FREE_MODE)
     {
         feedback();  // wait for feedback
 
@@ -265,15 +266,15 @@ void SSVEPstimulation::postTrial()
 
 void SSVEPstimulation::postTrialEnd()
 {
-   // qDebug()<< Q_FUNC_INFO << m_flickeringSequence->sequence.length();
+    // qDebug()<< Q_FUNC_INFO << m_flickeringSequence->sequence.length();
     ++m_currentFlicker;
     ++m_trials;
 
     if (m_currentFlicker < m_flickeringSequence->sequence.size() &&
-            m_flickeringSequence->sequence.length() != 1 &&
-            (m_ssvep->experimentMode() == operation_mode::COPY_MODE ||
-             m_ssvep->experimentMode() == operation_mode::CALIBRATION ||
-             m_ssvep->experimentMode() == operation_mode::FREE_MODE))
+        m_flickeringSequence->sequence.length() != 1 &&
+        (m_ssvep->experimentMode() == operation_mode::COPY_MODE ||
+         m_ssvep->experimentMode() == operation_mode::CALIBRATION ||
+         m_ssvep->experimentMode() == operation_mode::FREE_MODE))
     {
         startTrial();
     }
@@ -299,7 +300,8 @@ void SSVEPstimulation::postTrialEnd()
 
 void SSVEPstimulation::Flickering()
 {
-    if(m_index == 0)
+    // if(m_index == 0)
+    if(m_index == -1)
     {
         connect(this, SIGNAL(frameSwapped()), this, SLOT(update()));
     }
@@ -389,30 +391,15 @@ void SSVEPstimulation::receiveFeedback()
     m_receivedFeedback = true;
 }
 
-void SSVEPstimulation::initElements()
-{
+void SSVEPstimulation::initElements(){}
 
-}
+void SSVEPstimulation::initCenters(){}
 
-void SSVEPstimulation::initCenters()
-{
+void SSVEPstimulation::initCircles(){}
 
-}
+void SSVEPstimulation::initColors(){}
 
-void SSVEPstimulation::initCircles()
-{
-
-}
-
-void SSVEPstimulation::initColors()
-{
-
-}
-
-void SSVEPstimulation::initIndices()
-{
-
-}
+void SSVEPstimulation::initIndices(){}
 
 void SSVEPstimulation::refreshCircles()
 {
@@ -479,8 +466,6 @@ void SSVEPstimulation::highlightTarget()
     }
 
     // qDebug()<< Q_FUNC_INFO << tmp << circleIndex;
-
-
     scheduleRedraw();
 }
 
@@ -616,7 +601,7 @@ void SSVEPstimulation::renderFeedBackText()
     QPainter painter(this);
 
     painter.setPen(m_externalFeedbackColor);
-    painter.setFont(QFont("Arial", 30, 30));
+    painter.setFont(QFont("Arial", 40, 40));
 
     screenWidth  = screenSize.width();
     screenHeight = screenSize.height();
@@ -647,30 +632,38 @@ bool SSVEPstimulation::isCorrect() const
 
 void SSVEPstimulation::update()
 {
-    // qDebug()<< "[update ] Index : "<< m_index << "current time: " << QTime::currentTime().msec();
-    if(m_index == 0)
+    qDebug()<< "[update ] Index : "<< m_index << "current time: " << QTime::currentTime().msec();
+    if(m_lostFrames <= 5)
     {
-        sendMarker(config::OVTK_StimulationLabel_Base + m_flickeringSequence->sequence[m_currentFlicker]);
-        sendMarker(OVTK_StimulationId_VisualSteadyStateStimulationStart);
+
     }
-
-    int k, offset;
-    k = 0;
-    offset = 1;
-
-    for(int i = 0; i<m_flicker.size() ;++i)
+    else
     {
-        for(int j=k; j<m_vertexPerCircle*(i+offset); j++)
+        // if(m_index == 0)
+        if(m_index == -1)
         {
-           m_colors[j] = QVector3D(m_flicker[i][m_index], m_flicker[i][m_index], m_flicker[i][m_index]); // white stim
-           // m_colors[j] = QVector3D(m_flicker[i][m_index], 0.0f, 0.0f); // red stim
-           // m_colors[j] = QVector3D(0.0f, m_flicker[i][m_index], 0.0f); // green stim
+            sendMarker(config::OVTK_StimulationLabel_Base + m_flickeringSequence->sequence[m_currentFlicker]);
+            sendMarker(OVTK_StimulationId_VisualSteadyStateStimulationStart);
         }
-        k += m_vertexPerCircle;
+
+        int k, offset;
+        k = 0;
+        offset = 1;
+
+        for(int i = 0; i<m_flicker.size() ;++i)
+        {
+            for(int j=k; j<m_vertexPerCircle*(i+offset); j++)
+            {
+                m_colors[j] = QVector3D(m_flicker[i][m_index], m_flicker[i][m_index], m_flicker[i][m_index]); // white stim
+                // m_colors[j] = QVector3D(m_flicker[i][m_index], 0.0f, 0.0f); // red stim
+                // m_colors[j] = QVector3D(0.0f, m_flicker[i][m_index], 0.0f); // green stim
+            }
+            k += m_vertexPerCircle;
+        }
+
+        ++m_index;
     }
-
-    ++m_index;
-
+    ++m_lostFrames;
     scheduleRedraw();
 }
 
