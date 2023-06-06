@@ -2,6 +2,7 @@
 #include <QtDebug>
 //
 #include "hybrid.h"
+#include "utils.h"
 //
 
 Hybrid::Hybrid()
@@ -37,7 +38,8 @@ Hybrid::Hybrid(ERP *erp, SSVEP *ssvep)
                                 ssvep->stimulationDuration(),
                                 ssvep->breakDuration(),
                                 ssvep->nrSequences(),
-                                ssvep->desiredPhrase(),
+                                ssvep->stimulationType(),
+                                ssvep->desiredPhrase(),                                
                                 m_externalAddress,
                                 ssvep->nrElements(),
                                 ssvep->frequencies(),
@@ -73,6 +75,7 @@ QVariant Hybrid::toVariant() const
     map.insert("SSVEP_nrElements", m_SSVEPparadigm->nrElements());
     map.insert("SSVEP_nrSequences", m_SSVEPparadigm->nrSequences());
     map.insert("SSVEP_paradigmType", m_SSVEPparadigm->type());
+    map.insert("SSVEP_stimulationType", m_SSVEPparadigm->stimulationType());
     map.insert("SSVEP_stimulationDuration", m_SSVEPparadigm->stimulationDuration());
     map.insert("SSVEP_stimulationMode", m_SSVEPparadigm->stimulationMode());
 
@@ -82,20 +85,37 @@ QVariant Hybrid::toVariant() const
 void Hybrid::fromVariant(const QVariant &variant)
 {
     QVariantMap map = variant.toMap();
-
+    int n_erpelement = 9;
+    int repetitions = 4;
     m_type = map.value("paradigymType").toUInt();
     m_experimentMode = map.value("experimentMode").toUInt();
 
     if(map.value("externalComm").isNull())
     {
-        m_externalComm = external_comm::DISABLED;
+        m_externalComm    = external_comm::DISABLED;
         m_externalAddress = "127.0.0.1"; // home sweet home
     }
     else
     {
-        m_externalComm = map.value("externalComm").toInt();
+        m_externalComm    = map.value("externalComm").toInt();
         m_externalAddress = map.value("ip").toString();
     }
+
+    // stimulations order
+    if(map.contains("order"))
+    {
+        m_order = map.value("order").toInt();
+    }
+    else
+    {
+        m_order = order::ERP_FIRST;
+    }
+
+    if (m_order == order::SSVEP_FIRST)
+    {
+        repetitions = 6;
+    }
+
     // ERP config
     m_ERPparadigm->setExperimentMode(map.value("experimentMode").toInt());
     m_ERPparadigm->setControlMode(map.value("ERP_controlMode").toInt());
@@ -103,12 +123,25 @@ void Hybrid::fromVariant(const QVariant &variant)
     m_ERPparadigm->setStimulationDuration(map.value("ERP_stimulationDuration").toInt());
     m_ERPparadigm->setBreakDuration(map.value("ERP_breakDuration").toInt());
     m_ERPparadigm->setNrSequences(map.value("ERP_nrSequences").toInt());
+    m_ERPparadigm->setStimulationType(map.value("ERP_stimulationType").toInt());
+    m_ERPparadigm->setFlashingMode(map.value("ERP_flashingMode").toInt());
     QString str = map.value("ERP_desiredPhrase").toString();
 
     if(str.isEmpty())
     {
+        if (m_ERPparadigm->stimulationType() == speller_type::AUDITORY)
+        {
+            n_erpelement = 5;
+        }
+
+        else if (m_ERPparadigm->stimulationType() >= speller_type::SMALL && m_ERPparadigm->stimulationType() <= speller_type::SMALL_CIRCLE)
+        {
+            n_erpelement = 6;
+        }
+        RandomFlashSequence *randomPhrase = new RandomFlashSequence(n_erpelement, repetitions);
+        // RandomFlashSequence *randomPhrase = new RandomFlashSequence(n_erpelement, 4);
         // RandomFlashSequence *randomPhrase = new RandomFlashSequence(9, 6);
-        RandomFlashSequence *randomPhrase = new RandomFlashSequence(9, 4);
+        // RandomFlashSequence *randomPhrase = new RandomFlashSequence(9, 8);
         m_ERPparadigm->setDesiredPhrase(randomPhrase->toString());
     }
     else
@@ -116,19 +149,39 @@ void Hybrid::fromVariant(const QVariant &variant)
         m_ERPparadigm->setDesiredPhrase(str);
     }
 
-    m_ERPparadigm->setStimulationType(map.value("ERP_stimulationType").toInt());
-    m_ERPparadigm->setFlashingMode(map.value("ERP_flashingMode").toInt());
     // SSVEP config
-    m_SSVEPparadigm->setExperimentMode(map.value("experimentMode").toInt());
+    if (map.contains("SSVEP_experimentMode"))
+    {
+        m_SSVEPparadigm->setExperimentMode(map.value("SSVEP_experimentMode").toInt());
+    }
+    else
+    {
+        m_SSVEPparadigm->setExperimentMode(map.value("experimentMode").toInt());
+    }
     m_SSVEPparadigm->setControlMode(map.value("SSVEP_controlMode").toInt());
     m_SSVEPparadigm->setType(map.value("paradigmType").toInt());
     m_SSVEPparadigm->setStimulationDuration(map.value("SSVEP_stimulationDuration").toInt());
     m_SSVEPparadigm->setBreakDuration(map.value("SSVEP_breakDuration").toInt());
     m_SSVEPparadigm->setNrSequences(map.value("SSVEP_nrSequences").toInt());
-    m_SSVEPparadigm->setDesiredPhrase(map.value("SSVEP_desiredPhrase").toString());
     m_SSVEPparadigm->setNrElements(map.value("SSVEP_nrElements").toInt());
     m_SSVEPparadigm->setFrequencies(map.value("SSVEP_frequencies").toString());
     m_SSVEPparadigm->setStimulationMode(map.value("SSVEP_stimulationMode").toInt());
+    m_SSVEPparadigm->setStimulationType(map.value("SSVEP_stimulationType").toInt());
+
+    str = map.value("SSVEP_desiredPhrase").toString();
+    if(str.isEmpty())
+    {
+     //   RandomFlashSequence *rfseq = new RandomFlashSequence(m_SSVEPparadigm->nrElements(),
+      //                                                       m_SSVEPparadigm->nrSequences() / m_SSVEPparadigm->nrElements());
+        int n_ssvepSequences = m_SSVEPparadigm->nrSequences() / m_SSVEPparadigm->nrElements();
+        RandomFlashSequence *rfseq = new RandomFlashSequence(m_SSVEPparadigm->nrElements(),
+                                                             n_ssvepSequences); // 6
+        m_SSVEPparadigm->setDesiredPhrase(rfseq->toString());
+    }
+    else
+    {
+        m_SSVEPparadigm->setDesiredPhrase(map.value("SSVEP_desiredPhrase").toString());
+    }
 }
 
 Hybrid::~Hybrid()

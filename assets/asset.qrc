@@ -36,9 +36,37 @@
         <file>rsz_bennabi_face_red_inverted.png</file>
         <file>rsz_whitehouse_small.png</file>
         <file>rsz_yin_yang_small_croped.png</file>
+<<<<<<< HEAD
+=======
+        <file>1_blue.png</file>
+        <file>2_blue.png</file>
+        <file>3_blue.png</file>
+        <file>4_yellow.png</file>
+        <file>5_yellow.png</file>
+        <file>6_yellow.png</file>
+        <file>7_magenta.png</file>
+        <file>8_magenta.png</file>
+        <file>9_magenta.png</file>
+        <file>circ0.png</file>
+        <file>circ1.png</file>
+        <file>circ2.png</file>
+        <file>circ3.png</file>
+        <file>circ4.png</file>
+        <file>circ5.png</file>
+        <file>circ6.png</file>
+        <file>circ7.png</file>
+        <file>circ8.png</file>
+>>>>>>> f48039ea1d566beb7dea6e01e3dbafd82c5eeeb1
     </qresource>
     <qresource prefix="/shaders">
         <file>../src/shaders/sh_f.frag</file>
         <file>../src/shaders/sh_v.vert</file>
+    </qresource>
+    <qresource prefix="/audio">
+        <file>audio/dove.wav</file>
+        <file>audio/duck.wav</file>
+        <file>audio/frog.wav</file>
+        <file>audio/seagull.wav</file>
+        <file>audio/singing_bird.wav</file>
     </qresource>
 </RCC>

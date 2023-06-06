@@ -6,6 +6,10 @@
 #include <QPropertyAnimation>
 //
 #include "ssvepgl.h"
+#include "ssvepcircle.h"
+#include "ssvepdirection.h"
+#include "ssvepstimulation.h"
+#include "externComm.h"
 #include "speller.h"
 #include "paradigm.h"
 #include "erp.h"
@@ -18,8 +22,11 @@ class HybridStimulation : public QObject
 
 public:
     explicit HybridStimulation(Hybrid *hybridStimulation);
-    explicit HybridStimulation(Hybrid *hybridStimulation, Speller *ERPspeller,
-                               SsvepGL *ssvepGL);
+    // explicit HybridStimulation(Hybrid *hybridStimulation, Speller *ERPspeller, SsvepGL *ssvepGL);
+    // explicit HybridStimulation(Hybrid *hybridStimulation, Speller *ERPspeller, SsvepCircle *ssvepGL);
+    // explicit HybridStimulation(Hybrid *hybridStimulation, Speller *ERPspeller, SsvepDirection *ssvepGL);
+    explicit HybridStimulation(Hybrid *hybridStimulation, Speller *ERPspeller, SSVEPstimulation *ssvepGL);
+
     ~HybridStimulation();
     void initERPspeller(ERP *erp);
     void initSSVEP(SSVEP *ssvep);
@@ -36,6 +43,11 @@ private slots:
     void swichStimWindows();
     void initExternalComm();
     void externalComm();
+<<<<<<< HEAD
+=======
+    void terminateExperiment();
+    void initAnimations();
+>>>>>>> f48039ea1d566beb7dea6e01e3dbafd82c5eeeb1
 
 private:
     int m_hybridState = trial_state::PRE_TRIAL;
@@ -51,13 +63,25 @@ private:
     QString m_ERPFeedback = "";
     QString m_SSVEPFeedback = "";
     //
+<<<<<<< HEAD
     Hybrid *m_hybridStimulaiton;
     Speller *m_ERPspeller;
     SsvepGL *m_ssvepStimulation;
+=======
+    Hybrid *m_hybridStimulation;
+    Speller *m_ERPspeller;
+    // SsvepGL *m_ssvepStimulation;
+    // SsvepCircle *m_ssvepStimulation;
+    // SsvepDirection *m_ssvepStimulation;
+    SSVEPstimulation *m_ssvepStimulation;
+>>>>>>> f48039ea1d566beb7dea6e01e3dbafd82c5eeeb1
     // QUdpSocket *m_robotSocket;
     QTcpSocket *m_robotSocket;
+    ExternComm *m_externComm;
     //
-    QPropertyAnimation *m_animation;
+    QPropertyAnimation *m_ERPanimation;
+    QPropertyAnimation *m_SSVEPanimation;
+
 };
 
 

@@ -32,6 +32,7 @@ public:
     void setSsvep(SSVEP *ssvep);
 
     friend class Hybrid;
+    friend class HybridSSVEP;
     friend class HybridStimulation;
     bool isCorrect() const;
     bool presentFeedback() const;
@@ -80,7 +81,10 @@ protected:
     void externalCommunication();
     void initExternalSocket();
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> f48039ea1d566beb7dea6e01e3dbafd82c5eeeb1
 private:
     //    bool isTarget();
     void highlightTarget();
@@ -89,6 +93,7 @@ private:
     void refresh(int feedbackIndex);
     void initLogger();
     void scheduleRedraw();
+    void renderText();
 
     bool m_firstRun = true;
     bool m_stateFinished = true;
@@ -121,17 +126,23 @@ private:
     // OpenGL State Information
     QOpenGLBuffer m_vertexBuffer; //vbo
     QOpenGLBuffer m_colorBuffer; //vbo
-
     QOpenGLVertexArrayObject m_vaObject; //vao
     QOpenGLShaderProgram *m_programShader;
 
     int m_index;
     //
-    // QVector <QVector <int>> m_flicker;
-    QVector <QVector <double>> m_flicker;
+
+    QVector <QVector <double> > m_flicker;
     QVector<QVector3D> m_vertices;
+    QVector<QVector3D> m_centers;
     QVector<QVector3D> m_colors;
     QVector<int> m_vindices;
+    QVector<int> m_centerindices;
+
+    // external communication
+    QString m_hybridCommand = "";
+    quint16 m_robotPort = 12347;
+    QTcpSocket *m_robotSocket;
 
     // external communication
     QString m_hybridCommand = "";

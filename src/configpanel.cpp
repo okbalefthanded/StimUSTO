@@ -10,22 +10,34 @@
 #include "speller.h"
 #include "ssvepgl.h"
 #include "hybridstimulation.h"
+#include "hybriderp.h"
+#include "hybridssvep.h"
 #include "utils.h"
 #include "paradigm.h"
 //
 #include "flashingspeller.h"
 #include "facespeller.h"
 #include "arabicspeller.h"
+#include "spellersmall.h"
+#include "spellercircular.h"
+#include "spellercircdir.h"
 #include "multistimuli.h"
+#include "chromaspeller.h"
+#include "auditoryspeller.h"
 #include "erp.h"
 #include "ssvep.h"
 #include "hybrid.h"
+#include "doubleerp.h"
+#include "doublessvep.h"
+#include "ssvepcircle.h"
+#include "phonekeypad.h"
+#include "ssvepdirection.h"
+#include "ssvepstimulation.h"
+#include "ssvepdircircle.h"
 #include "jsonserializer.h"
 #include "ovtk_stimulations.h"
 //
-ConfigPanel::ConfigPanel(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::ConfigPanel)
+ConfigPanel::ConfigPanel(QWidget *parent) : QMainWindow(parent), ui(new Ui::ConfigPanel)
 {
     ui->setupUi(this);
 }
@@ -71,6 +83,14 @@ void ConfigPanel::startExperiment()
         on_initHybrid_clicked();
     }
 
+    else if(paradigmType == paradigm_type::DOUBLE_ERP)
+    {
+        initDoubleERP();
+    }
+    else if(paradigmType == paradigm_type::DOUBLE_SSVEP)
+    {
+        initDoubleSSVEP();
+    }
 }
 
 // init speller
@@ -79,17 +99,6 @@ void ConfigPanel::startExperiment()
  */
 void ConfigPanel::on_initSpeller_clicked()
 {
-
-    // QHostAddress sender;
-    // quint16 senderPort = 54321;
-    // QByteArray *buffer = new QByteArray();
-    //    buffer->resize(start_socket->pendingDatagramSize());
-    //    qDebug() << "buffer size" << buffer->size();
-    //    start_socket->readDatagram(buffer->data(), buffer->size(), &sender, &senderPort);
-
-    // m_startSocket = new QUdpSocket(this);
-    // m_startSocket->bind(QHostAddress("10.3.65.37"), 54321);
-
     int spellerType = 0;
 
     ERP *erpParadigm = new ERP();
@@ -116,10 +125,9 @@ void ConfigPanel::on_initSpeller_clicked()
         launchTimer->setInterval(10000);
         launchTimer->setSingleShot(true);
 
-        Speller *speller = createSpeller(spellerType);
+        Speller *speller = createSpeller(spellerType, 12345);
         speller->setERP(erpParadigm);
         connectParadigm(speller, launchTimer);
-
     }
 }
 
@@ -142,6 +150,7 @@ void ConfigPanel::on_initSSVEP_clicked()
     if(!m_markerSender->connectedOnce())
     {
         QMessageBox::information(this,"Socket connection","Not Connected");
+        return;
     }
 
     else
@@ -151,7 +160,11 @@ void ConfigPanel::on_initSSVEP_clicked()
         launchTimer->setInterval(10000);
         launchTimer->setSingleShot(true);
 
-        SsvepGL *ssvepStimulation = createSSVEP(ssvepParadigm, 12345);
+        // SsvepGL *ssvepStimulation = createSSVEP(ssvepParadigm, 12345);
+        // SsvepCircle *ssvepStimulation = createSSVEP(ssvepParadigm, 12345);
+        // SsvepDirection *ssvepStimulation = createSSVEP(ssvepParadigm, 12345);
+        SSVEPstimulation *ssvepStimulation = createSSVEP(ssvepParadigm, 12345);
+        // PhoneKeypad *ssvepStimulation = createSSVEP(ssvepParadigm, 12345);
         connectParadigm(ssvepStimulation, launchTimer);
         // ssvepStimulation->show();
         ssvepStimulation->showFullScreen();
@@ -203,13 +216,11 @@ void ConfigPanel::on_initHybrid_clicked()
     {
         initParadigmJSon(hybridParadigm);
     }
-
     else
     {
         ERP *erpParadigm = initParadigmERPGui();
         SSVEP *ssvepParadigm = initParadigmSSVEPGui();
         *hybridParadigm = Hybrid(erpParadigm, ssvepParadigm);
-
     }
     if(!m_markerSender->connectedOnce())
     {
@@ -221,10 +232,18 @@ void ConfigPanel::on_initHybrid_clicked()
         launchTimer->setInterval(10000);
         launchTimer->setSingleShot(true);
 
-        Speller *speller = createSpeller(hybridParadigm->m_ERPparadigm->stimulationType());
+        Speller *speller = createSpeller(hybridParadigm->m_ERPparadigm->stimulationType(), 12345);
         speller->setERP(hybridParadigm->m_ERPparadigm);
         speller->setPresentFeedback(false);
+<<<<<<< HEAD
         SsvepGL *ssvepStimulation = createSSVEP(hybridParadigm->m_SSVEPparadigm, 12346);
+=======
+        // SsvepGL *ssvepStimulation = createSSVEP(hybridParadigm->m_SSVEPparadigm, 12346);
+        // SsvepGL *ssvepStimulation = new SsvepGL(hybridParadigm->m_SSVEPparadigm, 12346);
+        // SsvepCircle *ssvepStimulation = createSSVEP(hybridParadigm->m_SSVEPparadigm, 12346);
+        // SsvepDirection *ssvepStimulation = createSSVEP(hybridParadigm->m_SSVEPparadigm, 12346);
+        SSVEPstimulation *ssvepStimulation = createSSVEP(hybridParadigm->m_SSVEPparadigm, 12346);
+>>>>>>> f48039ea1d566beb7dea6e01e3dbafd82c5eeeb1
         ssvepStimulation->setPresentFeedback(false);
 
         HybridStimulation *hybrid = new HybridStimulation(hybridParadigm, speller, ssvepStimulation);
@@ -233,25 +252,99 @@ void ConfigPanel::on_initHybrid_clicked()
     }
 }
 
+void ConfigPanel::initDoubleERP()
+{
+    DoubleERP *hybridParadigm = new DoubleERP();
+
+    if(noGui)
+    {
+        initParadigmJSon(hybridParadigm);
+    }
+    else
+    {
+        ERP *FirstParadigm  = initParadigmERPGui();
+        ERP *SecondParadigm = initParadigmERPGui();
+        *hybridParadigm = DoubleERP(FirstParadigm, SecondParadigm);
+    }
+
+    if(!m_markerSender->connectedOnce())
+    {
+        QMessageBox::information(this,"Socket connection","Not Connected");
+    }
+    else
+    {
+        QTimer *launchTimer = new QTimer();
+        launchTimer->setInterval(10000);
+        launchTimer->setSingleShot(true);
+
+        Speller *speller = createSpeller(hybridParadigm->m_1stParadigm->stimulationType(), 12345);
+        speller->setERP(hybridParadigm->m_1stParadigm);
+        speller->setPresentFeedback(false);
+
+        Speller *speller2 = createSpeller(hybridParadigm->m_2ndParadigm->stimulationType(), 12346);
+        speller2->setERP(hybridParadigm->m_2ndParadigm);
+        speller2->setPresentFeedback(false);
+
+        HybridERP *hybrid = new HybridERP(hybridParadigm, speller, speller2);
+        connectParadigm(hybrid, launchTimer);
+        connect(hybrid, SIGNAL(experimentEnd()), this, SLOT(on_quitSpeller_clicked()));
+    }
+}
+
+void ConfigPanel::initDoubleSSVEP()
+{
+    DoubleSSVEP *hybridParadigm = new DoubleSSVEP();
+
+    if(noGui)
+    {
+        initParadigmJSon(hybridParadigm);
+    }
+    else
+    {
+        SSVEP *FirstParadigm  = initParadigmSSVEPGui();
+        SSVEP *SecondParadigm = initParadigmSSVEPGui();
+        *hybridParadigm = DoubleSSVEP(FirstParadigm, SecondParadigm);
+    }
+    if(!m_markerSender->connectedOnce())
+    {
+        QMessageBox::information(this,"Socket connection","Not Connected");
+    }
+    else
+    {
+        QTimer *launchTimer = new QTimer();
+        launchTimer->setInterval(10000);
+        launchTimer->setSingleShot(true);
+
+        SSVEPstimulation *ssvepSpeller1 = createSSVEP(hybridParadigm->m_1stParadigm, 12345);
+        ssvepSpeller1->setPresentFeedback(false);
+
+        SSVEPstimulation *ssvepSpeller2 = createSSVEP(hybridParadigm->m_2ndParadigm, 12346);
+        ssvepSpeller2->setPresentFeedback(false);
+
+        HybridSSVEP *hybrid = new HybridSSVEP(hybridParadigm, ssvepSpeller1, ssvepSpeller2);
+        connectParadigm(hybrid, launchTimer);
+        connect(hybrid, SIGNAL(experimentEnd()), this, SLOT(on_quitSpeller_clicked()));
+    }
+}
+
 ERP *ConfigPanel::initParadigmERPGui()
 {
-    ERP *erpParadigm = new ERP();
     int spellerType = ui->spellerType->currentIndex();
-    erpParadigm = new ERP(ui->spellingModeChoices->currentIndex(),
-                          control_mode::SYNC, // TODO : implement async ERP control mode
-                          paradigm_type::ERP,
-                          external_comm::DISABLED,
-                          ui->stimulusDuration->text().toInt(),
-                          ui->interStimulusDuration->text().toInt(),
-                          ui->numberOfRepetition->text().toInt(),
-                          ui->desiredPhrase->text(),
-                          "127.0.0.1",
-                          spellerType,
-                          flashing_mode::SC);
+    ERP *erpParadigm = new ERP(ui->spellingModeChoices->currentIndex(),
+                               control_mode::SYNC, // TODO : implement async ERP control mode
+                               paradigm_type::ERP,
+                               external_comm::DISABLED,
+                               ui->stimulusDuration->text().toInt(),
+                               ui->interStimulusDuration->text().toInt(),
+                               ui->numberOfRepetition->text().toInt(),
+                               ui->desiredPhrase->text(),
+                               "127.0.0.1",
+                               spellerType,
+                               flashing_mode::SC);
     return erpParadigm;
 }
 
-Speller *ConfigPanel::createSpeller(int t_spellerType)
+Speller *ConfigPanel::createSpeller(int t_spellerType, quint16 t_port)
 {
     switch(t_spellerType)
     {
@@ -267,10 +360,18 @@ Speller *ConfigPanel::createSpeller(int t_spellerType)
     case speller_type::INVERTED_FACE:
     case speller_type::COLORED_FACE:
     case speller_type::INVERTED_COLORED_FACE:
+    case speller_type::MISMATCH:
     {
         FaceSpeller *faceSpeller = new FaceSpeller();
         connectStimulation(faceSpeller);
-        return  faceSpeller;
+        return faceSpeller;
+    }
+
+    case speller_type::CHROMA:
+    {
+        ChromaSpeller *chromaSpeller = new ChromaSpeller();
+        connectStimulation(chromaSpeller);
+        return chromaSpeller;
     }
 
     case speller_type::ARABIC_SPELLER:
@@ -289,8 +390,38 @@ Speller *ConfigPanel::createSpeller(int t_spellerType)
         return multiStimuli;
     }
 
+    case speller_type::SMALL:
+    case speller_type::SMALL_FLASH:
+    case speller_type::SMALL_FACE:
+    case speller_type::SMALL_IFACE:
+    case speller_type::SMALL_ICFACE:
+    {
+        SpellerSmall *smallSpeller = new SpellerSmall(nullptr, t_port);
+        connectStimulation(smallSpeller);
+        return smallSpeller;
+    }
+    case speller_type::SMALL_CIRCLE:
+    {
+        SpellerCircular *spellerCircle = new SpellerCircular(nullptr, t_port);
+        connectStimulation(spellerCircle);
+        return spellerCircle;
     }
 
+    case speller_type::CIRC_DIR:
+    {
+        SpellerCircDir *spellerCircleDir = new SpellerCircDir();
+        connectStimulation(spellerCircleDir);
+        return spellerCircleDir;
+    }
+        /*
+    case speller_type::AUDITORY:
+    {
+        AuditorySpeller *auditorySpeller = new AuditorySpeller();
+        connectStimulation(auditorySpeller);
+        return auditorySpeller;
+    }
+    */
+    }
 }
 
 SSVEP *ConfigPanel::initParadigmSSVEPGui()
@@ -324,6 +455,7 @@ SSVEP *ConfigPanel::initParadigmSSVEPGui()
                               ui->SSVEP_StimDuration->text().toFloat(),
                               ui->SSVEP_BreakDuration->text().toFloat(),
                               ui->SSVEP_Sequence->text().toInt(),
+                              speller_type::SSVEP_CIRCLE,
                               "",
                               "127.0.0.1",
                               SSVEPNrElements,
@@ -332,19 +464,48 @@ SSVEP *ConfigPanel::initParadigmSSVEPGui()
     return ssvepParadigm;
 }
 
-SsvepGL *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
+// SsvepGL *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
+// PhoneKeypad *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
+// SsvepCircle *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
+// SsvepDirection *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
+SSVEPstimulation *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
 {
-
     QSurfaceFormat format;
     format.setRenderableType(QSurfaceFormat::OpenGL);
     format.setProfile(QSurfaceFormat::CoreProfile);
     format.setSwapInterval(1); // vsync on
     format.setSwapBehavior(QSurfaceFormat::TripleBuffer); //
-    // format.setVersion(3,0);
-    format.setVersion(3 ,0); // ANGLE supports ES 3.0, higher versions raise exceptions
-    // format.setVersion(4, 5); // HP ProBook
+    format.setVersion(3, 0); // ANGLE supports ES 3.0, higher versions raise exceptions
 
-    SsvepGL *ssvepStimulation = new SsvepGL(t_ssvep, t_port);
+    // format.setVersion(4, 5); // HP ProBook
+    // format.setVersion(4, 6); // Intel UHD 620
+    // PhoneKeypad *ssvepStimulation = new PhoneKeypad(t_ssvep, t_port);
+    // SsvepGL *ssvepStimulation = new SsvepGL(t_ssvep, t_port);
+    // SsvepCircle *ssvepStimulation = new SsvepCircle(t_ssvep, t_port);
+    // SsvepDirection *ssvepStimulation = new SsvepDirection(t_ssvep, t_port);
+    SSVEPstimulation *ssvepStimulation;
+
+    switch(t_ssvep->stimulationType())
+    {
+    case speller_type::SSVEP_DIRECTIONS:
+    {
+        ssvepStimulation = new SsvepDirection(t_ssvep, t_port);
+        break;
+    }
+    case speller_type::SSVEP_CIRCLE:
+    case speller_type::SSVEP_GRID:
+    {
+        ssvepStimulation = new SsvepCircle(t_ssvep, t_port);
+        break;
+    }
+
+    case speller_type::SSVEP_DIRCIRCLE:
+    {
+        ssvepStimulation = new SsvepDirectionCircle(t_ssvep, t_port);
+        break;
+    }
+    }
+
     ssvepStimulation->setFormat(format);
 
     if(QGuiApplication::screens().size() == 2)
@@ -354,18 +515,17 @@ SsvepGL *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
     }
     else
     {
-        ssvepStimulation->resize(QSize(1366, 768)); // temporaty size;
+     //   ssvepStimulation->resize(QSize(1366, 768)); // temporaty size;
+         ssvepStimulation->resize(QSize(1920, 1080)); // temporaty size;
     }
 
     connectStimulation(ssvepStimulation);
 
     return ssvepStimulation;
-
 }
 
 void ConfigPanel::initParadigmJSon(Paradigm *prdg)
 {
-
     m_markerSender = new OVMarkerSender(this);
     if(!m_markerSender->Connect("127.0.0.1", "15361"))
     {
@@ -384,7 +544,6 @@ void ConfigPanel::connectStimulation(QObject *t_obj)
 
 void ConfigPanel::connectParadigm(QObject *pr, QTimer *timer)
 {
-
     if(noGui)
     {
         connect(timer, SIGNAL(timeout()), pr, SLOT(startTrial()));
@@ -393,7 +552,6 @@ void ConfigPanel::connectParadigm(QObject *pr, QTimer *timer)
     else
     {
         connect(ui->startSpeller, SIGNAL(clicked()), pr, SLOT(startTrial()));
-
     }
 }
 
@@ -422,6 +580,3 @@ ConfigPanel::~ConfigPanel()
     delete ui;
 
 }
-
-
-

@@ -3,19 +3,12 @@
 #include "utils.h"
 #include "randomflashsequence.h"
 
-ERP::ERP() : Paradigm (),
-             m_stimulationType(speller_type::INVERTED_FACE), m_flashingMode(flashing_mode::SC)
-{
-
-}
+ERP::ERP() : Paradigm (), m_flashingMode(flashing_mode::SC){}
 
 ERP::ERP(quint8 mode, quint8 control, quint8 type, quint8 comm, int dur, quint8 bDur,
          quint8 nrSeq, QString phrase,  QString ip, quint8 sType, quint8 fMode):
-        Paradigm(mode, control, type, comm, dur, bDur, nrSeq, phrase, ip),
-        m_stimulationType(sType), m_flashingMode(fMode)
-{
-
-}
+    Paradigm(mode, control, type, comm, dur, bDur, nrSeq, sType, phrase, ip),
+    m_flashingMode(fMode){}
 
 QVariant ERP::toVariant() const
 {
@@ -39,9 +32,12 @@ QVariant ERP::toVariant() const
 
 void ERP::fromVariant(const QVariant &variant)
 {
+    int n_elements = 9;
+
     QVariantMap map = variant.toMap();
     m_experimentMode = map.value("experimentMode").toInt();
     m_controlMode = map.value("controlMode").toInt();
+
     if(map.value("externalComm").isNull())
     {
         m_externalComm = external_comm::DISABLED;
@@ -57,14 +53,50 @@ void ERP::fromVariant(const QVariant &variant)
     m_breakDuration = map.value("breakDuration").toInt();
     m_nrSequences = map.value("nrSequences").toInt();
 
-    m_desiredPhrase = map.value("desiredPhrase").toString();
-    if(m_desiredPhrase.isEmpty())
+    m_desiredPhrase   = map.value("desiredPhrase").toString();
+    m_stimulationType = map.value("stimulationType").toInt();      
+
+
+    if (m_stimulationType == speller_type::AUDITORY)
     {
-        RandomFlashSequence *randomPhrase = new RandomFlashSequence(9, 2);
-        m_desiredPhrase = randomPhrase->toString();
+        n_elements = 5;
+    }
+    else if (m_stimulationType >= speller_type::SMALL && m_stimulationType <= speller_type::SMALL_CIRCLE)
+    {
+        n_elements = 6;
     }
 
-    m_stimulationType = map.value("stimulationType").toInt();
+    if(m_controlMode == control_mode::ASYNC)
+    {
+        ++n_elements;
+    }
+
+
+    if(m_desiredPhrase.isEmpty())
+    {
+        RandomFlashSequence *randomPhrase;
+
+        if (m_experimentMode == operation_mode::CALIBRATION)
+        {
+            // randomPhrase = new RandomFlashSequence(9, 4);
+            randomPhrase = new RandomFlashSequence(n_elements, 4);
+            // randomPhrase = new RandomFlashSequence(9, 2);
+            // randomPhrase = new RandomFlashSequence(9, 1);
+
+            // RandomFlashSequence *randomPhrase = new RandomFlashSequence(9, 2);
+            // RandomFlashSequence *randomPhrase = new RandomFlashSequence(9, 4);
+            // RandomFlashSequence *randomPhrase = new RandomFlashSequence(9, 3);
+        }
+        else
+        {
+            //  randomPhrase = new RandomFlashSequence(9, 6);
+             randomPhrase = new RandomFlashSequence(n_elements, 4);
+          //  randomPhrase = new RandomFlashSequence(n_elements, 6);
+        }
+
+        m_desiredPhrase = randomPhrase->toString();
+    }
+    // qDebug()<< Q_FUNC_INFO << m_desiredPhrase;
     m_flashingMode = map.value("flashingMode").toInt();
 }
 

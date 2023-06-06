@@ -3,29 +3,41 @@
 #include <QApplication>
 #include <QPropertyAnimation>
 #include <QGraphicsOpacityEffect>
+<<<<<<< HEAD
+=======
+#include <algorithm>
+>>>>>>> f48039ea1d566beb7dea6e01e3dbafd82c5eeeb1
 //
 #include "hybridstimulation.h"
+#include "ssvepdirection.h"
 #include "facespeller.h"
 #include "flashingspeller.h"
 #include "hybrid.h"
 #include "ovtk_stimulations.h"
+
 //
 HybridStimulation::HybridStimulation(Hybrid *hybridStimulation)
 {
-    m_hybridStimulaiton = new Hybrid();
+    m_hybridStimulation = new Hybrid();
     initERPspeller(hybridStimulation->m_ERPparadigm);
     initSSVEP(hybridStimulation->m_SSVEPparadigm);
+    initAnimations();
 }
 
-HybridStimulation::HybridStimulation(Hybrid *hybridStimulation, Speller *ERPspeller, SsvepGL *ssvepGL)
+// HybridStimulation::HybridStimulation(Hybrid *hybridStimulation, Speller *ERPspeller, SsvepGL *ssvepGL)
+// HybridStimulation::HybridStimulation(Hybrid *hybridStimulation, Speller *ERPspeller, SsvepCircle *ssvepGL)
+// HybridStimulation::HybridStimulation(Hybrid *hybridStimulation, Speller *ERPspeller, SsvepDirection *ssvepGL)
+HybridStimulation::HybridStimulation(Hybrid *hybridStimulation, Speller *ERPspeller, SSVEPstimulation *ssvepGL)
 {
-    m_hybridStimulaiton = hybridStimulation;
-    m_ERPspeller = ERPspeller;
-    m_ssvepStimulation = ssvepGL;
+    m_hybridStimulation = hybridStimulation;
+    m_ERPspeller        = ERPspeller;
+    m_ssvepStimulation  = ssvepGL;
     //
     initExternalComm();
     //
     m_ssvepStimulation->m_firstRun = false;
+    m_ssvepStimulation->m_flickeringSequence = new RandomFlashSequence(1, 1);
+    /*
     m_ssvepStimulation->m_flickeringSequence = new RandomFlashSequence(1, 1);
 
     if(m_hybridStimulaiton->m_SSVEPparadigm->desiredPhrase() == "")
@@ -35,13 +47,26 @@ HybridStimulation::HybridStimulation(Hybrid *hybridStimulation, Speller *ERPspel
         m_hybridStimulaiton->m_SSVEPparadigm->setDesiredPhrase(rfseq->toString());
     }
 
-    if(m_hybridStimulaiton->experimentMode() == operation_mode::CALIBRATION)
+    */
+
+    if(m_hybridStimulation->experimentMode() == operation_mode::CALIBRATION)
     {
         m_trials = 1;
     }
-    else if(m_hybridStimulaiton->experimentMode() == operation_mode::COPY_MODE)
+    else if(m_hybridStimulation->experimentMode() == operation_mode::COPY_MODE ||
+            operation_mode::FREE_MODE)
     {
-        m_trials = m_hybridStimulaiton->m_ERPparadigm->desiredPhrase().count();
+
+        // if(m_hybridStimulation->m_ERPparadigm->stimulationType() != speller_type::SMALL)
+        if(m_hybridStimulation->m_order == order::ERP_FIRST)
+        {
+            m_trials = m_hybridStimulation->m_ERPparadigm->desiredPhrase().count();
+        }
+        else
+        {
+            m_trials = m_hybridStimulation->m_SSVEPparadigm->desiredPhrase().count();
+        }
+        //   qDebug()<< Q_FUNC_INFO << m_hybridStimulaiton->m_ERPparadigm->desiredPhrase();
     }
     /*
     else if(m_hybridStimulation->experimentMode() == operation_mode::FREE_MODE)
@@ -52,25 +77,56 @@ HybridStimulation::HybridStimulation(Hybrid *hybridStimulation, Speller *ERPspel
 
     connect(m_ERPspeller, SIGNAL(slotTerminated()), this, SLOT(switchState()) );
     connect(m_ssvepStimulation, SIGNAL(slotTerminated()), this, SLOT(switchState()));
+
+    if(utils::screenCount() == 2)
+    {
+      //  m_ERPspeller->move(-1366, 0);//quick hack
+        m_ERPspeller->move(-1920, 0);//quick hack
+    }
+
+    if(m_hybridStimulation->m_order == order::ERP_FIRST)
+    {
+        m_ssvepStimulation->hide();
+        m_ssvepStimulation->setPresentFeedback(true);
+        m_ssvepStimulation->setShowExternalFeedback(true);
+        m_ERPspeller->show();
+
+    }
+    else
+    {
+        m_ERPspeller->hide();
+        m_ssvepStimulation->setScreen(QGuiApplication::screens().last());
+        m_ssvepStimulation->showFullScreen();
+    }
+
+    initAnimations();
 }
 
 void HybridStimulation::hybridPreTrial()
 {
-    qDebug() << "[HYBRID PRETRIAL START]" << Q_FUNC_INFO;
+    // qDebug() << "[HYBRID PRETRIAL START]" << Q_FUNC_INFO;
 
-    if(m_hybridStimulaiton->experimentMode() == operation_mode::CALIBRATION)
+    if(m_hybridStimulation->experimentMode() == operation_mode::CALIBRATION)
     {
-        m_ERPspeller->setDesiredPhrase(m_hybridStimulaiton->m_ERPparadigm->desiredPhrase());
-        m_ssvepStimulation->m_flickeringSequence->sequence = RandomFlashSequence::toSequence(m_hybridStimulaiton->m_SSVEPparadigm->desiredPhrase());
+        m_ERPspeller->setDesiredPhrase(m_hybridStimulation->m_ERPparadigm->desiredPhrase());
+        m_ssvepStimulation->m_flickeringSequence->sequence = RandomFlashSequence::toSequence(m_hybridStimulation->m_SSVEPparadigm->desiredPhrase());
     }
 
-    else if(m_hybridStimulaiton->experimentMode() == operation_mode::COPY_MODE)
+    else if(m_hybridStimulation->experimentMode() == operation_mode::COPY_MODE)
     {
-        m_ERPspeller->setDesiredPhrase(m_hybridStimulaiton->m_ERPparadigm->desiredPhrase()[m_currentTrial].toLower());
-        m_ssvepStimulation->m_flickeringSequence->sequence[0] = m_hybridStimulaiton->m_SSVEPparadigm->desiredPhrase()[m_currentTrial].digitValue();
+        m_ERPspeller->setDesiredPhrase(m_hybridStimulation->m_ERPparadigm->desiredPhrase()[m_currentTrial].toLower());
+      //  qDebug()<< Q_FUNC_INFO << m_hybridStimulation->m_ERPparadigm->desiredPhrase();
+        if (m_hybridStimulation->m_SSVEPparadigm->experimentMode() == operation_mode::COPY_MODE)
+        {
+            m_ssvepStimulation->m_flickeringSequence->sequence[0] = m_hybridStimulation->m_SSVEPparadigm->desiredPhrase()[m_currentTrial].digitValue();
+        }
+        else
+        {
+            m_ssvepStimulation->m_flickeringSequence->sequence[0] = 0;
+        }
     }
 
-    else if(m_hybridStimulaiton->experimentMode() == operation_mode::FREE_MODE)
+    else if(m_hybridStimulation->experimentMode() == operation_mode::FREE_MODE)
     {
         m_ERPspeller->setDesiredPhrase("");
         m_ssvepStimulation->m_flickeringSequence->sequence[0] = 0;
@@ -81,7 +137,7 @@ void HybridStimulation::hybridPreTrial()
 
 void HybridStimulation::startTrial()
 {
-    qDebug() << "[HYBRID TRIAL START]" << Q_FUNC_INFO;
+    // qDebug() << "[HYBRID TRIAL START]" << Q_FUNC_INFO;
 
     if(m_hybridState == trial_state::PRE_TRIAL)
     {
@@ -90,21 +146,29 @@ void HybridStimulation::startTrial()
 
     if(m_hybridState == trial_state::STIMULUS)
     {
-
-        if(m_switchStimulation)
+        if(m_hybridStimulation->m_order == order::ERP_FIRST)
         {
-            qDebug() << Q_FUNC_INFO << "ERP trial";
-            swichStimWindows();
-            m_ERPspeller->startTrial();
+            if(m_switchStimulation)
+            {
+                //qDebug() << Q_FUNC_INFO << "ERP trial";
+                swichStimWindows();
+                // m_ERPspeller->startTrial();
+            }
+            else
+            {
+                // qDebug() << Q_FUNC_INFO << "SSVEP trial";
+                swichStimWindows();
+                // utils::wait(100); // pause before switching
+                // m_ssvepStimulation->startTrial();
+            }
         }
-
+        // SSVEP stim first
         else
         {
-            qDebug() << Q_FUNC_INFO << "SSVEP trial";
             swichStimWindows();
-            m_ssvepStimulation->startTrial();
         }
     }
+
     if(m_hybridState == trial_state::POST_TRIAL)
     {
         hybridPostTrial();
@@ -126,9 +190,13 @@ void HybridStimulation::switchState()
 
 void HybridStimulation::swichStimWindows()
 {
+    // qDebug()<< Q_FUNC_INFO << m_currentTrial;
+    QColor fbkColor = Qt::black;
 
-    if(m_switchStimulation)
+    // ERP FIRST IN ORDER
+    if(m_hybridStimulation->m_order ==   order::ERP_FIRST)
     {
+<<<<<<< HEAD
         qDebug()<< "Hiding SSVEP" <<QTime::currentTime();
         m_ssvepStimulation->hide();
 
@@ -138,9 +206,46 @@ void HybridStimulation::swichStimWindows()
         m_ERPspeller->show();
         qDebug()<< "showing done" << QTime::currentTime();
         // m_ssvepStimulation->setOpacity(0.01);
+=======
+        // ERP TRIAL
+        if(m_switchStimulation)
+        {
+            if(m_currentTrial == 0)
+            {
+                m_ssvepStimulation->hide();
+                m_ERPspeller->show();
+                m_ERPspeller->startTrial();
+                return;
+            }
+            else
+            {
+                m_ERPanimation->start();
+                // m_ERPspeller->show();
+                m_ERPspeller->showFullScreen();
+                m_ssvepStimulation->hide();
+            }
+        }
+        // SSVEP TRIAL
+        else
+        {
+            m_ssvepStimulation->setScreen(QGuiApplication::screens().last());
+            m_SSVEPanimation->start();
+            m_ssvepStimulation->showFullScreen();
+            m_ERPspeller->hide();
+            m_ERPFeedback    = m_ERPspeller->m_text;
+            // qDebug()<< m_ERPFeedback << " " << m_ERPspeller->Correct() << m_ERPspeller->m_desiredPhrase <<"correct or no";
+            if(m_ERPspeller->Correct())
+            {
+                fbkColor = Qt::red;
+            }
+            m_ssvepStimulation->setExternalFeedback(m_ERPFeedback[m_ERPFeedback.length() - 1].digitValue(), fbkColor);
+        }
+>>>>>>> f48039ea1d566beb7dea6e01e3dbafd82c5eeeb1
     }
+    // SSVEP FIRST IN ORDER
     else
     {
+<<<<<<< HEAD
         /*
         QGraphicsOpacityEffect* fade_effect = new QGraphicsOpacityEffect();
         m_ERPspeller->setGraphicsEffect(fade_effect);
@@ -161,17 +266,53 @@ void HybridStimulation::swichStimWindows()
         // qDebug()<<"hiding done" <<QTime::currentTime();
         // m_ERPspeller->setProperty("opacity", 0.01);
 
+=======
+        if(m_switchStimulation)
+        {
+            if(m_currentTrial == 0)
+            {
+                m_ERPspeller->hide();
+                m_ssvepStimulation->startTrial();
+                return;
+            }
+            else
+            {
+                m_ssvepStimulation->setScreen(QGuiApplication::screens().last());
+                m_SSVEPanimation->start();
+                 // QCoreApplication::processEvents(QEventLoop::AllEvents);
+                //  m_ssvepStimulation->setScreen(QGuiApplication::screens().last());
+                m_ssvepStimulation->showFullScreen();
+                m_ERPspeller->hide();
+
+                // displacing the break from hybridpostTrial to here
+                // utils::wait(1000); // useless
+            }
+        }
+        else
+        {
+            m_ERPanimation->start();
+            // m_ERPspeller->show();
+            m_ERPspeller->showFullScreen();
+            m_ssvepStimulation->hide();
+        }
+>>>>>>> f48039ea1d566beb7dea6e01e3dbafd82c5eeeb1
     }
 }
 
 void HybridStimulation::initExternalComm()
 {
-    if(m_hybridStimulaiton->externalComm() == external_comm::ENABLED)
+    if(m_hybridStimulation->externalComm() == external_comm::ENABLED)
+    {
+        // create an external comm object
+        m_externComm = new ExternComm(m_hybridStimulation->externalAddress(), 12347, m_hybridStimulation->externalComm());
+    }
+    /*
+    if(m_hybridStimulation->externalComm() == external_comm::ENABLED)
     {
         m_robotSocket = new QTcpSocket();
         //    m_robotSocket->connectToHost(QHostAddress("10.3.66.5"), m_robotPort);
         // m_robotSocket->connectToHost(QHostAddress("10.3.65.128"), m_robotPort);
-        m_robotSocket->connectToHost(QHostAddress(m_hybridStimulaiton->externalAddress()), m_robotPort);
+        m_robotSocket->connectToHost(QHostAddress(m_hybridStimulation->externalAddress()), m_robotPort);
         if(m_robotSocket->waitForConnected())
         {
             qDebug() << "Robot Connection : State Connected";
@@ -180,12 +321,12 @@ void HybridStimulation::initExternalComm()
         {
             qDebug() << "Robot Connection : State Not Connected";
         }
-    }
+    }*/
 }
 
 void HybridStimulation::externalComm()
 {
-    if(m_hybridStimulaiton->externalComm() == external_comm::ENABLED)
+    if(m_hybridStimulation->externalComm() == external_comm::ENABLED)
     {
         qDebug() << "Sending Feedback to Robot";
         // m_hybridCommand = "12";
@@ -220,8 +361,8 @@ void HybridStimulation::externalComm()
         QByteArray robotState = m_robotSocket->readAll();
 
         quint8 rState = robotState.toUInt();
-        qDebug()<< Q_FUNC_INFO << "Robot State recieved " << rState;
-        if(rState == robot_state::READY)
+        qDebug()<< "Robot State recieved " << rState;
+        if(rState == machine_state::READY)
         {
             qDebug()<< "Correct State";
             m_hybridState = trial_state::PRE_TRIAL;
@@ -242,6 +383,7 @@ void HybridStimulation::externalComm()
 
 void HybridStimulation::hybridPostTrial()
 {
+<<<<<<< HEAD
     qDebug() << "[HYBRID POST TRIAL]" << Q_FUNC_INFO;
     bool correct = false;
     // recieve feedback from both paradigms:
@@ -250,13 +392,27 @@ void HybridStimulation::hybridPostTrial()
     //
     if(m_hybridStimulaiton->experimentMode() == operation_mode::COPY_MODE ||
             m_hybridStimulaiton->experimentMode() == operation_mode::FREE_MODE)
+=======
+    // qDebug()<< Q_FUNC_INFO;
+    bool correct = false;
+    bool doExternalComm = true;
+    QColor erpColor = Qt::black;
+
+    if(m_hybridStimulation->experimentMode() == operation_mode::COPY_MODE ||
+            m_hybridStimulation->experimentMode() == operation_mode::FREE_MODE)
+>>>>>>> f48039ea1d566beb7dea6e01e3dbafd82c5eeeb1
     {
-        m_ERPFeedback = m_ERPspeller->m_text;
+        m_ERPFeedback    = m_ERPspeller->m_text;
         m_SSVEPFeedback += m_ssvepStimulation->m_sessionFeedback;
-        qDebug() << Q_FUNC_INFO << "ERP feedback: " << m_ERPFeedback;
-        qDebug() << Q_FUNC_INFO << "SSVEP feedback: " << m_SSVEPFeedback;
+        if (m_ERPspeller->Correct())
+        {
+            erpColor = Qt::red;
+        }
+        // qDebug() << Q_FUNC_INFO << "ERP feedback: "   << m_ERPFeedback;
+        // qDebug() << Q_FUNC_INFO << "SSVEP feedback: " << m_SSVEPFeedback;
     }
 
+<<<<<<< HEAD
     // Send and Recieve feedback to/from Robot if external communication is enabled
     if (m_hybridStimulaiton->m_SSVEPparadigm->controlMode() == control_mode::ASYNC)
     {
@@ -277,32 +433,174 @@ void HybridStimulation::hybridPostTrial()
     //
     hybridPostTrialEnd();
 
+=======
+    // m_hybridCommand = m_ERPFeedback[m_currentTrial] + m_SSVEPFeedback.at(m_currentTrial);
+    m_hybridCommand = m_ERPFeedback[m_ERPFeedback.length() - 1] + m_SSVEPFeedback.at(m_SSVEPFeedback.length() - 1);
+
+    // show feedback on SSVEP
+    if (m_hybridStimulation->m_order == order::ERP_FIRST)
+    {
+        // qDebug()<< m_ERPFeedback[m_ERPFeedback.length() - 1] << "  " << m_ERPFeedback[m_ERPFeedback.length() - 1].digitValue();
+        m_ssvepStimulation->setExternalFeedback(m_ERPFeedback[m_ERPFeedback.length() - 1].digitValue(), erpColor);
+    }
+
+    // show feedback on ERP speller for 500 ms
+    else
+    {
+        correct = m_ssvepStimulation->isCorrect();
+        m_ssvepStimulation->hide();
+        m_ERPspeller->show();
+        m_ERPspeller->showFeedback(m_hybridCommand, correct);
+    }
+
+    // check if correct feedback, send it to robot, otherwise
+    // repeat until feedback is correct in COPY MODE
+    if (m_hybridStimulation->externalComm() == external_comm::ENABLED)
+    {
+        QString directionFeedback, directionDesired;
+        // Send and Recieve feedback to/from Robot if external communication is enabled
+        if (m_hybridStimulation->m_SSVEPparadigm->controlMode() == control_mode::ASYNC)
+        {
+            if(m_SSVEPFeedback[m_currentTrial].digitValue() == 1)
+            {
+                m_SSVEPFeedback[m_currentTrial] = '0';
+            }
+            else
+            {
+                m_SSVEPFeedback[m_currentTrial] = QString::number(m_SSVEPFeedback[m_currentTrial].digitValue() - 1).at(0);
+            }
+        }
+
+        if(m_hybridStimulation->experimentMode() == operation_mode::COPY_MODE)
+        {
+            // direction controlled by SSVEP
+            if(m_hybridStimulation->m_ERPparadigm->stimulationType() == speller_type::SMALL)
+            {
+                directionFeedback = m_SSVEPFeedback[m_SSVEPFeedback.length() - 1];
+                directionDesired  = m_hybridStimulation->m_SSVEPparadigm->desiredPhrase()[m_currentTrial];
+                std::reverse(m_hybridCommand.begin(), m_hybridCommand.end());
+            }
+            // direction controlled by ERP
+            else
+            {
+                directionFeedback = m_ERPFeedback[m_ERPFeedback.length() - 1];
+                directionDesired  = m_ERPspeller->getDesiredPhrase();
+            }
+
+            if(directionFeedback != directionDesired)
+            {
+                doExternalComm = false;
+                --m_currentTrial;
+            }
+            else
+            {
+                doExternalComm = true;
+            }
+        }
+
+        if (m_hybridCommand[0] != '#' && doExternalComm)
+        {
+            // externalComm();
+            m_externComm->communicate(m_hybridCommand);
+        }
+
+    }
+
+    /*
+    else
+    {
+        // increase waiting time after feedabck by 500 or 1000 ms (experimenting with 2000ms)
+        // only when control of external device is disabled
+        utils::wait(1000); // 1000
+    }
+    */
+
+    /*
+    if (m_hybridCommand[0] != '#' && doExternalComm)
+    {
+       // externalComm();
+         m_externComm->communicate(m_hybridCommand);
+    }
+    */
+    //
+    hybridPostTrialEnd();
+>>>>>>> f48039ea1d566beb7dea6e01e3dbafd82c5eeeb1
 }
 
 void HybridStimulation::hybridPostTrialEnd()
 {
     ++m_currentTrial;
+
     m_hybridState = trial_state::PRE_TRIAL;
 
-    if(m_currentTrial < m_trials || m_hybridStimulaiton->experimentMode() == operation_mode::FREE_MODE)
+    // More trials to conduct
+    if( (m_currentTrial < m_trials) || (m_hybridStimulation->experimentMode() == operation_mode::FREE_MODE))
     {
-        startTrial();
+        if(m_ERPFeedback[m_ERPFeedback.length() - 1] == '5' && m_hybridStimulation->experimentMode() == operation_mode::FREE_MODE) // stop command in ERP
+        {
+            qDebug()<< "Terminate FREE experiment";
+            terminateExperiment();
+        }
+        else
+        {
+            startTrial();
+        }
     }
+
+    // Experiment Ends
     else
     {
-        if(m_hybridStimulaiton->experimentMode() == operation_mode::COPY_MODE)
+        if(m_hybridStimulation->experimentMode() == operation_mode::COPY_MODE)
         {
-            m_ERPCorrect = (m_ERPspeller->m_correct / m_trials) * 100;
+            m_ERPCorrect   = (m_ERPspeller->m_correct / m_trials) * 100;
             m_SSVEPCorrect = (m_ssvepStimulation->m_correct / m_trials) * 100;
             qDebug()<< "Accuracy in ERP: " << m_ERPCorrect;
             qDebug()<< "Accuracy in SSVEP: "<< m_SSVEPCorrect;
         }
 
+<<<<<<< HEAD
         qDebug() << "Hybrid Experiment End";
         // m_ERPspeller->close();
         // m_ssvepStimulation->close();
         // emit experimentEnd();
+=======
+        terminateExperiment();
     }
+}
+
+void HybridStimulation::terminateExperiment()
+{
+    qDebug() << "Hybrid Experiment End";
+    m_ERPspeller->sendMarker(OVTK_StimulationId_ExperimentStop);
+    if (m_hybridStimulation->externalComm() == external_comm::ENABLED)
+    {
+        m_externComm->communicate("00");
+>>>>>>> f48039ea1d566beb7dea6e01e3dbafd82c5eeeb1
+    }
+    utils::wait(2000);
+    // m_ERPspeller->close();
+    // m_ssvepStimulation->close();
+    // emit experimentEnd();
+}
+
+void HybridStimulation::initAnimations()
+{
+    m_ERPanimation = new QPropertyAnimation(m_ERPspeller, "windowOpacity");
+    m_ERPanimation->setDuration(600); // 750 //1000 //2000 //500 //250
+    m_ERPanimation->setStartValue(0.0); //
+    m_ERPanimation->setEndValue(1.0); //
+    m_ERPanimation->setEasingCurve(QEasingCurve::OutQuint);
+    // connect(m_ERPanimation, SIGNAL(started()), m_ERPspeller, SLOT(highlightTarget()));
+    connect(m_ERPanimation, SIGNAL(finished()), m_ERPspeller, SLOT(startTrial()));
+
+    m_SSVEPanimation = new QPropertyAnimation(m_ssvepStimulation, "opacity");
+    m_SSVEPanimation->setDuration(600);//750 //1000  //500 //250
+    m_SSVEPanimation->setStartValue(0.0); //1366
+    m_SSVEPanimation->setEndValue(1.0); // 0
+    m_SSVEPanimation->setEasingCurve(QEasingCurve::OutQuint);
+
+    // connect(m_SSVEPanimation, SIGNAL(started()), m_ssvepStimulation, SLOT(highlightTarget()));
+    connect(m_SSVEPanimation, SIGNAL(finished()), m_ssvepStimulation, SLOT(startTrial()));
 }
 
 void HybridStimulation::initERPspeller(ERP *erp)
@@ -327,6 +625,12 @@ void HybridStimulation::initERPspeller(ERP *erp)
         //m_ERPspeller->initSpeller(erp);
         break;
     }
+        // TODO: add the rest of Spellers
+    }
+
+    if(m_hybridStimulation->m_order == order::SSVEP_FIRST)
+    {
+        m_ERPspeller->hide();
     }
 }
 
@@ -338,10 +642,12 @@ void HybridStimulation::initSSVEP(SSVEP *ssvep)
     format.setSwapInterval(1); // vsync on
     format.setSwapBehavior(QSurfaceFormat::TripleBuffer); //
     // format.setVersion(3,3);
-    format.setVersion(3,0); // ANGLE supports ES 3.0, higher versions raise exceptions
-
-
-    m_ssvepStimulation = new SsvepGL(ssvep, 12346);
+    // format.setVersion(3,0); // ANGLE supports ES 3.0, higher versions raise exceptions
+    format.setVersion(4, 6); // Intel UHD 620
+    QSize tmp_size(1920, 1080); // (1366, 768) 15.6 inch
+    // m_ssvepStimulation = new SsvepGL(ssvep, 12346);
+    // m_ssvepStimulation = new SsvepCircle(ssvep, 12346);
+    m_ssvepStimulation = new SsvepDirection(ssvep, 12346);
     m_ssvepStimulation->setFormat(format);
 
     if(QGuiApplication::screens().size() == 2)
@@ -350,10 +656,14 @@ void HybridStimulation::initSSVEP(SSVEP *ssvep)
     }
     else
     {
-        m_ssvepStimulation->resize(QSize(1366, 768)); //temporaty size;
+        // m_ssvepStimulation->resize(QSize(1366, 768)); //temporaty size;
+        m_ssvepStimulation->resize(tmp_size); //temporaty size;
     }
-    m_ssvepStimulation->hide();
+
+    if (m_hybridStimulation->m_order == order::ERP_FIRST)
+    {
+        m_ssvepStimulation->hide();
+    }
 }
 
-HybridStimulation::~HybridStimulation()
-{}
+HybridStimulation::~HybridStimulation(){}

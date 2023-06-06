@@ -8,7 +8,7 @@
 #include "ovtk_stimulations.h"
 #include "utils.h"
 //
-MultiStimuli::MultiStimuli(QWidget *parent) : Speller(0)
+MultiStimuli::MultiStimuli(QWidget *parent) : Speller(12345)
 {
     // qDebug()<< Q_FUNC_INFO;
 
@@ -71,7 +71,6 @@ void MultiStimuli::preTrial()
 
         if(m_ERP->stimulationType() == speller_type::DUAL_STIM)
         {
-
             t_stimMap = m_stimuliMapDual;
         }
         else if(m_ERP->stimulationType() == speller_type::MULTI_STIM)
@@ -83,7 +82,6 @@ void MultiStimuli::preTrial()
         foreach(QString value, t_stimMap)
         {
             QPixmap pic(":/images/"+value);
-
             m_stimuli.append(pic);
         }
     }

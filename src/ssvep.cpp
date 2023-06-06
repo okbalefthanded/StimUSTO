@@ -10,9 +10,9 @@ SSVEP::SSVEP() : Paradigm (),
 }
 
 SSVEP::SSVEP(quint8 mode, quint8 control, quint8 type, quint8 comm, int dur, quint8 bDur,
-             quint8 nrSeq, QString phrase, QString ip, quint8 nElements,
+             quint8 nrSeq, quint8 sType, QString phrase, QString ip, quint8 nElements,
              QString frequnecies, quint8 stimulationMode):
-    Paradigm(mode, control, type, comm, dur, bDur, nrSeq, phrase, ip),
+    Paradigm(mode, control, type, comm, dur, bDur, nrSeq, sType, phrase, ip),
     m_nrElements(nElements), m_frequencies(frequnecies), m_stimulationMode(stimulationMode)
 {
 }
@@ -29,6 +29,7 @@ QVariant SSVEP::toVariant() const
     map.insert("stimulationDuration", m_stimulationDuration);
     map.insert("breakDuration", m_breakDuration);
     map.insert("nrSequences", m_nrSequences);
+    map.insert("stimulationType", m_stimulationType);
     map.insert("desiredPhrase", m_desiredPhrase);
     map.insert("nrElements", m_nrElements);
     map.insert("frequencies", m_frequencies);
@@ -45,20 +46,29 @@ void SSVEP::fromVariant(const QVariant &variant)
 
     if(map.value("externalComm").isNull())
     {
-        m_externalComm = external_comm::DISABLED;
+        m_externalComm    = external_comm::DISABLED;
         m_externalAddress = "127.0.0.1"; // home sweet home
     }
     else
     {
-        m_externalComm = map.value("externalComm").toInt();
+        m_externalComm    = map.value("externalComm").toInt();
         m_externalAddress = map.value("ip").toString();
     }
     m_type = map.value("paradigmType").toInt();
     m_stimulationDuration = map.value("stimulationDuration").toInt();
     m_breakDuration = map.value("breakDuration").toInt();
-    m_nrSequences = map.value("nrSequences").toInt();
+    m_nrSequences   = map.value("nrSequences").toInt();
     m_desiredPhrase = map.value("desiredPhrase").toString();
-    m_nrElements = map.value("nrElements").toInt();
+    m_stimulationType = map.value("stimulationType").toInt();
+    // m_nrElements = map.value("nrElements").toInt();
+    if (map.value("nrElements").isNull())
+    {
+        m_nrElements = 12; // phonekeypad
+    }
+    else
+    {
+        m_nrElements = map.value("nrElements").toInt();
+    }
     m_frequencies = map.value("frequencies").toString();
     m_stimulationMode = map.value("stimulationMode").toInt();
 }

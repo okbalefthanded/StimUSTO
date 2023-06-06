@@ -7,10 +7,13 @@
 #include <QElapsedTimer>
 #include <QUdpSocket>
 #include <QTcpSocket>
+#include <QColor>
+#include <QDialog>
 //
 #include "ui_spellerform.h"
 //
 #include "randomflashsequence.h"
+#include "externComm.h"
 #include "matrixlayout.h"
 #include "erp.h"
 #include "utils.h"
@@ -22,13 +25,14 @@ namespace Ui {
 class Speller;
 }
 */
-class Speller : public QWidget, protected Ui::SpellerForm
+// class Speller : public QWidget, protected Ui::SpellerForm
+class Speller : public QDialog, protected Ui::SpellerForm
 {
     Q_OBJECT
 
 public:
-    explicit Speller(QWidget *parent = 0);
-    Speller(int i);
+    explicit Speller(QWidget *parent = nullptr);
+    Speller(quint16 t_port);
     ~Speller();
 
     ERP *erp() const;
@@ -38,11 +42,20 @@ public:
     void setDesiredPhrase(const QString &t_desiredPhrase);
     void setTimers(int t_stimulation, int t_isi);
     void setPresentFeedback(bool t_do);
+<<<<<<< HEAD
     void showFeedback (QString command, bool correct); // used for HybridStimulation
+=======
+    void setFeedbackPort(quint16 t_port);
+    virtual void showFeedback (QString command, bool correct); // used for HybridStimulation
+>>>>>>> f48039ea1d566beb7dea6e01e3dbafd82c5eeeb1
     int getCurrentTarget();
 
     friend class Hybrid;
     friend class HybridStimulation;
+    friend class DoubleERP;
+    friend class HybridERP;
+
+    QString getDesiredPhrase() const;
 
 signals:
     void markerTag(uint64_t t_ovStimulation);
@@ -68,28 +81,38 @@ public slots:
 
 protected:
 
-    void initLogger();
     void showWindow();
+    void initLogger();
     void initTimers();
     void initFeedbackSocket();
-
+    void endInit();
     bool isTarget();
     bool isTarget(int t_stim);
-    void highlightTarget();
+    bool isAsync();
+    bool Correct();
+    virtual void highlightTarget();
     virtual void refreshTarget();
 
     virtual void sendStimulationInfo();
     void switchStimulationTimers();
 
+    void experimentStart();
     void startPreTrial();
     void endPreTrial();
-
+    void postTrialEnd();
     void trialEnd();
 
-    void externalCommunication();
-
-
+    virtual int getnElements();
+    // void externalCommunication();
+    void fillFeedBackMap(QPixmap *map, QColor t_mapColor, QColor t_textColor, QString text="");
     // Ui::Speller *ui;
+
+    QList<QPixmap> m_multStimuli = {QPixmap(":/images/bennabi_face_magenta.png"),
+                                    // QPixmap(":/images/bennabi_face_blue.png"),
+                                    QPixmap(":/images/bennabi_face_green.png"),
+                                    // QPixmap(":/images/bennabi_face_yellow.png"),
+                                    QPixmap(":/images/bennabi_face_red.png"),
+                                    QPixmap(":/images/bennabi_face_orange.png")};
 
     int m_rows;
     int m_cols;
@@ -125,6 +148,10 @@ protected:
     QList<QPixmap> m_icons;
     MatrixLayout *m_mLayout;
     QLabel *m_element;
+    QColor m_highlightColor = Qt::white; // Qt::yellow;
+    QColor m_correctColor   = Qt::yellow; //Qt:green
+    QColor m_incorrectColor = Qt::blue;
+    QPixmap m_highlight;
     // Timers
     QTimer *m_preTrialTimer;
     QTimer *m_stimTimer;
@@ -135,9 +162,10 @@ protected:
     RandomFlashSequence *m_flashingSequence;
 
     // external communication
-    QString m_hybridCommand = "";
-    quint16 m_robotPort = 12347;
-    QTcpSocket *m_robotSocket;
+    // QString m_command = "";
+    // quint16 m_machinePort = 12347;
+    // QTcpSocket *m_machineSocket;
+    ExternComm *m_externComm;
 
     // logger
     Logger *log;

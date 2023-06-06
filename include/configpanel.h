@@ -12,6 +12,10 @@
 #include "paradigm.h"
 #include "erp.h"
 #include "ssvep.h"
+#include "ssvepcircle.h"
+#include "phonekeypad.h"
+#include "ssvepdirection.h"
+#include "ssvepstimulation.h"
 //
 namespace Ui {
 class ConfigPanel;
@@ -49,14 +53,20 @@ private slots:
     void on_quitSpeller_clicked();
     void on_initSSVEP_clicked();
     void on_initHybrid_clicked();
+    void initDoubleERP();
+    void initDoubleSSVEP();
 
 
 private:
     void initParadigmJSon(Paradigm *prdg);
     ERP *initParadigmERPGui();
     SSVEP *initParadigmSSVEPGui();
-    Speller *createSpeller(int t_spellerType);
-    SsvepGL *createSSVEP(SSVEP *t_ssvep, int t_port);
+    Speller *createSpeller(int t_spellerType, quint16 t_port);
+    // SsvepGL *createSSVEP(SSVEP *t_ssvep, int t_port);
+    // SsvepCircle *createSSVEP(SSVEP *t_ssvep, int t_port);
+    // SsvepDirection *createSSVEP(SSVEP *t_ssvep, int t_port);
+    // PhoneKeypad *createSSVEP(SSVEP *t_ssvep, int t_port);
+    SSVEPstimulation *createSSVEP(SSVEP *t_ssvep, int t_port);
     void connectStimulation(QObject *t_obj);
     void connectParadigm(QObject *pr, QTimer *timer);
     Ui::ConfigPanel *ui;

@@ -4,21 +4,38 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network opengl
+QT       += core gui network opengl multimedia
 
 CONFIG += c++11 console
+# CONFIG += c++11
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = LaresiBCI
+TARGET = StimUSTO
 TEMPLATE = app
 
 
 SOURCES += src\main.cpp\
     src/arabicspeller.cpp \
+    src/auditoryspeller.cpp \
+    src/chromaspeller.cpp \
+    src/circularlayout.cpp \
+    src/doubleerp.cpp \
+    src/doublessvep.cpp \
+    src/externComm.cpp \
     src/hybrid.cpp \
+    src/hybriderp.cpp \
+    src/hybridssvep.cpp \
     src/hybridstimulation.cpp \
     src/multistimuli.cpp \
+    src/phonekeypad.cpp \
+    src/spellercircdir.cpp \
+    src/spellercircular.cpp \
+    src/spellersmall.cpp \
+    src/ssvepcircle.cpp \
+    src/ssvepdircircle.cpp \
+    src/ssvepdirection.cpp \    
+    src/ssvepstimulation.cpp \
     src\configpanel.cpp \
     src\matrixlayout.cpp \
     src\ovmarkersender.cpp \
@@ -37,9 +54,25 @@ SOURCES += src\main.cpp\
 
 HEADERS  += include\configpanel.h \
     include/arabicspeller.h \
+    include/auditoryspeller.h \
+    include/chromaspeller.h \
+    include/circularlayout.h \
+    include/doubleerp.h \
+    include/doublessvep.h \
+    include/externComm.h \
     include/hybrid.h \
+    include/hybriderp.h \
+    include/hybridssvep.h \
     include/hybridstimulation.h \
     include/multistimuli.h \
+    include/phonekeypad.h \
+    include/spellercircdir.h \
+    include/spellercircular.h \
+    include/spellersmall.h \
+    include/ssvepcircle.h \
+    include/ssvepdircircle.h \
+    include/ssvepdirection.h \    
+    include/ssvepstimulation.h \
     include\ovtk_stimulations.h \
     include\matrixlayout.h \
     include\ovmarkersender.h \

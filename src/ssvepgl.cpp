@@ -6,6 +6,9 @@
 #include <Qapplication>
 #include <QDateTime>
 #include <QDir>
+#include <QPainter>
+#include <QFont>
+#include <array>
 //
 #include "ssvepgl.h"
 #include "ovtk_stimulations.h"
@@ -43,15 +46,19 @@ SsvepGL::SsvepGL(SSVEP *paradigm, int t_port)
     //
     m_state = trial_state::PRE_TRIAL;
 
+    // this->setFlag(Qt::Desktop);
+
 }
 
 void SsvepGL::initializeGL()
 {
     // Initialize OpenGL Backend
     initializeOpenGLFunctions();
-    m_index = -1;
+
+    m_index = 0;
     // Set global information
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glEnable(GL_PROGRAM_POINT_SIZE); //
     glEnable(GL_FRAMEBUFFER_SRGB);
 
     /*
@@ -68,10 +75,12 @@ void SsvepGL::initializeGL()
     // static const int samplesLength = REFRESH_RATE * (stimulationDuration);
 
     m_flicker.resize(m_frequencies.size());
-
+    double phase = 0.0;
     for (int i=0; i < m_frequencies.size(); ++i)
     {
-        m_flicker[i] = utils::gen_flick(m_frequencies[i], config::REFRESH_RATE, m_ssvep->stimulationDuration(), m_ssvep->stimulationMode(), config::PHASE*i);
+        // phase = config::PHASE * ((i+1)%2);
+        phase = config::PHASE * (i%2);
+        m_flicker[i] = utils::gen_flick(m_frequencies[i], config::REFRESH_RATE, m_ssvep->stimulationDuration(), m_ssvep->stimulationMode(), phase);
     }
     //qDebug() << "flicker size: "<< m_flicker[0].size();
     // Application-specific initialization
@@ -112,7 +121,10 @@ void SsvepGL::initializeGL()
         m_colorBuffer.release();
         m_programShader->release();
     }
+<<<<<<< HEAD
 
+=======
+>>>>>>> f48039ea1d566beb7dea6e01e3dbafd82c5eeeb1
     initExternalSocket();
 }
 
@@ -126,19 +138,26 @@ void SsvepGL::resizeGL(int w, int h)
 
 void SsvepGL::paintGL()
 {
-
     // clear
     glClear(GL_COLOR_BUFFER_BIT);
     int nVertices = glUtils::VERTICES_PER_TRIANGLE * (m_ssvep->nrElements()) * glUtils::TRIANGLES_PER_SQUARE;
+    int centerVertices = m_ssvep->nrElements();
     // Render using our shader
     m_programShader->bind();
     {
         m_vaObject.bind();
         // nr_triangles = 3 * Nr_elments * 2 (3 : vertices per triangle), (2: 2 triangles per rectangle)
         glDrawElements(GL_TRIANGLES, nVertices, GL_UNSIGNED_INT, m_vindices.data());
+        // draw rectangles center points in red
+        glDrawElements(GL_POINTS, centerVertices, GL_UNSIGNED_INT, m_centerindices.data());
         m_vaObject.release();
     }
     m_programShader->release();
+
+    if (m_ssvep->experimentMode() == operation_mode::FREE_MODE)
+    {
+        renderText();
+    }
 
 }
 
@@ -163,7 +182,8 @@ void SsvepGL::startTrial()
 void SsvepGL::preTrial()
 {
 
-    if(m_trials == 0 && m_preTrialCount == 0)
+    //    if(m_trials == 0 && m_preTrialCount == 0)
+    if(m_trials == 0)
     {
         sendMarker(OVTK_StimulationId_ExperimentStart);
     }
@@ -188,19 +208,23 @@ void SsvepGL::preTrial()
         }
 
     }
+
     else if(m_preTrialCount == 2)
     {
         if (m_ssvep->experimentMode() == operation_mode::CALIBRATION ||
                 m_ssvep->experimentMode() == operation_mode::COPY_MODE)
         {
+            // refresh only for idle
+            if (m_ssvep->controlMode() == control_mode::ASYNC && m_flickeringSequence->sequence[m_currentFlicker] == 1)
+            {
             // qDebug() << "Refresh target SSVEP ";
             refreshTarget();
+            }
         }
     }
 
     m_preTrialTimer->start();
     m_preTrialCount++;
-
 
     if (m_preTrialCount > m_preTrialWait)
     {
@@ -219,8 +243,8 @@ void SsvepGL::postTrial()
     disconnect(this, SIGNAL(frameSwapped()), this, SLOT(update()));
     initElements();
 
-    m_index = -1;
-    m_lostFrames = 0;
+    m_index = 0;
+    // m_lostFrames = 0;
     m_state = trial_state::PRE_TRIAL;
 
     // feedback
@@ -231,6 +255,10 @@ void SsvepGL::postTrial()
         feedback();  // wait for feedback
         if (m_presentFeedback)
         {
+<<<<<<< HEAD
+=======
+            // utils::wait(300);
+>>>>>>> f48039ea1d566beb7dea6e01e3dbafd82c5eeeb1
             utils::wait(500);
             // feedback for 1 sec & refresh
             // utils::wait(1000);
@@ -244,9 +272,15 @@ void SsvepGL::postTrial()
     }
 
     externalCommunication();
+<<<<<<< HEAD
 
     postTrialEnd();
 
+=======
+
+    postTrialEnd();
+
+>>>>>>> f48039ea1d566beb7dea6e01e3dbafd82c5eeeb1
 }
 
 void SsvepGL::postTrialEnd()
@@ -257,7 +291,12 @@ void SsvepGL::postTrialEnd()
     if (m_currentFlicker < m_flickeringSequence->sequence.size() &&
             m_flickeringSequence->sequence.length() != 1 &&
             (m_ssvep->experimentMode() == operation_mode::COPY_MODE ||
+<<<<<<< HEAD
              m_ssvep->experimentMode() == operation_mode::CALIBRATION))
+=======
+             m_ssvep->experimentMode() == operation_mode::CALIBRATION ||
+             m_ssvep->experimentMode() == operation_mode::FREE_MODE))
+>>>>>>> f48039ea1d566beb7dea6e01e3dbafd82c5eeeb1
     {
         startTrial();
     }
@@ -279,10 +318,10 @@ void SsvepGL::postTrialEnd()
     }
 }
 
+
 void SsvepGL::Flickering()
 {
-
-    if(m_index == -1)
+    if(m_index == 0)
     {
         // qDebug()<< Q_FUNC_INFO << "connecting frameswapped to update" << "index " << index;
         connect(this, SIGNAL(frameSwapped()), this, SLOT(update()));
@@ -312,19 +351,27 @@ void SsvepGL::Flickering()
 void SsvepGL::feedback()
 {
     // receiveFeedback
+<<<<<<< HEAD
     // m_feedbackSocket->waitForReadyRead(500);
     // qDebug()<< QTime::currentTime();
     // m_feedbackSocket->waitForReadyRead(100);
     // m_feedbackSocket->waitForReadyRead(90);
+=======
+>>>>>>> f48039ea1d566beb7dea6e01e3dbafd82c5eeeb1
     m_feedbackSocket->waitForReadyRead();
 
     if(m_presentFeedback)
     {
+<<<<<<< HEAD
         // m_feedbackSocket->waitForReadyRead(100);
 
         if(m_ssvep->experimentMode() == operation_mode::COPY_MODE)
         {
 
+=======
+        if(m_ssvep->experimentMode() == operation_mode::COPY_MODE)
+        {
+>>>>>>> f48039ea1d566beb7dea6e01e3dbafd82c5eeeb1
             if(m_sessionFeedback[m_currentFlicker].digitValue() == m_flickeringSequence->sequence[m_currentFlicker])
             {
                 highlightFeedback(glColors::green, m_flickeringSequence->sequence[m_currentFlicker]-1);
@@ -363,7 +410,6 @@ void SsvepGL::receiveFeedback()
 
     if (m_flickeringSequence->sequence.length() == 1) // Hybrid stimulation mode
     {
-
         m_sessionFeedback = buffer->data();
     }
     else
@@ -372,7 +418,6 @@ void SsvepGL::receiveFeedback()
     }
 
     // qDebug() << Q_FUNC_INFO << "SSVEP FEEDBACK "<< m_sessionFeedback;
-
 }
 
 void SsvepGL::initElements()
@@ -404,7 +449,10 @@ void SsvepGL::initElements()
     {
         // init vectors
         int vectorsSize = m_ssvep->nrElements() * glUtils::POINTS_PER_SQUARE;
+        // int vectorsSize = glUtils::VERTICES_PER_TRIANGLE * (m_ssvep->nrElements()) * glUtils::TRIANGLES_PER_SQUARE;
+        vectorsSize += m_ssvep->nrElements();
         m_vertices.resize(vectorsSize);
+
         initRects();
         initColors();
     }
@@ -427,6 +475,9 @@ void SsvepGL::initRects()
     int isNullX = 0, isNullY = 0, sx=1;
     int offset;
 
+    m_centers.resize(m_ssvep->nrElements());
+    int k=0; // centers index counter
+
     if( m_ssvep->controlMode() == control_mode::SYNC)
     {
         offset = glUtils::POINTS_PER_SQUARE;
@@ -436,7 +487,7 @@ void SsvepGL::initRects()
         offset = 0;
     }
 
-    for(int i=0;i<m_vertices.count(); i+=glUtils::POINTS_PER_SQUARE)
+    for(int i=0;i<m_vertices.count() - m_ssvep->nrElements(); i+=glUtils::POINTS_PER_SQUARE)
     {
         m_vertices[i] = refPoints::topPoints[(i+offset)/glUtils::POINTS_PER_SQUARE];
         sx = 1;
@@ -448,20 +499,51 @@ void SsvepGL::initRects()
             m_vertices[j].setY(m_vertices[j-1].y() - (dy * isNullY));
             m_vertices[j].setZ(refPoints::topPoints[0].z());
             sx--;
+            // calculate center point
+            if (j==(i+2))
+            {
+                m_centers[k].setX((m_vertices[j].x() + m_vertices[i].x()) / 2);
+                m_centers[k].setY((m_vertices[j].y() + m_vertices[i].y()) / 2);
+                m_centers[k].setZ(refPoints::topPoints[0].z());
+                ++k;
+            }
         }
     }
+<<<<<<< HEAD
+=======
+
+    k = m_vertices.count() - m_ssvep->nrElements();
+
+    int i =0;
+    for (int ind=k; ind<m_vertices.count();++ind)
+    {
+        m_vertices[ind] = m_centers[i];
+        ++i;
+    }
+
+>>>>>>> f48039ea1d566beb7dea6e01e3dbafd82c5eeeb1
 }
 
 void SsvepGL::initColors()
 {
     int vectorsSize = m_ssvep->nrElements() * glUtils::POINTS_PER_SQUARE;
+
+    vectorsSize += m_ssvep->nrElements(); // for centers
+
     m_colors.resize(vectorsSize);
 
-    if( m_ssvep->controlMode() == control_mode::SYNC)
+    if(m_ssvep->controlMode() == control_mode::SYNC)
     {
         for (int i=0; i<m_colors.count(); i++)
         {
-            m_colors[i] = glColors::white;
+            if (i < m_colors.count() - m_ssvep->nrElements())
+            {
+                m_colors[i] = glColors::white;
+            }
+            else
+            {
+                m_colors[i] = glColors::red;
+            }
         }
     }
     else
@@ -471,15 +553,26 @@ void SsvepGL::initColors()
         m_colors.resize(vectorsSize);
         for (int i=glUtils::POINTS_PER_SQUARE; i<m_colors.count(); i++)
         {
-            m_colors[i] = glColors::white;
+            // m_colors[i] = glColors::white;
+            if (i < m_colors.count() - m_ssvep->nrElements())
+            {
+                m_colors[i] = glColors::white;
+            }
+            else
+            {
+                m_colors[i] = glColors::red;
+            }
         }
     }
+
 }
 
 void SsvepGL::initIndices()
 {
     // init indices
     m_vindices.resize(m_ssvep->nrElements()*glUtils::INDICES_PER_SQUARE);
+    m_centerindices.resize(m_ssvep->nrElements());
+
     int k=0; int val = 0;
     for(int i=0; i<(m_ssvep->nrElements()*glUtils::INDICES_PER_SQUARE); i+=glUtils::INDICES_PER_SQUARE)
     {
@@ -491,6 +584,64 @@ void SsvepGL::initIndices()
         m_vindices[i+4] = m_vindices[i+2];
         m_vindices[i+5] = val + 3;
         k +=2;
+    }
+
+    int centerStart = m_vertices.count() - m_ssvep->nrElements();
+
+    for (int i=0;i<m_centerindices.count();++i)
+    {
+        m_centerindices[i] = centerStart + i;
+    }
+
+    qDebug()<< Q_FUNC_INFO << "Vertices "<< m_vertices.count() << "Indices "<< m_vindices.count();
+    qDebug()<< Q_FUNC_INFO << "Vertices "<< m_vertices << "Indices "<< m_vindices;
+
+}
+
+void SsvepGL::externalCommunication()
+{
+    // Send and Recieve feedback to/from Robot if external communication is enabled
+    // qDebug()<< Q_FUNC_INFO << m_sessionFeedback;
+    std::string cmd = QString(m_sessionFeedback[m_currentFlicker]).toStdString();
+
+    if(m_ssvep->externalComm() == external_comm::ENABLED)
+    {
+        qDebug() << "Sending Feedback to Robot";
+        if (!m_robotSocket->isOpen())
+        {
+            qDebug()<< "Not sending Feedback to Robot : Cannot send feedback socket is not open";
+        }
+
+        try
+        {
+            std::string str = cmd;
+            const char* p = str.c_str();
+            // qDebug()<< "command to send to Robot: " << QString::fromStdString(cmd) << m_sessionFeedback[m_currentFlicker];
+            QByteArray byteovStimulation;
+            QDataStream streamovs(&byteovStimulation, QIODevice::WriteOnly);
+            streamovs.setByteOrder(QDataStream::LittleEndian);
+            streamovs.writeRawData(p, str.length());
+            m_robotSocket->write(byteovStimulation);
+            m_robotSocket->waitForBytesWritten();
+        }
+        catch(...)
+        {
+            qDebug() <<"Send Feedback to Robot, Issue With writting Data";
+        }
+
+        qDebug() << "Recieve State from Robot";
+        m_robotSocket->waitForReadyRead();
+
+        QByteArray robotState = m_robotSocket->readAll();
+
+        quint8 rState = robotState.toUInt();
+        qDebug()<< Q_FUNC_INFO << "Robot State recieved " << rState;
+        if(rState == machine_state::READY)
+        {
+            qDebug()<< "Correct State";
+            m_state = trial_state::PRE_TRIAL;
+        }
+
     }
 }
 
@@ -632,12 +783,22 @@ void SsvepGL::highlightFeedback(QVector3D feedbackColor, int feebdackIndex)
 
 void SsvepGL::refresh(int feedbackIndex)
 {
-
     int squareIndex = feedbackIndex + (glUtils::VERTICES_PER_TRIANGLE*feedbackIndex);
-    m_colors[squareIndex] = glColors::white;
-    m_colors[squareIndex + 1] = glColors::white;
-    m_colors[squareIndex + 2] = glColors::white;
-    m_colors[squareIndex + 3] = glColors::white;
+
+    if(feedbackIndex == 0 && m_ssvep->controlMode() == control_mode::ASYNC)
+    {
+        m_colors[squareIndex] = glColors::gray;
+        m_colors[squareIndex + 1] = glColors::gray;
+        m_colors[squareIndex + 2] = glColors::gray;
+        m_colors[squareIndex + 3] = glColors::gray;
+    }
+    else{
+
+        m_colors[squareIndex] = glColors::white;
+        m_colors[squareIndex + 1] = glColors::white;
+        m_colors[squareIndex + 2] = glColors::white;
+        m_colors[squareIndex + 3] = glColors::white;
+    }
 
     scheduleRedraw();
 
@@ -680,6 +841,58 @@ void SsvepGL::scheduleRedraw()
     QOpenGLWindow::update();
 }
 
+<<<<<<< HEAD
+=======
+void SsvepGL::renderText()
+{
+    int screenWidth, screenHeight;
+    int x, y;
+    QPainter painter(this);
+
+    /*
+      painter.beginNativePainting();
+      glClear(GL_COLOR_BUFFER_BIT);
+      painter.endNativePainting();
+      */
+
+    painter.setPen(Qt::red);
+    // painter.setPen(Qt::gray);
+
+    painter.setFont(QFont("Arial", 20, 20));
+
+    x = 0;
+    y = 0;
+
+    QSize screenSize = utils::getScreenSize();
+
+    screenWidth = screenSize.width();
+    screenHeight = screenSize.height();
+    // int k[4] = {1,2,4,3};
+    // int k[4] = {1,2,3,4}; // for one-line
+    std::array<int, 5> k = {1,2,4,3,0};
+    if (m_ssvep->controlMode() == control_mode::ASYNC)
+    {
+         k = {1,2,3,4,5};
+    }
+
+    for (int i=0; i<m_centers.length(); i++)
+    {
+
+        // leftPixels = leftPercent * screenWidth /2;
+        // topPixels = topPercent * screenHeight /2;
+        x = int(m_centers[i].x() * (screenWidth / 2));
+        // y = int(m_centers[i].y() * (screenHeight/ 2) - 50);
+        // y = int(m_centers[i].y() * (screenHeight/ 2)- 75); // for one-line
+        y = int(m_centers[i].y() * (screenHeight/ 2) + 80);
+        // painter.drawText(x, y, width(), height(), Qt::AlignCenter, QString::number(i+1));
+        painter.drawText(x, -y, width(), height(), Qt::AlignCenter, QString::number(k[i]));
+
+    }
+
+    painter.end();
+}
+
+>>>>>>> f48039ea1d566beb7dea6e01e3dbafd82c5eeeb1
 bool SsvepGL::presentFeedback() const
 {
     return m_presentFeedback;
@@ -690,6 +903,10 @@ void SsvepGL::setPresentFeedback(bool presentFeedback)
     m_presentFeedback = presentFeedback;
 }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> f48039ea1d566beb7dea6e01e3dbafd82c5eeeb1
 SSVEP *SsvepGL::ssvep() const
 {
     return m_ssvep;
@@ -705,56 +922,69 @@ bool SsvepGL::isCorrect() const
     return m_sessionFeedback[m_currentFlicker].digitValue() == m_flickeringSequence->sequence[m_currentFlicker];
 }
 
+bool SsvepGL::isCorrect() const
+{
+    return m_sessionFeedback[m_sessionFeedback.length()-1].digitValue() == m_flickeringSequence->sequence[m_currentFlicker];
+}
+
 void SsvepGL::update()
 {
+<<<<<<< HEAD
     //   qDebug()<< "[update ] Index : "<< m_lostFrames << " " << m_index << "current time: " << QTime::currentTime().msec();
+=======
+    // qDebug()<< "[update ] Index : "<< m_lostFrames << " " << m_index << "current time: " << QTime::currentTime().msec();
+>>>>>>> f48039ea1d566beb7dea6e01e3dbafd82c5eeeb1
 
-    // temporary hack
-    if (m_lostFrames <= 7)
+    if(m_index == 0)
     {
+<<<<<<< HEAD
         //if(m_lostFrames == 0)
         //  qDebug()<< "[update ] first: incorrect" << QTime::currentTime();
+=======
+        // qDebug()<< "[update ] first correct: " << QTime::currentTime();
+        sendMarker(config::OVTK_StimulationLabel_Base + m_flickeringSequence->sequence[m_currentFlicker]);
+        sendMarker(OVTK_StimulationId_VisualSteadyStateStimulationStart);
+>>>>>>> f48039ea1d566beb7dea6e01e3dbafd82c5eeeb1
     }
-    else
-    {
 
+<<<<<<< HEAD
         if(m_index == -1)
         {
             //  qDebug()<< "[update ] first correct: " << QTime::currentTime();
             sendMarker(config::OVTK_StimulationLabel_Base + m_flickeringSequence->sequence[m_currentFlicker]);
             sendMarker(OVTK_StimulationId_VisualSteadyStateStimulationStart);
         }
+=======
+    int k;
+>>>>>>> f48039ea1d566beb7dea6e01e3dbafd82c5eeeb1
 
-        int k;
-
-        if(m_ssvep->nrElements() == 1)
+    if(m_ssvep->nrElements() == 1)
+    {
+        k = 0;
+    }
+    else
+    {
+        if (m_ssvep->controlMode() == control_mode::SYNC)
         {
             k = 0;
         }
         else
         {
-            if (m_ssvep->controlMode() == control_mode::SYNC)
-            {
-                k = 0;
-            }
-            else
-            {
-                k = glUtils::POINTS_PER_SQUARE;
-            }
+            k = glUtils::POINTS_PER_SQUARE;
         }
-        for(int i = 0; i<m_flicker.size() ;++i)
-        {
-            m_colors[k]   = QVector3D(m_flicker[i][m_index], m_flicker[i][m_index], m_flicker[i][m_index]);
-            m_colors[k+1] = QVector3D(m_flicker[i][m_index], m_flicker[i][m_index], m_flicker[i][m_index]);
-            m_colors[k+2] = QVector3D(m_flicker[i][m_index], m_flicker[i][m_index], m_flicker[i][m_index]);
-            m_colors[k+3] = QVector3D(m_flicker[i][m_index], m_flicker[i][m_index], m_flicker[i][m_index]);
-            k += glUtils::POINTS_PER_SQUARE;
-        }
+    }
+    for(int i = 0; i<m_flicker.size() ;++i)
+    {
+        m_colors[k]   = QVector3D(m_flicker[i][m_index], m_flicker[i][m_index], m_flicker[i][m_index]);
+        m_colors[k+1] = QVector3D(m_flicker[i][m_index], m_flicker[i][m_index], m_flicker[i][m_index]);
+        m_colors[k+2] = QVector3D(m_flicker[i][m_index], m_flicker[i][m_index], m_flicker[i][m_index]);
+        m_colors[k+3] = QVector3D(m_flicker[i][m_index], m_flicker[i][m_index], m_flicker[i][m_index]);
 
-        ++m_index;
+        k += glUtils::POINTS_PER_SQUARE;
     }
 
-    ++m_lostFrames;
+    ++m_index;
+
     scheduleRedraw();
 }
 
@@ -808,6 +1038,10 @@ void SsvepGL::initExternalSocket()
     }
 }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> f48039ea1d566beb7dea6e01e3dbafd82c5eeeb1
 SsvepGL::~SsvepGL()
 {
     makeCurrent();
