@@ -633,7 +633,7 @@ bool SSVEPstimulation::isCorrect() const
 void SSVEPstimulation::update()
 {
     qDebug()<< "[update ] Index : "<< m_index << "current time: " << QTime::currentTime().msec();
-    if(m_lostFrames <= 5)
+    if(m_lostFrames <= 1)
     {
 
     }
