@@ -11,6 +11,7 @@
 //
 int main(int argc, char *argv[])
 {
+    QGuiApplication::setAttribute(Qt::AA_UseOpenGLES);
     QApplication app(argc, argv);
     QApplication::setApplicationName("StimUSTO");
     QApplication::setApplicationVersion("0.1.0-beta");
