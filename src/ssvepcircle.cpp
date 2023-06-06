@@ -40,7 +40,7 @@ void SsvepCircle::initCenters()
 {
     int n_elements = m_ssvep->nrElements();
     QSize screenSize = utils::getScreenSize();
-    float radiusx = glUtils::STIM_RADIUS / (screenSize.width() * glUtils::PIXEL_CM);
+    float radiusx = glUtils::STIM_RADIUS / (screenSize.width()  * glUtils::PIXEL_CM);
     float radiusy = glUtils::STIM_RADIUS / (screenSize.height() * glUtils::PIXEL_CM);
     int start = 0;
 

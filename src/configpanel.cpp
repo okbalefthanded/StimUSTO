@@ -512,7 +512,7 @@ SSVEPstimulation *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
     else
     {
      //   ssvepStimulation->resize(QSize(1366, 768)); // temporaty size;
-         ssvepStimulation->resize(QSize(1920, 1080)); // temporaty size;
+         ssvepStimulation->resize(utils::getScreenSize()); // temporaty size;
     }
 
     connectStimulation(ssvepStimulation);

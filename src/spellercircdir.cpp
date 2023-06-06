@@ -119,6 +119,8 @@ void SpellerCircDir::feedback()
 void SpellerCircDir::createLayout()
 {
     // qDebug()<< Q_FUNC_INFO;
+    QSize screenSize = utils::getScreenSize();
+    int px = screenSize.width() * 0.09375;
     // speller settings
     m_rows = 2;
     m_cols = 4;
@@ -150,7 +152,8 @@ void SpellerCircDir::createLayout()
     {
         // m_multStimuli[i] = m_multStimuli[i].scaled(130, 130, Qt::KeepAspectRatio);
         // m_multStimuli[i] = m_multStimuli[i].scaled(150, 150, Qt::KeepAspectRatio);
-        m_multStimuli[i] = m_multStimuli[i].scaled(180, 180, Qt::KeepAspectRatio);
+        // m_multStimuli[i] = m_multStimuli[i].scaled(180, 180, Qt::KeepAspectRatio);
+        m_multStimuli[i] = m_multStimuli[i].scaled(px, px, Qt::KeepAspectRatio);
     }
 
     for (int i=0; i<m_nrElements; i++)

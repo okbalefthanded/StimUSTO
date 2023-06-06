@@ -279,7 +279,7 @@ bool Speller::Correct()
 
     if (m_trials == 0)
     {
-       return m_text[0] == m_desiredPhrase[0];
+        return m_text[0] == m_desiredPhrase[0];
     }
 
     else if(m_text.length() < m_desiredPhrase.length())
@@ -795,6 +795,8 @@ void Speller::setDesiredPhrase(const QString &t_desiredPhrase)
 void Speller::createLayout()
 {
     //  qDebug()<< Q_FUNC_INFO;
+    QSize screenSize = utils::getScreenSize();
+    int px = screenSize.width() * 0.09375;
     // speller settings
     m_rows = 3;
     m_cols = 3;
@@ -838,7 +840,8 @@ void Speller::createLayout()
     {
         // m_multStimuli[i] = m_multStimuli[i].scaled(130, 130, Qt::KeepAspectRatio);
         // m_multStimuli[i] = m_multStimuli[i].scaled(150, 150, Qt::KeepAspectRatio);
-        m_multStimuli[i] = m_multStimuli[i].scaled(180, 180, Qt::KeepAspectRatio);
+        // m_multStimuli[i] = m_multStimuli[i].scaled(180, 180, Qt::KeepAspectRatio);
+        m_multStimuli[i] = m_multStimuli[i].scaled(px, px, Qt::KeepAspectRatio);
     }
 
     // add speller ellements
@@ -899,12 +902,8 @@ void Speller::createLayout()
     // this->setStyleSheet("background-color:gray"); //brown
 }
 
-void Speller::refreshLayout()
-{
-    // TODO
-}
+void Speller::refreshLayout(){/* TODO */}
 
-Speller::~Speller()
-{
+Speller::~Speller(){
     // delete ui;
 }

@@ -144,7 +144,7 @@ protected:
 
     int m_index;
     int m_vertexPerCircle;
-
+    int tmp_t = 0;
     // QVector <QVector <int>> m_flicker;
     QVector<QVector3D> m_centerPoints;
     QVector <QVector <double> > m_flicker;

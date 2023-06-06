@@ -324,7 +324,7 @@ void SSVEPstimulation::Flickering()
 
     sendMarker(OVTK_StimulationId_TrialStop);
     m_state = trial_state::POST_TRIAL;
-
+    tmp_t = 0;
     disconnect(this, SIGNAL(frameSwapped()), this, SLOT(update()));
     refreshCircles();
 }
@@ -632,10 +632,12 @@ bool SSVEPstimulation::isCorrect() const
 
 void SSVEPstimulation::update()
 {
-    qDebug()<< "[update ] Index : "<< m_index << "current time: " << QTime::currentTime().msec();
-    if(m_lostFrames <= 5)
+    // int currt = QTime::currentTime().msec();
+    // qDebug()<< "[update ] Index : "<< m_index << "current time: " << currt << currt - tmp_t;
+    // tmp_t = currt;
+    if(m_lostFrames < 0)
     {
-
+        // do nothing
     }
     else
     {

@@ -13,7 +13,8 @@ void CircularLayout::setGeometry(const QRect &rect)
     QLayout::setGeometry(rect);
 
     const QSize screenSize = utils::getScreenSize();
-    const qreal radius = 440; // 320;//340; // in px  // screenSize.width() / 4.0; //4.3; // 5 //4; 4.5
+    // const qreal radius = 440; // 320;//340; // in px  // screenSize.width() / 4.0; //4.3; // 5 //4; 4.5
+    const qreal radius = screenSize.width() / 4.36;
     const QPointF center(screenSize.width() / 2.0, screenSize.height() / 2.0); //1920x1080, 1366x768 screensize
     QSize size;
     QRectF itemRect;
