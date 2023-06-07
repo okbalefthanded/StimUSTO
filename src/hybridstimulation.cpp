@@ -362,8 +362,6 @@ void HybridStimulation::hybridPostTrial()
         {
             erpColor = Qt::red;
         }
-        // qDebug() << Q_FUNC_INFO << "ERP feedback: "   << m_ERPFeedback;
-        // qDebug() << Q_FUNC_INFO << "SSVEP feedback: " << m_SSVEPFeedback;
     }
 
     // m_hybridCommand = m_ERPFeedback[m_currentTrial] + m_SSVEPFeedback.at(m_currentTrial);
@@ -372,7 +370,6 @@ void HybridStimulation::hybridPostTrial()
     // show feedback on SSVEP
     if (m_hybridStimulation->m_order == order::ERP_FIRST)
     {
-        // qDebug()<< m_ERPFeedback[m_ERPFeedback.length() - 1] << "  " << m_ERPFeedback[m_ERPFeedback.length() - 1].digitValue();
         m_ssvepStimulation->setExternalFeedback(m_ERPFeedback[m_ERPFeedback.length() - 1].digitValue(), erpColor);
     }
 
@@ -438,22 +435,6 @@ void HybridStimulation::hybridPostTrial()
 
     }
 
-    /*
-    else
-    {
-        // increase waiting time after feedabck by 500 or 1000 ms (experimenting with 2000ms)
-        // only when control of external device is disabled
-        utils::wait(1000); // 1000
-    }
-    */
-
-    /*
-    if (m_hybridCommand[0] != '#' && doExternalComm)
-    {
-       // externalComm();
-         m_externComm->communicate(m_hybridCommand);
-    }
-    */
     //
     hybridPostTrialEnd();
 }
