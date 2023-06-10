@@ -34,6 +34,10 @@ HybridStimulation::HybridStimulation(Hybrid *hybridStimulation, Speller *ERPspel
     //
     m_ssvepStimulation->m_firstRun = false;
     m_ssvepStimulation->m_flickeringSequence = new RandomFlashSequence(1, 1);
+
+    qDebug()<<" ERP   "<<m_hybridStimulation->m_ERPparadigm->desiredPhrase();
+    qDebug()<<" SSVEP "<<m_hybridStimulation->m_SSVEPparadigm->desiredPhrase();
+
     /*
     m_ssvepStimulation->m_flickeringSequence = new RandomFlashSequence(1, 1);
 

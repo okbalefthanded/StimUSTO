@@ -647,9 +647,9 @@ bool SSVEPstimulation::isCorrect() const
 
 void SSVEPstimulation::update()
 {
-    double currt =  QTime::currentTime().msec();
-    qDebug()<< "[update ] Index : "<< m_index << "current time: " << currt-time_tmp;
-    time_tmp = currt;
+    // double currt =  QTime::currentTime().msec();
+    //qDebug()<< "[update ] Index : "<< m_index << "current time: " << currt-time_tmp;
+    // time_tmp = currt;
     if(m_index == 0)
     {
         sendMarker(config::OVTK_StimulationLabel_Base + m_flickeringSequence->sequence[m_currentFlicker]);

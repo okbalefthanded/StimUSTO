@@ -86,7 +86,7 @@ void Hybrid::fromVariant(const QVariant &variant)
 {
     QVariantMap map = variant.toMap();
     int n_erpelement = 9;
-    int repetitions = 4;
+    int repetitions  = 4;
     m_type = map.value("paradigymType").toUInt();
     m_experimentMode = map.value("experimentMode").toUInt();
 
@@ -184,7 +184,4 @@ void Hybrid::fromVariant(const QVariant &variant)
     }
 }
 
-Hybrid::~Hybrid()
-{
-
-}
+Hybrid::~Hybrid(){}

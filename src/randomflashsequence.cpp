@@ -12,7 +12,10 @@ RandomFlashSequence::RandomFlashSequence(QObject *parent) : QObject(parent)
 }
 RandomFlashSequence::RandomFlashSequence(int length, int nr_sequences, int min_dist, bool repetition)
 {
-    srand(time(0));
+    // srand(time(0));
+    // srand(time(0));
+    qDebug()<< time(NULL);
+    srand(time(NULL));
     QVector<int> list(length);
     QVector<int> l(length);
 
