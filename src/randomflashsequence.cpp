@@ -2,25 +2,34 @@
 #include <QVector>
 #include <QList>
 #include <algorithm>
+#include <random>
 #include <time.h>
 #include <QtDebug>
 //using namespace std;
 
-RandomFlashSequence::RandomFlashSequence(QObject *parent) : QObject(parent)
-{
+RandomFlashSequence::RandomFlashSequence(QObject *parent) : QObject(parent){}
 
-}
 RandomFlashSequence::RandomFlashSequence(int length, int nr_sequences, int min_dist, bool repetition)
 {
     // srand(time(0));
     // srand(time(0));
-    qDebug()<< time(NULL);
+    // qDebug()<< time(NULL);
     srand(time(NULL));
     QVector<int> list(length);
     QVector<int> l(length);
 
+    // std::random_device rd;
+    // std::mt19937 g(rd());
+
+    std::random_device r;
+    std::seed_seq seed{r(), r(), r(), r(), r(), r(), r(), r()};
+    std::mt19937 eng(seed);
+
     std::iota(list.begin(), list.end(), 1);
-    std::random_shuffle(list.begin(), list.end());
+    // std::random_shuffle(list.begin(), list.end(), g); removed in c++17
+    // std::shuffle(list.begin(), list.end(), g);
+    std::shuffle(list.begin(), list.end(), eng);
+
     l = list;
 
     for (int i=1; i<nr_sequences; i++)
