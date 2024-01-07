@@ -35,8 +35,8 @@ HybridStimulation::HybridStimulation(Hybrid *hybridStimulation, Speller *ERPspel
     m_ssvepStimulation->m_firstRun = false;
     m_ssvepStimulation->m_flickeringSequence = new RandomFlashSequence(1, 1);
 
-    qDebug()<<" ERP   "<<m_hybridStimulation->m_ERPparadigm->desiredPhrase();
-    qDebug()<<" SSVEP "<<m_hybridStimulation->m_SSVEPparadigm->desiredPhrase();
+    // qDebug()<<" ERP   "<<m_hybridStimulation->m_ERPparadigm->desiredPhrase();
+    // qDebug()<<" SSVEP "<<m_hybridStimulation->m_SSVEPparadigm->desiredPhrase();
 
     /*
     m_ssvepStimulation->m_flickeringSequence = new RandomFlashSequence(1, 1);
@@ -194,7 +194,7 @@ void HybridStimulation::swichStimWindows()
     QColor fbkColor = Qt::black;
 
     // ERP FIRST IN ORDER
-    if(m_hybridStimulation->m_order ==   order::ERP_FIRST)
+    if(m_hybridStimulation->m_order == order::ERP_FIRST)
     {
         // ERP TRIAL
         if(m_switchStimulation)
@@ -208,7 +208,10 @@ void HybridStimulation::swichStimWindows()
             }
             else
             {
+                // qDebug()<<"animate";
+                // sendMarker(OVTK_StimulationId_SegmentStart);
                 m_ERPanimation->start();
+                // sendMarker(OVTK_StimulationId_SegmentStart);
                 // m_ERPspeller->show();
                 m_ERPspeller->showFullScreen();
                 m_ssvepStimulation->hide();
@@ -218,7 +221,10 @@ void HybridStimulation::swichStimWindows()
         else
         {
             m_ssvepStimulation->setScreen(QGuiApplication::screens().last());
+            //qDebug()<<"animate";
+            //sendMarker(OVTK_StimulationId_SegmentStart);
             m_SSVEPanimation->start();
+
             m_ssvepStimulation->showFullScreen();
             m_ERPspeller->hide();
             m_ERPFeedback    = m_ERPspeller->m_text;
@@ -244,7 +250,10 @@ void HybridStimulation::swichStimWindows()
             else
             {
                 m_ssvepStimulation->setScreen(QGuiApplication::screens().last());
+                // qDebug()<<"animate";
+                // sendMarker(OVTK_StimulationId_SegmentStart);
                 m_SSVEPanimation->start();
+                // sendMarker(OVTK_StimulationId_SegmentStart);
                  // QCoreApplication::processEvents(QEventLoop::AllEvents);
                 //  m_ssvepStimulation->setScreen(QGuiApplication::screens().last());
                 m_ssvepStimulation->showFullScreen();
@@ -255,8 +264,10 @@ void HybridStimulation::swichStimWindows()
             }
         }
         else
-        {
+        {   // qDebug()<<"animate";
+            //sendMarker(OVTK_StimulationId_SegmentStart);
             m_ERPanimation->start();
+            // sendMarker(OVTK_StimulationId_SegmentStart);
             // m_ERPspeller->show();
             m_ERPspeller->showFullScreen();
             m_ssvepStimulation->hide();
@@ -289,6 +300,7 @@ void HybridStimulation::initExternalComm()
     }*/
 }
 
+/*
 void HybridStimulation::externalComm()
 {
     if(m_hybridStimulation->externalComm() == external_comm::ENABLED)
@@ -344,7 +356,7 @@ void HybridStimulation::externalComm()
     m_robotSocket->writeDatagram(Data, QHostAddress("10.3.66.5"), m_robotPort);
     */
     //
-}
+//}
 
 void HybridStimulation::hybridPostTrial()
 {
@@ -418,7 +430,8 @@ void HybridStimulation::hybridPostTrial()
                 directionFeedback = m_ERPFeedback[m_ERPFeedback.length() - 1];
                 directionDesired  = m_ERPspeller->getDesiredPhrase();
             }
-
+          // This feature is temporarly executed in the ERP speller.
+            /*
             if(directionFeedback != directionDesired)
             {
                 doExternalComm = false;
@@ -427,7 +440,7 @@ void HybridStimulation::hybridPostTrial()
             else
             {
                 doExternalComm = true;
-            }
+            }*/
         }
 
         if (m_hybridCommand[0] != '#' && doExternalComm)

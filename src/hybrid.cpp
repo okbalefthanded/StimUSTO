@@ -1,4 +1,5 @@
 //
+#include<algorithm>
 #include <QtDebug>
 //
 #include "hybrid.h"
@@ -176,6 +177,8 @@ void Hybrid::fromVariant(const QVariant &variant)
         int n_ssvepSequences = m_SSVEPparadigm->nrSequences() / m_SSVEPparadigm->nrElements();
         RandomFlashSequence *rfseq = new RandomFlashSequence(m_SSVEPparadigm->nrElements(),
                                                              n_ssvepSequences); // 6
+
+        std::random_shuffle(rfseq->sequence.begin(), rfseq->sequence.end());
         m_SSVEPparadigm->setDesiredPhrase(rfseq->toString());
     }
     else

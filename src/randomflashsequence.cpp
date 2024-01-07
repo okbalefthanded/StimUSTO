@@ -14,21 +14,22 @@ RandomFlashSequence::RandomFlashSequence(int length, int nr_sequences, int min_d
     // srand(time(0));
     // srand(time(0));
     // qDebug()<< time(NULL);
-    srand(time(NULL));
+    srand(time(0));
     QVector<int> list(length);
     QVector<int> l(length);
 
     // std::random_device rd;
     // std::mt19937 g(rd());
 
-    std::random_device r;
-    std::seed_seq seed{r(), r(), r(), r(), r(), r(), r(), r()};
-    std::mt19937 eng(seed);
+    // std::random_device r;
+    // std::seed_seq seed{r(), r(), r(), r(), r(), r(), r(), r()};
+    // std::mt19937 eng(seed);
 
     std::iota(list.begin(), list.end(), 1);
+    std::random_shuffle(list.begin(), list.end());
     // std::random_shuffle(list.begin(), list.end(), g); removed in c++17
     // std::shuffle(list.begin(), list.end(), g);
-    std::shuffle(list.begin(), list.end(), eng);
+    // std::shuffle(list.begin(), list.end(), eng);
 
     l = list;
 

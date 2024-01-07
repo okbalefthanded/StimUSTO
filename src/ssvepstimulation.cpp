@@ -237,7 +237,6 @@ void SSVEPstimulation::postTrial()
         {
             // feedback for 0.5 sec & refresh
             // utils::wait(300);
-
             utils::wait(500);
             refresh(m_sessionFeedback[m_currentFlicker].digitValue()-1);
         }
@@ -266,6 +265,8 @@ void SSVEPstimulation::postTrial()
 void SSVEPstimulation::postTrialEnd()
 {
    // qDebug()<< Q_FUNC_INFO << m_flickeringSequence->sequence.length();
+    sendMarker(OVTK_StimulationId_SegmentStart);
+
     ++m_currentFlicker;
     ++m_trials;
 
@@ -647,9 +648,12 @@ bool SSVEPstimulation::isCorrect() const
 
 void SSVEPstimulation::update()
 {
-    // double currt =  QTime::currentTime().msec();
-    //qDebug()<< "[update ] Index : "<< m_index << "current time: " << currt-time_tmp;
-    // time_tmp = currt;
+    /*
+    double currt =  QTime::currentTime().msec();
+    qDebug()<< "[update ] Index : "<< m_index << "current time: " << currt-time_tmp;
+    time_tmp = currt;
+   */
+
     if(m_index == 0)
     {
         sendMarker(config::OVTK_StimulationLabel_Base + m_flickeringSequence->sequence[m_currentFlicker]);
