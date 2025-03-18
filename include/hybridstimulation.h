@@ -32,6 +32,7 @@ public:
     void initSSVEP(SSVEP *ssvep);
 
 signals:
+    void markerTag(uint64_t ovStimulation);
     void experimentEnd();
 private slots:
     void hybridPreTrial();
@@ -42,9 +43,13 @@ private slots:
     void switchState();
     void swichStimWindows();
     void initExternalComm();
-    void externalComm();
+    // void externalComm();
     void terminateExperiment();
     void initAnimations();
+
+    void sendMarker(uint64_t t_ovStimulation){
+        emit markerTag(t_ovStimulation);
+    }
 
 private:
     int m_hybridState = trial_state::PRE_TRIAL;

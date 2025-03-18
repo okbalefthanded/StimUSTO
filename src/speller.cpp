@@ -287,7 +287,7 @@ bool Speller::Correct()
 
     if (m_trials == 0)
     {
-       return m_text[0] == m_desiredPhrase[0];
+        return m_text[0] == m_desiredPhrase[0];
     }
 
     else if(m_text.length() < m_desiredPhrase.length())
@@ -455,9 +455,14 @@ void Speller::endPreTrial()
 
 void Speller::postTrialEnd()
 {
+<<<<<<< HEAD
     // sendMarker(OVTK_StimulationId_VisualStimulationStop);
     utils::wait(500 - m_delay);// 500 // 1000
+=======
+    utils::wait(500);// 1000 // make this for single ERP only
+>>>>>>> c03437bda5b9454c45fd05cd1126421ae00b5e3e
     //
+    sendMarker(OVTK_StimulationId_SegmentStart);
     m_currentStimulation = 0;
     m_state = trial_state::PRE_TRIAL;
     //
@@ -482,8 +487,19 @@ void Speller::postTrialEnd()
     else if(m_desiredPhrase.length() <= 1)
     {
         m_currentLetter = 0;
-        emit(slotTerminated());
-        return;
+        // test if correct
+        //qDebug()<< m_desiredPhrase << " "<<m_text[m_text.length()-1];
+        if (m_desiredPhrase != m_text[m_text.length()-1])
+        {
+            //
+            startTrial();
+        }
+        else
+        {
+            sendMarker(OVTK_StimulationId_RestStart);
+            emit(slotTerminated());
+            return;
+        }
     }
     else
     {

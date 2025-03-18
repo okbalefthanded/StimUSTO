@@ -251,7 +251,6 @@ void SSVEPstimulation::postTrial()
         {
             // feedback for 0.5 sec & refresh
             // utils::wait(300);
-
             utils::wait(500);
             refresh(m_sessionFeedback[m_currentFlicker].digitValue()-1);
         }
@@ -280,6 +279,8 @@ void SSVEPstimulation::postTrial()
 void SSVEPstimulation::postTrialEnd()
 {
    // qDebug()<< Q_FUNC_INFO << m_flickeringSequence->sequence.length();
+    sendMarker(OVTK_StimulationId_SegmentStart);
+
     ++m_currentFlicker;
     ++m_trials;
 
@@ -680,11 +681,20 @@ bool SSVEPstimulation::isCorrect() const
 
 void SSVEPstimulation::update()
 {
+<<<<<<< HEAD
 
     logger->logFrame();
     double currt =  QTime::currentTime().msec();
     qDebug()<< "[update ] Index : "<< m_index << "current time: " << currt-time_tmp;
     time_tmp = currt;
+=======
+    /*
+    double currt =  QTime::currentTime().msec();
+    qDebug()<< "[update ] Index : "<< m_index << "current time: " << currt-time_tmp;
+    time_tmp = currt;
+   */
+
+>>>>>>> c03437bda5b9454c45fd05cd1126421ae00b5e3e
     if(m_index == 0)
     {
         correctortimer->start(); // hacky solution
