@@ -132,6 +132,7 @@ protected:
     //
     int m_preTrialWait = 1; // 2 seconds
     int m_preTrialCount = 0;
+    int m_delay = 0; // in ms
     quint16 m_feedbackPort = 12345;
 
     QString m_desiredPhrase = "";

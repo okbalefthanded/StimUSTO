@@ -1,6 +1,7 @@
 #include <QtMath>
 #include <QDebug>
 #include <QTime>
+#include <QElapsedTimer>
 //
 #include "utils.h"
 //
@@ -69,16 +70,19 @@ QVector<double> gen_flick_sin(double freq, int refreshRate, float length, double
 //
 void wait(int millisecondsToWait)
 {
-    //    qDebug()<< Q_FUNC_INFO;
+    //qDebug()<< Q_FUNC_INFO;
 
     // from stackoverflow question:
     // http://stackoverflow.com/questions/3752742/how-do-i-create-a-pause-wait-function-using-qt
-    QTime dieTime = QTime::currentTime().addMSecs( millisecondsToWait );
-    while( QTime::currentTime() < dieTime )
+    // QTime dieTime = QTime::currentTime().addMSecs( millisecondsToWait );
+    // while( QTime::currentTime() < dieTime )
+    QElapsedTimer timer;
+    timer.start();
+    while( timer.nsecsElapsed() <  millisecondsToWait*1000000)
     {
         // qDebug()<<"waiting..."<<QTime::currentTime();
-        QCoreApplication::processEvents( QEventLoop::AllEvents, 100);
-
+        // QCoreApplication::processEvents( QEventLoop::AllEvents, 100);
+        QCoreApplication::processEvents();
     }
 }
 //

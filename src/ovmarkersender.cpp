@@ -2,11 +2,12 @@
 #include "ovtk_stimulations.h"
 #include <QMessageBox>
 #include <QDataStream>
-
+#include <QDebug>
 
 OVMarkerSender::OVMarkerSender(QObject *parent)
     : QObject(parent), m_socket(new QTcpSocket(this))
 {
+    m_socket->setSocketOption(QAbstractSocket::LowDelayOption, QVariant::fromValue(1));
 
 }
 
@@ -22,8 +23,6 @@ OVMarkerSender::~OVMarkerSender()
 
 bool OVMarkerSender::Connect(QString t_asAddress, QString t_asTcpTagPort)
 {
-
-
     qDebug() << "Connection Adress: " << t_asAddress;
     qDebug() << "Connection Port : " << t_asTcpTagPort;
 
@@ -45,10 +44,8 @@ bool OVMarkerSender::Connect(QString t_asAddress, QString t_asTcpTagPort)
 }
 
 bool OVMarkerSender::sendStimulation(uint64_t t_ovStimulation)
-
 {
-
-    if ( !m_connectedOnce)
+    if (!m_connectedOnce)
     {
         qDebug()<< "Not sending Tag ";
         return false;
@@ -56,26 +53,25 @@ bool OVMarkerSender::sendStimulation(uint64_t t_ovStimulation)
 
     if (!m_socket->isOpen())
     {
-
         qDebug()<< "Not sending Tag : Send Stimulation Cannot send stimulation socket is not open";
         return false;
     }
 
     uint64_t timeStamp = 0;
+    uint64_t flags = 0;
+    // [uint64 flags ; uint64 stimulation_identifier ; uint64 timestamp] OV 2.0.1 and later
     try
-
     {
         QByteArray byteovStimulation;
         QDataStream streamovs(&byteovStimulation, QIODevice::WriteOnly);
         streamovs.setByteOrder(QDataStream::LittleEndian);
-        streamovs << timeStamp << t_ovStimulation << timeStamp;
+        streamovs << flags << t_ovStimulation << timeStamp;
         m_socket->write(byteovStimulation);
         m_socket->waitForBytesWritten();
     }
 
     catch(...)
     {
-
         qDebug() <<"Send Stimulation, Issue With writting Stimulus";
     }
 

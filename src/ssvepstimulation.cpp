@@ -8,11 +8,17 @@
 #include <QPainter>
 #include <QFont>
 #include <array>
+#include <QElapsedTimer>
+#include <QtMath>
+#include <dwmapi.h>  // Windows DWM API
 //
 #include "ssvepstimulation.h"
 #include "ovtk_stimulations.h"
 #include "utils.h"
 #include "glutils.h"
+#include "framelogger.h"
+
+
 
 SSVEPstimulation::SSVEPstimulation(SSVEP *paradigm, int t_port)
 {
@@ -39,6 +45,9 @@ SSVEPstimulation::SSVEPstimulation(SSVEP *paradigm, int t_port)
     initLogger();
 
     m_state = trial_state::PRE_TRIAL;
+    correctortimer = new QElapsedTimer();
+    QString loggerFname = QCoreApplication::applicationDirPath() + "/frame_log_win11_" + QDateTime::currentDateTime().toString("yyyy_MM_dd_HH.mm.ss.zzz") + ".csv";
+    logger = new FrameLogger(loggerFname);
 }
 
 SSVEPstimulation::SSVEPstimulation(){}
@@ -214,6 +223,11 @@ void SSVEPstimulation::preTrial()
         m_preTrialTimer->stop();
         m_preTrialCount = 1;
         m_state = trial_state::STIMULUS;
+
+        if(m_index == 0)
+        {
+            connect(this, SIGNAL(frameSwapped()), this, SLOT(update()));
+        }
     }
 }
 
@@ -299,11 +313,14 @@ void SSVEPstimulation::postTrialEnd()
 
 void SSVEPstimulation::Flickering()
 {
+    qint64 elapsedMs = 0;
+    /*
     if(m_index == 0)
     {
+
         connect(this, SIGNAL(frameSwapped()), this, SLOT(update()));
     }
-
+    */
     while(m_index <= m_flicker[0].size())
     {
         QCoreApplication::processEvents(QEventLoop::AllEvents);
@@ -320,11 +337,20 @@ void SSVEPstimulation::Flickering()
     }
     */
 
+    disconnect(this, SIGNAL(frameSwapped()), this, SLOT(update()));
+    elapsedMs = correctortimer->elapsed();
+    refreshCircles();
+    // hack
+    /*
+    if (elapsedMs < m_ssvep->stimulationDuration())
+    {
+        utils::wait(m_ssvep->stimulationDuration() - elapsedMs);
+    }
+    */
+    //
     sendMarker(OVTK_StimulationId_TrialStop);
     m_state = trial_state::POST_TRIAL;
 
-    disconnect(this, SIGNAL(frameSwapped()), this, SLOT(update()));
-    refreshCircles();
 }
 
 void SSVEPstimulation::feedback()
@@ -547,6 +573,12 @@ void SSVEPstimulation::initLogger()
 
 void SSVEPstimulation::scheduleRedraw()
 {
+    HRESULT hr = DwmFlush();  // Forces DWM to flush rendering
+    if (SUCCEEDED(hr)) {
+        qDebug() << "DWM flush succeeded";
+    } else {
+        qDebug() << "DWM flush failed with error code:" << hr;
+    }
     m_vaObject.bind();
     m_colorBuffer.bind();
     m_colorBuffer.write(0, m_colors.data(), m_colors.count() * sizeof(QVector3D)); // number of vertices to avoid * sizeof QVector3D
@@ -554,6 +586,7 @@ void SSVEPstimulation::scheduleRedraw()
     m_colorBuffer.release();
 
     QOpenGLWindow::update();
+
 }
 
 void SSVEPstimulation::renderText()
@@ -647,11 +680,14 @@ bool SSVEPstimulation::isCorrect() const
 
 void SSVEPstimulation::update()
 {
-    // double currt =  QTime::currentTime().msec();
-    //qDebug()<< "[update ] Index : "<< m_index << "current time: " << currt-time_tmp;
-    // time_tmp = currt;
+
+    logger->logFrame();
+    double currt =  QTime::currentTime().msec();
+    qDebug()<< "[update ] Index : "<< m_index << "current time: " << currt-time_tmp;
+    time_tmp = currt;
     if(m_index == 0)
     {
+        correctortimer->start(); // hacky solution
         sendMarker(config::OVTK_StimulationLabel_Base + m_flickeringSequence->sequence[m_currentFlicker]);
         sendMarker(OVTK_StimulationId_VisualSteadyStateStimulationStart);
     }
@@ -672,8 +708,8 @@ void SSVEPstimulation::update()
     }
 
     ++m_index;
-
     scheduleRedraw();
+    logger->logFrame();
 }
 
 // Setters

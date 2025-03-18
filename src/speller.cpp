@@ -132,7 +132,15 @@ void Speller::preTrial()
 
 void Speller::feedback()
 {
+
+    int start = 0, end = 0;
+
+    start = QTime::currentTime().msec();
     receiveFeedback();
+    end = QTime::currentTime().msec();
+    if (end < start) end += 1000;
+    m_delay = end - start; // account for the delay in OV python3 box in TrialStop
+
     m_textRow->setText(m_text);
 
     //  qDebug()<< Q_FUNC_INFO << m_text[m_text.length()-1];
@@ -183,7 +191,6 @@ void Speller::feedback()
 void Speller::postTrial()
 {
     // qDebug()<< Q_FUNC_INFO;
-
     ++m_trials;
     // m_currentStimulation = 0;
     // m_state = trial_state::PRE_TRIAL;
@@ -199,6 +206,7 @@ void Speller::postTrial()
         // utils::wait(1000);
         // utils::wait(500);
         // utils::wait(250); // showing feedback for 0.25 sec
+        // sendMarker(OVTK_StimulationId_VisualStimulationStop);
         utils::wait(100);
         if (m_text[m_text.length()-1] != "#")
         {
@@ -447,7 +455,8 @@ void Speller::endPreTrial()
 
 void Speller::postTrialEnd()
 {
-    utils::wait(500);// 1000
+    // sendMarker(OVTK_StimulationId_VisualStimulationStop);
+    utils::wait(500 - m_delay);// 500 // 1000
     //
     m_currentStimulation = 0;
     m_state = trial_state::PRE_TRIAL;
@@ -492,9 +501,11 @@ void Speller::trialEnd()
         m_isiTimer->stop();
         m_stimTimer->stop();
 
+        // sendMarker(OVTK_StimulationId_VisualStimulationStop);
         // utils::wait(1000); // time window after last epoch/stim
         utils::wait(500);
         // utils::wait(700); // 700 ms == epoch time windows
+
         sendMarker(OVTK_StimulationId_TrialStop);
         m_state = trial_state::FEEDBACK;
 

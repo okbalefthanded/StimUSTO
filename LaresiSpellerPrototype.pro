@@ -8,6 +8,7 @@ QT       += core gui network opengl multimedia
 
 CONFIG += c++11 console
 # CONFIG += c++11
+LIBS += -ldwmapi # DWM API
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -60,6 +61,7 @@ HEADERS  += include\configpanel.h \
     include/doubleerp.h \
     include/doublessvep.h \
     include/externComm.h \
+    include/framelogger.h \
     include/hybrid.h \
     include/hybriderp.h \
     include/hybridssvep.h \

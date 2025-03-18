@@ -470,7 +470,8 @@ SSVEPstimulation *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
     format.setRenderableType(QSurfaceFormat::OpenGL);
     format.setProfile(QSurfaceFormat::CoreProfile);
     format.setSwapInterval(1); // vsync on
-    format.setSwapBehavior(QSurfaceFormat::TripleBuffer); //
+    format.setSwapBehavior(QSurfaceFormat::DefaultSwapBehavior);
+    // format.setSwapBehavior(QSurfaceFormat::TripleBuffer); //
     // format.setVersion(3,0);
     format.setVersion(3, 0); // ANGLE supports ES 3.0, higher versions raise exceptions
     // format.setVersion(4, 5); // HP ProBook

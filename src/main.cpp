@@ -9,6 +9,9 @@
 #include "configpanel.h"
 #include "jsonserializer.h"
 //
+#include <dwmapi.h>
+#pragma comment(lib, "Dwmapi.lib")
+
 int main(int argc, char *argv[])
 {
     QGuiApplication::setAttribute(Qt::AA_UseOpenGLES);

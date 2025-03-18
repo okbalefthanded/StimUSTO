@@ -12,11 +12,13 @@
 #include <QVector3D>
 #include <QDebug>
 #include <QTcpSocket>
+#include <QElapsedTimer>
 //
 #include "randomflashsequence.h"
 #include "ssvep.h"
 #include "logger.h"
 #include "externComm.h"
+#include "framelogger.h"
 
 class SSVEPstimulation : public QOpenGLWindow, protected QOpenGLFunctions
 {
@@ -129,11 +131,12 @@ protected:
     QUdpSocket *m_feedbackSocket;
     // Timers
     QTimer *m_preTrialTimer;
-
+    QElapsedTimer *correctortimer;
     RandomFlashSequence *m_flickeringSequence;
 
     // logger
     Logger *log;
+    FrameLogger *logger;
 
     // OpenGL State Information
     QOpenGLBuffer m_vertexBuffer; //vbo
