@@ -8,7 +8,6 @@ OVMarkerSender::OVMarkerSender(QObject *parent)
     : QObject(parent), m_socket(new QTcpSocket(this))
 {
     m_socket->setSocketOption(QAbstractSocket::LowDelayOption, QVariant::fromValue(1));
-
 }
 
 OVMarkerSender::~OVMarkerSender()
@@ -17,7 +16,6 @@ OVMarkerSender::~OVMarkerSender()
     {
         m_socket->close();
         qDebug() << "Socket Closed";
-
     }
 }
 
@@ -67,7 +65,7 @@ bool OVMarkerSender::sendStimulation(uint64_t t_ovStimulation)
         streamovs.setByteOrder(QDataStream::LittleEndian);
         streamovs << flags << t_ovStimulation << timeStamp;
         m_socket->write(byteovStimulation);
-        m_socket->waitForBytesWritten();
+        m_socket->waitForBytesWritten(10);
     }
 
     catch(...)

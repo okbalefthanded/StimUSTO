@@ -4,21 +4,26 @@
 #include "paradigm.h"
 #include "utils.h"
 //
-Paradigm::Paradigm(quint8 mode, quint8 control, quint8 type, quint8 comm, int dur, quint8 bDur,
-                   quint8 nrSeq, quint8 stype, QString phrase, QString ip):
-    m_experimentMode(mode), m_controlMode(control), m_type(type), m_externalComm(comm),
-    m_stimulationDuration(dur), m_breakDuration(bDur), m_nrSequences(nrSeq),
-    m_stimulationType(stype), m_desiredPhrase(phrase), m_externalAddress(ip)
-{
-
-}
+Paradigm::Paradigm(QString mode, QString control,
+                   QString type, QString comm,
+                   int dur, quint8 bDur,
+                   quint8 nrSeq, QString stype,
+                   QString phrase, QString ip):
+    m_experimentMode(mode), m_controlMode(control),
+    m_type(type), m_externalComm(comm),
+    m_stimulationDuration(dur), m_breakDuration(bDur),
+    m_nrSequences(nrSeq), m_stimulationType(stype),
+    m_desiredPhrase(phrase), m_externalAddress(ip)
+{}
 
 Paradigm::Paradigm():
-    m_experimentMode(operation_mode::CALIBRATION), m_controlMode(control_mode::SYNC), m_type(paradigm_type::ERP), m_externalComm(external_comm::DISABLED),
-    m_stimulationDuration(100), m_breakDuration(100), m_nrSequences(10), m_stimulationType(0), m_desiredPhrase("12345"), m_externalAddress("127.0.0.1")
-{
-
-}
+    m_experimentMode(operation_mode::CALIBRATION), m_controlMode(control_mode::SYNC),
+    m_type(paradigm_type::ERP), m_externalComm(external_comm::DISABLED),
+    m_stimulationDuration(100), m_breakDuration(100),
+    m_nrSequences(10), m_stimulationType(speller_type::MULTIPLE),
+    m_desiredPhrase("12345"),
+    m_externalAddress("127.0.0.1")
+{}
 
 QVariant Paradigm::toVariant() const
 {
@@ -40,40 +45,40 @@ QVariant Paradigm::toVariant() const
 void Paradigm::fromVariant(const QVariant &variant)
 {
     QVariantMap map = variant.toMap();
-    m_experimentMode = map.value("experimentMode").toInt();
-    m_controlMode = map.value("controlMode").toInt();
+    m_experimentMode = map.value("experimentMode").toString().toUpper();
+    m_controlMode = map.value("controlMode").toString().toUpper();
     if(map.value("externalComm").isNull())
     {
         m_externalComm = external_comm::DISABLED;
     }
     else
     {
-        m_externalComm = map.value("externalComm").toInt();
+        m_externalComm = map.value("externalComm").toString().toUpper();
     }
-    m_type = map.value("paradigmType").toInt();
+    m_type = map.value("paradigmType").toString().toUpper();
     m_stimulationDuration = map.value("stimulationDuration").toInt();
     m_breakDuration = map.value("breakDuration").toInt();
     m_nrSequences = map.value("nrSequences").toInt();
-    m_stimulationType = map.value("stimulationType").toInt();
+    m_stimulationType = map.value("stimulationType").toString().toUpper();
     m_desiredPhrase = map.value("desiredPhrase").toString();
 }
 
-int Paradigm::experimentMode() const
+QString Paradigm::experimentMode() const
 {
     return m_experimentMode;
 }
 
-void Paradigm::setExperimentMode(int t_experimentMode)
+void Paradigm::setExperimentMode(QString t_experimentMode)
 {
     m_experimentMode = t_experimentMode;
 }
 
-int Paradigm::type() const
+QString Paradigm::type() const
 {
     return m_type;
 }
 
-void Paradigm::setType(int t_type)
+void Paradigm::setType(QString t_type)
 {
     m_type = t_type;
 }
@@ -118,22 +123,22 @@ void Paradigm::setDesiredPhrase(const QString &t_desiredPhrase)
     m_desiredPhrase = t_desiredPhrase;
 }
 
-quint8 Paradigm::controlMode() const
+QString Paradigm::controlMode() const
 {
     return m_controlMode;
 }
 
-void Paradigm::setControlMode(const int t_controlMode)
+void Paradigm::setControlMode(const QString t_controlMode)
 {
     m_controlMode = t_controlMode;
 }
 
-quint8 Paradigm::externalComm() const
+QString Paradigm::externalComm() const
 {
     return m_externalComm;
 }
 
-void Paradigm::setExternalComm(const quint8 &externalComm)
+void Paradigm::setExternalComm(const QString &externalComm)
 {
     m_externalComm = externalComm;
 }
@@ -148,17 +153,14 @@ void Paradigm::setExternalAddress(const QString &externalAddress)
     m_externalAddress = externalAddress;
 }
 
-quint8 Paradigm::stimulationType() const
+QString Paradigm::stimulationType() const
 {
     return m_stimulationType;
 }
 
-void Paradigm::setStimulationType(quint8 newStimulationType)
+void Paradigm::setStimulationType(QString newStimulationType)
 {
     m_stimulationType = newStimulationType;
 }
 
-Paradigm::~Paradigm()
-{
-    
-}
+Paradigm::~Paradigm(){}

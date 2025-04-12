@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
 
     ConfigPanel w;
 
-    if(optionParser->value("nogui")=="True")
+    if(optionParser->value("nogui") == "True")
     {
         qDebug()<< "nogui" << optionParser->value("nogui");
         qDebug()<< "file" << optionParser->value("file");    

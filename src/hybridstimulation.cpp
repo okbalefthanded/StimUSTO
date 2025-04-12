@@ -55,7 +55,7 @@ HybridStimulation::HybridStimulation(Hybrid *hybridStimulation, Speller *ERPspel
         m_trials = 1;
     }
     else if(m_hybridStimulation->experimentMode() == operation_mode::COPY_MODE ||
-            operation_mode::FREE_MODE)
+            m_hybridStimulation->experimentMode() == operation_mode::FREE_MODE)
     {
 
         // if(m_hybridStimulation->m_ERPparadigm->stimulationType() != speller_type::SMALL)
@@ -542,8 +542,8 @@ void HybridStimulation::initAnimations()
 
 void HybridStimulation::initERPspeller(ERP *erp)
 {
-    int spellerType = erp->stimulationType();
-
+    QString spellerType = erp->stimulationType();
+    /*
     switch (spellerType)
     {
     case speller_type::FLASHING_SPELLER:
@@ -564,6 +564,21 @@ void HybridStimulation::initERPspeller(ERP *erp)
     }
         // TODO: add the rest of Spellers
     }
+    */
+    if (spellerType == speller_type::FLASHING_SPELLER)
+    {
+        m_ERPspeller = new FlashingSpeller();
+        // m_ERPspeller->initSpeller(erp);
+    }
+    else if (spellerType == speller_type::FACES_SPELLER ||
+             spellerType == speller_type::INVERTED_FACE ||
+             spellerType == speller_type::COLORED_FACE ||
+             spellerType == speller_type::INVERTED_COLORED_FACE)
+    {
+        m_ERPspeller = new FaceSpeller();
+        //m_ERPspeller->initSpeller(erp);
+    }
+    // TODO: add the rest of Spellers using else if statements
 
     if(m_hybridStimulation->m_order == order::SSVEP_FIRST)
     {

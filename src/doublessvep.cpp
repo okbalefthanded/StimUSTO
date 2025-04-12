@@ -17,7 +17,7 @@ DoubleSSVEP::DoubleSSVEP(SSVEP *first, SSVEP *second)
 {
     m_type = paradigm_type::DOUBLE_SSVEP;
 
-    m_1stParadigm = new SSVEP(first->experimentMode(),
+    m_1stParadigm = new SSVEP(first->experimentMode() ,
                               first->controlMode(),
                               first->type(),
                               external_comm::DISABLED,
@@ -104,16 +104,16 @@ void DoubleSSVEP::fromVariant(const QVariant &variant)
     }
 
     // 1st SSVEP config
-    m_1stParadigm->setExperimentMode(map.value("experimentMode").toInt());
-    m_1stParadigm->setControlMode(map.value("1st_controlMode").toInt());
-    m_1stParadigm->setType(map.value("paradigmType").toInt());
+    m_1stParadigm->setExperimentMode(map.value("experimentMode").toString().toUpper());
+    m_1stParadigm->setControlMode(map.value("1st_controlMode").toString().toUpper());
+    m_1stParadigm->setType(map.value("paradigmType").toString().toUpper());
     m_1stParadigm->setStimulationDuration(map.value("1st_stimulationDuration").toInt());
     m_1stParadigm->setBreakDuration(map.value("1st_breakDuration").toInt());
     m_1stParadigm->setNrSequences(map.value("1st_nrSequences").toInt());
     m_1stParadigm->setNrElements(map.value("1st_nrElements").toInt());
     m_1stParadigm->setFrequencies(map.value("1st_frequencies").toString());
     m_1stParadigm->setStimulationMode(map.value("1st_stimulationMode").toInt());
-    m_1stParadigm->setStimulationType(map.value("1st_stimulationType").toInt());
+    m_1stParadigm->setStimulationType(map.value("1st_stimulationType").toString().toUpper());
     QString str = map.value("1st_desiredPhrase").toString();
 
     if(str.isEmpty())
@@ -133,21 +133,21 @@ void DoubleSSVEP::fromVariant(const QVariant &variant)
     // 2nd SSVEP config
     if (map.contains("2nd_experimentMode")) // for ASYNC
     {
-        m_2ndParadigm->setExperimentMode(map.value("2nd_experimentMode").toInt());
+        m_2ndParadigm->setExperimentMode(map.value("2nd_experimentMode").toString().toUpper());
     }
     else
     {
-        m_2ndParadigm->setExperimentMode(map.value("experimentMode").toInt());
+        m_2ndParadigm->setExperimentMode(map.value("experimentMode").toString().toUpper());
     }
-    m_2ndParadigm->setControlMode(map.value("2nd_controlMode").toInt());
-    m_2ndParadigm->setType(map.value("paradigmType").toInt());
+    m_2ndParadigm->setControlMode(map.value("2nd_controlMode").toString().toUpper());
+    m_2ndParadigm->setType(map.value("paradigmType").toString().toUpper());
     m_2ndParadigm->setStimulationDuration(map.value("2nd_stimulationDuration").toInt());
     m_2ndParadigm->setBreakDuration(map.value("2nd_breakDuration").toInt());
     m_2ndParadigm->setNrSequences(map.value("2nd_nrSequences").toInt());
     m_2ndParadigm->setNrElements(map.value("2nd_nrElements").toInt());
     m_2ndParadigm->setFrequencies(map.value("2nd_frequencies").toString());
     m_2ndParadigm->setStimulationMode(map.value("2nd_stimulationMode").toInt());
-    m_2ndParadigm->setStimulationType(map.value("2nd_stimulationType").toInt());
+    m_2ndParadigm->setStimulationType(map.value("2nd_stimulationType").toString().toUpper());
 
     str = map.value("2nd_desiredPhrase").toString();
     if(str.isEmpty())

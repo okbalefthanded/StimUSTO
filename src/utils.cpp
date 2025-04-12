@@ -112,6 +112,40 @@ int screenCount()
     return QGuiApplication::screens().size();
 }
 
+int indexToGridCoordinates(int index, int gridSize=6)
+{
+    // Adjust index to 0-based
+    index--;
+
+    int row = index / gridSize;
+    int col = index % gridSize;
+
+    return row;
 }
+
+QVector<int> indexToRowColumn(int index, int rows, int cols)
+{
+    int length = (rows == cols || index <= rows) ? cols : rows;
+    QVector<int> set(length, 0);
+
+    for(int i=0; i<length; i++)
+    {
+
+        if (index <= rows) // rows
+        {
+            set[i] = 1 + ((index - 1) * cols) + i;
+        }
+        else // columns
+        {
+            set[i] = (index - rows) + (cols * i);
+        }
+    }
+
+    return set;
+}
+
+
+}
+
 
 

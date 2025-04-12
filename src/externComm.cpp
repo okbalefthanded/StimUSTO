@@ -1,7 +1,7 @@
 #include <QHostAddress>
 #include "externComm.h"
 
-ExternComm::ExternComm(const QString t_address, const quint16 t_port, const quint8 t_commState)
+ExternComm::ExternComm(const QString t_address, const quint16 t_port, const QString t_commState)
 {
     setMachinePort(t_port);
     setMachineAddress(t_address);

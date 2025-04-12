@@ -455,12 +455,9 @@ void Speller::endPreTrial()
 
 void Speller::postTrialEnd()
 {
-<<<<<<< HEAD
     // sendMarker(OVTK_StimulationId_VisualStimulationStop);
     utils::wait(500 - m_delay);// 500 // 1000
-=======
-    utils::wait(500);// 1000 // make this for single ERP only
->>>>>>> c03437bda5b9454c45fd05cd1126421ae00b5e3e
+    // utils::wait(500);// 1000 // make this for single ERP only
     //
     sendMarker(OVTK_StimulationId_SegmentStart);
     m_currentStimulation = 0;

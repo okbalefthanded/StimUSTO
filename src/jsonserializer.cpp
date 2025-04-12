@@ -4,10 +4,7 @@
 //
 #include "jsonserializer.h"
 //
-JsonSerializer::JsonSerializer()
-{
-
-}
+JsonSerializer::JsonSerializer(){}
 
 void JsonSerializer::save(const Serializable& serializable, const QString &filepath, const QString& /*rootName*/)
 {

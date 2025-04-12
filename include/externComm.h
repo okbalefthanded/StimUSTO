@@ -9,7 +9,7 @@ class ExternComm : public QObject
     Q_OBJECT
 
 public:
-    explicit ExternComm(const QString t_address, const quint16 t_port, const quint8 t_commState);
+    explicit ExternComm(const QString t_address, const quint16 t_port, const QString t_commState);
       ~ExternComm();
 
     const QString &command() const;
@@ -31,7 +31,7 @@ private:
     quint16 m_machinePort = 12347;
     QString m_machineAddress = "";
     QTcpSocket *m_machineSocket;
-    quint8 m_commState    = external_comm::DISABLED;
+    QString m_commState   = external_comm::DISABLED;
     quint8 m_machineState = machine_state::READY;
     bool m_blocking = false;
 };

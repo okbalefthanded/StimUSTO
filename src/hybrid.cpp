@@ -29,7 +29,8 @@ Hybrid::Hybrid(ERP *erp, SSVEP *ssvep)
                             erp->desiredPhrase(),
                             m_externalAddress,
                             erp->stimulationType(),
-                            erp->flashingMode()
+                            erp->flashingMode(),
+                            speller_language::ENGLISH
                             );
 
     m_SSVEPparadigm = new SSVEP(ssvep->experimentMode(),
@@ -118,14 +119,14 @@ void Hybrid::fromVariant(const QVariant &variant)
     }
 
     // ERP config
-    m_ERPparadigm->setExperimentMode(map.value("experimentMode").toInt());
-    m_ERPparadigm->setControlMode(map.value("ERP_controlMode").toInt());
-    m_ERPparadigm->setType(map.value("ERP_paradigmType").toInt());
+    m_ERPparadigm->setExperimentMode(map.value("experimentMode").toString().toUpper());
+    m_ERPparadigm->setControlMode(map.value("ERP_controlMode").toString().toUpper());
+    m_ERPparadigm->setType(map.value("ERP_paradigmType").toString().toUpper());
     m_ERPparadigm->setStimulationDuration(map.value("ERP_stimulationDuration").toInt());
     m_ERPparadigm->setBreakDuration(map.value("ERP_breakDuration").toInt());
     m_ERPparadigm->setNrSequences(map.value("ERP_nrSequences").toInt());
-    m_ERPparadigm->setStimulationType(map.value("ERP_stimulationType").toInt());
-    m_ERPparadigm->setFlashingMode(map.value("ERP_flashingMode").toInt());
+    m_ERPparadigm->setStimulationType(map.value("ERP_stimulationType").toString().toUpper());
+    m_ERPparadigm->setFlashingMode(map.value("ERP_flashingMode").toString().toUpper());
     QString str = map.value("ERP_desiredPhrase").toString();
 
     if(str.isEmpty())
@@ -153,21 +154,21 @@ void Hybrid::fromVariant(const QVariant &variant)
     // SSVEP config
     if (map.contains("SSVEP_experimentMode"))
     {
-        m_SSVEPparadigm->setExperimentMode(map.value("SSVEP_experimentMode").toInt());
+        m_SSVEPparadigm->setExperimentMode(map.value("SSVEP_experimentMode").toString().toUpper());
     }
     else
     {
-        m_SSVEPparadigm->setExperimentMode(map.value("experimentMode").toInt());
+        m_SSVEPparadigm->setExperimentMode(map.value("experimentMode").toString().toUpper());
     }
-    m_SSVEPparadigm->setControlMode(map.value("SSVEP_controlMode").toInt());
-    m_SSVEPparadigm->setType(map.value("paradigmType").toInt());
+    m_SSVEPparadigm->setControlMode(map.value("SSVEP_controlMode").toString().toUpper());
+    m_SSVEPparadigm->setType(map.value("paradigmType").toString().toUpper());
     m_SSVEPparadigm->setStimulationDuration(map.value("SSVEP_stimulationDuration").toInt());
     m_SSVEPparadigm->setBreakDuration(map.value("SSVEP_breakDuration").toInt());
     m_SSVEPparadigm->setNrSequences(map.value("SSVEP_nrSequences").toInt());
     m_SSVEPparadigm->setNrElements(map.value("SSVEP_nrElements").toInt());
     m_SSVEPparadigm->setFrequencies(map.value("SSVEP_frequencies").toString());
     m_SSVEPparadigm->setStimulationMode(map.value("SSVEP_stimulationMode").toInt());
-    m_SSVEPparadigm->setStimulationType(map.value("SSVEP_stimulationType").toInt());
+    m_SSVEPparadigm->setStimulationType(map.value("SSVEP_stimulationType").toString().toUpper());
 
     str = map.value("SSVEP_desiredPhrase").toString();
     if(str.isEmpty())

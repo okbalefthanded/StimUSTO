@@ -40,7 +40,7 @@ void SpellerSmall::startFlashing()
     // qDebug()<< Q_FUNC_INFO;
 
     sendStimulationInfo();
-
+    /*
     switch(m_ERP->stimulationType())
     {
     case speller_type::SMALL:
@@ -70,6 +70,28 @@ void SpellerSmall::startFlashing()
         break;
     }
 
+    }
+    */
+
+    if (m_ERP->stimulationType() == speller_type::SMALL)
+    {
+        stimulationColoredFace();
+    }
+    else if (m_ERP->stimulationType() == speller_type::SMALL_FLASH)
+    {
+        flashing();
+    }
+    else if (m_ERP->stimulationType() == speller_type::SMALL_FACE)
+    {
+        stimulationFace();
+    }
+    else if (m_ERP->stimulationType() == speller_type::SMALL_IFACE)
+    {
+        stimulationInvertedFace();
+    }
+    else if (m_ERP->stimulationType() == speller_type::SMALL_ICFACE)
+    {
+        stimulationInvertedColoredFace();
     }
 
     switchStimulationTimers();

@@ -27,7 +27,8 @@ DoubleERP::DoubleERP(ERP *first, ERP *second)
                             first->desiredPhrase(),
                             m_externalAddress,
                             first->stimulationType(),
-                            first->flashingMode()
+                            first->flashingMode(),
+                            speller_language::ENGLISH
                             );
 
     m_2ndParadigm = new ERP(second->experimentMode(),
@@ -40,7 +41,8 @@ DoubleERP::DoubleERP(ERP *first, ERP *second)
                             second->desiredPhrase(),
                             m_externalAddress,
                             second->stimulationType(),
-                            second->flashingMode()
+                            second->flashingMode(),
+                            speller_language::ENGLISH
                             );
 }
 
@@ -91,19 +93,19 @@ void DoubleERP::fromVariant(const QVariant &variant)
     }
     else
     {
-        m_externalComm    = map.value("externalComm").toInt();
+        m_externalComm    = map.value("externalComm").toString().toUpper();
         m_externalAddress = map.value("ip").toString();
     }
 
     // 1st ERP config
-    m_1stParadigm->setExperimentMode(map.value("experimentMode").toInt());
+    m_1stParadigm->setExperimentMode(map.value("experimentMode").toString().toUpper());
     // m_1stParadigm->setControlMode(map.value("1st_controlMode").toInt());
-    m_1stParadigm->setType(map.value("1st_paradigmType").toInt());
+    m_1stParadigm->setType(map.value("1st_paradigmType").toString().toUpper());
     m_1stParadigm->setStimulationDuration(map.value("1st_stimulationDuration").toInt());
     m_1stParadigm->setBreakDuration(map.value("1st_breakDuration").toInt());
     m_1stParadigm->setNrSequences(map.value("1st_nrSequences").toInt());
-    m_1stParadigm->setStimulationType(map.value("1st_stimulationType").toInt());
-    m_1stParadigm->setFlashingMode(map.value("1st_flashingMode").toInt());
+    m_1stParadigm->setStimulationType(map.value("1st_stimulationType").toString().toUpper());
+    m_1stParadigm->setFlashingMode(map.value("1st_flashingMode").toString().toUpper());
     QString str = map.value("1st_desiredPhrase").toString();
     QString randomStr;
 
@@ -118,15 +120,15 @@ void DoubleERP::fromVariant(const QVariant &variant)
     }
 
     // 2nd ERP config
-    m_2ndParadigm->setExperimentMode(map.value("experimentMode").toInt());
-    m_2ndParadigm->setExperimentMode(map.value("experimentMode").toInt());
+    m_2ndParadigm->setExperimentMode(map.value("experimentMode").toString().toUpper());
+    //m_2ndParadigm->setExperimentMode(map.value("experimentMode").toInt());
     // m_2ndParadigm->setControlMode(map.value("2nd_controlMode").toInt());
-    m_2ndParadigm->setType(map.value("2nd_paradigmType").toInt());
+    m_2ndParadigm->setType(map.value("2nd_paradigmType").toString().toUpper());
     m_2ndParadigm->setStimulationDuration(map.value("2nd_stimulationDuration").toInt());
     m_2ndParadigm->setBreakDuration(map.value("2nd_breakDuration").toInt());
     m_2ndParadigm->setNrSequences(map.value("2nd_nrSequences").toInt());
-    m_2ndParadigm->setStimulationType(map.value("2nd_stimulationType").toInt());
-    m_2ndParadigm->setFlashingMode(map.value("2nd_flashingMode").toInt());
+    m_2ndParadigm->setStimulationType(map.value("2nd_stimulationType").toString().toUpper());
+    m_2ndParadigm->setFlashingMode(map.value("2nd_flashingMode").toString().toUpper());
     QString randomStr2;
     str = map.value("2nd_desiredPhrase").toString();
     if(str.isEmpty())

@@ -62,14 +62,14 @@ signals:
 // private slots:
 protected slots:
 
-    void startTrial();
     void preTrial();
+    void startTrial();
     void feedback();
     void postTrial();
     void postTrialEnd();
     void Flickering();
     // void pauseFlashing();
-    // void receiveFeedback();
+    void receiveFeedback();
     void update();
 
     virtual void initElements();
@@ -87,8 +87,6 @@ public slots:
         emit markerTag(ovStimulation);
     }
 
-protected slots:
-    void receiveFeedback();
 
 protected:
     void externalCommunication();

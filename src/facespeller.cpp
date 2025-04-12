@@ -11,7 +11,7 @@
 void FaceSpeller::startFlashing()
 {
     sendStimulationInfo();
-
+    /*
     switch(m_ERP->stimulationType())
     {
     case speller_type::FACES_SPELLER:
@@ -37,6 +37,28 @@ void FaceSpeller::startFlashing()
     case speller_type::MISMATCH:
         stimulationMismatchFace();
         break;
+    }
+    */
+
+    if (m_ERP->stimulationType() == speller_type::FACES_SPELLER)
+    {
+        stimulationFace();
+    }
+    else if (m_ERP->stimulationType() == speller_type::INVERTED_FACE)
+    {
+        stimulationInvertedFace();
+    }
+    else if (m_ERP->stimulationType() == speller_type::COLORED_FACE)
+    {
+        stimulationColoredFace();
+    }
+    else if (m_ERP->stimulationType() == speller_type::INVERTED_COLORED_FACE)
+    {
+        stimulationInvertedColoredFace();
+    }
+    else if (m_ERP->stimulationType() == speller_type::MISMATCH)
+    {
+        stimulationMismatchFace();
     }
 
     switchStimulationTimers();

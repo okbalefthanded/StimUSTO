@@ -37,7 +37,7 @@ public:
 
     ERP *erp() const;
     void setERP(ERP *erp);
-    QString *desiredPhrase() const;
+    // QString *desiredPhrase() const;
     bool presentFeedback() const;
     void setDesiredPhrase(const QString &t_desiredPhrase);
     void setTimers(int t_stimulation, int t_isi);

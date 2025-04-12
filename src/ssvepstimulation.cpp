@@ -314,6 +314,14 @@ void SSVEPstimulation::postTrialEnd()
 
 void SSVEPstimulation::Flickering()
 {
+    HRESULT hr = DwmFlush();  // Forces DWM to flush rendering // works for Intel UHD 620
+    if (SUCCEEDED(hr)) {
+        qDebug() << "DWM flush succeeded";
+    } else {
+        qDebug() << "DWM flush failed with error code:" << hr;
+    }
+
+
     qint64 elapsedMs = 0;
     /*
     if(m_index == 0)
@@ -574,12 +582,14 @@ void SSVEPstimulation::initLogger()
 
 void SSVEPstimulation::scheduleRedraw()
 {
+    /*
     HRESULT hr = DwmFlush();  // Forces DWM to flush rendering
     if (SUCCEEDED(hr)) {
         qDebug() << "DWM flush succeeded";
     } else {
         qDebug() << "DWM flush failed with error code:" << hr;
     }
+    */
     m_vaObject.bind();
     m_colorBuffer.bind();
     m_colorBuffer.write(0, m_colors.data(), m_colors.count() * sizeof(QVector3D)); // number of vertices to avoid * sizeof QVector3D
@@ -681,20 +691,12 @@ bool SSVEPstimulation::isCorrect() const
 
 void SSVEPstimulation::update()
 {
-<<<<<<< HEAD
+
 
     logger->logFrame();
     double currt =  QTime::currentTime().msec();
     qDebug()<< "[update ] Index : "<< m_index << "current time: " << currt-time_tmp;
     time_tmp = currt;
-=======
-    /*
-    double currt =  QTime::currentTime().msec();
-    qDebug()<< "[update ] Index : "<< m_index << "current time: " << currt-time_tmp;
-    time_tmp = currt;
-   */
-
->>>>>>> c03437bda5b9454c45fd05cd1126421ae00b5e3e
     if(m_index == 0)
     {
         correctortimer->start(); // hacky solution

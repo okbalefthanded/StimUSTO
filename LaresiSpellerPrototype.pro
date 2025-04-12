@@ -16,7 +16,7 @@ TARGET = StimUSTO
 TEMPLATE = app
 
 
-SOURCES += src\main.cpp\
+SOURCES += src\main.cpp \
     src/arabicspeller.cpp \
     src/auditoryspeller.cpp \
     src/chromaspeller.cpp \
@@ -35,8 +35,10 @@ SOURCES += src\main.cpp\
     src/spellersmall.cpp \
     src/ssvepcircle.cpp \
     src/ssvepdircircle.cpp \
-    src/ssvepdirection.cpp \    
+    src/ssvepdirection.cpp \
+    src/stimulation.cpp \
     src/ssvepstimulation.cpp \
+    src/visualspeller.cpp \
     src\configpanel.cpp \
     src\matrixlayout.cpp \
     src\ovmarkersender.cpp \
@@ -70,11 +72,14 @@ HEADERS  += include\configpanel.h \
     include/phonekeypad.h \
     include/spellercircdir.h \
     include/spellercircular.h \
+    include/spellerfactory.h \
     include/spellersmall.h \
     include/ssvepcircle.h \
     include/ssvepdircircle.h \
-    include/ssvepdirection.h \    
+    include/ssvepdirection.h \
+    include/stimulation.h \
     include/ssvepstimulation.h \
+    include/visualspeller.h \
     include\ovtk_stimulations.h \
     include\matrixlayout.h \
     include\ovmarkersender.h \

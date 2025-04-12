@@ -9,11 +9,20 @@ SSVEP::SSVEP() : Paradigm (),
 {
 }
 
-SSVEP::SSVEP(quint8 mode, quint8 control, quint8 type, quint8 comm, int dur, quint8 bDur,
-             quint8 nrSeq, quint8 sType, QString phrase, QString ip, quint8 nElements,
-             QString frequnecies, quint8 stimulationMode):
-    Paradigm(mode, control, type, comm, dur, bDur, nrSeq, sType, phrase, ip),
-    m_nrElements(nElements), m_frequencies(frequnecies), m_stimulationMode(stimulationMode)
+SSVEP::SSVEP(QString mode, QString control,
+             QString type, QString comm,
+             int dur, quint8 bDur,
+             quint8 nrSeq, QString sType,
+             QString phrase, QString ip,
+             quint8 nElements, QString frequnecies,
+             quint8 stimulationMode):
+    Paradigm(mode, control,
+               type, comm,
+               dur, bDur,
+               nrSeq, sType,
+               phrase, ip),
+    m_nrElements(nElements), m_frequencies(frequnecies),
+    m_stimulationMode(stimulationMode)
 {
 }
 
@@ -41,7 +50,7 @@ void SSVEP::fromVariant(const QVariant &variant)
 {
 
     QVariantMap map = variant.toMap();
-    m_experimentMode = map.value("experimentMode").toInt();
+    m_experimentMode = map.value("experimentMode").toString().toUpper();
     m_controlMode = map.value("controlMode").toInt();
 
     if(map.value("externalComm").isNull())
@@ -54,7 +63,7 @@ void SSVEP::fromVariant(const QVariant &variant)
         m_externalComm    = map.value("externalComm").toInt();
         m_externalAddress = map.value("ip").toString();
     }
-    m_type = map.value("paradigmType").toInt();
+    m_type = map.value("paradigmType").toString().toUpper();
     m_stimulationDuration = map.value("stimulationDuration").toInt();
     m_breakDuration = map.value("breakDuration").toInt();
     m_nrSequences   = map.value("nrSequences").toInt();

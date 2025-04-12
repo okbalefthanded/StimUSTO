@@ -5,9 +5,25 @@
 #include <random>
 #include <time.h>
 #include <QtDebug>
+#include "utils.h"
 //using namespace std;
 
 RandomFlashSequence::RandomFlashSequence(QObject *parent) : QObject(parent){}
+
+RandomFlashSequence::RandomFlashSequence(int length, int nr_sequences, QString flash_type, int rows, int cols)
+{
+
+    if (flash_type == flashing_mode::SC)
+    {
+        SCSequence(length, nr_sequences);
+    }
+    else if(flash_type == flashing_mode::RC)
+
+    {
+        RCSequence(length, nr_sequences, 2, false, rows, cols);
+    }
+
+}
 
 RandomFlashSequence::RandomFlashSequence(int length, int nr_sequences, int min_dist, bool repetition)
 {
@@ -58,7 +74,6 @@ RandomFlashSequence::RandomFlashSequence(int length, int nr_sequences, int min_d
         }
     }
     sequence = list;
-
 }
 
 RandomFlashSequence::RandomFlashSequence(int elements, int nr_sequences, int setCount, int setLength)
@@ -157,6 +172,67 @@ RandomFlashSequence::RandomFlashSequence(int nr_sequences)
 
 }
 
+void RandomFlashSequence::SCSequence(int length, int nr_sequences, int min_dist, bool repetition)
+{
+    QVector<int> sequence = initSequence(length, nr_sequences, min_dist, repetition);
+
+    for(int i=0; i< sequenceSet.length(); i++)
+    {
+        sequenceSet[i] = {sequence[i]};
+    }
+}
+
+void RandomFlashSequence::RCSequence(int length, int nr_sequences, int min_dist, bool repetition, int rows, int cols)
+{
+    QVector<int> sequence = initSequence(length, nr_sequences, min_dist, repetition);
+
+    for(int i=0; i< sequenceSet.length(); i++)
+    {
+        sequenceSet[i] = utils::indexToRowColumn(sequence[i], rows, cols); //FIXME
+    }
+
+}
+
+
+QVector<int> RandomFlashSequence::generateSequence(int length, int nr_sequences, int min_dist, bool repetition)
+{
+    srand(time(0));
+    QVector<int> list(length);
+    QVector<int> l(length);
+
+    std::iota(list.begin(), list.end(), 1);
+    std::random_shuffle(list.begin(), list.end());
+
+    l = list;
+
+    for (int i=1; i<nr_sequences; i++)
+    {
+        if (length == 1)
+        {
+            list.append( l );
+        }
+        else {
+            std::random_shuffle(l.begin(), l.end());
+            list.append( l );
+
+            if(list.last()==l.first())
+            {
+                std::swap(l[0], l[2]);
+            }
+            else if(list.last()==l[1])
+            {
+                std::swap(l[1], l[2]);
+            }
+            else if(list[list.count()-1]==l[0])
+            {
+                std::swap(l[0], l[1]);
+            }
+        }
+    }
+
+    return list;
+}
+
 QVector<int> RandomFlashSequence::range(int start, int end)
 {
     QVector<int> list(end-start+1);
@@ -194,6 +270,15 @@ QVector<int> RandomFlashSequence::toSequence(QString seqStr)
     }
 
     return intSeq;
+}
+
+QVector<int> RandomFlashSequence::initSequence(int length, int nr_sequences, int min_dist, bool repetition)
+{
+    QVector<int> sequence = generateSequence(length, nr_sequences, min_dist, repetition);
+    this->sequence = sequence;
+    sequenceSet.resize(sequence.length());
+
+    return sequence;
 }
 
 

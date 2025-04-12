@@ -41,7 +41,7 @@ HybridSSVEP::HybridSSVEP(DoubleSSVEP *hybridStimulation, SSVEPstimulation *First
         m_trials = 1;
     }
     else if(m_hybridStimulation->experimentMode() == operation_mode::COPY_MODE ||
-            operation_mode::FREE_MODE)
+            m_hybridStimulation->experimentMode() == operation_mode::FREE_MODE)
     {
         m_trials = m_hybridStimulation->m_1stParadigm->desiredPhrase().count();
     }

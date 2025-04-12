@@ -36,6 +36,8 @@
 #include "ssvepdircircle.h"
 #include "jsonserializer.h"
 #include "ovtk_stimulations.h"
+// test refector
+#include "visualspeller.h"
 //
 ConfigPanel::ConfigPanel(QWidget *parent) : QMainWindow(parent), ui(new Ui::ConfigPanel)
 {
@@ -68,7 +70,7 @@ void ConfigPanel::startExperiment()
     JsonSerializer jSerializer;
     Paradigm paradigm;
     jSerializer.load(paradigm, configFile);
-    quint8  paradigmType = paradigm.type();
+    QString  paradigmType = paradigm.type();
 
     if(paradigmType == paradigm_type::ERP)
     {
@@ -99,7 +101,7 @@ void ConfigPanel::startExperiment()
  */
 void ConfigPanel::on_initSpeller_clicked()
 {
-    int spellerType = 0;
+    QString spellerType = 0;
 
     ERP *erpParadigm = new ERP();
 
@@ -119,6 +121,19 @@ void ConfigPanel::on_initSpeller_clicked()
     {
         QMessageBox::information(this, "Socket connection", "Not Connected");
     }
+
+    else //if(spellerType == speller_type::TEST)
+    {
+        QTimer *launchTimer = new QTimer();
+        launchTimer->setInterval(10000);
+        launchTimer->setSingleShot(true);
+
+        VisualSpeller *speller = new VisualSpeller(erpParadigm);
+        connectStimulation(speller);
+        // speller->setParadigm(erpParadigm);
+        connectParadigm(speller, launchTimer);
+    }
+    /*
     else
     {
         QTimer *launchTimer = new QTimer();
@@ -129,6 +144,7 @@ void ConfigPanel::on_initSpeller_clicked()
         speller->setERP(erpParadigm);
         connectParadigm(speller, launchTimer);
     }
+    */
 }
 
 
@@ -325,8 +341,9 @@ void ConfigPanel::initDoubleSSVEP()
 
 ERP *ConfigPanel::initParadigmERPGui()
 {
-    int spellerType = ui->spellerType->currentIndex();
-    ERP *erpParadigm = new ERP(ui->spellingModeChoices->currentIndex(),
+    QString spellerType = ui->spellerType->currentText().toUpper();
+
+    ERP *erpParadigm = new ERP(ui->spellingModeChoices->currentText().toUpper(),
                                control_mode::SYNC, // TODO : implement async ERP control mode
                                paradigm_type::ERP,
                                external_comm::DISABLED,
@@ -336,12 +353,73 @@ ERP *ConfigPanel::initParadigmERPGui()
                                ui->desiredPhrase->text(),
                                "127.0.0.1",
                                spellerType,
-                               flashing_mode::SC);
+                               flashing_mode::SC,
+                               speller_language::ENGLISH);
     return erpParadigm;
 }
 
-Speller *ConfigPanel::createSpeller(int t_spellerType, quint16 t_port)
+Speller *ConfigPanel::createSpeller(QString t_spellerType, quint16 t_port)
 {
+
+    if (t_spellerType == speller_type::FLASHING_SPELLER)
+    {
+        FlashingSpeller *flashSpeller = new FlashingSpeller();
+        connectStimulation(flashSpeller);
+        return flashSpeller;
+    }
+    else if (t_spellerType == speller_type::FACES_SPELLER ||
+             t_spellerType == speller_type::INVERTED_FACE ||
+             t_spellerType == speller_type::COLORED_FACE ||
+             t_spellerType == speller_type::INVERTED_COLORED_FACE ||
+             t_spellerType == speller_type::MISMATCH)
+    {
+        FaceSpeller *faceSpeller = new FaceSpeller();
+        connectStimulation(faceSpeller);
+        return faceSpeller;
+    }
+    else if (t_spellerType == speller_type::CHROMA)
+    {
+        ChromaSpeller *chromaSpeller = new ChromaSpeller();
+        connectStimulation(chromaSpeller);
+        return chromaSpeller;
+    }
+    else if (t_spellerType == speller_type::ARABIC_SPELLER)
+    {
+        ArabicSpeller *arabicSpeller = new ArabicSpeller();
+        connectStimulation(arabicSpeller);
+        return arabicSpeller;
+    }
+    else if (t_spellerType == speller_type::DUAL_STIM ||
+             t_spellerType == speller_type::MULTI_STIM)
+    {
+        MultiStimuli *multiStimuli = new MultiStimuli();
+        connectStimulation(multiStimuli);
+        return multiStimuli;
+    }
+    else if (t_spellerType == speller_type::SMALL ||
+             t_spellerType == speller_type::SMALL_FLASH ||
+             t_spellerType == speller_type::SMALL_FACE ||
+             t_spellerType == speller_type::SMALL_IFACE ||
+             t_spellerType == speller_type::SMALL_ICFACE)
+    {
+        SpellerSmall *smallSpeller = new SpellerSmall(nullptr, t_port);
+        connectStimulation(smallSpeller);
+        return smallSpeller;
+    }
+    else if (t_spellerType == speller_type::SMALL_CIRCLE)
+    {
+        SpellerCircular *spellerCircle = new SpellerCircular(nullptr, t_port);
+        connectStimulation(spellerCircle);
+        return spellerCircle;
+    }
+    else if (t_spellerType == speller_type::CIRC_DIR)
+    {
+        SpellerCircDir *spellerCircleDir = new SpellerCircDir();
+        connectStimulation(spellerCircleDir);
+        return spellerCircleDir;
+    }
+
+    /*
     switch(t_spellerType)
     {
     case speller_type::FLASHING_SPELLER:
@@ -409,15 +487,18 @@ Speller *ConfigPanel::createSpeller(int t_spellerType, quint16 t_port)
         connectStimulation(spellerCircleDir);
         return spellerCircleDir;
     }
-        /*
+    */
+
+    /*
     case speller_type::AUDITORY:
     {
         AuditorySpeller *auditorySpeller = new AuditorySpeller();
         connectStimulation(auditorySpeller);
         return auditorySpeller;
     }
-    */
+
     }
+*/
 }
 
 SSVEP *ConfigPanel::initParadigmSSVEPGui()
@@ -425,7 +506,7 @@ SSVEP *ConfigPanel::initParadigmSSVEPGui()
     SSVEP *ssvepParadigm = new SSVEP();
 
     int SSVEPNrElements;
-    int operationMode;
+    QString operationMode;
 
     QStringList freqsList = ui->Frequencies->text().split(',');
     operationMode = ui->SSVEP_Mode->currentIndex();
@@ -445,7 +526,7 @@ SSVEP *ConfigPanel::initParadigmSSVEPGui()
     }
 
     ssvepParadigm = new SSVEP(operationMode,
-                              ui->SSVEP_Control->currentIndex(),
+                              ui->SSVEP_Control->currentText().toUpper(),
                               paradigm_type::SSVEP,
                               external_comm::DISABLED,
                               ui->SSVEP_StimDuration->text().toFloat(),
@@ -481,7 +562,7 @@ SSVEPstimulation *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
     // SsvepCircle *ssvepStimulation = new SsvepCircle(t_ssvep, t_port);
     // SsvepDirection *ssvepStimulation = new SsvepDirection(t_ssvep, t_port);
     SSVEPstimulation *ssvepStimulation;
-
+  /*
     switch(t_ssvep->stimulationType())
     {
     case speller_type::SSVEP_DIRECTIONS:
@@ -502,6 +583,23 @@ SSVEPstimulation *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
         break;
     }
     }
+     */
+
+
+    if (t_ssvep->stimulationType() == speller_type::SSVEP_DIRECTIONS)
+    {
+        ssvepStimulation = new SsvepDirection(t_ssvep, t_port);
+    }
+    else if (t_ssvep->stimulationType() == speller_type::SSVEP_CIRCLE ||
+             t_ssvep->stimulationType() == speller_type::SSVEP_GRID)
+    {
+        ssvepStimulation = new SsvepCircle(t_ssvep, t_port);
+    }
+    else if (t_ssvep->stimulationType() == speller_type::SSVEP_DIRCIRCLE)
+    {
+        ssvepStimulation = new SsvepDirectionCircle(t_ssvep, t_port);
+    }
+
 
     ssvepStimulation->setFormat(format);
 

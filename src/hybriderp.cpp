@@ -34,7 +34,7 @@ HybridERP::HybridERP(DoubleERP *hybridStimulation, Speller *FirstSpeller, Spelle
         m_trials = 1;
     }
     else if(m_hybridStimulation->experimentMode() == operation_mode::COPY_MODE ||
-            operation_mode::FREE_MODE)
+             m_hybridStimulation->experimentMode() == operation_mode::FREE_MODE)
     {
         m_trials = m_hybridStimulation->m_1stParadigm->desiredPhrase().count();
     }
@@ -62,7 +62,7 @@ HybridERP::HybridERP(DoubleERP *hybridStimulation, Speller *FirstSpeller, Spelle
 
 void HybridERP::hybridPreTrial()
 {
-  // qDebug() << "[HYBRID PRETRIAL START]" << Q_FUNC_INFO;
+    // qDebug() << "[HYBRID PRETRIAL START]" << Q_FUNC_INFO;
 
     if(m_hybridStimulation->experimentMode() == operation_mode::CALIBRATION)
     {
@@ -236,7 +236,7 @@ void HybridERP::hybridPostTrial()
     QColor erpColor = Qt::black;
 
     if(m_hybridStimulation->experimentMode() == operation_mode::COPY_MODE ||
-            m_hybridStimulation->experimentMode() == operation_mode::FREE_MODE)
+        m_hybridStimulation->experimentMode() == operation_mode::FREE_MODE)
     {
         m_FirstFeedback  = m_FirstSpeller->m_text;
         m_SecondFeedback = m_SecondSpeller->m_text;
@@ -294,7 +294,7 @@ void HybridERP::hybridPostTrial()
 
 void HybridERP::hybridPostTrialEnd()
 {
-  //  qDebug()<< Q_FUNC_INFO;
+    //  qDebug()<< Q_FUNC_INFO;
 
     ++m_currentTrial;
 
@@ -363,8 +363,25 @@ void HybridERP::initAnimations()
 
 void HybridERP::initFirstSpeller(ERP *erp)
 {
-    int spellerType = erp->stimulationType();
+    // int spellerType = erp->stimulationType();
+    QString spellerType = erp->stimulationType();
 
+    if (spellerType == speller_type::FLASHING_SPELLER)
+    {
+        m_FirstSpeller = new FlashingSpeller();
+        // m_ERPspeller->initSpeller(erp);
+    }
+    else if (spellerType == speller_type::FACES_SPELLER ||
+             spellerType == speller_type::INVERTED_FACE ||
+             spellerType == speller_type::COLORED_FACE ||
+             spellerType == speller_type::INVERTED_COLORED_FACE)
+    {
+        m_FirstSpeller = new FaceSpeller();
+        //m_ERPspeller->initSpeller(erp);
+    }
+    // TODO: add the rest of Spellers using else if statements
+
+    /*
     switch (spellerType)
     {
     case speller_type::FLASHING_SPELLER:
@@ -385,13 +402,15 @@ void HybridERP::initFirstSpeller(ERP *erp)
     }
         // TODO: add the rest of Spellers
     }
+*/
 
 }
 
 void HybridERP::initSecondSpeller(ERP *erp)
 {
-    int spellerType = erp->stimulationType();
+    QString spellerType = erp->stimulationType();
 
+    /*
     switch (spellerType)
     {
     case speller_type::FLASHING_SPELLER:
@@ -412,6 +431,22 @@ void HybridERP::initSecondSpeller(ERP *erp)
     }
         // TODO: add the rest of Spellers
     }
+   */
+
+    if (spellerType == speller_type::FLASHING_SPELLER)
+    {
+        m_SecondSpeller = new FlashingSpeller();
+        // m_ERPspeller->initSpeller(erp);
+    }
+    else if (spellerType == speller_type::FACES_SPELLER ||
+             spellerType == speller_type::INVERTED_FACE ||
+             spellerType == speller_type::COLORED_FACE ||
+             spellerType == speller_type::INVERTED_COLORED_FACE)
+    {
+        m_SecondSpeller = new FaceSpeller();
+        //m_ERPspeller->initSpeller(erp);
+    }
+    // TODO: add the rest of Spellers using else if statements
 
     m_SecondSpeller->hide();
 }
