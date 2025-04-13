@@ -1,10 +1,21 @@
-{
-    "breakDuration": 100,
-    "desiredPhrase": "123456789",
-    "experimentMode": 0,
-    "flashingMode": 0,
-    "nrSequences": 10,
-    "paradigmType": 0,
-    "stimulationDuration": 100,
-    "stimulationType": 0
+{ 
+    "language": "english",
+    "rows": 6,
+    "columns": 6,
+    "background_color": "black",
+    "character_color": "gray",
+    "character_font": 40,
+    "stimuli_files": ["C:\\coding\\LaresiSpellerPrototype\\assets\\bennabi_face_red.png",
+                      "C:\\coding\\LaresiSpellerPrototype\\assets\\bennabi_face_magenta.png",
+                      "C:\\coding\\LaresiSpellerPrototype\\assets\\bennabi_face_green.png"
+                        ],
+    
+    "experimentMode": "calibration",
+    "paradigmType": "erp",
+    "stimulationType": "multi stimulus",
+    "flashingMode": "single character",
+    "desiredPhrase": "b",
+    "nrSequences": 1,
+    "breakDuration": 30,
+    "stimulationDuration": 70    	
 }

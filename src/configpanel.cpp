@@ -51,7 +51,7 @@ ConfigPanel::ConfigPanel(QWidget *parent) : QMainWindow(parent), ui(new Ui::Conf
  */
 void ConfigPanel::on_connectOvAsBtn_clicked()
 {
-    QString ovAsAddress = ui->addressOvAs->text();
+    QString ovAsAddress  = ui->addressOvAs->text();
     QString ovTcpTagPort = ui->portOvAs->text();
     m_markerSender = new OVMarkerSender(this);
 
@@ -69,8 +69,10 @@ void ConfigPanel::startExperiment()
 {
     JsonSerializer jSerializer;
     Paradigm paradigm;
+    QString  paradigmType;
+
     jSerializer.load(paradigm, configFile);
-    QString  paradigmType = paradigm.type();
+    paradigmType = paradigm.type();
 
     if(paradigmType == paradigm_type::ERP)
     {
@@ -101,7 +103,7 @@ void ConfigPanel::startExperiment()
  */
 void ConfigPanel::on_initSpeller_clicked()
 {
-    QString spellerType = 0;
+    QString spellerType;
 
     ERP *erpParadigm = new ERP();
 

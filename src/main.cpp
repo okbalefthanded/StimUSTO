@@ -7,6 +7,7 @@
 #include <QObject>
 //
 #include "configpanel.h"
+#include "newconfigpanel.h"
 #include "jsonserializer.h"
 //
 #include <dwmapi.h>
@@ -32,6 +33,7 @@ int main(int argc, char *argv[])
     optionParser->process(app);
 
     ConfigPanel w;
+    NewConfigPanel newCP;
 
     if(optionParser->value("nogui") == "True")
     {
@@ -41,6 +43,9 @@ int main(int argc, char *argv[])
         w.setConfigFile(optionParser->value("file"));
         w.setNoGui(true);
         w.hide();
+        //
+        newCP.setConfigFilePath(optionParser->value("file"));
+        //
         QTimer *launchTimer = new QTimer();
         launchTimer->setInterval(1000);
         launchTimer->setSingleShot(true);
@@ -54,6 +59,7 @@ int main(int argc, char *argv[])
         w.setConfigFile("");
         w.setNoGui(false);
         w.show();
+        newCP.show();
     };
 
     return app.exec();

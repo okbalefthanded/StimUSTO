@@ -138,6 +138,8 @@ const quint8 SIN_FP = 2; // joint frequency-phase modulation
 
 namespace config {
 //
+
+const QString ovTCPTagPort = "15631";
 const int start_port = 54321;
 //
 const uint64_t OVTK_StimulationLabel_Base = 0x00008100;
@@ -160,5 +162,6 @@ namespace machine_state {
 const quint8 MOVING = 0;
 const quint8 READY  = 1;
 }
+
 
 #endif // UTILS_H

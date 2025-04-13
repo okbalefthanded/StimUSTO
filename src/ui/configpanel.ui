@@ -122,7 +122,7 @@
       <rect>
        <x>11</x>
        <y>26</y>
-       <width>147</width>
+       <width>175</width>
        <height>301</height>
       </rect>
      </property>
@@ -223,9 +223,9 @@
     <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
-       <x>160</x>
-       <y>30</y>
-       <width>101</width>
+       <x>190</x>
+       <y>20</y>
+       <width>143</width>
        <height>291</height>
       </rect>
      </property>
@@ -541,7 +541,7 @@
       <rect>
        <x>135</x>
        <y>21</y>
-       <width>111</width>
+       <width>140</width>
        <height>281</height>
       </rect>
      </property>
@@ -605,7 +605,7 @@
      <x>0</x>
      <y>0</y>
      <width>850</width>
-     <height>18</height>
+     <height>26</height>
     </rect>
    </property>
   </widget>

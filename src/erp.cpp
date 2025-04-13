@@ -52,6 +52,8 @@ void ERP::fromVariant(const QVariant &variant)
 
     QVariantMap map = variant.toMap();
 
+    m_map = new QVariantMap(variant.toMap());
+
     m_experimentMode = map.value("experimentMode").toString().toUpper();
     m_controlMode    = map.value("controlMode").toString().toUpper();
 

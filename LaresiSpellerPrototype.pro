@@ -29,6 +29,7 @@ SOURCES += src\main.cpp \
     src/hybridssvep.cpp \
     src/hybridstimulation.cpp \
     src/multistimuli.cpp \
+    src/newconfigpanel.cpp \
     src/phonekeypad.cpp \
     src/spellercircdir.cpp \
     src/spellercircular.cpp \
@@ -69,6 +70,7 @@ HEADERS  += include\configpanel.h \
     include/hybridssvep.h \
     include/hybridstimulation.h \
     include/multistimuli.h \
+    include/newconfigpanel.h \
     include/phonekeypad.h \
     include/spellercircdir.h \
     include/spellercircular.h \
@@ -102,6 +104,7 @@ HEADERS  += include\configpanel.h \
 INCLUDEPATH += include\
 
 FORMS    += src\ui\configpanel.ui \
+            src\ui\newconfigpanel.ui \
             src\ui\ssvep.ui \
             src\ui\ssvepsingle.ui \
             src\ui\spellerform.ui

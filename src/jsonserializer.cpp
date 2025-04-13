@@ -18,8 +18,15 @@ void JsonSerializer::save(const Serializable& serializable, const QString &filep
 void JsonSerializer::load(Serializable& serializable, const QString &filepath)
 {
     QFile file(filepath);
-    file.open(QFile::ReadOnly);
-    QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
-    serializable.fromVariant(doc.toVariant());
+    if (file.open(QFile::ReadOnly))
+    {
+        QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
+        serializable.fromVariant(doc.toVariant());
+    }
+    else
+    {
+        qDebug() << "Error opening file:" << file.errorString();
+    }
+    file.close();
 }
 

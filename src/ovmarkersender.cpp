@@ -1,8 +1,8 @@
-#include "ovmarkersender.h"
-#include "ovtk_stimulations.h"
 #include <QMessageBox>
 #include <QDataStream>
 #include <QDebug>
+//
+#include "ovmarkersender.h"
 
 OVMarkerSender::OVMarkerSender(QObject *parent)
     : QObject(parent), m_socket(new QTcpSocket(this))
@@ -10,19 +10,10 @@ OVMarkerSender::OVMarkerSender(QObject *parent)
     m_socket->setSocketOption(QAbstractSocket::LowDelayOption, QVariant::fromValue(1));
 }
 
-OVMarkerSender::~OVMarkerSender()
-{
-    if (m_socket->isOpen())
-    {
-        m_socket->close();
-        qDebug() << "Socket Closed";
-    }
-}
-
 bool OVMarkerSender::Connect(QString t_asAddress, QString t_asTcpTagPort)
 {
     qDebug() << "Connection Adress: " << t_asAddress;
-    qDebug() << "Connection Port : " << t_asTcpTagPort;
+    qDebug() << "Connection Port  : " << t_asTcpTagPort;
 
     m_socket->connectToHost(t_asAddress, t_asTcpTagPort.toUShort());
 
@@ -74,7 +65,6 @@ bool OVMarkerSender::sendStimulation(uint64_t t_ovStimulation)
     }
 
     return true;
-
 }
 
 bool OVMarkerSender::connectedOnce() const
@@ -85,4 +75,13 @@ bool OVMarkerSender::connectedOnce() const
 void OVMarkerSender::setConnectedOnce(bool t_connectedOnce)
 {
     m_connectedOnce = t_connectedOnce;
+}
+
+OVMarkerSender::~OVMarkerSender()
+{
+    if (m_socket->isOpen())
+    {
+        m_socket->close();
+        qDebug() << "Socket Closed";
+    }
 }

@@ -49,6 +49,9 @@ public:
     QString stimulationType() const;
     void setStimulationType(QString newStimulationType);
 
+    QVariantMap *map() const;
+    void setMap(QVariantMap *newMap);
+
 protected:
     QString m_experimentMode;
     QString m_controlMode;
@@ -60,6 +63,8 @@ protected:
     QString m_stimulationType;
     QString m_desiredPhrase;
     QString m_externalAddress;
+    //
+    QVariantMap *m_map;
 
 };
 
