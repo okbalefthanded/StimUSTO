@@ -10,14 +10,11 @@ Stimulation::Stimulation()
     m_state = trial_state::PRE_TRIAL;
 }
 
-
-
 void Stimulation::initFeedbackSocket()
 {
     m_feedbackSocket = new QUdpSocket(this);
     m_feedbackSocket->bind(QHostAddress::LocalHost, m_feedbackPort);
     connect(m_feedbackSocket, SIGNAL(readyRead()), this, SLOT(receiveFeedback()));
-
 }
 
 void Stimulation::receiveFeedback()

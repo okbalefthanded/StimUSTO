@@ -28,8 +28,10 @@ SOURCES += src\main.cpp \
     src/hybriderp.cpp \
     src/hybridssvep.cpp \
     src/hybridstimulation.cpp \
+    src/layout.cpp \
     src/multistimuli.cpp \
     src/newconfigpanel.cpp \
+    src/openglstimulation.cpp \
     src/phonekeypad.cpp \
     src/spellercircdir.cpp \
     src/spellercircular.cpp \
@@ -69,8 +71,10 @@ HEADERS  += include\configpanel.h \
     include/hybriderp.h \
     include/hybridssvep.h \
     include/hybridstimulation.h \
+    include/layout.h \
     include/multistimuli.h \
     include/newconfigpanel.h \
+    include/openglstimulation.h \
     include/phonekeypad.h \
     include/spellercircdir.h \
     include/spellercircular.h \

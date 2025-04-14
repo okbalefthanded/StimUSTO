@@ -1,6 +1,8 @@
 #include <QtMath>
+//
 #include "circularlayout.h"
 #include "utils.h"
+//
 CircularLayout::CircularLayout(QWidget *parent){}
 
 QSize CircularLayout::sizeHint() const

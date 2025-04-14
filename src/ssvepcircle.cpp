@@ -88,7 +88,7 @@ void SsvepCircle::initCircles()
 {
     float twicePi = 2.0f * M_PI;
     int start = 0;
-    int stop = m_vertexPerCircle;
+    int stop  = m_vertexPerCircle;
     int k=0;
     int elements = m_ssvep->nrElements();
 

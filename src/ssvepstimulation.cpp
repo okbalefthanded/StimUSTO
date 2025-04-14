@@ -18,8 +18,6 @@
 #include "glutils.h"
 #include "framelogger.h"
 
-
-
 SSVEPstimulation::SSVEPstimulation(SSVEP *paradigm, int t_port)
 {
     m_ssvep = paradigm;
@@ -424,30 +422,15 @@ void SSVEPstimulation::receiveFeedback()
     m_receivedFeedback = true;
 }
 
-void SSVEPstimulation::initElements()
-{
+void SSVEPstimulation::initElements(){}
 
-}
+void SSVEPstimulation::initCenters(){}
 
-void SSVEPstimulation::initCenters()
-{
+void SSVEPstimulation::initCircles(){}
 
-}
+void SSVEPstimulation::initColors(){}
 
-void SSVEPstimulation::initCircles()
-{
-
-}
-
-void SSVEPstimulation::initColors()
-{
-
-}
-
-void SSVEPstimulation::initIndices()
-{
-
-}
+void SSVEPstimulation::initIndices(){}
 
 void SSVEPstimulation::refreshCircles()
 {

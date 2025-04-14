@@ -74,10 +74,11 @@ const QString RASP = QStringLiteral("RASP"); //
 namespace speller_type {
 // speller types
 // stimulation type
+// ERP
 const QString FLASH = QStringLiteral("FLASH");
 const QString SINGLE = QStringLiteral("SINGLE STIMULUS");
 const QString MULTIPLE = QStringLiteral("MULTI STIMULUS");
-//
+
 const QString FLASHING_SPELLER = QStringLiteral("FLASHING_SPELLER");
 const QString FACES_SPELLER = QStringLiteral("FACES_SPELLER");
 const QString INVERTED_FACE = QStringLiteral("INVERTED_FACE");
@@ -132,9 +133,10 @@ const quint8 POST_TRIAL    = 4;
 }
 //
 namespace frequency_stimulation {
-const quint8 ON_OFF = 0;
-const quint8 SIN    = 1; // only frequency
-const quint8 SIN_FP = 2; // joint frequency-phase modulation
+const QString ON_OFF  = QStringLiteral("SQUARE");
+const QString SQUAREP = QStringLiteral("SQUARE PHASE");
+const QString SIN     = QStringLiteral("SINE"); // only frequency
+const QString SIN_FP  = QStringLiteral("SINE PHASE"); // joint frequency-phase modulation
 }
 
 namespace config {

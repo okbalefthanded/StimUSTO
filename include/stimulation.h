@@ -9,8 +9,10 @@
 #include "paradigm.h"
 
 // Base stimulation class
-class Stimulation : public QObject {
+class Stimulation : public QObject
+{
         Q_OBJECT
+
 public:
     Stimulation();
     ~Stimulation();
@@ -49,8 +51,6 @@ protected slots:
     virtual void pauseFlashing(){};
     virtual void feedback(){};
     void receiveFeedback();
-
-
 
 protected:
     Paradigm *m_settings;

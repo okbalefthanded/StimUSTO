@@ -15,6 +15,7 @@
 #include "stimulation.h"
 #include "logger.h"
 #include "utils.h"
+
 // VisualSpeller::VisualSpeller(QWidget *parent) : QWidget(parent), Stimulation()
 VisualSpeller::VisualSpeller(ERP *t_erp) : Stimulation()
 {
