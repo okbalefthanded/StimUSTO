@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>NewConfigPanel</class>
+ <widget class="QMainWindow" name="NewConfigPanel">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>970</width>
+    <height>635</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QGroupBox" name="OVConnectionBox">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>20</y>
+      <width>291</width>
+      <height>171</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>OpenVibe Connection Settings</string>
+    </property>
+    <widget class="QLineEdit" name="feedback_port">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>40</y>
+       <width>113</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>12345</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="portLabel_2">
+     <property name="geometry">
+      <rect>
+       <x>130</x>
+       <y>40</y>
+       <width>91</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>TCP Tag Port</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="connectOvAsBtn">
+     <property name="geometry">
+      <rect>
+       <x>200</x>
+       <y>130</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Connect</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="portOvAs">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>70</y>
+       <width>113</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>15361</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="portLabel">
+     <property name="geometry">
+      <rect>
+       <x>130</x>
+       <y>70</y>
+       <width>131</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>UDP Feedback Port</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="addressOvAs">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>100</y>
+       <width>113</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>127.0.0.1</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="addressLabel">
+     <property name="geometry">
+      <rect>
+       <x>130</x>
+       <y>100</y>
+       <width>47</width>
+       <height>13</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Address</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="ControlBox">
+    <property name="geometry">
+     <rect>
+      <x>320</x>
+      <y>20</y>
+      <width>261</width>
+      <height>80</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Control</string>
+    </property>
+    <widget class="QPushButton" name="startSpeller">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>30</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Start</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="quitSpeller">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>30</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Quit</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="initSpeller">
+     <property name="geometry">
+      <rect>
+       <x>180</x>
+       <y>30</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Init Stim</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="ConfigFileBox">
+    <property name="geometry">
+     <rect>
+      <x>590</x>
+      <y>20</y>
+      <width>371</width>
+      <height>80</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Config File control</string>
+    </property>
+    <widget class="QPushButton" name="loadConfigBtn">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>30</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Load</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="saveConfigBtn">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>30</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Save</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="settingLevel">
+     <property name="geometry">
+      <rect>
+       <x>174</x>
+       <y>30</y>
+       <width>81</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <item>
+      <property name="text">
+       <string>Basic</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Advanced</string>
+      </property>
+     </item>
+    </widget>
+    <widget class="QLabel" name="label">
+     <property name="geometry">
+      <rect>
+       <x>260</x>
+       <y>30</y>
+       <width>101</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Settings Level</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_2">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>200</y>
+      <width>921</width>
+      <height>371</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Config FIie</string>
+    </property>
+    <widget class="QTableWidget" name="ConfigFile">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>30</y>
+       <width>901</width>
+       <height>341</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+      </font>
+     </property>
+     <column>
+      <property name="text">
+       <string>Setting</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Value</string>
+      </property>
+     </column>
+    </widget>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>970</width>
+     <height>26</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
