@@ -4,6 +4,14 @@
 #include "paradigm.h"
 #include "utils.h"
 //
+
+const QVector<QString> Paradigm::basicSettings = {"language", "experimentMode",
+   "paradigmType", "desiredPhrase",
+   "nrSequences", "stimulationDuration",
+   "breakDuration"
+};
+
+
 Paradigm::Paradigm(QString mode, QString control,
                    QString type, QString comm,
                    int dur, quint8 bDur,
@@ -42,11 +50,21 @@ QVariant Paradigm::toVariant() const
     return map;
 }
 
+QVariant Paradigm::toVariantSave() const
+{
+    //TODO
+    QVariant variant;
+
+    variant = map();
+
+    return variant;
+}
+
 void Paradigm::fromVariant(const QVariant &variant)
 {
     QVariantMap map = variant.toMap();
 
-    m_map = new QVariantMap(variant.toMap());
+    m_map = QVariantMap(variant.toMap());
 
     m_experimentMode = map.value("experimentMode").toString().toUpper();
     m_controlMode = map.value("controlMode").toString().toUpper();
@@ -166,12 +184,12 @@ void Paradigm::setStimulationType(QString newStimulationType)
     m_stimulationType = newStimulationType;
 }
 
-QVariantMap *Paradigm::map() const
+QVariantMap Paradigm::map() const
 {
     return m_map;
 }
 
-void Paradigm::setMap(QVariantMap *newMap)
+void Paradigm::setMap(QVariantMap newMap)
 {
     m_map = newMap;
 }

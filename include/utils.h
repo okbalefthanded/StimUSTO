@@ -45,6 +45,7 @@ int indexToGridCoordinates(int index, int gridSize);
 
 QVector<int> indexToRowColumn(int index, int rows, int cols);
 
+QString configFolderPath();
 }
 //
 namespace operation_mode {
@@ -138,7 +139,6 @@ const quint8 SIN_FP = 2; // joint frequency-phase modulation
 
 namespace config {
 //
-
 const QString ovTCPTagPort = "15631";
 const int start_port = 54321;
 //

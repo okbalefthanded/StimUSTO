@@ -10,8 +10,7 @@ public:
     JsonSerializer();
 
     void save(const Serializable& serializable,
-              const QString& filepath,
-              const QString& rootName) override;
+              const QString& filepath) override;
     void load(Serializable& serializable,
               const QString& filepath) override;
 }   ;

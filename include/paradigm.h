@@ -17,6 +17,7 @@ public:
     ~Paradigm();
 
     QVariant toVariant()  const override;
+    QVariant toVariantSave()  const override;
     void fromVariant(const QVariant& variant)  override;
 
     QString experimentMode() const;
@@ -49,8 +50,10 @@ public:
     QString stimulationType() const;
     void setStimulationType(QString newStimulationType);
 
-    QVariantMap *map() const;
-    void setMap(QVariantMap *newMap);
+    QVariantMap map() const;
+    void setMap(QVariantMap newMap);
+
+    static const QVector<QString> basicSettings;
 
 protected:
     QString m_experimentMode;
@@ -64,7 +67,7 @@ protected:
     QString m_desiredPhrase;
     QString m_externalAddress;
     //
-    QVariantMap *m_map;
+    QVariantMap m_map;
 
 };
 

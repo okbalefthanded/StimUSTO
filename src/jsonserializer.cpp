@@ -6,12 +6,20 @@
 //
 JsonSerializer::JsonSerializer(){}
 
-void JsonSerializer::save(const Serializable& serializable, const QString &filepath, const QString& /*rootName*/)
+void JsonSerializer::save(const Serializable& serializable, const QString &filepath)
 {
-    QJsonDocument doc = QJsonDocument::fromVariant(serializable.toVariant());
+    QJsonDocument doc = QJsonDocument::fromVariant(serializable.toVariantSave());
     QFile file(filepath);
-    file.open(QFile::WriteOnly);
-    file.write(doc.toJson());
+
+    if(file.open(QFile::WriteOnly))
+    {
+        qDebug() << Q_FUNC_INFO << doc.toJson();
+        file.write(doc.toJson());
+    }
+    else
+    {
+        qDebug() << "Error saving file:" << file.errorString();
+    }
     file.close();
 }
 

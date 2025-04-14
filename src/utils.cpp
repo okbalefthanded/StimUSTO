@@ -145,6 +145,22 @@ QVector<int> indexToRowColumn(int index, int rows, int cols)
 }
 
 
+QString configFolderPath()
+{
+    QString desiredPath;
+    QString defaultFilePath = QCoreApplication::applicationDirPath();
+    QStringList pathParts = defaultFilePath.split('/');
+
+    if (pathParts.size() > 3) {
+        QStringList desiredParts;
+        for (int i = 0; i < pathParts.size() - 3; ++i) {
+            desiredParts << pathParts[i];
+        }
+        desiredPath = desiredParts.join('/');
+    }
+
+    return desiredPath + "/config";
+}
 }
 
 
