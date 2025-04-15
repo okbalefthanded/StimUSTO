@@ -39,6 +39,7 @@ SOURCES += src\main.cpp \
     src/ssvepcircle.cpp \
     src/ssvepdircircle.cpp \
     src/ssvepdirection.cpp \
+    src/ssvepstimulation_.cpp \
     src/stimulation.cpp \
     src/ssvepstimulation.cpp \
     src/visualspeller.cpp \
@@ -83,6 +84,7 @@ HEADERS  += include\configpanel.h \
     include/ssvepcircle.h \
     include/ssvepdircircle.h \
     include/ssvepdirection.h \
+    include/ssvepstimulation_.h \
     include/stimulation.h \
     include/ssvepstimulation.h \
     include/visualspeller.h \

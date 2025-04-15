@@ -38,6 +38,9 @@ public:
     int horizontalSpace() const;
     void setHorizontalSpace(int newHorizontalSpace);
 
+    float flickerDimension() const;
+    void setFlickerDimension(float newFlickerDimension);
+
 protected:
     QString m_shape;
     QColor m_backgroundColor = Qt::black;

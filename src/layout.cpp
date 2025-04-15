@@ -53,16 +53,6 @@ void Layout::setCenterColor(const QColor &newCenterColor)
     m_centerColor = newCenterColor;
 }
 
-float Layout::flickerRadius() const
-{
-    return m_flickerRadius;
-}
-
-void Layout::setFlickerRadius(float newFlickerRadius)
-{
-    m_flickerRadius = newFlickerRadius;
-}
-
 int Layout::verticalSpace() const
 {
     return m_verticalSpace;
@@ -81,6 +71,16 @@ int Layout::horizontalSpace() const
 void Layout::setHorizontalSpace(int newHorizontalSpace)
 {
     m_horizontalSpace = newHorizontalSpace;
+}
+
+float Layout::flickerDimension() const
+{
+    return m_flickerDimension;
+}
+
+void Layout::setFlickerDimension(float newFlickerDimension)
+{
+    m_flickerDimension = newFlickerDimension;
 }
 
 

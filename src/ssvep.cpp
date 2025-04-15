@@ -50,6 +50,9 @@ void SSVEP::fromVariant(const QVariant &variant)
 {
 
     QVariantMap map = variant.toMap();
+
+    m_map = map;
+
     m_experimentMode = map.value("experimentMode").toString().toUpper();
     m_controlMode = map.value("controlMode").toInt();
 

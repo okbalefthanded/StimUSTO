@@ -7,6 +7,8 @@
 OpenGLStimulation::OpenGLStimulation(SSVEP *paradigm)
 {
     setFrequencies(paradigm->frequencies());
+    initFormat();
+
     correctortimer = new QElapsedTimer();
     QString loggerFname = QCoreApplication::applicationDirPath() + "/frame_log_win11_" + QDateTime::currentDateTime().toString("yyyy_MM_dd_HH.mm.ss.zzz") + ".csv";
     logger = new FrameLogger(loggerFname);
@@ -15,7 +17,7 @@ OpenGLStimulation::OpenGLStimulation(SSVEP *paradigm)
     m_flicker.resize(m_frequencies.size());
 
     // initElements ?
-
+    // initElements();
 }
 // OpenGL window interface
 void OpenGLStimulation::initializeGL()
@@ -145,6 +147,8 @@ void OpenGLStimulation::update()
     logger->logFrame();
 }
 
+
+
 void OpenGLStimulation::refreshFlickers()
 {
     // qDebug()<< Q_FUNC_INFO ;
@@ -214,7 +218,59 @@ void OpenGLStimulation::renderFeedBackText(int index, QString text)
     // qDebug()<<Q_FUNC_INFO << m_externalFeedback<< "i" << i;
 }
 
+// inits
+void OpenGLStimulation::initFormat()
+{
+    QSurfaceFormat format;
+    format.setRenderableType(QSurfaceFormat::OpenGL);
+    format.setProfile(QSurfaceFormat::CoreProfile);
+    format.setSwapInterval(1); // vsync on
+    format.setSwapBehavior(QSurfaceFormat::DefaultSwapBehavior);
+    // format.setSwapBehavior(QSurfaceFormat::TripleBuffer); //
+    format.setVersion(3, 0); // ANGLE supports ES 3.0, higher versions raise exceptions
+    setFormat(format);
+}
+
+void OpenGLStimulation::initIntensity()
+{
+    double phase = 0.0;
+    for (int i=0; i < m_frequencies.size(); ++i)
+    {
+        // phase = config::PHASE * ((i+1)%2);
+        phase = config::PHASE * (i%2);
+        m_flicker[i] = utils::gen_flick(m_frequencies[i], config::REFRESH_RATE, m_ssvep->stimulationDuration(), m_ssvep->stimulationMode(), phase);
+    }
+}
+
+void OpenGLStimulation::initElements()
+{
+    // init vectors
+    // int m_vertexPerCircle = glUtils::SIDES_PER_CIRCLE + 2;
+    m_vertexPerCircle = glUtils::SIDES_PER_CIRCLE + 2;
+    int vectorsSize = (m_ssvep->nrElements() * m_vertexPerCircle) + m_ssvep->nrElements();
+    m_vertices.resize(vectorsSize);
+    //
+    initIntensity(); // flicker values
+    initCenters();  // circles centers points
+    initFlickers(); // vertices
+    initColors();  // vertices' colors
+    initIndices(); // vertices indices
+    //
+    scheduleRedraw();
+}
+
+
 // Getters and Setters
+QVector<QVector<double> > OpenGLStimulation::flicker() const
+{
+    return m_flicker;
+}
+
+void OpenGLStimulation::setFlicker(const QVector<QVector<double> > &newFlicker)
+{
+    m_flicker = newFlicker;
+}
+
 QVector<double> OpenGLStimulation::frequencies() const
 {
     return m_frequencies;

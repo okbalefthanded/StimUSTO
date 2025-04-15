@@ -22,15 +22,21 @@ class OpenGLStimulation : public QOpenGLWindow, protected QOpenGLFunctions
 {
     Q_OBJECT
 
+public:
     explicit OpenGLStimulation(SSVEP *paradigm);
     OpenGLStimulation();
     ~OpenGLStimulation();
 
-// QOpenGLWindow interface
+    friend class SSVEPStimulation;
 
 public:
+    virtual void initElements();
     QVector<double> frequencies() const;
     void setFrequencies(QString t_freqs);
+
+// QOpenGLWindow interface
+    QVector<QVector<double> > flicker() const;
+    void setFlicker(const QVector<QVector<double> > &newFlicker);
 
 protected:
     void initializeGL();
@@ -41,7 +47,6 @@ protected slots:
 
     void update();
 
-    virtual void initElements();
     virtual void initCenters();
     virtual void initFlickers();
     virtual void initColors();
@@ -56,6 +61,8 @@ protected:
 
     // private:
     //    bool isTarget();
+    void initFormat();
+    void initIntensity();
     void highlightTarget(){};
     void highlightFeedback(QVector3D feedbackColor, int feedbackIndex);
     void refreshTarget(){};

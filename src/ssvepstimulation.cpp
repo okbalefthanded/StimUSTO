@@ -674,8 +674,6 @@ bool SSVEPstimulation::isCorrect() const
 
 void SSVEPstimulation::update()
 {
-
-
     logger->logFrame();
     double currt =  QTime::currentTime().msec();
     qDebug()<< "[update ] Index : "<< m_index << "current time: " << currt-time_tmp;
