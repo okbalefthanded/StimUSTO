@@ -27,9 +27,6 @@ RandomFlashSequence::RandomFlashSequence(int length, int nr_sequences, QString f
     {
         RASPSequence(length, nr_sequences, 2, false, rows, cols);
     }
-
-    qDebug()<< Q_FUNC_INFO << "DONE CREATING RANDOM SEQUENCE";
-
 }
 
 RandomFlashSequence::RandomFlashSequence(int length, int nr_sequences, int min_dist, bool repetition)

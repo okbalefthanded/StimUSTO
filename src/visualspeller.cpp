@@ -383,7 +383,8 @@ void VisualSpeller::trialEnd()
         sendMarker(OVTK_StimulationId_TrialStop);
         m_state = trial_state::FEEDBACK;
 
-        if(m_settings->experimentMode() == operation_mode::COPY_MODE || m_settings->experimentMode() == operation_mode::FREE_MODE)
+        if(m_settings->experimentMode() == operation_mode::COPY_MODE ||
+            m_settings->experimentMode() == operation_mode::FREE_MODE)
         {
             feedback();
         }
@@ -450,8 +451,14 @@ void VisualSpeller::sendStimulationInfo()
 {
 
     sendMarker(OVTK_StimulationId_VisualStimulationStart);
-    sendMarker(config::OVTK_StimulationLabel_Base + m_flashingSequence->sequence[m_currentStimulation]);
-
+    if (m_settings->flashingMode().compare(flashing_mode::RASP) != 0)
+    {
+        sendMarker(config::OVTK_StimulationLabel_Base + m_flashingSequence->sequence[m_currentStimulation]);
+    }
+    else
+    {
+        sendRASPStimulation();
+    }
     // send target marker
     if (m_settings->experimentMode() == operation_mode::CALIBRATION ||
         m_settings->experimentMode() == operation_mode::COPY_MODE)
@@ -464,6 +471,15 @@ void VisualSpeller::sendStimulationInfo()
         {
             sendMarker(OVTK_StimulationId_NonTarget);
         }
+    }
+}
+
+void VisualSpeller::sendRASPStimulation()
+{
+    QVector<int> currentSequence = m_flashingSequence->sequenceSet.at(m_currentStimulation);
+    for(int i=0; i<currentSequence.length(); ++i)
+    {
+        sendMarker(config::OVTK_StimulationLabel_Base + currentSequence.at(i));
     }
 }
 
@@ -498,6 +514,7 @@ void VisualSpeller::stimulationFlash()
 
     m_layout = m_speller->layout();
     const QVector<int>& currentSequence = m_flashingSequence->sequenceSet.at(m_currentStimulation);
+
     int sequenceLength = currentSequence.length();
     int index = 0;
 
@@ -535,7 +552,7 @@ void VisualSpeller::stimulationPixMap()
     }
     end = QTime::currentTime().msec();
     //
-   updateStimTimer(start, end);
+    updateStimTimer(start, end);
 }
 
 void VisualSpeller::stimulationMultiPixMap()

@@ -60,6 +60,7 @@ protected:
     void trialEnd();
 
     void sendStimulationInfo();
+    void sendRASPStimulation();
     void switchStimulationTimers();
     void updateStimTimer(int start, int end);
     void updateIsiTimer(int start, int end);
