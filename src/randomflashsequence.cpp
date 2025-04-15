@@ -23,6 +23,13 @@ RandomFlashSequence::RandomFlashSequence(int length, int nr_sequences, QString f
         RCSequence(length, nr_sequences, 2, false, rows, cols);
     }
 
+    else if(flash_type == flashing_mode::RASP)
+    {
+        RASPSequence(length, nr_sequences, 2, false, rows, cols);
+    }
+
+    qDebug()<< Q_FUNC_INFO << "DONE CREATING RANDOM SEQUENCE";
+
 }
 
 RandomFlashSequence::RandomFlashSequence(int length, int nr_sequences, int min_dist, bool repetition)
@@ -191,6 +198,56 @@ void RandomFlashSequence::RCSequence(int length, int nr_sequences, int min_dist,
         sequenceSet[i] = utils::indexToRowColumn(sequence[i], rows, cols); //FIXME
     }
 
+}
+
+void RandomFlashSequence::RASPSequence(int length, int nr_sequences, int min_dist, bool repetition, int rows, int cols)
+{
+    srand(time(0));
+    QVector<int> sequence = initSequence(length, nr_sequences, min_dist, repetition);
+    int elements = rows * cols;
+    int min = 1;
+    QVector<QVector<int>> grid(rows);
+    QVector<int> indices;
+
+    for (int i = min; i <= elements; ++i)
+    {
+        indices.append(i);
+    }
+
+    // Shuffle the possible values randomly
+    std::random_shuffle(indices.begin(), indices.end());
+
+
+    int valueIndex = 0;
+    for (int i = 0; i < rows; ++i)
+    {
+        grid[i].resize(cols);
+        for (int j = 0; j < cols; ++j)
+        {
+            grid[i][j] = indices[valueIndex++];
+        }
+    }
+
+    int jk = 0;
+
+    for(int i=0; i< sequenceSet.length(); i++)
+    {
+        if (i < rows)
+        {
+            sequenceSet[i] = grid[i];
+        }
+        else
+        {
+            jk = i - rows;
+            QVector<int> tmp;
+            for(int k=0; k<rows; ++k)
+            {
+                tmp.append(grid[k][jk]);
+            }
+
+            sequenceSet[i] = tmp;
+        }
+    }
 }
 
 

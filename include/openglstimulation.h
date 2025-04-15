@@ -47,10 +47,10 @@ protected slots:
 
     void update();
 
-    virtual void initCenters();
-    virtual void initFlickers();
-    virtual void initColors();
-    virtual void initIndices();
+    virtual void initCenters(){};
+    virtual void initFlickers(){};
+    virtual void initColors(){};
+    virtual void initIndices(){};
 
 public slots:
     //    void create_layout();

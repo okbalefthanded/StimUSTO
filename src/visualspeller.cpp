@@ -72,7 +72,7 @@ void VisualSpeller::postTrial()
 
     ++m_trials;
 
-    utils::wait(250);
+    utils::wait(250); //
 
     if (m_text[m_text.length()-1] != "#")
     {
@@ -94,6 +94,8 @@ void VisualSpeller::postTrial()
     {
         m_externComm->communicate(QString(m_text[m_text.length()-1]));
     }
+
+    utils::wait(2000); // 2 sec pause before starting a new Trial // TODO
 
     postTrialEnd();
 }
@@ -308,6 +310,7 @@ void VisualSpeller::experimentStart()
 
 void VisualSpeller::startPreTrial()
 {
+    // qDebug()<< Q_FUNC_INFO;
     if (m_preTrialCount == 0)
     {
         sendMarker(OVTK_StimulationId_TrialStart);
@@ -318,6 +321,7 @@ void VisualSpeller::startPreTrial()
                                                      m_rows,
                                                      m_cols);
 
+
         /*
         for(int i=0; i< m_flashingSequence->sequence.length(); i++)
         {
@@ -325,6 +329,7 @@ void VisualSpeller::startPreTrial()
             qDebug()<< Q_FUNC_INFO << m_flashingSequence->sequenceSet.at(i);
         }
         */
+
         if (m_settings->experimentMode() == operation_mode::CALIBRATION)
         {
             highlightTarget();
@@ -535,7 +540,6 @@ void VisualSpeller::stimulationPixMap()
 
 void VisualSpeller::stimulationMultiPixMap()
 {
-
     int start, end = 0;
 
     start = QTime::currentTime().msec();
@@ -624,7 +628,6 @@ void VisualSpeller::pauseStimPixMap()
 
 void VisualSpeller::highlightTarget()
 {
-
     int currentTarget = getCurrentTarget();
 
     m_speller

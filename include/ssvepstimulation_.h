@@ -20,8 +20,8 @@ protected slots:
     void startTrial();
     void Flickering();
     void postTrial();
-    void startFlashing();
-    void pauseFlashing();
+    void startFlashing(){}; // TODO
+    void pauseFlashing(){}; // TODO
     void feedback();
     void createLayout();
 
