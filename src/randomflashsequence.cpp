@@ -225,23 +225,19 @@ void RandomFlashSequence::RASPSequence(int length, int nr_sequences, int min_dis
         }
     }
 
-    int jk = 0;
-
     for(int i=0; i< sequenceSet.length(); i++)
     {
-        if (i < rows)
+        if (sequence[i] <= rows)
         {
-            sequenceSet[i] = grid[i];
+            sequenceSet[i] = grid[sequence[i] - 1];
         }
         else
         {
-            jk = i - rows;
             QVector<int> tmp;
             for(int k=0; k<rows; ++k)
             {
-                tmp.append(grid[k][jk]);
+                tmp.append(grid[k][sequence[i] - (rows+1)]);
             }
-
             sequenceSet[i] = tmp;
         }
     }
@@ -331,7 +327,6 @@ QVector<int> RandomFlashSequence::initSequence(int length, int nr_sequences, int
     QVector<int> sequence = generateSequence(length, nr_sequences, min_dist, repetition);
     this->sequence = sequence;
     sequenceSet.resize(sequence.length());
-
     return sequence;
 }
 

@@ -321,7 +321,6 @@ void VisualSpeller::startPreTrial()
                                                      m_rows,
                                                      m_cols);
 
-
         /*
         for(int i=0; i< m_flashingSequence->sequence.length(); i++)
         {
@@ -449,7 +448,6 @@ void VisualSpeller::postTrialEnd()
 
 void VisualSpeller::sendStimulationInfo()
 {
-
     sendMarker(OVTK_StimulationId_VisualStimulationStart);
     if (m_settings->flashingMode().compare(flashing_mode::RASP) != 0)
     {
@@ -501,7 +499,6 @@ void VisualSpeller::switchStimulationTimers()
         m_state = trial_state::STIMULUS;
     }
 }
-
 
 // graphics manipulations
 void VisualSpeller::stimulationFlash()
