@@ -23,7 +23,9 @@ static QString ArabicLetters = "أبتثجحخدذرزسشصضطظغفقكلمن
 const static QString numbers = "0123456789<_>";
 
 // rectangle flickering
-QVector<double> gen_flick(double freq, int refreshRate, float length, quint8 stimMode, double phase=0.0);
+QVector<double> gen_flick(double freq, int refreshRate,
+                          float length, QString stimMode,
+                          double phase=0.0);
 
 // rectangle flickering : ON/OFF
 QVector<double> gen_flick_on_off(double freq, int refreshRate, float length);

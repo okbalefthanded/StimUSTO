@@ -19,6 +19,8 @@ SSVEPStimulation::SSVEPStimulation(SSVEP *t_ssvep)
 // Stimulation Loop
 void SSVEPStimulation::startTrial()
 {
+    // qDebug()<< Q_FUNC_INFO;
+
     if (m_state == trial_state::PRE_TRIAL)
     {
         preTrial();
@@ -38,7 +40,7 @@ void SSVEPStimulation::Flickering()
     // send markers
     if(m_ui->m_index == 0)
     {
-        sendMarker(config::OVTK_StimulationLabel_Base + m_flickeringSequence->sequence[m_currentFlicker]);
+        sendMarker(config::OVTK_StimulationLabel_Base + m_flashingSequence->sequence[m_currentFlicker]);
         sendMarker(OVTK_StimulationId_VisualSteadyStateStimulationStart);
     }
 
@@ -51,7 +53,6 @@ void SSVEPStimulation::Flickering()
             break;
         }
     }
-
 
     disconnect(m_ui, SIGNAL(frameSwapped()), m_ui, SLOT(update()));
     // elapsedMs = correctortimer->elapsed();
@@ -75,13 +76,13 @@ void SSVEPStimulation::preTrial()
     {
         if(m_settings->desiredPhrase().isEmpty())
         {
-            m_flickeringSequence = new RandomFlashSequence(m_settings->nrElements(), m_settings->nrSequences() / m_settings->nrElements());
+            m_flashingSequence = new RandomFlashSequence(m_settings->nrElements(), m_settings->nrSequences() / m_settings->nrElements());
         }
 
         else
         {
-            m_flickeringSequence = new RandomFlashSequence();
-            m_flickeringSequence->sequence = RandomFlashSequence::toSequence(m_settings->desiredPhrase());
+            m_flashingSequence = new RandomFlashSequence();
+            m_flashingSequence->sequence = RandomFlashSequence::toSequence(m_settings->desiredPhrase());
         }
 
         m_firstRun = false;
@@ -94,7 +95,8 @@ void SSVEPStimulation::preTrial()
         if (m_settings->experimentMode() == operation_mode::CALIBRATION ||
             m_settings->experimentMode() == operation_mode::COPY_MODE)
         {
-            m_ui->highlightTarget();
+            // m_ui->highlightTarget();
+            m_ui->highlightFeedback(glColors::yellow, m_flashingSequence->sequence[m_currentFlicker] -1);
         }
     }
 
@@ -143,7 +145,7 @@ void SSVEPStimulation::postTrial()
     // calibration mode
     else
     {
-        m_ui->refreshTarget();
+        m_ui->refresh(m_flashingSequence->sequence[m_currentFlicker] - 1);
     }
 
     m_state = trial_state::PRE_TRIAL;
@@ -162,7 +164,7 @@ void SSVEPStimulation::postTrial()
 
 void SSVEPStimulation::feedback()
 {
-    // receiveFeedback
+     // receiveFeedback
     if (!m_receivedFeedback)
     {
         m_feedbackSocket->waitForReadyRead();
@@ -172,9 +174,9 @@ void SSVEPStimulation::feedback()
     {
         if(m_settings->experimentMode() == operation_mode::COPY_MODE)
         {
-            if(m_sessionFeedback[m_currentFlicker].digitValue() == m_flickeringSequence->sequence[m_currentFlicker])
+            if(m_sessionFeedback[m_currentFlicker].digitValue() == m_flashingSequence->sequence[m_currentFlicker])
             {
-                m_ui->highlightFeedback(glColors::green, m_flickeringSequence->sequence[m_currentFlicker]-1);
+                m_ui->highlightFeedback(glColors::green, m_flashingSequence->sequence[m_currentFlicker]-1);
                 ++m_correct;
             }
             else
@@ -187,7 +189,6 @@ void SSVEPStimulation::feedback()
             m_ui->highlightFeedback(glColors::red, m_sessionFeedback[m_currentFlicker].digitValue()-1);
         }
     }
-
 }
 
 void SSVEPStimulation::postTrialEnd()
@@ -198,15 +199,15 @@ void SSVEPStimulation::postTrialEnd()
     ++m_currentFlicker;
     ++m_trials;
 
-    if (m_currentFlicker < m_flickeringSequence->sequence.size() &&
-        m_flickeringSequence->sequence.length() != 1 &&
+    if (m_currentFlicker < m_flashingSequence->sequence.size() &&
+        m_flashingSequence->sequence.length() != 1 &&
         (m_settings->experimentMode() == operation_mode::COPY_MODE ||
          m_settings->experimentMode() == operation_mode::CALIBRATION ||
          m_settings->experimentMode() == operation_mode::FREE_MODE))
     {
         startTrial();
     }
-    else if (m_flickeringSequence->sequence.length() <= 1)
+    else if (m_flashingSequence->sequence.length() <= 1)
     {
         m_currentFlicker = 0;
         emit(slotTerminated());
@@ -214,7 +215,7 @@ void SSVEPStimulation::postTrialEnd()
     }
     else
     {
-        m_correct = (m_correct / m_flickeringSequence->sequence.size()) * 100;
+        m_correct = (m_correct / m_flashingSequence->sequence.size()) * 100;
         qDebug()<< "Accuracy in SSVEP session: " << m_correct;
         qDebug()<< "Experiment End, closing SSVEP stimulation";
         sendMarker(OVTK_StimulationId_ExperimentStop);
@@ -232,6 +233,17 @@ void SSVEPStimulation::createLayout()
     m_ui = new OpenGLStimulation(m_settings);
     m_ui->initElements();
     //
+    if(QGuiApplication::screens().size() == 2)
+    {
+        m_ui->resize(utils::getScreenSize());
+        m_ui->setScreen(QGuiApplication::screens().last());
+    }
+    else
+    {
+        m_ui->resize(QSize(1366, 768)); // temporaty size;
+    }
+
+    m_ui->showFullScreen();
 }
 
 // inits

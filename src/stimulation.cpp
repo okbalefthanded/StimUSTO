@@ -41,6 +41,7 @@ void Stimulation::receiveFeedback()
     }
     // }
 
+
     m_presentFeedback = true;
 }
 

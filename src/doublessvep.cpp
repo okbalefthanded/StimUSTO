@@ -112,7 +112,7 @@ void DoubleSSVEP::fromVariant(const QVariant &variant)
     m_1stParadigm->setNrSequences(map.value("1st_nrSequences").toInt());
     m_1stParadigm->setNrElements(map.value("1st_nrElements").toInt());
     m_1stParadigm->setFrequencies(map.value("1st_frequencies").toString());
-    m_1stParadigm->setStimulationMode(map.value("1st_stimulationMode").toInt());
+    m_1stParadigm->setStimulationMode(map.value("1st_stimulationMode").toString().toUpper());
     m_1stParadigm->setStimulationType(map.value("1st_stimulationType").toString().toUpper());
     QString str = map.value("1st_desiredPhrase").toString();
 
@@ -146,7 +146,7 @@ void DoubleSSVEP::fromVariant(const QVariant &variant)
     m_2ndParadigm->setNrSequences(map.value("2nd_nrSequences").toInt());
     m_2ndParadigm->setNrElements(map.value("2nd_nrElements").toInt());
     m_2ndParadigm->setFrequencies(map.value("2nd_frequencies").toString());
-    m_2ndParadigm->setStimulationMode(map.value("2nd_stimulationMode").toInt());
+    m_2ndParadigm->setStimulationMode(map.value("2nd_stimulationMode").toString().toUpper());
     m_2ndParadigm->setStimulationType(map.value("2nd_stimulationType").toString().toUpper());
 
     str = map.value("2nd_desiredPhrase").toString();

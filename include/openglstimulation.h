@@ -47,10 +47,10 @@ protected slots:
 
     void update();
 
-    virtual void initCenters(){};
-    virtual void initFlickers(){};
-    virtual void initColors(){};
-    virtual void initIndices(){};
+    virtual void initCenters();
+    virtual void initFlickers();
+    virtual void initColors();
+    virtual void initIndices();
 
 public slots:
     //    void create_layout();
@@ -62,7 +62,7 @@ protected:
     // private:
     //    bool isTarget();
     void initFormat();
-    void initIntensity();
+    void initIntensity(int t_stimDur, QString t_stimMode);
     void highlightTarget(){};
     void highlightFeedback(QVector3D feedbackColor, int feedbackIndex);
     void refreshTarget(){};

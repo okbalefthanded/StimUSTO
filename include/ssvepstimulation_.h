@@ -20,8 +20,8 @@ protected slots:
     void startTrial();
     void Flickering();
     void postTrial();
-    void startFlashing(){}; // TODO
-    void pauseFlashing(){}; // TODO
+    void startFlashing(){}; // TODO, useless funcs
+    void pauseFlashing(){}; // TODO, useless funcs
     void feedback();
     void createLayout();
 
@@ -32,7 +32,7 @@ protected:
     OpenGLStimulation *m_ui;
     SSVEP *m_settings;
     //
-    RandomFlashSequence *m_flickeringSequence;
+    // RandomFlashSequence *m_flashingSequence;
     QTimer *m_preTrialTimer;
     int m_preTrialWait;
     bool m_firstRun = true;

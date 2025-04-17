@@ -7,7 +7,9 @@
 //
 namespace utils {
 // rectangle flickering : ON/OFF
-QVector<double> gen_flick(double freq, int refreshRate, float length, quint8 stimMode, double phase)
+QVector<double> gen_flick(double freq, int refreshRate,
+                          float length, QString stimMode,
+                          double phase)
 {
 
     if(stimMode == frequency_stimulation::ON_OFF)

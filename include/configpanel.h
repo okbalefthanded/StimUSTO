@@ -15,7 +15,8 @@
 #include "ssvepcircle.h"
 #include "phonekeypad.h"
 #include "ssvepdirection.h"
-#include "ssvepstimulation.h"
+//#include "ssvepstimulation.h"
+#include "ssvepstimulation_.h"
 //
 namespace Ui {
 class ConfigPanel;
@@ -66,7 +67,9 @@ private:
     // SsvepCircle *createSSVEP(SSVEP *t_ssvep, int t_port);
     // SsvepDirection *createSSVEP(SSVEP *t_ssvep, int t_port);
     // PhoneKeypad *createSSVEP(SSVEP *t_ssvep, int t_port);
-    SSVEPstimulation *createSSVEP(SSVEP *t_ssvep, int t_port);
+    // SSVEPstimulation *createSSVEP(SSVEP *t_ssvep, int t_port);
+
+    SSVEPStimulation *createSSVEP(SSVEP *t_ssvep, int t_port);
     void connectStimulation(QObject *t_obj);
     void connectParadigm(QObject *pr, QTimer *timer);
     Ui::ConfigPanel *ui;

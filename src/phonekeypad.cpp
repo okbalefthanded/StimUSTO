@@ -61,7 +61,7 @@ void PhoneKeypad::initializeGL()
         // phase = config::PHASE * (i%2);
         phase = config::PHASE * (i%4);
         // qDebug()<<"phases " << i << phase;
-        m_flicker[i] = utils::gen_flick(m_frequencies[i], config::REFRESH_RATE, m_ssvep->stimulationDuration(), m_ssvep->stimulationMode(), phase);
+        //FIXME m_flicker[i] = utils::gen_flick(m_frequencies[i], config::REFRESH_RATE, m_ssvep->stimulationDuration(), m_ssvep->stimulationMode(), phase);
     }
 
     // Application-specific initialization

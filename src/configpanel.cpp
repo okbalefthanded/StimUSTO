@@ -33,6 +33,7 @@
 #include "phonekeypad.h"
 #include "ssvepdirection.h"
 #include "ssvepstimulation.h"
+#include "ssvepstimulation_.h"
 #include "ssvepdircircle.h"
 #include "jsonserializer.h"
 #include "ovtk_stimulations.h"
@@ -153,7 +154,7 @@ void ConfigPanel::on_initSpeller_clicked()
 //INIT SSVEP
 void ConfigPanel::on_initSSVEP_clicked()
 {
-
+    // qDebug()<< Q_FUNC_INFO;
     SSVEP *ssvepParadigm = new SSVEP();
 
     if(noGui)
@@ -181,11 +182,14 @@ void ConfigPanel::on_initSSVEP_clicked()
         // SsvepGL *ssvepStimulation = createSSVEP(ssvepParadigm, 12345);
         // SsvepCircle *ssvepStimulation = createSSVEP(ssvepParadigm, 12345);
         // SsvepDirection *ssvepStimulation = createSSVEP(ssvepParadigm, 12345);
-        SSVEPstimulation *ssvepStimulation = createSSVEP(ssvepParadigm, 12345);
+        //SSVEPstimulation *ssvepStimulation = createSSVEP(ssvepParadigm, 12345);
         // PhoneKeypad *ssvepStimulation = createSSVEP(ssvepParadigm, 12345);
-        connectParadigm(ssvepStimulation, launchTimer);
         // ssvepStimulation->show();
-        ssvepStimulation->showFullScreen();
+        // ssvepStimulation->showFullScreen();
+
+
+        SSVEPStimulation *ssvepStimulation = createSSVEP(ssvepParadigm, 12345);
+        connectParadigm(ssvepStimulation, launchTimer);
 
     }
 }
@@ -199,17 +203,11 @@ void ConfigPanel::on_startSpeller_clicked()
 
 //TODO
 //Pause speller
-void ConfigPanel::on_pauseSpeller_clicked()
-{
-
-}
+void ConfigPanel::on_pauseSpeller_clicked(){}
 
 //TODO
 //Stop speller
-void ConfigPanel::on_stopSpeller_clicked()
-{
-
-}
+void ConfigPanel::on_stopSpeller_clicked(){}
 
 //Quit speller
 void ConfigPanel::on_quitSpeller_clicked()
@@ -257,7 +255,9 @@ void ConfigPanel::on_initHybrid_clicked()
         // SsvepGL *ssvepStimulation = new SsvepGL(hybridParadigm->m_SSVEPparadigm, 12346);
         // SsvepCircle *ssvepStimulation = createSSVEP(hybridParadigm->m_SSVEPparadigm, 12346);
         // SsvepDirection *ssvepStimulation = createSSVEP(hybridParadigm->m_SSVEPparadigm, 12346);
-        SSVEPstimulation *ssvepStimulation = createSSVEP(hybridParadigm->m_SSVEPparadigm, 12346);
+
+        //SSVEPstimulation *ssvepStimulation = createSSVEP(hybridParadigm->m_SSVEPparadigm, 12346);
+        SSVEPstimulation *ssvepStimulation;
         ssvepStimulation->setPresentFeedback(false);
 
         HybridStimulation *hybrid = new HybridStimulation(hybridParadigm, speller, ssvepStimulation);
@@ -329,10 +329,12 @@ void ConfigPanel::initDoubleSSVEP()
         launchTimer->setInterval(10000);
         launchTimer->setSingleShot(true);
 
-        SSVEPstimulation *ssvepSpeller1 = createSSVEP(hybridParadigm->m_1stParadigm, 12345);
+        // SSVEPstimulation *ssvepSpeller1 = createSSVEP(hybridParadigm->m_1stParadigm, 12345);
+        SSVEPstimulation *ssvepSpeller1;
         ssvepSpeller1->setPresentFeedback(false);
 
-        SSVEPstimulation *ssvepSpeller2 = createSSVEP(hybridParadigm->m_2ndParadigm, 12346);
+        // SSVEPstimulation *ssvepSpeller2 = createSSVEP(hybridParadigm->m_2ndParadigm, 12346);
+        SSVEPstimulation *ssvepSpeller2;
         ssvepSpeller2->setPresentFeedback(false);
 
         HybridSSVEP *hybrid = new HybridSSVEP(hybridParadigm, ssvepSpeller1, ssvepSpeller2);
@@ -539,7 +541,7 @@ SSVEP *ConfigPanel::initParadigmSSVEPGui()
                               "127.0.0.1",
                               SSVEPNrElements,
                               ui->Frequencies->text(),
-                              ui->SSVEP_Stimulation->currentIndex());
+                              ui->SSVEP_Stimulation->currentText().toUpper());
     return ssvepParadigm;
 }
 
@@ -547,23 +549,23 @@ SSVEP *ConfigPanel::initParadigmSSVEPGui()
 // PhoneKeypad *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
 // SsvepCircle *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
 // SsvepDirection *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
-SSVEPstimulation *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
+SSVEPStimulation *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
 {
-    QSurfaceFormat format;
-    format.setRenderableType(QSurfaceFormat::OpenGL);
-    format.setProfile(QSurfaceFormat::CoreProfile);
-    format.setSwapInterval(1); // vsync on
-    format.setSwapBehavior(QSurfaceFormat::DefaultSwapBehavior);
+    // QSurfaceFormat format;
+    // format.setRenderableType(QSurfaceFormat::OpenGL);
+    // format.setProfile(QSurfaceFormat::CoreProfile);
+    // format.setSwapInterval(1); // vsync on
+    // format.setSwapBehavior(QSurfaceFormat::DefaultSwapBehavior);
     // format.setSwapBehavior(QSurfaceFormat::TripleBuffer); //
     // format.setVersion(3,0);
-    format.setVersion(3, 0); // ANGLE supports ES 3.0, higher versions raise exceptions
+    // format.setVersion(3, 0); // ANGLE supports ES 3.0, higher versions raise exceptions
     // format.setVersion(4, 5); // HP ProBook
 
     // PhoneKeypad *ssvepStimulation = new PhoneKeypad(t_ssvep, t_port);
     // SsvepGL *ssvepStimulation = new SsvepGL(t_ssvep, t_port);
     // SsvepCircle *ssvepStimulation = new SsvepCircle(t_ssvep, t_port);
     // SsvepDirection *ssvepStimulation = new SsvepDirection(t_ssvep, t_port);
-    SSVEPstimulation *ssvepStimulation;
+    // SSVEPstimulation *ssvepStimulation;
   /*
     switch(t_ssvep->stimulationType())
     {
@@ -587,7 +589,8 @@ SSVEPstimulation *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
     }
      */
 
-
+    // SSVEPstimulation *ssvepStimulation;
+    /*
     if (t_ssvep->stimulationType() == speller_type::SSVEP_DIRECTIONS)
     {
         ssvepStimulation = new SsvepDirection(t_ssvep, t_port);
@@ -614,7 +617,9 @@ SSVEPstimulation *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
     {
         ssvepStimulation->resize(QSize(1366, 768)); // temporaty size;
     }
+*/
 
+    SSVEPStimulation *ssvepStimulation = new SSVEPStimulation(t_ssvep);
     connectStimulation(ssvepStimulation);
 
     return ssvepStimulation;
@@ -647,7 +652,7 @@ void ConfigPanel::connectParadigm(QObject *pr, QTimer *timer)
     }
     else
     {
-        connect(ui->startSpeller, SIGNAL(clicked()), pr, SLOT(startTrial()));
+        connect(ui->startSpeller, SIGNAL(clicked()), pr, SLOT(sta   rtTrial()));
     }
 }
 
@@ -674,5 +679,4 @@ void ConfigPanel::setConfigFile(const QString &value)
 ConfigPanel::~ConfigPanel()
 {
     delete ui;
-
 }

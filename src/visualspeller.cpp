@@ -321,13 +321,13 @@ void VisualSpeller::startPreTrial()
                                                      m_rows,
                                                      m_cols);
 
-        /*
+
         for(int i=0; i< m_flashingSequence->sequence.length(); i++)
         {
             qDebug()<< Q_FUNC_INFO << m_flashingSequence->sequence[i];
             qDebug()<< Q_FUNC_INFO << m_flashingSequence->sequenceSet.at(i);
         }
-        */
+
 
         if (m_settings->experimentMode() == operation_mode::CALIBRATION)
         {

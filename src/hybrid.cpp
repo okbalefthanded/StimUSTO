@@ -167,7 +167,7 @@ void Hybrid::fromVariant(const QVariant &variant)
     m_SSVEPparadigm->setNrSequences(map.value("SSVEP_nrSequences").toInt());
     m_SSVEPparadigm->setNrElements(map.value("SSVEP_nrElements").toInt());
     m_SSVEPparadigm->setFrequencies(map.value("SSVEP_frequencies").toString());
-    m_SSVEPparadigm->setStimulationMode(map.value("SSVEP_stimulationMode").toInt());
+    m_SSVEPparadigm->setStimulationMode(map.value("SSVEP_stimulationMode").toString().toUpper());
     m_SSVEPparadigm->setStimulationType(map.value("SSVEP_stimulationType").toString().toUpper());
 
     str = map.value("SSVEP_desiredPhrase").toString();

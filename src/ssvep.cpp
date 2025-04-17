@@ -15,7 +15,7 @@ SSVEP::SSVEP(QString mode, QString control,
              quint8 nrSeq, QString sType,
              QString phrase, QString ip,
              quint8 nElements, QString frequnecies,
-             quint8 stimulationMode):
+             QString stimulationMode):
     Paradigm(mode, control,
                type, comm,
                dur, bDur,
@@ -54,7 +54,7 @@ void SSVEP::fromVariant(const QVariant &variant)
     m_map = map;
 
     m_experimentMode = map.value("experimentMode").toString().toUpper();
-    m_controlMode = map.value("controlMode").toInt();
+    m_controlMode = map.value("controlMode").toString().toUpper();
 
     if(map.value("externalComm").isNull())
     {
@@ -63,7 +63,7 @@ void SSVEP::fromVariant(const QVariant &variant)
     }
     else
     {
-        m_externalComm    = map.value("externalComm").toInt();
+        m_externalComm    = map.value("externalComm").toString().toUpper();
         m_externalAddress = map.value("ip").toString();
     }
     m_type = map.value("paradigmType").toString().toUpper();
@@ -71,7 +71,7 @@ void SSVEP::fromVariant(const QVariant &variant)
     m_breakDuration = map.value("breakDuration").toInt();
     m_nrSequences   = map.value("nrSequences").toInt();
     m_desiredPhrase = map.value("desiredPhrase").toString();
-    m_stimulationType = map.value("stimulationType").toInt();
+    m_stimulationType = map.value("stimulationType").toString().toUpper();
     // m_nrElements = map.value("nrElements").toInt();
     if (map.value("nrElements").isNull())
     {
@@ -82,7 +82,8 @@ void SSVEP::fromVariant(const QVariant &variant)
         m_nrElements = map.value("nrElements").toInt();
     }
     m_frequencies = map.value("frequencies").toString();
-    m_stimulationMode = map.value("stimulationMode").toInt();
+    // m_stimulationMode = map.value("stimulationMode").toInt();
+    m_stimulationMode = map.value("stimulationMode").toString().toUpper();
 }
 
 quint8 SSVEP::nrElements() const
@@ -105,12 +106,12 @@ void SSVEP::setFrequencies(const QString &frequencies)
     m_frequencies = frequencies;
 }
 
-quint8 SSVEP::stimulationMode() const
+QString SSVEP::stimulationMode() const
 {
     return m_stimulationMode;
 }
 
-void SSVEP::setStimulationMode(const quint8 &stimulationMode)
+void SSVEP::setStimulationMode(const QString &stimulationMode)
 {
     m_stimulationMode = stimulationMode;
 }

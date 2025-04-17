@@ -14,7 +14,7 @@ public:
                    quint8 nrSeq, QString sType,
                    QString phrase, QString ip,
                    quint8 nElements, QString frequnecies,
-                   quint8 stimulationMode);
+                   QString stimulationMode);
 
     QVariant toVariant() const override;
     void fromVariant(const QVariant& variant) override;
@@ -25,13 +25,13 @@ public:
     QString frequencies() const;
     void setFrequencies(const QString &frequencies);
 
-    quint8 stimulationMode() const;
-    void setStimulationMode(const quint8 &stimulationMode);
+    QString stimulationMode() const;
+    void setStimulationMode(const QString &stimulationMode);
 
 private:
     quint8 m_nrElements;
     QString m_frequencies;
-    quint8 m_stimulationMode;
+    QString m_stimulationMode;
     // quint8 m_stimShape;
 
 };

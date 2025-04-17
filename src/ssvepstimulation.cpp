@@ -69,7 +69,7 @@ void SSVEPstimulation::initializeGL()
     {
         // phase = config::PHASE * ((i+1)%2);
         phase = config::PHASE * (i%2);
-        m_flicker[i] = utils::gen_flick(m_frequencies[i], config::REFRESH_RATE, m_ssvep->stimulationDuration(), m_ssvep->stimulationMode(), phase);
+     //   m_flicker[i] = utils::gen_flick(m_frequencies[i], config::REFRESH_RATE, m_ssvep->stimulationDuration(), m_ssvep->stimulationMode(), phase);
     }
 
     // Application-specific initialization
