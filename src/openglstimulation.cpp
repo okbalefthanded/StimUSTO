@@ -17,10 +17,6 @@ OpenGLStimulation::OpenGLStimulation(SSVEP *paradigm)
     correctortimer = new QElapsedTimer();
     QString loggerFname = QCoreApplication::applicationDirPath() + "/frame_log_win11_" + QDateTime::currentDateTime().toString("yyyy_MM_dd_HH.mm.ss.zzz") + ".csv";
     logger = new FrameLogger(loggerFname);
-    // qDebug()<< Q_FUNC_INFO << "finishing creating SSVEP";
-
-    // initElements ?
-    // initElements();
 }
 // OpenGL window interface
 void OpenGLStimulation::initializeGL()

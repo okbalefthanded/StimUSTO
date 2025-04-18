@@ -1,6 +1,7 @@
 #ifndef LAYOUT_H
 #define LAYOUT_H
 
+#include <QVariantMap>
 #include <QObject>
 #include <QColor>
 //
@@ -15,6 +16,7 @@ public:
                     float flickerdimension, int vSpace,
                     int hSpace
                    );
+    Layout(QVariantMap settings);
     ~Layout();
 
     QString shape() const;
@@ -49,6 +51,52 @@ protected:
     float m_flickerDimension = 3.7;
     int m_verticalSpace   = 0;
     int m_horizontalSpace = 0;
+
 };
+
+class Grid: public Layout
+{
+    Q_OBJECT
+public:
+    explicit Grid(QString shape, QColor background,
+                    QColor flickerColor, QColor centerColor,
+                    float flickerdimension, int vSpace,
+                    int hSpace, int rows, int cols
+                    );
+    Grid(QVariantMap settings);
+    ~Grid();
+
+
+public:
+    int rows() const;
+    void setRows(int newRows);
+
+    int cols() const;
+    void setCols(int newCols);
+
+protected:
+    int m_rows;
+    int m_cols;
+};
+
+class Circular : public Layout
+{
+    Q_OBJECT
+
+public:
+    explicit Circular(QString shape, QColor background,
+                      QColor flickerColor, QColor centerColor,
+                      float flickerdimension, int vSpace,
+                      int hSpace, int radius
+                      );
+
+    Circular(QVariantMap settings);
+    ~Circular();
+
+protected:
+    int m_radius;
+
+};
+
 
 #endif // LAYOUT_H

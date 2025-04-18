@@ -73,6 +73,7 @@ HEADERS  += include\configpanel.h \
     include/hybridssvep.h \
     include/hybridstimulation.h \
     include/layout.h \
+    include/layoutfactory.h \
     include/multistimuli.h \
     include/newconfigpanel.h \
     include/openglstimulation.h \

@@ -1,7 +1,7 @@
 //
 #include "layout.h"
 //
-
+// Layout Super Class
 Layout::Layout(QString shape, QColor background,
                QColor flickerColor, QColor centerColor,
                float flickerdimension, int vSpace,
@@ -83,8 +83,48 @@ void Layout::setFlickerDimension(float newFlickerDimension)
     m_flickerDimension = newFlickerDimension;
 }
 
-
 // Destructor
 Layout::~Layout(){}
 
 
+// Sub Classes : grid, circular
+
+// Grid
+Grid::Grid(QString shape, QColor background,
+           QColor flickerColor, QColor centerColor,
+           float flickerdimension, int vSpace,
+           int hSpace, int rows, int cols):
+    Layout(shape, background, flickerColor, centerColor,
+             flickerdimension, vSpace, hSpace),
+    m_rows(rows), m_cols(cols)
+{}
+
+int Grid::rows() const
+{
+    return m_rows;
+}
+
+void Grid::setRows(int newRows)
+{
+    m_rows = newRows;
+}
+
+int Grid::cols() const
+{
+    return m_cols;
+}
+
+void Grid::setCols(int newCols)
+{
+    m_cols = newCols;
+}
+
+// Circular
+
+Circular::Circular(QString shape, QColor background,
+                   QColor flickerColor, QColor centerColor,
+                   float flickerdimension, int vSpace,
+                   int hSpace, int radius):
+    Layout(shape, background, flickerColor, centerColor,
+             flickerdimension, vSpace, hSpace), m_radius(radius)
+{   }

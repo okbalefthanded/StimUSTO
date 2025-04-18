@@ -8,6 +8,7 @@
 SSVEPStimulation::SSVEPStimulation(SSVEP *t_ssvep)
 {
     setParadigm(t_ssvep);
+    qDebug()<< Q_FUNC_INFO << t_ssvep->map();
     // create SSVEP OpenGLStimulation
     createLayout();
     // init the rest
