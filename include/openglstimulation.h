@@ -70,7 +70,11 @@ protected:
     void initCircles();
     void initSquares();
 
+    void initIndicesCircles();
+    void initIndicesSquares();
 
+    void initColorsCircles();
+    void initColorsSquares();
 
     void highlightTarget(){};
     void highlightFeedback(QVector3D feedbackColor, int feedbackIndex);

@@ -233,100 +233,30 @@ void OpenGLStimulation::initFlickers()
 
 void OpenGLStimulation::initColors()
 {
-    // int vectorsSize = (m_ssvep->nrElements() * m_vertexPerCircle) + m_ssvep->nrElements();
-    int elements = m_frequencies.length();
-    int vectorsSize = (elements * m_vertexPerCircle) + elements;
-    m_colors.resize(vectorsSize);
 
-
-    for (int i=0; i<m_colors.count(); i++)
+    if(m_layout->flickerShape().compare("square") == 0)
     {
-        if (i < m_colors.count() - elements)
-        {
-            m_colors[i] = glColors::white;
-        }
-        else
-        {
-            m_colors[i] = glColors::red; // center points //TODO convert colors to glcolor
-        }
+        // TODO
+        initColorsSquares();
     }
 
-    /*
-    if(m_ssvep->controlMode() == control_mode::SYNC)
+    else if (m_layout->flickerShape().compare("circle") == 0)
     {
-        for (int i=0; i<m_colors.count(); i++)
-        {
-            if (i < m_colors.count() - m_ssvep->nrElements())
-            {
-                m_colors[i] = glColors::white;
-            }
-            else
-            {
-                m_colors[i] = glColors::red;
-            }
-        }
+        initColorsCircles();
     }
-    else
-    {
-        // init colors
-        // center idle stim
-        for (int i=0; i<m_vertexPerCircle; ++i)
-        {
-            m_colors[i] = glColors::gray;
-        }
-
-        for (int i=m_vertexPerCircle; i<m_colors.count(); i++)
-        {
-            if (i < m_colors.count() - m_ssvep->nrElements())
-            {
-                m_colors[i] = glColors::white;
-            }
-            else
-            {
-                m_colors[i] = glColors::red;
-            }
-        }
-    }
-
-    */
-
 }
 
 void OpenGLStimulation::initIndices()
 {
-    // init indices
-    // int circleCount = m_ssvep->nrElements();
-    int circleCount = m_frequencies.count();
-
-    m_vindices.resize(3*(m_vertexPerCircle*circleCount-(circleCount*2)));
-    // m_centerindices.resize(m_ssvep->nrElements());
-    m_centerindices.resize(circleCount);
-
-    int circleIndices = 3*glUtils::SIDES_PER_CIRCLE;
-    int k = 0;
-
-    for (int i=0; i<m_vindices.count(); i+=3)
+    if(m_layout->flickerShape().compare("square") == 0)
     {
-        if((i%3)==0)
-        {
-            m_vindices[i] = m_vertexPerCircle * (i / circleIndices);
-        }
-
-        if( (i % circleIndices) == 0)
-        {
-            k = m_vindices[i];
-        }
-
-        m_vindices[i+1] = k+1;
-        m_vindices[i+2] = k+2;
-        k++;
+        // TODO
+        initIndicesSquares();
     }
 
-    // int centerStart = m_vertices.count() - m_ssvep->nrElements();
-    int centerStart = m_vertices.count() - circleCount;
-    for (int i=0; i<m_centerindices.count(); ++i)
+    else if (m_layout->flickerShape().compare("circle") == 0)
     {
-        m_centerindices[i] = centerStart + i;
+        initIndicesCircles();
     }
 }
 
@@ -394,7 +324,136 @@ void OpenGLStimulation::initCentersCircular()
 void OpenGLStimulation::initSquares()
 {
     // TODO
+    float pixelSize = m_layout->flickerDimension(); // length of a stimulus vertex in pixels
+    int n_elements  = m_frequencies.length();
+    QSize screenSize = utils::getScreenSize();
+    double dx = pixelSize / screenSize.width();
+    double dy = pixelSize / screenSize.height();
+    int isNullX = 0, isNullY = 0, sx=1;
+    int offset;
+
+    int vectorsSize = n_elements * glUtils::POINTS_PER_SQUARE;
+    // int vectorsSize = glUtils::VERTICES_PER_TRIANGLE * (m_ssvep->nrElements()) * glUtils::TRIANGLES_PER_SQUARE;
+    vectorsSize += n_elements;
+    m_vertices.resize(vectorsSize);
+
+    int k=0; // centers index counter
+
+    /*
+    if( m_ssvep->controlMode() == control_mode::SYNC)
+    {
+        offset = glUtils::POINTS_PER_SQUARE;
+    }
+    else
+    {
+        offset = 0;
+    }
+
+    */
+
+    offset = glUtils::POINTS_PER_SQUARE;
+
+    for(int i=0;i<m_vertices.count() - n_elements; i+=glUtils::POINTS_PER_SQUARE)
+    {
+        //  m_vertices[i] = refPoints::topPoints[(i+offset)/glUtils::POINTS_PER_SQUARE];
+        m_vertices[i] = m_centerPoints[(i+offset)/glUtils::POINTS_PER_SQUARE];
+        sx = 1;
+        for(int j=i+1; j<i+glUtils::POINTS_PER_SQUARE; ++j)
+        {
+            isNullX = j % 2;
+            isNullY = (j+1) % 2;
+            m_vertices[j].setX(m_vertices[j-1].x() + (dx * isNullX * sx));
+            m_vertices[j].setY(m_vertices[j-1].y() - (dy * isNullY));
+            m_vertices[j].setZ(refPoints::topPoints[0].z());
+            sx--;
+            // calculate center point
+            // if (j==(i+2))
+            //{
+            //    m_centers[k].setX((m_vertices[j].x() + m_vertices[i].x()) / 2);
+            //    m_centers[k].setY((m_vertices[j].y() + m_vertices[i].y()) / 2);
+            //    m_centers[k].setZ(refPoints::topPoints[0].z());
+            //    ++k;
+            //}
+        }
+    }
+
+    k = m_vertices.count() - n_elements;
+
+    int i =0;
+    for (int ind=k; ind<m_vertices.count(); ++ind)
+    {
+        m_vertices[ind] = m_centerPoints[i];
+        ++i;
+    }
 }
+
+void OpenGLStimulation::initIndicesCircles()
+{
+    // init indices
+    // int circleCount = m_ssvep->nrElements();
+    int circleCount = m_frequencies.count();
+
+    m_vindices.resize(3*(m_vertexPerCircle*circleCount-(circleCount*2)));
+    // m_centerindices.resize(m_ssvep->nrElements());
+    m_centerindices.resize(circleCount);
+
+    int circleIndices = 3*glUtils::SIDES_PER_CIRCLE;
+    int k = 0;
+
+    for (int i=0; i<m_vindices.count(); i+=3)
+    {
+        if((i%3)==0)
+        {
+            m_vindices[i] = m_vertexPerCircle * (i / circleIndices);
+        }
+
+        if( (i % circleIndices) == 0)
+        {
+            k = m_vindices[i];
+        }
+
+        m_vindices[i+1] = k+1;
+        m_vindices[i+2] = k+2;
+        k++;
+    }
+
+    // int centerStart = m_vertices.count() - m_ssvep->nrElements();
+    int centerStart = m_vertices.count() - circleCount;
+    for (int i=0; i<m_centerindices.count(); ++i)
+    {
+        m_centerindices[i] = centerStart + i;
+    }
+}
+
+void OpenGLStimulation::initIndicesSquares()
+{
+    // init indices
+    int n_elements = m_frequencies.length();
+
+    m_vindices.resize(n_elements * glUtils::INDICES_PER_SQUARE);
+    m_centerindices.resize(n_elements);
+
+    int k=0; int val = 0;
+    for(int i=0; i<(n_elements*glUtils::INDICES_PER_SQUARE); i+=glUtils::INDICES_PER_SQUARE)
+    {
+        val = 2*k;
+        m_vindices[i] =  val;
+        m_vindices[i+1] = val + 1;
+        m_vindices[i+2] = val + 2;
+        m_vindices[i+3] = m_vindices[i];
+        m_vindices[i+4] = m_vindices[i+2];
+        m_vindices[i+5] = val + 3;
+        k +=2;
+    }
+
+    int centerStart = m_vertices.count() - n_elements;
+
+    for (int i=0;i<m_centerindices.count();++i)
+    {
+        m_centerindices[i] = centerStart + i;
+    }
+}
+
 
 
 void OpenGLStimulation::initCircles()
@@ -425,8 +484,6 @@ void OpenGLStimulation::initCircles()
     }
     */
 
-    m_centers.resize(elements);
-
     for (int j = start; j<elements; ++j)
     {
         x = m_centerPoints[j].x();
@@ -456,6 +513,74 @@ void OpenGLStimulation::initCircles()
         ++i;
     }
 }
+
+
+void OpenGLStimulation::initColorsCircles()
+{
+    // int vectorsSize = (m_ssvep->nrElements() * m_vertexPerCircle) + m_ssvep->nrElements();
+    int elements = m_frequencies.length();
+    int vectorsSize = (elements * m_vertexPerCircle) + elements;
+    m_colors.resize(vectorsSize);
+
+
+    for (int i=0; i<m_colors.count(); i++)
+    {
+        if (i < m_colors.count() - elements)
+        {
+            m_colors[i] = glColors::white;
+        }
+        else
+        {
+            m_colors[i] = glColors::red; // center points //TODO convert colors to glcolor
+        }
+    }
+
+    /*
+    if(m_ssvep->controlMode() == control_mode::SYNC)
+    {
+        for (int i=0; i<m_colors.count(); i++)
+        {
+            if (i < m_colors.count() - m_ssvep->nrElements())
+            {
+                m_colors[i] = glColors::white;
+            }
+            else
+            {
+                m_colors[i] = glColors::red;
+            }
+        }
+    }
+    else
+    {
+        // init colors
+        // center idle stim
+        for (int i=0; i<m_vertexPerCircle; ++i)
+        {
+            m_colors[i] = glColors::gray;
+        }
+
+        for (int i=m_vertexPerCircle; i<m_colors.count(); i++)
+        {
+            if (i < m_colors.count() - m_ssvep->nrElements())
+            {
+                m_colors[i] = glColors::white;
+            }
+            else
+            {
+                m_colors[i] = glColors::red;
+            }
+        }
+    }
+
+    */
+
+}
+
+void OpenGLStimulation::initColorsSquares()
+{
+
+}
+
 
 void OpenGLStimulation::refreshFlickers()
 {
