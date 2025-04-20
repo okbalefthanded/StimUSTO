@@ -5,17 +5,17 @@
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLFunctions>
-#include <QTimer>
-#include <QUdpSocket>
-#include <QTimer>
 #include <QOpenGLBuffer>
-#include <QVector3D>
-#include <QDebug>
-#include <QTcpSocket>
 #include <QElapsedTimer>
+#include <QUdpSocket>
+#include <QTcpSocket>
+#include <QVector3D>
+#include <QTimer>
+#include <QDebug>
 //
 #include "ssvep.h"
 #include "logger.h"
+#include "layout.h"
 #include "framelogger.h"
 
 class OpenGLStimulation : public QOpenGLWindow, protected QOpenGLFunctions
@@ -63,6 +63,15 @@ protected:
     //    bool isTarget();
     void initFormat();
     void initIntensity(int t_stimDur, QString t_stimMode);
+
+    void initCentersGrid();
+    void initCentersCircular();
+
+    void initCircles();
+    void initSquares();
+
+
+
     void highlightTarget(){};
     void highlightFeedback(QVector3D feedbackColor, int feedbackIndex);
     void refreshTarget(){};
@@ -80,6 +89,7 @@ protected:
     int m_lostFrames = 0;
     //
     SSVEP *m_ssvep;
+    Layout *m_layout;
     QVector<double> m_frequencies;
     QColor m_externalFeedbackColor = Qt::red;
 

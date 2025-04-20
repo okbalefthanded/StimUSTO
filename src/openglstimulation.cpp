@@ -1,15 +1,16 @@
 #include <QPainter>
 //
 #include "openglstimulation.h"
+#include "layoutfactory.h"
 #include "glutils.h"
 #include "utils.h"
 //
 OpenGLStimulation::OpenGLStimulation(SSVEP *paradigm)
 {
     // qDebug()<< Q_FUNC_INFO;
-
     setFrequencies(paradigm->frequencies());
     initFormat();
+    m_layout = LayoutFactory::layoutFactory(paradigm->map());
     // set m_flicker size and fill the flickering values (jfpm etc)
     m_flicker.resize(m_frequencies.size());
     initIntensity(paradigm->stimulationDuration(), paradigm->stimulationMode()); // flicker values
@@ -149,9 +150,7 @@ void OpenGLStimulation::update()
 void OpenGLStimulation::initElements()
 {
     // init vectors
-    // int m_vertexPerCircle = glUtils::SIDES_PER_CIRCLE + 2;
     m_vertexPerCircle = glUtils::SIDES_PER_CIRCLE + 2;
-
 
     // int vectorsSize = (m_ssvep->nrElements() * m_vertexPerCircle) + m_ssvep->nrElements();
     int vectorsSize = (m_frequencies.length() * m_vertexPerCircle) + m_frequencies.length();
@@ -181,15 +180,25 @@ void OpenGLStimulation::initIntensity(int t_stimDur, QString t_stimMode)
                                         t_stimDur,
                                         t_stimMode,
                                         phase);
-                                       // m_ssvep->stimulationDuration(),
-                                       // m_ssvep->stimulationMode(), phase);
     }
 }
 
 void OpenGLStimulation::initCenters()
 {
+    if(m_layout->shape().compare("grid", Qt::CaseInsensitive) == 0)
+    {
+        // TODO
+        initCentersGrid();
+    }
+    else if(m_layout->shape().compare("circular", Qt::CaseInsensitive) == 0)
+    {
+        // TODO
+        initCentersCircular();
+    }
+
+    /*
     // int n_elements = m_ssvep->nrElements();
-    int n_elements = m_frequencies.length();
+    int n_elements   = m_frequencies.length();
     QSize screenSize = utils::getScreenSize();
     float radiusx = glUtils::STIM_RADIUS / (screenSize.width() * glUtils::PIXEL_CM);
     float radiusy = glUtils::STIM_RADIUS / (screenSize.height() * glUtils::PIXEL_CM);
@@ -203,96 +212,30 @@ void OpenGLStimulation::initCenters()
         m_centerPoints[j].setX(refPoints::grid_centers[j].x());
         m_centerPoints[j].setY(refPoints::grid_centers[j].y());
         m_centerPoints[j].setZ(refPoints::grid_centers[j].z());
-
-        /*
-
-        if(m_ssvep->stimulationType() == speller_type::SSVEP_CIRCLE)
-        {
-            // circles center points
-            m_centerPoints[j].setX(refPoints::centers[j].x());
-            m_centerPoints[j].setY(refPoints::centers[j].y());
-            m_centerPoints[j].setZ(refPoints::centers[j].z());
-        }
-        else if(m_ssvep->stimulationType() == speller_type::SSVEP_GRID)
-        {
-            m_centerPoints[j].setX(refPoints::grid_centers[j].x());
-            m_centerPoints[j].setY(refPoints::grid_centers[j].y());
-            m_centerPoints[j].setZ(refPoints::grid_centers[j].z());
-        }
-
-        */
     }
-
+    */
 }
 
 void OpenGLStimulation::initFlickers()
 {
-    float twicePi = 2.0f * M_PI;
-    int start = 0;
-    int stop  = m_vertexPerCircle;
-    int k=0;
-    //int elements = m_ssvep->nrElements();
-    int elements = m_frequencies.length();
 
-    QSize screenSize = utils::getScreenSize();
-    float radiusx = glUtils::RADIUS_CM / (screenSize.width() * glUtils::PIXEL_CM);
-    float radiusy = glUtils::RADIUS_CM / (screenSize.height() * glUtils::PIXEL_CM);
-    float x, y, z, xx, yy;
-
-
-    /*
-    if(m_ssvep->controlMode() == control_mode::SYNC)
+    if(m_layout->flickerShape().compare("square") == 0)
     {
-        start = 0;
-    }
-    else
-    {
-        --elements;
-    }
-    */
-
-    // m_centers.resize(m_ssvep->nrElements());
-    m_centers.resize(elements);
-
-    for (int j = start; j<elements; ++j)
-    {
-
-        x = m_centerPoints[j].x();
-        y = m_centerPoints[j].y();
-        z = m_centerPoints[j].z();
-
-        setVertex(k, x, y, z);
-
-        // circles vertices
-        for ( int i = k+1; i < stop; i++ )
-        {
-
-            xx = (x + (radiusx * cos(i * twicePi / glUtils::SIDES_PER_CIRCLE)));
-            yy = (y + (radiusy * sin(i * twicePi /glUtils::SIDES_PER_CIRCLE)));
-            setVertex(i, xx, yy, z);
-        }
-        k = stop;
-        stop += m_vertexPerCircle;
+        // TODO
+        initSquares();
     }
 
-    // k = m_vertices.count() - m_ssvep->nrElements();
-    k = m_vertices.count() - elements;
-
-    // center points vertices
-    int i=start;
-    for (int ind=k; ind<m_vertices.count();++ind)
+    else if (m_layout->flickerShape().compare("circle") == 0)
     {
-        setVertex(ind, m_centerPoints[i].x(), m_centerPoints[i].y(), m_centerPoints[i].z());
-        ++i;
+        initCircles();
     }
-
 }
 
 void OpenGLStimulation::initColors()
 {
     // int vectorsSize = (m_ssvep->nrElements() * m_vertexPerCircle) + m_ssvep->nrElements();
-    int vectorsSize = (m_frequencies.length() * m_vertexPerCircle) + m_frequencies.length();
     int elements = m_frequencies.length();
+    int vectorsSize = (elements * m_vertexPerCircle) + elements;
     m_colors.resize(vectorsSize);
 
 
@@ -304,7 +247,7 @@ void OpenGLStimulation::initColors()
         }
         else
         {
-            m_colors[i] = glColors::red;
+            m_colors[i] = glColors::red; // center points //TODO convert colors to glcolor
         }
     }
 
@@ -384,6 +327,133 @@ void OpenGLStimulation::initIndices()
     for (int i=0; i<m_centerindices.count(); ++i)
     {
         m_centerindices[i] = centerStart + i;
+    }
+}
+
+void OpenGLStimulation::initCentersGrid()
+{
+    Grid *g = qobject_cast<Grid*>(m_layout);
+
+    QSize screenSize   = utils::getScreenSize();
+    int n_elements     = m_frequencies.length();
+    int rows = g->rows();
+    int cols = g->cols();
+    int elementsPerRow = n_elements / rows;
+    int elementsPerCol = n_elements / cols;
+    int k = 0;
+    float xCoord, yCoord;
+    QPointF openglCoord;
+
+    int vSpace = (g->verticalSpace() == 0) ? screenSize.height() / (elementsPerCol + 1) : g->verticalSpace();
+    int hSpace = (g->horizontalSpace() == 0) ? screenSize.width() / (elementsPerRow + 1) : g->horizontalSpace();
+
+    m_centerPoints.resize(n_elements);
+
+    for(int i=0; i< rows; ++i)
+    {
+        for(int j=0; j< cols; ++j)
+        {
+            xCoord = hSpace + (hSpace * j);
+            yCoord = vSpace + (vSpace * i);
+
+            openglCoord = openGLCoordinates(xCoord, yCoord, screenSize);
+
+            m_centerPoints[k].setX(openglCoord.x());
+            m_centerPoints[k].setY(openglCoord.y());
+            m_centerPoints[k].setZ(1.0f);
+            ++k;
+        }
+    }
+}
+
+void OpenGLStimulation::initCentersCircular()
+{
+    // TODO
+    Circular *c = qobject_cast<Circular*>(m_layout);
+
+    int n_elements   = m_frequencies.length();
+    QSize screenSize = utils::getScreenSize();
+    float radiusx = c->radius() / screenSize.width();
+    float radiusy = c->radius() / screenSize.height();
+    int start  = 0;
+    qreal angle= 0;
+
+    m_centerPoints.resize(n_elements);
+    // m_centerPoints[0] = QVector3D(0.0f, 0.0f, 1.0f);
+
+    for(int i=start; i<n_elements; ++i)
+    {
+        // angle = (i * 2 * M_PI) / (n_elements - 1);
+        angle = (i * 2 * M_PI) / n_elements;
+        m_centerPoints[i].setX(radiusx * cos(angle));
+        m_centerPoints[i].setY(radiusy * sin(angle));
+        m_centerPoints[i].setZ(1.0f);
+    }
+}
+
+void OpenGLStimulation::initSquares()
+{
+    // TODO
+}
+
+
+void OpenGLStimulation::initCircles()
+{
+    float twicePi = 2.0f * M_PI;
+    int start = 0;
+    int stop  = m_vertexPerCircle;
+    int k=0;
+    int elements = m_frequencies.length();
+
+    QSize screenSize = utils::getScreenSize();
+
+    float radiusx = m_layout->flickerDimension() / screenSize.width();
+    float radiusy = m_layout->flickerDimension() / screenSize.height();
+
+    // float radiusx = glUtils::RADIUS_CM / (screenSize.width() * glUtils::PIXEL_CM);
+    // float radiusy = glUtils::RADIUS_CM / (screenSize.height() * glUtils::PIXEL_CM);
+    float x, y, z, xx, yy;
+
+    /*
+    if(m_ssvep->controlMode() == control_mode::SYNC)
+    {
+        start = 0;
+    }
+    else
+    {
+        --elements;
+    }
+    */
+
+    m_centers.resize(elements);
+
+    for (int j = start; j<elements; ++j)
+    {
+        x = m_centerPoints[j].x();
+        y = m_centerPoints[j].y();
+        z = m_centerPoints[j].z();
+
+        setVertex(k, x, y, z);
+
+        // circles vertices
+        for ( int i = k+1; i < stop; i++ )
+        {
+            xx = (x + (radiusx * cos(i * twicePi / glUtils::SIDES_PER_CIRCLE)));
+            yy = (y + (radiusy * sin(i * twicePi /glUtils::SIDES_PER_CIRCLE)));
+            setVertex(i, xx, yy, z);
+        }
+        k = stop;
+        stop += m_vertexPerCircle;
+    }
+
+    k = m_vertices.count() - elements;
+
+    // center points vertices
+    int i=start;
+    for (int ind=k; ind<m_vertices.count();++ind)
+    {
+        setVertex(ind, m_centerPoints[i].x(), m_centerPoints[i].y(), m_centerPoints[i].z());
+        ++i;
     }
 }
 

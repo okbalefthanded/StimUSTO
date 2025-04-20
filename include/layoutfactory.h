@@ -2,6 +2,7 @@
 #define LAYOUTFACTORY_H
 
 #include <QVariantMap>
+#include <QDebug>
 //
 #include "layout.h"
 

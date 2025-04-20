@@ -86,6 +86,7 @@ HEADERS  += include\configpanel.h \
     include/ssvepdircircle.h \
     include/ssvepdirection.h \
     include/ssvepstimulation_.h \
+    include/ssvepstimulationfactory.h \
     include/stimulation.h \
     include/ssvepstimulation.h \
     include/visualspeller.h \

@@ -561,9 +561,9 @@ SSVEPStimulation *ConfigPanel::createSSVEP(SSVEP *t_ssvep, int t_port)
     // format.setVersion(3, 0); // ANGLE supports ES 3.0, higher versions raise exceptions
     // format.setVersion(4, 5); // HP ProBook
 
-    // PhoneKeypad *ssvepStimulation = new PhoneKeypad(t_ssvep, t_port);
-    // SsvepGL *ssvepStimulation = new SsvepGL(t_ssvep, t_port);
-    // SsvepCircle *ssvepStimulation = new SsvepCircle(t_ssvep, t_port);
+    // PhoneKeypad *ssvepStimulation    = new PhoneKeypad(t_ssvep, t_port);
+    // SsvepGL *ssvepStimulation        = new SsvepGL(t_ssvep, t_port);
+    // SsvepCircle *ssvepStimulation    = new SsvepCircle(t_ssvep, t_port);
     // SsvepDirection *ssvepStimulation = new SsvepDirection(t_ssvep, t_port);
     // SSVEPstimulation *ssvepStimulation;
   /*

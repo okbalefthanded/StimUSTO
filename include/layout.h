@@ -12,9 +12,9 @@ class Layout : public QObject
 
 public:
     explicit Layout(QString shape, QColor background,
-                    QColor flickerColor, QColor centerColor,
-                    float flickerdimension, int vSpace,
-                    int hSpace
+                    QString flickerShape, QColor flickerColor,
+                    QColor centerColor, float flickerdimension,
+                    int vSpace, int hSpace
                    );
     Layout(QVariantMap settings);
     ~Layout();
@@ -43,14 +43,22 @@ public:
     float flickerDimension() const;
     void setFlickerDimension(float newFlickerDimension);
 
+
+
+    QString flickerShape() const;
+    void setFlickerShape(const QString &newFlickerShape);
+
 protected:
     QString m_shape;
     QColor m_backgroundColor = Qt::black;
+    QString m_flickerShape = "circle";
     QColor m_flickerColor = Qt::white;
     QColor m_centerColor  = Qt::red;
     float m_flickerDimension = 3.7;
-    int m_verticalSpace   = 0;
-    int m_horizontalSpace = 0;
+    int m_verticalSpace   = 0; // in pixels
+    int m_horizontalSpace = 0; // in pixels
+
+    void createFlickerDimension(QVariantMap &settings);
 
 };
 
@@ -58,7 +66,7 @@ class Grid: public Layout
 {
     Q_OBJECT
 public:
-    explicit Grid(QString shape, QColor background,
+    explicit Grid(QString shape, QColor background, QString fShape,
                     QColor flickerColor, QColor centerColor,
                     float flickerdimension, int vSpace,
                     int hSpace, int rows, int cols
@@ -84,7 +92,7 @@ class Circular : public Layout
     Q_OBJECT
 
 public:
-    explicit Circular(QString shape, QColor background,
+    explicit Circular(QString shape, QColor background, QString fShape,
                       QColor flickerColor, QColor centerColor,
                       float flickerdimension, int vSpace,
                       int hSpace, int radius
@@ -93,8 +101,11 @@ public:
     Circular(QVariantMap settings);
     ~Circular();
 
+    float radius() const;
+    void setRadius(float newRadius);
+
 protected:
-    int m_radius;
+    float m_radius;
 
 };
 

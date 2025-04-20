@@ -1,8 +1,10 @@
 #ifndef GLUTILS_H
 #define GLUTILS_H
 //
+#include "qsize.h"
 #include<QVector>
 #include<QVector3D>
+#include <QDebug>
 
 namespace glUtils {
 
@@ -130,6 +132,19 @@ static const QVector<QVector3D> dcenters =
     QVector3D(-0.45f, -0.60f, 1.0f), QVector3D(0.0f, -0.60f, 1.0f), QVector3D(0.45f, -0.60f, 1.0f)
 
 };
+}
+
+static const QPointF openGLCoordinates(int pixelX, int pixelY, QSize screenSize)
+{
+    // Normalize to 0-1 range
+    float normalizedX = float(pixelX) / screenSize.width();
+    float normalizedY = float(pixelY) / screenSize.height();
+
+    // Remap to -1 to +1 range (and flip Y)
+    float ndcX = (normalizedX * 2.0f) - 1.0f;
+    float ndcY = (normalizedY * -2.0f) + 1.0f;
+
+    return QPointF(ndcX, ndcY);
 }
 
 
