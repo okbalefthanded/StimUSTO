@@ -548,11 +548,11 @@ void OpenGLStimulation::initColorsCircles()
     {
         if (i < m_colors.count() - m_elements)
         {
-            m_colors[i] = glColors::white;
+            m_colors[i] = m_layout->flickerColor(); //glColors::white;
         }
         else
         {
-            m_colors[i] = glColors::red; // center points //TODO convert colors to glcolor
+            m_colors[i] = m_layout->centerColor(); //glColors::red; // center points //TODO convert colors to glcolor
         }
     }
 
@@ -608,11 +608,11 @@ void OpenGLStimulation::initColorsSquares()
     {
         if (i < m_colors.count() - m_elements)
         {
-            m_colors[i] = glColors::white;
+            m_colors[i] = m_layout->flickerColor();  // glColors::white;
         }
         else
         {
-            m_colors[i] = glColors::red;
+            m_colors[i] = m_layout->centerColor(); //glColors::red;
         }
     }
 }
@@ -682,11 +682,11 @@ void OpenGLStimulation::refreshCircles(int feedbackIndex)
 {
     int circleIndex = m_vertexPerCircle*feedbackIndex;
     QVector3D color;
-    color = glColors::white;
+    // color = glColors::white;
 
     for(int i=circleIndex;i<circleIndex+m_vertexPerCircle; ++i)
     {
-        m_colors[i] = color;
+        m_colors[i] = m_layout->flickerColor();
     }
 
     scheduleRedraw();
@@ -698,10 +698,10 @@ void OpenGLStimulation::refreshSquares(int feedbackIndex)
     // int tmp = m_flickeringSequence->sequence[m_currentFlicker]-1;
     int squareIndex = feedbackIndex + (glUtils::VERTICES_PER_TRIANGLE * feedbackIndex);
 
-    m_colors[squareIndex] = glColors::white;
-    m_colors[squareIndex + 1] = glColors::white;
-    m_colors[squareIndex + 2] = glColors::white;
-    m_colors[squareIndex + 3] = glColors::white;
+    m_colors[squareIndex]     = m_layout->flickerColor(); //glColors::white;
+    m_colors[squareIndex + 1] = m_layout->flickerColor(); //glColors::white;
+    m_colors[squareIndex + 2] = m_layout->flickerColor(); //glColors::white;
+    m_colors[squareIndex + 3] = m_layout->flickerColor(); // glColors::white;
 }
 
 void OpenGLStimulation::scheduleRedraw()

@@ -1,6 +1,7 @@
 #ifndef GLUTILS_H
 #define GLUTILS_H
 //
+#include "qcolor.h"
 #include "qsize.h"
 #include<QVector>
 #include<QVector3D>
@@ -145,6 +146,18 @@ static const QPointF openGLCoordinates(int pixelX, int pixelY, QSize screenSize)
     float ndcY = (normalizedY * -2.0f) + 1.0f;
 
     return QPointF(ndcX, ndcY);
+}
+
+static const QVector3D qColorToOpenGLColor(QString color)
+{
+    QColor qtColor(color);
+    // Normalize the red, green, and blue components to the range [0.0, 1.0]
+    float red   = qtColor.redF();
+    float green = qtColor.greenF();
+    float blue  = qtColor.blueF();
+
+    // Create a QVector3D with the normalized color components
+    return QVector3D(red, green, blue);
 }
 
 

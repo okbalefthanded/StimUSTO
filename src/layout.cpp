@@ -1,9 +1,10 @@
 //
+#include "glutils.h"
 #include "layout.h"
 //
 // Layout Super Class
-Layout::Layout(QString shape, QColor background, QString flickerShape,
-               QColor flickerColor, QColor centerColor,
+Layout::Layout(QString shape, QVector3D background, QString flickerShape,
+               QVector3D flickerColor, QVector3D centerColor,
                float flickerdimension, int vSpace,
                int hSpace) : QObject(),
     m_shape(shape), m_backgroundColor(background),
@@ -15,11 +16,11 @@ Layout::Layout(QString shape, QColor background, QString flickerShape,
 Layout::Layout(QVariantMap settings)
 {
     m_shape = settings.value("layout_shape").toString();
-    m_backgroundColor = settings.value("background_color").toString();
+    m_backgroundColor = qColorToOpenGLColor(settings.value("background_color").toString());
     m_flickerShape    = settings.value("flicker_shape").toString();
     createFlickerDimension(settings);
-    m_flickerColor    = settings.value("flicker_color").toString();
-    m_centerColor     = settings.value("center_color").toString();
+    m_flickerColor    = qColorToOpenGLColor(settings.value("flicker_color").toString());
+    m_centerColor     = qColorToOpenGLColor(settings.value("center_color").toString());
     m_verticalSpace   = settings.value("vertical_space").toInt();
     m_horizontalSpace = settings.value("horizontal_space").toInt();
 }
@@ -36,32 +37,32 @@ void Layout::setShape(const QString &newShape)
     m_shape = newShape;
 }
 
-QColor Layout::backgroundColor() const
+QVector3D Layout::backgroundColor() const
 {
     return m_backgroundColor;
 }
 
-void Layout::setBackgroundColor(const QColor &newBackgroundColor)
+void Layout::setBackgroundColor(const QVector3D &newBackgroundColor)
 {
     m_backgroundColor = newBackgroundColor;
 }
 
-QColor Layout::flickerColor() const
+QVector3D Layout::flickerColor() const
 {
     return m_flickerColor;
 }
 
-void Layout::setFlickerColor(const QColor &newFlickerColor)
+void Layout::setFlickerColor(const QVector3D &newFlickerColor)
 {
     m_flickerColor = newFlickerColor;
 }
 
-QColor Layout::centerColor() const
+QVector3D Layout::centerColor() const
 {
     return m_centerColor;
 }
 
-void Layout::setCenterColor(const QColor &newCenterColor)
+void Layout::setCenterColor(const QVector3D &newCenterColor)
 {
     m_centerColor = newCenterColor;
 }
@@ -126,9 +127,9 @@ Layout::~Layout(){}
 // Sub Classes : grid, circular
 
 // Grid
-Grid::Grid(QString shape, QColor background,
-           QString fShape, QColor flickerColor,
-           QColor centerColor, float flickerdimension,
+Grid::Grid(QString shape, QVector3D background,
+           QString fShape, QVector3D flickerColor,
+           QVector3D centerColor, float flickerdimension,
            int vSpace, int hSpace, int rows, int cols):
     Layout(shape, background, fShape, flickerColor, centerColor,
              flickerdimension, vSpace, hSpace),
@@ -164,8 +165,8 @@ void Grid::setCols(int newCols)
 Grid::~Grid(){}
 // Circular
 
-Circular::Circular(QString shape, QColor background, QString fShape,
-                   QColor flickerColor, QColor centerColor,
+Circular::Circular(QString shape, QVector3D background, QString fShape,
+                   QVector3D flickerColor, QVector3D centerColor,
                    float flickerdimension, int vSpace,
                    int hSpace, int radius):
     Layout(shape, background, fShape, flickerColor, centerColor,

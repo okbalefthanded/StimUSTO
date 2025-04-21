@@ -1,6 +1,7 @@
 #ifndef LAYOUT_H
 #define LAYOUT_H
 
+#include "qvector3d.h"
 #include <QVariantMap>
 #include <QObject>
 #include <QColor>
@@ -11,9 +12,9 @@ class Layout : public QObject
     Q_OBJECT
 
 public:
-    explicit Layout(QString shape, QColor background,
-                    QString flickerShape, QColor flickerColor,
-                    QColor centerColor, float flickerdimension,
+    explicit Layout(QString shape, QVector3D background,
+                    QString flickerShape, QVector3D flickerColor,
+                    QVector3D centerColor, float flickerdimension,
                     int vSpace, int hSpace
                    );
     Layout(QVariantMap settings);
@@ -22,14 +23,14 @@ public:
     QString shape() const;
     void setShape(const QString &newShape);
 
-    QColor backgroundColor() const;
-    void setBackgroundColor(const QColor &newBackgroundColor);
+    QVector3D backgroundColor() const;
+    void setBackgroundColor(const QVector3D &newBackgroundColor);
 
-    QColor flickerColor() const;
-    void setFlickerColor(const QColor &newFlickerColor);
+    QVector3D flickerColor() const;
+    void setFlickerColor(const QVector3D &newFlickerColor);
 
-    QColor centerColor() const;
-    void setCenterColor(const QColor &newCenterColor);
+    QVector3D centerColor() const;
+    void setCenterColor(const QVector3D &newCenterColor);
 
     float flickerRadius() const;
     void setFlickerRadius(float newFlickerRadius);
@@ -43,17 +44,15 @@ public:
     float flickerDimension() const;
     void setFlickerDimension(float newFlickerDimension);
 
-
-
     QString flickerShape() const;
     void setFlickerShape(const QString &newFlickerShape);
 
 protected:
     QString m_shape;
-    QColor m_backgroundColor = Qt::black;
+    QVector3D m_backgroundColor; //= Qt::black;
     QString m_flickerShape = "circle";
-    QColor m_flickerColor = Qt::white;
-    QColor m_centerColor  = Qt::red;
+    QVector3D m_flickerColor; //= Qt::white;
+    QVector3D m_centerColor;//  = Qt::red;
     float m_flickerDimension = 3.7;
     int m_verticalSpace   = 0; // in pixels
     int m_horizontalSpace = 0; // in pixels
@@ -66,8 +65,8 @@ class Grid: public Layout
 {
     Q_OBJECT
 public:
-    explicit Grid(QString shape, QColor background, QString fShape,
-                    QColor flickerColor, QColor centerColor,
+    explicit Grid(QString shape, QVector3D background, QString fShape,
+                    QVector3D flickerColor, QVector3D centerColor,
                     float flickerdimension, int vSpace,
                     int hSpace, int rows, int cols
                     );
@@ -92,8 +91,8 @@ class Circular : public Layout
     Q_OBJECT
 
 public:
-    explicit Circular(QString shape, QColor background, QString fShape,
-                      QColor flickerColor, QColor centerColor,
+    explicit Circular(QString shape, QVector3D background, QString fShape,
+                      QVector3D flickerColor, QVector3D centerColor,
                       float flickerdimension, int vSpace,
                       int hSpace, int radius
                       );
@@ -108,6 +107,5 @@ protected:
     float m_radius;
 
 };
-
 
 #endif // LAYOUT_H
