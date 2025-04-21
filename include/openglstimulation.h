@@ -47,6 +47,7 @@ protected slots:
 
     void update();
 
+    virtual void initVectors();
     virtual void initCenters();
     virtual void initFlickers();
     virtual void initColors();
@@ -64,6 +65,9 @@ protected:
     void initFormat();
     void initIntensity(int t_stimDur, QString t_stimMode);
 
+    void initVectorsSquares();
+    void initVectorsCircles();
+
     void initCentersGrid();
     void initCentersCircular();
 
@@ -80,6 +84,13 @@ protected:
     void highlightFeedback(QVector3D feedbackColor, int feedbackIndex);
     void refreshTarget(){};
     void refresh(int feedbackIndex);
+
+    void highlightCircles(QVector3D feedbackColor, int feedbackIndex);
+    void highlightSquares(QVector3D feedbackColor, int feedbackIndex);
+
+    void refreshCircles(int feedbackIndex);
+    void refreshSquares(int feedbackIndex);
+
     void initLogger(){};
     void scheduleRedraw();
     void renderText(){};
@@ -112,6 +123,7 @@ protected:
     QOpenGLShaderProgram *m_programShader;
 
     int m_index;
+    int m_elements = 0;
     int m_vertexPerCircle;
     double time_tmp = 0;
     // QVector <QVector <int>> m_flicker;
